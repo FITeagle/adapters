@@ -1,0 +1,4 @@
+adapters
+========
+
+Resource Adapters
