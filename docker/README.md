@@ -1,11 +1,11 @@
 FITeagle :: Adapter :: Docker
 =============================
-Author: Alexander Willner
-Level: Demonstration
-Technologies: JMS, EJB, MDB
-Summary: Demonstrates the use of JMS 1.1 and EJB 3.1 Message-Driven Bean to implement a FITeagle Adapter for Docker
-Target Product: FITeagle
-Source: <https://github.com/fiteagle/adapters/>
+- Author: Alexander Willner
+- Level: Demonstration
+- Technologies: JMS, EJB, MDB
+- Summary: Demonstrates the use of JMS 1.1 and EJB 3.1 Message-Driven Bean to implement a FITeagle Adapter for Docker
+- Target Product: FITeagle
+- Source: <https://github.com/fiteagle/adapters/>
 
 What is it?
 -----------
