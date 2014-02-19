@@ -20,6 +20,7 @@ import org.fiteagle.api.Adapter;
 @MessageDriven(name = "DockerAdapterMDB", activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "topic/adapters"),
+        //@ActivationConfigProperty(propertyName = "messageSelector", propertyValue = Adapter.PROPERTY_TYPE + "=DockerAdapter"),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class DockerAdapter implements MessageListener {
     private final static Logger LOGGER = Logger.getLogger(DockerAdapter.class.toString());
