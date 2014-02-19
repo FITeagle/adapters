@@ -50,8 +50,8 @@ import javax.servlet.http.HttpServletResponse;
  * @author Serge Pagop (spagop@redhat.com)
  * 
  */
-@WebServlet("/HelloWorldMDBServletClient")
-public class DockerMDBServletClient extends HttpServlet {
+@WebServlet("/debug")
+public class DockerAdapterDebugServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -8314035702649252239L;
 
