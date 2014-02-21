@@ -17,10 +17,7 @@
 package org.fiteagle.adapter.docker.servlet;
 
 import java.io.IOException;
-
 import java.io.PrintWriter;
-
-import org.fiteagle.api.Adapter;
 
 import javax.annotation.Resource;
 import javax.jms.Connection;
@@ -79,20 +76,25 @@ public class DockerAdapterDebugServlet extends HttpServlet {
 			MessageProducer messageProducer = session
 					.createProducer(destination);
 			connection.start();
+
 			out.write("<h3>Following messages will be send to the destination:</h3>");
 			TextMessage message = session.createTextMessage();
+			
 			for (int i = 0; i < MSG_COUNT; i++) {
 				message.setText("This is message " + (i + 1));
-				if (i / 2 == 0)
-					message.setStringProperty(Adapter.PROPERTY_STATUS, Adapter.STATUS_STARTED);
+/*				if (i / 2 == 0)
+					message.setStringProperty(AdapterMDB.PROPERTY_STATUS, AdapterMDB.STATUS_STARTED);
 				else
-					message.setStringProperty(Adapter.PROPERTY_STATUS, Adapter.STATUS_STOPPED);
-				messageProducer.send(message);
-				out.write("Message (" + i + "): " + Adapter.toDebugString(message)
-						+ "</br>");
+					message.setStringProperty(AdapterMDB.PROPERTY_STATUS, AdapterMDB.STATUS_STOPPED);
+*/				messageProducer.send(message);
+//	 	 		out.write("Message (" + i + "): " + AdapterMDB.toDebugString(message)
+//						+ "</br>");
 			}
 			out.write("<p><i>Go to your JBoss Application Server console or Server log to see the result of messages processing</i></p>");
 
+			out.write("<p><i>Searching for adapters...</i></p>");
+//			message.setJMSType(AdapterMDB.TYPE_QUERY);
+			messageProducer.send(message);
 		} catch (JMSException e) {
 			e.printStackTrace();
 			out.write("<h2>A problem occurred during the delivery of this message</h2>");
