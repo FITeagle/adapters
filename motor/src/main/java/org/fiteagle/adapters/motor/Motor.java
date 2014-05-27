@@ -1,14 +1,14 @@
 package org.fiteagle.adapters.motor;
 
+import java.util.HashMap;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-
-
-
 
 //Label As a Developer, I want to play around with a Motor adapter, so that I know how to develop my own adapter.
 //Description 
@@ -34,8 +34,6 @@ import javax.ws.rs.Produces;
 //mvn site && open target/site/index.html
 //curl localhost:8080/ADAPTERNAME/description.ttl
 
-
-
 //Motor Properties
 //- Name
 //- Location
@@ -50,59 +48,49 @@ import javax.ws.rs.Produces;
 //- Set Rotational Speed
 //- Turn off
 
-
-
-@Path("/")
+@Path("/api")
 public class Motor {
 
+    MotorHandler motorHandler = new MotorHandler();
 
-	@GET
-	@Path("description.ttl")
-	@Produces("text/turtle")
-	public String getDescription() {
-	  
-
-		return "# this is a complete turtle document\n@prefix foo: <http://example.org/ns#> .\n@prefix : <http://other.example.org/ns#> .\nfoo:bar foo: :\n .:bar : foo:bar .";
-	}
-	
-	 @GET
-	  @Path("instances.ttl")
-	  @Produces("text/turtle")
-	  public String getAllInstances() {	    
-
-	    return "# this is a complete turtle document\n@prefix foo: <http://example.org/ns#> .\n@prefix : <http://other.example.org/ns#> .\nfoo:bar foo: :\n .:bar : foo:bar .";
-	  }
-
-	 
-	 
-	  @GET
-	  @Path("instance/{instanceNumber}")
-	  @Produces("text/html")
-	  public String getSingleInstance(@PathParam("instanceNumber") int instanceNumber) {
-	    return "Instance number : " + instanceNumber;
-	  }
-	  
-	  
     @GET
-    @Path("instance/{instanceNumber}/description.ttl")
-    @Produces("text/html")
-    public String getSingleInstanceDescription(@PathParam("instanceNumber") int instanceNumber) {
-      return "Description - Instance number : " + instanceNumber;
-    }
-    
-    @PUT
-    @Path("instance/{instanceNumber}/description.ttl")
-    @Produces("text/html")
-    public String putSingleInstanceDescription(@PathParam("instanceNumber") int instanceNumber) {
-      return "Put - Instance number : " + instanceNumber;
+    @Path("description.ttl")
+    @Produces("text/turtle")
+    public String getDescription() {
+
+        return "# this is a complete turtle document\n@prefix foo: <http://example.org/ns#> .\n@prefix : <http://other.example.org/ns#> .\nfoo:bar foo: :\n .:bar : foo:bar .";
     }
 
-    
+    @GET
+    @Path("instances.ttl")
+    @Produces("text/html")
+    public String getAllInstances() {
+       String output = "";
+       HashMap<Integer,MotorInstance> instances = motorHandler.getAllMotorInstances();
+        for (Integer  currentID :  instances.keySet()) {
+            output += currentID + ": " + instances.get(currentID).toString() + "\n";
+        }
+        return output;
+    }
+
+    @POST
+    @Path("instance/{instanceNumber}")
+    @Produces("text/html")
+    public String createInstance(@PathParam("instanceNumber") int instanceNumber) {
+        if(motorHandler.createMotorInstance(instanceNumber)){
+            return "Created instance number : " + instanceNumber;
+        }
+        return "Invalid instance number";
+    }
+
     @DELETE
     @Path("instance/{instanceNumber}")
     @Produces("text/html")
-    public String terminateSingleInstance(@PathParam("instanceNumber") int instanceNumber) {
-      return "Terminated - Instance number : " + instanceNumber;
+    public String terminateInstance(@PathParam("instanceNumber") int instanceNumber) {
+        if(motorHandler.terminateMotorInstance(instanceNumber)){
+            return "Terminated instance number : " + instanceNumber;
+        }
+        return "Invalid instance number";
     }
 
 }

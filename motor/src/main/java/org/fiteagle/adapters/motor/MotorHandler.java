@@ -1,25 +1,32 @@
 package org.fiteagle.adapters.motor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
 
 public class MotorHandler {
     
     
-    ArrayList<MotorInstance> motorList = new ArrayList<MotorInstance>();
+    HashMap<Integer, MotorInstance> motorList = new HashMap<Integer, MotorInstance>();
     int currentIndex = 0;
     
-    public int createMotorInstance(){
+    public boolean createMotorInstance(int motorInstanceID){
         
         MotorInstance newMotor = new MotorInstance();
-        motorList.add(currentIndex,newMotor);
         
-        return currentIndex++;
+        if(motorList.containsKey(motorInstanceID)){
+            return false;
+        }
+        
+        motorList.put(motorInstanceID, newMotor);
+        return true;
         
     }
     
     public boolean terminateMotorInstance(int motorInstanceID){
         
-        if(motorList.remove(motorInstanceID) != null){
+        if(motorList.containsKey(motorInstanceID)){
+            motorList.remove(motorInstanceID);
             return true;
         }
         
@@ -31,7 +38,9 @@ public class MotorHandler {
         return motorList.get(motorInstanceID);
     }
     
-    public ArrayList<MotorInstance> getAllMotorInstances(){
+    public HashMap<Integer, MotorInstance> getAllMotorInstances(){
+        
+        
         
         return motorList;        
     }

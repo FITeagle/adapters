@@ -11,6 +11,23 @@ public class MotorInstance {
     private int currentRotationalSpeed;
     private int maxRotationalSpeed;
     
+    
+    public MotorInstance(){
+        
+        name = "Motor name";
+        location = "Garage";
+        type = "electro";
+        manufacturer = "Siemens";
+        
+        status = false;
+        currentRotationalSpeed = 0;
+        maxRotationalSpeed = 3000;
+    }
+    
+    public String toString(){
+       return name + ", " + location + ", " + type + ", " + manufacturer + ", " + status + ", " + currentRotationalSpeed + "/" + maxRotationalSpeed;
+    }
+    
     public String getName() {
         return name;
     }
