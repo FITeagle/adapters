@@ -1,96 +1,50 @@
 package org.fiteagle.adapters.motor;
 
-import java.util.HashMap;
-
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-
-//Label As a Developer, I want to play around with a Motor adapter, so that I know how to develop my own adapter.
-//Description 
-//See mytestbed.net/doc/omf/file.DEVELOPERS.html
-//
-//The adapter should:
-//* Be located at github.com/fiteagle/adapters
-//* Has the namespace: org.fiteagle.adapters.ADAPTERNAME.*
-//* Has the delivery mechanism namespace: org.fiteagle.adapters.ADAPTERNAME.*.dm
-//* Be deployable with: "cd adapters/ADAPTERNAME; mvn wildfly:deploy;"
-//* Should provide a REST interface
-// * Describe: HTTP GET localhost:8080/ADAPTERNAME/description.ttl
-// * Provision: HTTP GET localhost:8080/ADAPTERNAME/instances.ttl
-// * Provision: HTTP POST localhost:8080/ADAPTERNAME/instance/1
-// * Monitor: HTTP GET localhost:8080/ADAPTERNAME/instance/1/descripti...
-// * Control: HTTP PUT localhost:8080/ADAPTERNAME/instance/1/descripti...
-// * Terminate: HTTP DELETE localhost:8080/ADAPTERNAME/instance/1
-//Themes  
-//Qualities .
-//Test  cd adapters/ADAPTERNAME
-//mvn test
-//mvn wildfly:deploy;
-//mvn site && open target/site/index.html
-//curl localhost:8080/ADAPTERNAME/description.ttl
-
-//Motor Properties
-//- Name
-//- Location
-//- Type (Electrical, Gasoline)
-//- Manufacturer
-//- Status (ON/OFF)
-//- Current Rotational Speed (RPM)
-//- Maximum Rotational Speed
-//
-//Motor Control
-//- Turn on
-//- Set Rotational Speed
-//- Turn off
-
-@Path("/api")
 public class Motor {
+    
 
-    MotorHandler motorHandler = new MotorHandler();
-
-    @GET
-    @Path("description.ttl")
-    @Produces("text/turtle")
-    public String getDescription() {
-
-        return "# this is a complete turtle document\n@prefix foo: <http://example.org/ns#> .\n@prefix : <http://other.example.org/ns#> .\nfoo:bar foo: :\n .:bar : foo:bar .";
+    public String getManufacturer() {
+        return manufacturer;
+    }
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+    public int getRpm() {
+        return rpm;
+    }
+    public void setRpm(int rpm) {
+        this.rpm = rpm;
+    }
+    public int getMaxRpm() {
+        return maxRpm;
+    }
+    public void setMaxRpm(int maxRpm) {
+        this.maxRpm = maxRpm;
+    }
+    public int getThrottle() {
+        return throttle;
+    }
+    public void setThrottle(int throttle) {
+        this.throttle = throttle;
+    }
+    
+    
+    public Motor() {
+        super();
+        this.manufacturer = "Fraunhofer FOKUS";
+        this.rpm = 0;
+        this.maxRpm = 3000;
+        this.throttle = 0;
     }
 
-    @GET
-    @Path("instances.ttl")
-    @Produces("text/html")
-    public String getAllInstances() {
-       String output = "";
-       HashMap<Integer,MotorInstance> instances = motorHandler.getAllMotorInstances();
-        for (Integer  currentID :  instances.keySet()) {
-            output += currentID + ": " + instances.get(currentID).toString() + "\n";
-        }
-        return output;
-    }
 
-    @POST
-    @Path("instance/{instanceNumber}")
-    @Produces("text/html")
-    public String createInstance(@PathParam("instanceNumber") int instanceNumber) {
-        if(motorHandler.createMotorInstance(instanceNumber)){
-            return "Created instance number : " + instanceNumber;
-        }
-        return "Invalid instance number";
-    }
+    private String manufacturer;    
+    private int rpm;
+    private int maxRpm;
+    private int throttle;
+    
+    
 
-    @DELETE
-    @Path("instance/{instanceNumber}")
-    @Produces("text/html")
-    public String terminateInstance(@PathParam("instanceNumber") int instanceNumber) {
-        if(motorHandler.terminateMotorInstance(instanceNumber)){
-            return "Terminated instance number : " + instanceNumber;
-        }
-        return "Invalid instance number";
-    }
 
+    
 }
