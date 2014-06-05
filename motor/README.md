@@ -23,22 +23,22 @@ Access the Adapter
 The adapter will be running at the following URL in the Browser: <http://localhost:8080/AdapterMotor/api/description.ttl> and will send some test TTL file.
 
  * Describe:
-`curl -X GET http://localhost:8080/AdapterMotor/api/description.ttl --header "Content-Type:text/xml"`
+`curl -X GET http://localhost:8080/AdapterMotor/api/description.ttl`
 
  * Provision:
-`curl -X GET http://localhost:8080/AdapterMotor/api/instances.ttl --header "Content-Type:text/xml"`
+`curl -X GET http://localhost:8080/AdapterMotor/api/instances.ttl`
 
  * Provision (create instance):
-`curl -X DELETE http://localhost:8080/AdapterMotor/api/instance/1 --header "Content-Type:text/xml"`
+`curl -X POST http://localhost:8080/AdapterMotor/api/instance/1`
 
- * Monitor: HTTP GET localhost:8080/ADAPTERNAME/instance/1/descripti...
-TODO
+ * Monitor:
+`curl -X GET http://localhost:8080/AdapterMotor/api/instance/1/description.ttl`
 
- * Control: HTTP PUT localhost:8080/ADAPTERNAME/instance/1/descripti...
-TODO
+ * Control (file is path to local input ttl file)
+`curl -v -X PUT -F file=@"input.ttl" http://localhost:8080/AdapterMotor/api/instance/1/description.ttl`
 
  * Terminate:
-`curl -X DELETE http://localhost:8080/AdapterMotor/api/instance/1 --header "Content-Type:text/xml"`
+`curl -X DELETE http://localhost:8080/AdapterMotor/api/instance/1`
 
 
 
