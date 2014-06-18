@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.motor;
 
-import org.fiteagle.adapters.motor.dm.MotorREST;
+import org.fiteagle.adapters.motor.dm.MotorAdapterREST;
 import org.junit.Assert;
 import org.junit.Test;
 

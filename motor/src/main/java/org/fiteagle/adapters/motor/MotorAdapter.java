@@ -2,11 +2,9 @@ package org.fiteagle.adapters.motor;
 
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -14,13 +12,13 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-public class MotorLogic {
+
+public class MotorAdapter implements IMotorAdapter {
        
     HashMap<Integer, Motor> motorList = new HashMap<Integer, Motor>(); 
     
@@ -34,7 +32,7 @@ public class MotorLogic {
     
     private List<Property> motorControlProperties = new LinkedList<Property>();
     
-    public MotorLogic(){
+    public MotorAdapter() {
         modelGeneral = ModelFactory.createDefaultModel();       
         
         modelGeneral.setNsPrefix("" , "http://fiteagle.org/ontology/adapter/motor#");
@@ -230,6 +228,13 @@ public class MotorLogic {
          
 
     }
+
+
+	@Override
+	public void registerForEvents(IAdapterListener adapterDM) {
+		// TODO store list of DM's
+		adapterDM.onAdapterMessage("event from adapter");
+	}
     
    
 
