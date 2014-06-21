@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.DependsOn;
 import javax.inject.Named;
 import javax.jms.JMSException;
 import javax.naming.InitialContext;
@@ -20,17 +22,18 @@ import org.fiteagle.adapters.motor.IMotorAdapter;
 
 @Named
 @ServerEndpoint("/api/commander")
+@DependsOn("MotorAdapter")
 public class MotorAdapterWebsocket implements IAdapterListener {
 
 	private static final Logger LOGGER = Logger
 			.getLogger(MotorAdapterWebsocket.class.getName());
-
 	
 	private IMotorAdapter motorLogic;
 	private Session wsSession;
 
-	public MotorAdapterWebsocket() throws NamingException {
-		this.motorLogic = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapterEJB");
+	@PostConstruct
+	public void setup() throws NamingException {
+		this.motorLogic = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
 		this.motorLogic.registerForEvents(this);
 	}
 

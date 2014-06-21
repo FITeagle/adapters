@@ -8,7 +8,7 @@ import org.fiteagle.adapters.motor.IMotorAdapter;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
 
-@Stateless
+@Stateless(name ="MotorAdapter")
 @Remote(IMotorAdapter.class)
 public class MotorAdapterEJB implements IMotorAdapter {
 	private final MotorAdapter adapter;

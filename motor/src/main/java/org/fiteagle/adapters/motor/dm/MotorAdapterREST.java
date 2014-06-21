@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.motor.dm;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.DependsOn;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.GET;
@@ -49,15 +51,13 @@ import org.fiteagle.adapters.motor.IMotorAdapter;
 //- Turn off
 
 @Path("/")
-public class MotorAdapterREST {
-
-	
-	private static final String EJB_NAME = "java:module/MotorAdapterEJB";
+@DependsOn("MotorAdapter")
+public class MotorAdapterREST {	
 	private IMotorAdapter motorLogic;
 	
-    public MotorAdapterREST() throws NamingException {
-		super();
-		this.motorLogic = (IMotorAdapter) new InitialContext().lookup(MotorAdapterREST.EJB_NAME);
+	@PostConstruct
+	public void setup() throws NamingException {
+		this.motorLogic = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
 	}
 
 	public static final String UPLOADED_FILE_PARAMETER_NAME = "file";
