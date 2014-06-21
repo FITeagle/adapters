@@ -24,7 +24,12 @@ public class MotorAdapterEJB implements IMotorAdapter {
 
 	@Override
 	public void registerForEvents(IAdapterListener adapterDM) {
-		// TODO Auto-generated method stub
+		this.adapter.registerForEvents(adapterDM);
+	}
+
+	@Override
+	public boolean createMotorInstance(int instanceNumber) {
+		return this.adapter.createMotorInstance(instanceNumber);
 	}
 
 }

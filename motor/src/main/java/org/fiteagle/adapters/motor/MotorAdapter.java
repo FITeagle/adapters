@@ -31,6 +31,8 @@ public class MotorAdapter implements IMotorAdapter {
     private Property motorPropertyManufacturer;
     
     private List<Property> motorControlProperties = new LinkedList<Property>();
+
+	private List<IAdapterListener> listeners = new LinkedList<IAdapterListener>();
     
     public MotorAdapter() {
         modelGeneral = ModelFactory.createDefaultModel();       
@@ -103,6 +105,13 @@ public class MotorAdapter implements IMotorAdapter {
         }
         
         motorList.put(motorInstanceID, newMotor);
+        
+        System.out.println("created new instance");
+        for (IAdapterListener client : this.listeners) {
+        	System.out.println("Sending message to adapter listener...");
+			client.onAdapterMessage("created new instance");
+		}
+        
         return true;
         
     }
@@ -231,11 +240,7 @@ public class MotorAdapter implements IMotorAdapter {
 
 
 	@Override
-	public void registerForEvents(IAdapterListener adapterDM) {
-		// TODO store list of DM's
-		adapterDM.onAdapterMessage("event from adapter");
+	public void registerForEvents(IAdapterListener listener) {
+		this.listeners.add(listener);
 	}
-    
-   
-
 }

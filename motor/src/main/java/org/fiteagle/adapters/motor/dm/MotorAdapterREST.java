@@ -3,7 +3,9 @@ package org.fiteagle.adapters.motor.dm;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.fiteagle.adapters.motor.IMotorAdapter;
@@ -74,15 +76,15 @@ public class MotorAdapterREST {
 //        return motorLogic.getAllMotorInstances("TURTLE");
 //    }
 //
-//    @POST
-//    @Path("instance/{instanceNumber}")
-//    @Produces("text/html")
-//    public String createInstance(@PathParam("instanceNumber") int instanceNumber) {
-//        if (motorLogic.createMotorInstance(instanceNumber)) {
-//            return "Created instance number : " + instanceNumber;
-//        }
-//        return "Invalid instance number";
-//    }
+    @POST
+    @Path("instance/{instanceNumber}")
+    @Produces("text/html")
+    public String createInstance(@PathParam("instanceNumber") int instanceNumber) {
+        if (motorLogic.createMotorInstance(instanceNumber)) {
+            return "Created instance number : " + instanceNumber;
+        }
+        return "Invalid instance number";
+    }
 //
 //    @DELETE
 //    @Path("instance/{instanceNumber}")
