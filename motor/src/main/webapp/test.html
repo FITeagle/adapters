@@ -1,0 +1,138 @@
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+        <script language="javascript" type="text/javascript">
+
+            var wsUri = getRootUri() + "/AdapterMotor/websocket";
+	var restOutput;
+	var wsOutput;	
+var websocket;
+
+            function getRootUri() {
+                return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":" +
+                        (document.location.port == "" ? "8080" : document.location.port);
+            }
+
+
+            function init() {
+                restOutput = document.getElementById("restOutput");
+		wsOutput = document.getElementById("wsOutput");
+
+		websocket = new WebSocket(wsUri);
+                websocket.onopen = function(evt) {
+                    onOpen(evt)
+                };
+                websocket.onmessage = function(evt) {
+                    onMessage(evt)
+                };
+                websocket.onerror = function(evt) {
+                    onError(evt)
+                };
+            }
+
+
+
+function wsGetDescription() {
+	wsDoSend("description.ttl");
+
+}
+
+
+            function onOpen(evt) {
+                wsWriteToScreen("Connected to Endpoint!");
+               // doSend(textID.value);
+            }
+
+            function onMessage(evt) {
+                wsWriteToScreen("Message Received: " + evt.data);
+            }
+
+            function onError(evt) {
+                wsWriteToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+            }
+
+            function wsDoSend(message) {
+                wsWriteToScreen("Message Sent: " + message);
+                websocket.send(message);
+            }
+
+            function wsWriteToScreen(message) {
+                var pre = document.createElement("p");
+                pre.style.wordWrap = "break-word";
+                pre.innerHTML = message;
+                 
+                wsOutput.appendChild(pre);
+            }
+
+            window.addEventListener("load", init, false);
+
+
+
+        </script>
+
+
+	<title>Motor Adapder</title>
+
+    </head>
+    <body>
+
+        <div style="width:45%; border-right: 2px solid black;float: left;">
+
+		<h1 style="text-align: center;">DM: REST</h2>
+		<br>
+		<div style="text-align: center;">
+		    <form action="">
+
+    <input type="radio" name="serialization" value="TTL"> TTL 
+    <input type="radio" name="serialization" value="RDF"> RDF 
+    <input type="radio" name="serialization" value="NTRIPLE"> NTRIPLE <br/>
+
+<input onclick="restGetDescription()" value="description" type="button">
+<input onclick="restGetInstances()" value="instances" type="button"><br/>
+<input onclick="restProvisionInstance()" value="provision" type="button">
+ID: <input id="restProvisionInstanceNumber" value="1" type="text" size="3"><br/>
+<input onclick="restMonitorInstance()" value="monitor" type="button">
+ID: <input id="restMonitorInstanceNumber" value="1" type="text" size="3"><br/>
+<input onclick="restTerminateInstance()" value="terminate" type="button">
+ID: <input id="restTerminateInstanceNumber" value="1" type="text" size="3"><br/>
+
+<br>
+		    </form>
+		</div>
+		<div id="restOutput" style="width:100%; height: 500px;background-color:#DDDDDD;overflow:scroll;"></div>
+
+	</div>
+
+        <div style="width:45%; float: right;">
+
+		<h1 style="text-align: center;">DM: REST</h2>
+		<br>
+		<div style="text-align: center;">
+		    <form action="">
+
+    <input type="radio" name="serialization" value="TTL"> TTL 
+    <input type="radio" name="serialization" value="RDF"> RDF 
+    <input type="radio" name="serialization" value="NTRIPLE"> NTRIPLE <br/>
+
+<input onclick="wsGetDescription()" value="description" type="button">
+<input onclick="wsGetInstances()" value="instances" type="button"><br/>
+<input onclick="wsProvisionInstance()" value="provision" type="button">
+ID: <input id="wsProvisionInstanceNumber" value="1" type="text" size="3"><br/>
+<input onclick="wsMonitorInstance()" value="monitor" type="button">
+ID: <input id="wsMonitorInstanceNumber" value="1" type="text" size="3"><br/>
+<input onclick="wsTerminateInstance()" value="terminate" type="button">
+ID: <input id="wsTerminateInstanceNumber" value="1" type="text" size="3"><br/>
+
+<br>
+		    </form>
+		</div>
+		<div id="wsOutput" style="width:100%; height: 500px;background-color:#DDDDDD;overflow:scroll;"></div>
+
+	</div>
+
+
+
+	
+</body>
+</html>

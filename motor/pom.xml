@@ -9,6 +9,9 @@
 	<description>
            FITeagle | Future Internet Testbed Experimentation and Management Framework
      </description>
+     
+     
+     <url>http://av.tu-berlin.de</url>
 
 	<organization>
 		<name>Berlin University of Technology, Next Generation Networks (AV)</name>
