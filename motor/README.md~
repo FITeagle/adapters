@@ -41,9 +41,6 @@ The adapter will be running at the following URL in the Browser: <http://localho
 `curl -X DELETE http://localhost:8080/AdapterMotor/api/instance/1`
 
 
- *open web GUI
-`http://localhost:8080/AdapterMotor/gui/index.html`
-
 
 Undeploy the Adapter
 --------------------
