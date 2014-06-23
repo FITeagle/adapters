@@ -20,6 +20,19 @@ Build and Deploy the Adapter
 Access the Adapter
 ------------------
 
+New Javascript Client is at:
+
+<http://localhost:8080/AdapterMotor/test.html>
+
+WebSocket is at:
+
+`ws://localhost:8080/AdapterMotor/websocket`
+
+REST is at:
+
+<http://localhost:8080/AdapterMotor/api/>
+
+
 The adapter will be running at the following URL in the Browser: <http://localhost:8080/AdapterMotor/api/description.ttl> and will send some test TTL file.
 
  * Describe:
@@ -39,10 +52,6 @@ The adapter will be running at the following URL in the Browser: <http://localho
 
  * Terminate:
 `curl -X DELETE http://localhost:8080/AdapterMotor/api/instance/1`
-
-
- *open web GUI
-`http://localhost:8080/AdapterMotor/gui/index.html`
 
 
 Undeploy the Adapter
