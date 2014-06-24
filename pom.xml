@@ -10,7 +10,8 @@
 	<url>https://github.com/fiteagle</url>
 
 	<modules>
-        <module>docker</module>
+        <module>motor</module>
+        <module>mightyrobot</module>
 	</modules>
 
 	<description>
