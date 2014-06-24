@@ -95,12 +95,13 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+<!--
 		<dependency>
 			<groupId>org.fiteagle</groupId>
 			<artifactId>api</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
-
+-->
 		<!-- Use JDK logging for runtime since that's what Glassfish uses. -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
