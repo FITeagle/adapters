@@ -16,7 +16,7 @@ public class MotorAdapterEJB implements IMotorAdapter {
     private final MotorAdapter adapter;
 
     public MotorAdapterEJB() {
-        this.adapter = new MotorAdapter();
+        this.adapter = MotorAdapter.getInstance();
     }
 
     // @Override

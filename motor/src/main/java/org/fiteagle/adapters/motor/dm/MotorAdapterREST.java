@@ -49,13 +49,14 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 //curl localhost:8080/ADAPTERNAME/description.ttl
 
 @Path("/")
-@DependsOn("MotorAdapter")
+//@DependsOn("MotorAdapter")
 public class MotorAdapterREST {
     private IMotorAdapter motorAdapterEJB;
 
     @PostConstruct
     public void setup() throws NamingException {
-        this.motorAdapterEJB = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
+       // this.motorAdapterEJB = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
+        this.motorAdapterEJB = MotorAdapter.getInstance();
     }
 
     public static final String UPLOADED_FILE_PARAMETER_NAME = "file";

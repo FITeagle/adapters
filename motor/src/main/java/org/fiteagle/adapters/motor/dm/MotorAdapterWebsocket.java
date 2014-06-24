@@ -23,9 +23,9 @@ import org.fiteagle.adapters.motor.IAdapterListener;
 import org.fiteagle.adapters.motor.IMotorAdapter;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
-@Named
+//@Named
 @ServerEndpoint("/websocket")
-@DependsOn("MotorAdapter")
+//@DependsOn("MotorAdapter")
 public class MotorAdapterWebsocket implements PropertyChangeListener {
 
     // private static final Logger LOGGER = Logger.getLogger(MotorAdapterWebsocket.class.getName());
@@ -42,8 +42,9 @@ public class MotorAdapterWebsocket implements PropertyChangeListener {
     
     @PostConstruct
     public void setup() throws NamingException {
-      this.motorAdapterEJB = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
-    //  this.motorAdapterEJB.addChangeListener(this);
+  //    this.motorAdapterEJB = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
+      this.motorAdapterEJB = MotorAdapter.getInstance();
+      this.motorAdapterEJB.addChangeListener(this);
       
       
       
@@ -98,7 +99,7 @@ public class MotorAdapterWebsocket implements PropertyChangeListener {
         if (wsSession != null && wsSession.isOpen()) {
             Set<Session> sessions = wsSession.getOpenSessions();
             
-            String message = "Changed property: " + event.getPropertyName() + " [old -> " + event.getOldValue() + "] | [new -> " + event.getNewValue() + "]";
+            String message = "Event Notification: " + event.getSource().toString() + " " + event.getPropertyName() + " [old -> " + event.getOldValue() + "] | [new -> " + event.getNewValue() + "]";
             for (Session client : sessions) {
                 client.getAsyncRemote().sendText(message);
             }

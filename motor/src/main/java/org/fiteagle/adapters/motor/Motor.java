@@ -40,6 +40,11 @@ public class Motor {
         
         this.owningAdapter = owningAdapter;
     }
+    
+    public String toString(){
+        
+        return "Motor";
+    }
 
 
     private String manufacturer;    

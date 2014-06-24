@@ -12,7 +12,7 @@ public class MotorAdapterTest {
     @Test
     public void testCreateAndTerminate() {
 
-        MotorAdapter motorAdapter = new MotorAdapter();
+        MotorAdapter motorAdapter = MotorAdapter.getInstance();
 
         // create instance
         Assert.assertEquals(true, motorAdapter.createMotorInstance(1));
@@ -35,7 +35,7 @@ public class MotorAdapterTest {
     @Test
     public void testControl() {
 
-        MotorAdapter motorAdapter = new MotorAdapter();
+        MotorAdapter motorAdapter = MotorAdapter.getInstance();
 
         Assert.assertEquals(true, motorAdapter.createMotorInstance(1));
 
@@ -57,6 +57,9 @@ public class MotorAdapterTest {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        
+        // terminate instance
+        Assert.assertEquals(true, motorAdapter.terminateMotorInstance(1));
     }
 
 }

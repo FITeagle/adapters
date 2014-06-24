@@ -20,7 +20,18 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-public class MotorAdapter implements IMotorAdapter {
+public final class MotorAdapter implements IMotorAdapter {
+    
+    
+    private static MotorAdapter motorAdapterSingleton; 
+    
+   
+    public static synchronized MotorAdapter getInstance() 
+    { 
+      if ( motorAdapterSingleton == null ) 
+          motorAdapterSingleton = new MotorAdapter(); 
+      return motorAdapterSingleton; 
+    } 
 
     public static final String PARAM_TURTLE = "TURTLE";
     public static final String PARAM_RDFXML = "RDF/XML";
@@ -54,7 +65,7 @@ public class MotorAdapter implements IMotorAdapter {
         listener.add(newListener);
     }
 
-    public MotorAdapter() {
+    private MotorAdapter() {
         modelGeneral = ModelFactory.createDefaultModel();
 
         modelGeneral.setNsPrefix("", "http://fiteagle.org/ontology/adapter/motor#");
@@ -125,7 +136,7 @@ public class MotorAdapter implements IMotorAdapter {
 
         motorList.put(motorInstanceID, newMotor);
         
-        notifyListeners(newMotor, "motor", "null", newMotor.toString());
+        notifyListeners(newMotor, "new instance (ID: " + motorInstanceID + ")", "null", "" + motorInstanceID);
 
         // System.out.println("created new instance");
         // for (IAdapterListener client : this.listeners) {
@@ -140,6 +151,7 @@ public class MotorAdapter implements IMotorAdapter {
     public boolean terminateMotorInstance(int motorInstanceID) {
 
         if (motorList.containsKey(motorInstanceID)) {
+            notifyListeners(motorList.get(motorInstanceID), "terminated instance (ID: " + motorInstanceID + ")", "" + motorInstanceID, "null");
             motorList.remove(motorInstanceID);
             return true;
         }
