@@ -36,6 +36,18 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<fiteagle.version>${project.version}</fiteagle.version>
 		<github.global.server>github</github.global.server>
+		<findbugs.version>2.5.2</findbugs.version>
+		<checkstyle.version>2.12.1</checkstyle.version>
+		<surefire.reportplugin.version>2.17</surefire.reportplugin.version>
+		<cobertura.version>2.6</cobertura.version>
+		<versions.version>2.1</versions.version>
+		<validator.version>1.4.0</validator.version>
+		<libphonenumber.version>6.1</libphonenumber.version>
+		<opencsv.version>2.3</opencsv.version>
+		<site.version>3.3</site.version>
+		<taglist.version>2.4</taglist.version>
+		<jdepend.version>2.0</jdepend.version>
+		<pmd.version>3.1</pmd.version>
 	</properties>
 
 	<repositories>
@@ -192,18 +204,8 @@
         </configuration>
     <executions>
       <execution>
-        <id>clean</id>
-        <phase>pre-site</phase>
         <goals>
           <goal>clean</goal>
-        </goals>
-      </execution>
-      <execution>
-        <id>instrument</id>
-        <phase>site</phase>
-        <goals>
-          <goal>instrument</goal>
-          <goal>cobertura</goal>
         </goals>
       </execution>
     </executions>
@@ -469,6 +471,37 @@
 					<!-- Adding location information is very slow, so we disable it. -->
 					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<configuration>
+					<linkXref>true</linkXref>
+				</configuration>
+				<version>${pmd.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+				<version>${taglist.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jdepend-maven-plugin</artifactId>
+				<version>${jdepend.version}</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>${versions.version}</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>dependency-updates-report</report>
+							<report>plugin-updates-report</report>
+							<report>property-updates-report</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 			<!-- to be configured later <plugin> <groupId>org.apache.maven.plugins</groupId> 
 				<artifactId>maven-javadoc-plugin</artifactId> <version>2.8.1</version> <inherited>false</inherited> 
