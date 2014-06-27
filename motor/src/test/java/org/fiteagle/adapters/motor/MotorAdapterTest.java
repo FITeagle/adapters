@@ -15,20 +15,20 @@ public class MotorAdapterTest {
         MotorAdapter motorAdapter = MotorAdapter.getInstance();
 
         // create instance
-        Assert.assertEquals(true, motorAdapter.createMotorInstance(1));
+        Assert.assertEquals(true, motorAdapter.createInstance(1));
 
         // check instance shows up
-        String returnStringTurtle = motorAdapter.getAllMotorInstances("TURTLE");
+        String returnStringTurtle = motorAdapter.getAllInstances("TURTLE");
         Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":m1"));
 
         // terminate instance
-        Assert.assertEquals(true, motorAdapter.terminateMotorInstance(1));
+        Assert.assertEquals(true, motorAdapter.terminateInstance(1));
 
         // terminate again
-        Assert.assertEquals(false, motorAdapter.terminateMotorInstance(1));
+        Assert.assertEquals(false, motorAdapter.terminateInstance(1));
 
         // check instance is gone
-        returnStringTurtle = motorAdapter.getAllMotorInstances("TURTLE");
+        returnStringTurtle = motorAdapter.getAllInstances("TURTLE");
         Assert.assertEquals(-1, returnStringTurtle.indexOf(":m1"));
     }
 
@@ -37,20 +37,20 @@ public class MotorAdapterTest {
 
         MotorAdapter motorAdapter = MotorAdapter.getInstance();
 
-        Assert.assertEquals(true, motorAdapter.createMotorInstance(1));
+        Assert.assertEquals(true, motorAdapter.createInstance(1));
 
         // Check initial rpm is 0
-        String returnStringTurtle = motorAdapter.monitorMotorInstance(1, "TURTLE");
+        String returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
         Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"0\""));
 
         // Change rpm
         InputStream is;
         try {
             is = new FileInputStream("target/test-classes/input.ttl");
-            motorAdapter.controlMotorInstance(is, "TURTLE");
+            motorAdapter.controlInstance(is, "TURTLE");
 
             // Check new rpm is 88 (as defined in input.ttl
-            returnStringTurtle = motorAdapter.monitorMotorInstance(1, "TURTLE");
+            returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
             Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
 
         } catch (FileNotFoundException e) {
@@ -59,7 +59,7 @@ public class MotorAdapterTest {
         }
         
         // terminate instance
-        Assert.assertEquals(true, motorAdapter.terminateMotorInstance(1));
+        Assert.assertEquals(true, motorAdapter.terminateInstance(1));
     }
 
 }

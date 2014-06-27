@@ -48,9 +48,9 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 //mvn site && open target/site/index.html
 //curl localhost:8080/ADAPTERNAME/description.ttl
 
-@Path("/")
+@Path("/rest2/")
 //@DependsOn("MotorAdapter")
-public class MotorAdapterREST {
+public class MotorAdapterREST2 {
     private IMotorAdapter motorAdapterEJB;
 
     @PostConstruct

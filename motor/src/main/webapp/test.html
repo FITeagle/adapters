@@ -70,21 +70,43 @@
 	function wsWriteToScreen(message) {
 		var pre = document.createElement("p");
 		pre.style.wordWrap = "break-word";
-		pre.innerHTML = message;
+		
+//         if(isCommand){
+//             pre.style.color = "blue";
+//           }
 
-		wsOutput.appendChild(pre);
+//         if(wsSerialization = "ttl"){
+//             message = message.split('\n').join('<br/>');          
+//           } else {
+//             $('#myText').val(message);
+//           }
+          pre.innerHTML = message;
+          wsOutput.appendChild(pre);
 	}
 	
 	 function restWriteToScreen(isCommand, message) {
 		    var pre = document.createElement("p");
 		    pre.style.wordWrap = "break-word";
-		    pre.innerHTML = message;
 		    if(isCommand){
-		    	  pre.color = "#ff4488"
+		    	pre.style.color = "blue";
 		    }
 
+// 		    if(restSerialization = "ttl"){
+// 		    	message = message.split('\n').join('<br/>');		    	
+// 		    } else {
+// 		    	alert(getXmlString(message));
+// 		    }
+		    pre.innerHTML = message;
 		    restOutput.appendChild(pre);
+
+		    restOutput.scrollTop = restOutput.scrollHeight;
 		  }
+	 
+	 function getXmlString(xml) {
+		  if (window.ActiveXObject) { return xml.xml; }
+		  return new XMLSerializer().serializeToString(xml);
+		}
+
 
 	window.addEventListener("load", init, false);
 
@@ -191,6 +213,8 @@
 				</form>
 			</div>
 			<div id="restOutput" style="width: 100%; height: 500px; background-color: #DDDDDD; overflow: scroll;"></div>
+			
+			<textarea id='myText'  rows="30" cols="120" value='123'> </textarea>
 	</div>
 
 	<div style="width: 45%; float: right;">

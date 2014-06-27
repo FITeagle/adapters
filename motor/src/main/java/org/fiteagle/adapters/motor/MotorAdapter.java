@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.fiteagle.adapters.AbstractAdapter;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -20,7 +22,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-public final class MotorAdapter implements IMotorAdapter {
+public final class MotorAdapter implements AbstractAdapter, IMotorAdapter {
     
     
     private static MotorAdapter motorAdapterSingleton; 
@@ -54,15 +56,16 @@ public final class MotorAdapter implements IMotorAdapter {
     private List<PropertyChangeListener> listener = new ArrayList<PropertyChangeListener>();
 
     public void notifyListeners(Object object, String property, String oldValue, String newValue) {
-        System.err.println("sending event to " + listener.size() + " listeners");
+        //System.err.println("sending event to " + listener.size() + " listeners");
         
         for (PropertyChangeListener name : listener) {
             name.propertyChange(new PropertyChangeEvent(this, property, oldValue, newValue));
         }
     }
 
-    public void addChangeListener(PropertyChangeListener newListener) {
+    public boolean addChangeListener(PropertyChangeListener newListener) {
         listener.add(newListener);
+        return true;
     }
 
     private MotorAdapter() {
@@ -126,7 +129,7 @@ public final class MotorAdapter implements IMotorAdapter {
         return writer.toString();
     }
 
-    public boolean createMotorInstance(int motorInstanceID) {
+    public boolean createInstance(int motorInstanceID) {
 
         Motor newMotor = new Motor(this);
 
@@ -148,7 +151,7 @@ public final class MotorAdapter implements IMotorAdapter {
 
     }
 
-    public boolean terminateMotorInstance(int motorInstanceID) {
+    public boolean terminateInstance(int motorInstanceID) {
 
         if (motorList.containsKey(motorInstanceID)) {
             notifyListeners(motorList.get(motorInstanceID), "terminated instance (ID: " + motorInstanceID + ")", "" + motorInstanceID, "null");
@@ -159,7 +162,7 @@ public final class MotorAdapter implements IMotorAdapter {
         return false;
     }
 
-    public String monitorMotorInstance(int motorInstanceID, String serializationFormat) {
+    public String monitorInstance(int motorInstanceID, String serializationFormat) {
 
         Model modelInstances = ModelFactory.createDefaultModel();
 
@@ -191,7 +194,7 @@ public final class MotorAdapter implements IMotorAdapter {
 
     }
 
-    public String getAllMotorInstances(String serializationFormat) {
+    public String getAllInstances(String serializationFormat) {
 
         Model modelInstances = ModelFactory.createDefaultModel();
 
@@ -222,7 +225,7 @@ public final class MotorAdapter implements IMotorAdapter {
         return writer.toString();
     }
 
-    public String controlMotorInstance(InputStream in, String serializationFormat) {
+    public String controlInstance(InputStream in, String serializationFormat) {
 
         // create an empty model
         Model model2 = ModelFactory.createDefaultModel();

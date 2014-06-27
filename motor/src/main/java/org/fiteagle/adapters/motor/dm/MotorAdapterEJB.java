@@ -6,6 +6,7 @@ import java.io.InputStream;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
+import org.fiteagle.adapters.AbstractAdapter;
 import org.fiteagle.adapters.motor.IAdapterListener;
 import org.fiteagle.adapters.motor.IMotorAdapter;
 import org.fiteagle.adapters.motor.MotorAdapter;
@@ -30,33 +31,33 @@ public class MotorAdapterEJB implements IMotorAdapter {
     }
 
     @Override
-    public boolean createMotorInstance(int motorInstanceID) {
-        return this.adapter.createMotorInstance(motorInstanceID);
+    public boolean createInstance(int instanceID) {
+        return this.adapter.createInstance(instanceID);
     }
 
     @Override
-    public boolean terminateMotorInstance(int motorInstanceID) {
-        return this.adapter.terminateMotorInstance(motorInstanceID);
+    public boolean terminateInstance(int instanceID) {
+        return this.adapter.terminateInstance(instanceID);
     }
 
     @Override
-    public String monitorMotorInstance(int motorInstanceID, String serializationFormat) {
-        return this.adapter.monitorMotorInstance(motorInstanceID, serializationFormat);
+    public String monitorInstance(int instanceID, String serializationFormat) {
+        return this.adapter.monitorInstance(instanceID, serializationFormat);
     }
 
     @Override
-    public String getAllMotorInstances(String serializationFormat) {
-        return this.adapter.getAllMotorInstances(serializationFormat);
+    public String getAllInstances(String serializationFormat) {
+        return this.adapter.getAllInstances(serializationFormat);
     }
 
     @Override
-    public String controlMotorInstance(InputStream in, String serializationFormat) {
-        return this.adapter.controlMotorInstance(in, serializationFormat);
+    public String controlInstance(InputStream in, String serializationFormat) {
+        return this.adapter.controlInstance(in, serializationFormat);
     }
     
     @Override
-    public void addChangeListener(PropertyChangeListener newListener){
-        this.adapter.addChangeListener(newListener);
+    public boolean addChangeListener(PropertyChangeListener newListener){
+        return this.adapter.addChangeListener(newListener);
     }
 
 }
