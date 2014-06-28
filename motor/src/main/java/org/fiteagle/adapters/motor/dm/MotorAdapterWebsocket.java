@@ -73,15 +73,15 @@ public class MotorAdapterWebsocket implements PropertyChangeListener {
             return motorAdapterEJB.getAdapterDescription(MotorAdapter.PARAM_NTRIPLE);
         } else if(message.equals("instances.ttl")){
             
-            return motorAdapterEJB.getAllMotorInstances(MotorAdapter.PARAM_TURTLE);
+            return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_TURTLE);
             
         } else if(message.equals("instances.rdf")){            
             
-            return motorAdapterEJB.getAllMotorInstances(MotorAdapter.PARAM_RDFXML);
+            return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_RDFXML);
             
         }  else if(message.equals("instances.ntriple")){            
             
-            return motorAdapterEJB.getAllMotorInstances(MotorAdapter.PARAM_NTRIPLE);
+            return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_NTRIPLE);
         }
 
 
