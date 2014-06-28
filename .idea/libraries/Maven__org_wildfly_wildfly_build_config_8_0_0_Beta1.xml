@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.wildfly:wildfly-build-config:8.0.0.Beta1">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wildfly/wildfly-build-config/8.0.0.Beta1/wildfly-build-config-8.0.0.Beta1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wildfly/wildfly-build-config/8.0.0.Beta1/wildfly-build-config-8.0.0.Beta1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/wildfly/wildfly-build-config/8.0.0.Beta1/wildfly-build-config-8.0.0.Beta1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

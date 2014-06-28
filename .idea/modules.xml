@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/motor/AdapterMotor.iml" filepath="$PROJECT_DIR$/motor/AdapterMotor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/stopwatch/AdapterStopwatch.iml" filepath="$PROJECT_DIR$/stopwatch/AdapterStopwatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/adapters.iml" filepath="$PROJECT_DIR$/adapters.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mightyrobot/mightyrobot.iml" filepath="$PROJECT_DIR$/mightyrobot/mightyrobot.iml" />
+    </modules>
+  </component>
+</project>
+

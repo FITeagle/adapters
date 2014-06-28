@@ -12,6 +12,7 @@
 	<modules>
         <module>motor</module>
         <module>mightyrobot</module>
+        <module>stopwatch</module>
 	</modules>
 
 	<description>
