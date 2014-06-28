@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.motor.dm;
+package org.fiteagle.adapters.stopwatch.dm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.DependsOn;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -18,13 +16,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.fiteagle.adapters.motor.IMotorAdapter;
-import org.fiteagle.adapters.motor.MotorAdapter;
+import org.fiteagle.adapters.stopwatch.IStopwatchAdapter;
+import org.fiteagle.adapters.stopwatch.StopwatchAdapter;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 //Label 
-//As a Developer, I want to play around with a Motor adapter, so that I know how to develop my own adapter.
+//As a Developer, I want to play around with a Stopwatch adapter, so that I know how to develop my own adapter.
 //Description 
 //See mytestbed.net/doc/omf/file.DEVELOPERS.html
 //
@@ -48,15 +46,15 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 //mvn site && open target/site/index.html
 //curl localhost:8080/ADAPTERNAME/description.ttl
 
-@Path("/")
-//@DependsOn("MotorAdapter")
-public class MotorAdapterREST {
-    private IMotorAdapter motorAdapterEJB;
+@Path("/rest2/")
+//@DependsOn("StopwatchAdapter")
+public class StopwatchAdapterREST2 {
+    private IStopwatchAdapter motorAdapterEJB;
 
     @PostConstruct
     public void setup() throws NamingException {
-       // this.motorAdapterEJB = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
-        this.motorAdapterEJB = MotorAdapter.getInstance();
+       // this.motorAdapterEJB = (IStopwatchAdapter) new InitialContext().lookup("java:module/StopwatchAdapter");
+        this.motorAdapterEJB = StopwatchAdapter.getInstance();
     }
 
     public static final String UPLOADED_FILE_PARAMETER_NAME = "file";
@@ -72,42 +70,42 @@ public class MotorAdapterREST {
     @Path("description.ttl")
     @Produces("text/turtle")
     public String getDescriptionTurtle() {
-        return motorAdapterEJB.getAdapterDescription(MotorAdapter.PARAM_TURTLE);
+        return motorAdapterEJB.getAdapterDescription(StopwatchAdapter.PARAM_TURTLE);
     }
 
     @GET
     @Path("description.rdf")
     @Produces("application/rdf+xml")
     public String getDescriptionRDF() {
-        return motorAdapterEJB.getAdapterDescription(MotorAdapter.PARAM_RDFXML);
+        return motorAdapterEJB.getAdapterDescription(StopwatchAdapter.PARAM_RDFXML);
     }
 
     @GET
     @Path("description.ntriple")
     @Produces("application/n-triples")
     public String getDescriptionNTRIPLE() {
-        return motorAdapterEJB.getAdapterDescription(MotorAdapter.PARAM_NTRIPLE);
+        return motorAdapterEJB.getAdapterDescription(StopwatchAdapter.PARAM_NTRIPLE);
     }
 
     @GET
     @Path("instances.ttl")
     @Produces("text/turtle")
     public String getAllInstancesTurtle() {
-        return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_TURTLE);
+        return motorAdapterEJB.getAllInstances(StopwatchAdapter.PARAM_TURTLE);
     }
 
     @GET
     @Path("instances.rdf")
     @Produces("application/rdf+xml")
     public String getAllInstancesRDF() {
-        return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_RDFXML);
+        return motorAdapterEJB.getAllInstances(StopwatchAdapter.PARAM_RDFXML);
     }
 
     @GET
     @Path("instances.ntriple")
     @Produces("application/n-triples")
     public String getAllInstancesNTRIPLE() {
-        return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_NTRIPLE);
+        return motorAdapterEJB.getAllInstances(StopwatchAdapter.PARAM_NTRIPLE);
     }
 
     @POST
@@ -134,21 +132,21 @@ public class MotorAdapterREST {
     @Path("instance/{instanceNumber}/description.ttl")
     @Produces("text/turtle")
     public String monitorInstanceTurtle(@PathParam("instanceNumber") int instanceNumber) {
-        return motorAdapterEJB.monitorInstance(instanceNumber, MotorAdapter.PARAM_TURTLE);
+        return motorAdapterEJB.monitorInstance(instanceNumber, StopwatchAdapter.PARAM_TURTLE);
     }
 
     @GET
     @Path("instance/{instanceNumber}/description.rdf")
     @Produces("application/rdf+xml")
     public String monitorInstanceRDF(@PathParam("instanceNumber") int instanceNumber) {
-        return motorAdapterEJB.monitorInstance(instanceNumber, MotorAdapter.PARAM_RDFXML);
+        return motorAdapterEJB.monitorInstance(instanceNumber, StopwatchAdapter.PARAM_RDFXML);
     }
 
     @GET
     @Path("instance/{instanceNumber}/description.ntriple")
     @Produces("application/n-triples")
     public String monitorInstanceNTRIPLE(@PathParam("instanceNumber") int instanceNumber) {
-        return motorAdapterEJB.monitorInstance(instanceNumber, MotorAdapter.PARAM_NTRIPLE);
+        return motorAdapterEJB.monitorInstance(instanceNumber, StopwatchAdapter.PARAM_NTRIPLE);
     }
 
     @PUT
@@ -167,7 +165,7 @@ public class MotorAdapterREST {
             try {
                 InputStream inputStream = inputPart.getBody(InputStream.class, null);
 
-                return motorAdapterEJB.controlInstance(inputStream, MotorAdapter.PARAM_TURTLE);
+                return motorAdapterEJB.controlInstance(inputStream, StopwatchAdapter.PARAM_TURTLE);
 
             } catch (IOException e) {
                 return "IO Exception";
@@ -192,7 +190,7 @@ public class MotorAdapterREST {
             try {
                 InputStream inputStream = inputPart.getBody(InputStream.class, null);
 
-                return motorAdapterEJB.controlInstance(inputStream, MotorAdapter.PARAM_RDFXML);
+                return motorAdapterEJB.controlInstance(inputStream, StopwatchAdapter.PARAM_RDFXML);
 
             } catch (IOException e) {
                 return "IO Exception";
@@ -217,7 +215,7 @@ public class MotorAdapterREST {
             try {
                 InputStream inputStream = inputPart.getBody(InputStream.class, null);
 
-                return motorAdapterEJB.controlInstance(inputStream, MotorAdapter.PARAM_NTRIPLE);
+                return motorAdapterEJB.controlInstance(inputStream, StopwatchAdapter.PARAM_NTRIPLE);
 
             } catch (IOException e) {
                 return "IO Exception";

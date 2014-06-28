@@ -1,24 +1,13 @@
-package org.fiteagle.adapters.motor.dm;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.jms.JMSContext;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Topic;
+package org.fiteagle.adapters.stopwatch.dm;
 
 //@Stateless
-public class MotorAdapterBean {
+public class StopwatchAdapterBean {
 //
 //	@Inject
 //	private JMSContext jmsContext;
 //	@Resource(mappedName = "java:/topic/core") //todo: get from api package
 //	private Topic topic;
-//	private static final Logger LOGGER = Logger.getLogger(MotorAdapterBean.class
+//	private static final Logger LOGGER = Logger.getLogger(StopwatchAdapterBean.class
 //			.getName());
 //
 //	public void sendMessage(Message message) throws JMSException {

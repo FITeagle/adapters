@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.motor;
+package org.fiteagle.adapters.stopwatch;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,12 +7,12 @@ import java.io.InputStream;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class MotorAdapterTest {
+public class StopwatchAdapterTest {
 
     @Test
     public void testCreateAndTerminate() {
 
-        MotorAdapter motorAdapter = MotorAdapter.getInstance();
+        StopwatchAdapter motorAdapter = StopwatchAdapter.getInstance();
 
         // create instance
         Assert.assertEquals(true, motorAdapter.createInstance(1));
@@ -35,7 +35,7 @@ public class MotorAdapterTest {
     @Test
     public void testControl() {
 
-        MotorAdapter motorAdapter = MotorAdapter.getInstance();
+        StopwatchAdapter motorAdapter = StopwatchAdapter.getInstance();
 
         Assert.assertEquals(true, motorAdapter.createInstance(1));
 
@@ -51,7 +51,7 @@ public class MotorAdapterTest {
 
             // Check new rpm is 88 (as defined in input.ttl
             returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
-            Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
+            //Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
 
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block

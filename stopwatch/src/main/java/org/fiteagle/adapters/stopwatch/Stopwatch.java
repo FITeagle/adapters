@@ -1,6 +1,6 @@
-package org.fiteagle.adapters.motor;
+package org.fiteagle.adapters.stopwatch;
 
-public class Motor {    
+public class Stopwatch {
 
     public String getManufacturer() {
         return manufacturer;
@@ -31,7 +31,7 @@ public class Motor {
     }
     
     
-    public Motor(MotorAdapter owningAdapter) {
+    public Stopwatch(StopwatchAdapter owningAdapter) {
         super();
         this.manufacturer = "Fraunhofer FOKUS";
         this.rpm = 0;
@@ -43,7 +43,7 @@ public class Motor {
     
     public String toString(){
         
-        return "Motor";
+        return "Stopwatch";
     }
 
 
@@ -51,7 +51,7 @@ public class Motor {
     private int rpm;
     private int maxRpm;
     private int throttle;
-    private MotorAdapter owningAdapter;
+    private StopwatchAdapter owningAdapter;
     
     
 

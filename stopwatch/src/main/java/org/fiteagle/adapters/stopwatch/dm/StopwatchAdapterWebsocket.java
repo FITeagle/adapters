@@ -1,17 +1,12 @@
-package org.fiteagle.adapters.motor.dm;
+package org.fiteagle.adapters.stopwatch.dm;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.DependsOn;
-import javax.inject.Named;
 import javax.jms.JMSException;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.OnMessage;
@@ -19,36 +14,35 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import org.fiteagle.adapters.motor.IAdapterListener;
-import org.fiteagle.adapters.motor.IMotorAdapter;
-import org.fiteagle.adapters.motor.MotorAdapter;
+import org.fiteagle.adapters.stopwatch.IStopwatchAdapter;
+import org.fiteagle.adapters.stopwatch.StopwatchAdapter;
 
 //@Named
 @ServerEndpoint("/websocket")
-//@DependsOn("MotorAdapter")
-public class MotorAdapterWebsocket implements PropertyChangeListener {
+//@DependsOn("StopwatchAdapter")
+public class StopwatchAdapterWebsocket implements PropertyChangeListener {
 
-    // private static final Logger LOGGER = Logger.getLogger(MotorAdapterWebsocket.class.getName());
+    // private static final Logger LOGGER = Logger.getLogger(StopwatchAdapterWebsocket.class.getName());
 
-    private IMotorAdapter motorAdapterEJB;
+    private IStopwatchAdapter motorAdapterEJB;
     private Session wsSession;
 
 //    @PostConstruct
 //    public void setup() throws NamingException {
-//        motorAdapterEJB = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
+//        motorAdapterEJB = (IStopwatchAdapter) new InitialContext().lookup("java:module/StopwatchAdapter");
 //        motorAdapterEJB.addChangeListener(this);
 //        // this.motorLogic.registerForEvents(this);
 //    }
     
     @PostConstruct
     public void setup() throws NamingException {
-  //    this.motorAdapterEJB = (IMotorAdapter) new InitialContext().lookup("java:module/MotorAdapter");
-      this.motorAdapterEJB = MotorAdapter.getInstance();
+  //    this.motorAdapterEJB = (IStopwatchAdapter) new InitialContext().lookup("java:module/StopwatchAdapter");
+      this.motorAdapterEJB = StopwatchAdapter.getInstance();
       this.motorAdapterEJB.addChangeListener(this);
       
       
       
-//      21:03:46,385 ERROR [io.undertow.request] (default task-15) Blocking request failed HttpServerExchange{ GET /AdapterMotor/websocket}: org.jboss.weld.exceptions.WeldException: WELD-000049: Unable to invoke public void org.fiteagle.adapters.motor.dm.MotorAdapterWebsocket.setup() throws javax.naming.NamingException on org.fiteagle.adapters.motor.dm.MotorAdapterWebsocket@158517f
+//      21:03:46,385 ERROR [io.undertow.request] (default task-15) Blocking request failed HttpServerExchange{ GET /AdapterMotor/websocket}: org.jboss.weld.exceptions.WeldException: WELD-000049: Unable to invoke public void org.fiteagle.adapters.stopwatch.dm.StopwatchAdapterWebsocket.setup() throws javax.naming.NamingException on org.fiteagle.adapters.stopwatch.dm.StopwatchAdapterWebsocket@158517f
 //      at org.jboss.weld.injection.producer.DefaultLifecycleCallbackInvoker.invokeMethods(DefaultLifecycleCallbackInvoker.java:91)
 //      at org.jboss.weld.injection.producer.DefaultLifecycleCallbackInvoker.postConstruct(DefaultLifecycleCallbackInvoker.java:72)
 //      at org.jboss.weld.injection.producer.BasicInjectionTarget.postConstruct(BasicInjectionTarget.java:95)
@@ -62,26 +56,26 @@ public class MotorAdapterWebsocket implements PropertyChangeListener {
         
         if(message.equals("description.ttl")){
             
-            return motorAdapterEJB.getAdapterDescription(MotorAdapter.PARAM_TURTLE);
+            return motorAdapterEJB.getAdapterDescription(StopwatchAdapter.PARAM_TURTLE);
             
         } else if(message.equals("description.rdf")){            
             
-            return motorAdapterEJB.getAdapterDescription(MotorAdapter.PARAM_RDFXML);
+            return motorAdapterEJB.getAdapterDescription(StopwatchAdapter.PARAM_RDFXML);
             
         }  else if(message.equals("description.ntriple")){            
             
-            return motorAdapterEJB.getAdapterDescription(MotorAdapter.PARAM_NTRIPLE);
+            return motorAdapterEJB.getAdapterDescription(StopwatchAdapter.PARAM_NTRIPLE);
         } else if(message.equals("instances.ttl")){
             
-            return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_TURTLE);
+            return motorAdapterEJB.getAllInstances(StopwatchAdapter.PARAM_TURTLE);
             
         } else if(message.equals("instances.rdf")){            
             
-            return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_RDFXML);
+            return motorAdapterEJB.getAllInstances(StopwatchAdapter.PARAM_RDFXML);
             
         }  else if(message.equals("instances.ntriple")){            
             
-            return motorAdapterEJB.getAllInstances(MotorAdapter.PARAM_NTRIPLE);
+            return motorAdapterEJB.getAllInstances(StopwatchAdapter.PARAM_NTRIPLE);
         }
 
 

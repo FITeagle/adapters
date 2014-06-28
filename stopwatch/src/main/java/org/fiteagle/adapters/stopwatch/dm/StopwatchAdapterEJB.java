@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.motor.dm;
+package org.fiteagle.adapters.stopwatch.dm;
 
 import java.beans.PropertyChangeListener;
 import java.io.InputStream;
@@ -6,18 +6,16 @@ import java.io.InputStream;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
-import org.fiteagle.adapters.AbstractAdapter;
-import org.fiteagle.adapters.motor.IAdapterListener;
-import org.fiteagle.adapters.motor.IMotorAdapter;
-import org.fiteagle.adapters.motor.MotorAdapter;
+import org.fiteagle.adapters.stopwatch.IStopwatchAdapter;
+import org.fiteagle.adapters.stopwatch.StopwatchAdapter;
 
-@Singleton(name = "MotorAdapter")
-@Remote(IMotorAdapter.class)
-public class MotorAdapterEJB implements IMotorAdapter {
-    private final MotorAdapter adapter;
+@Singleton(name = "StopwatchAdapter")
+@Remote(IStopwatchAdapter.class)
+public class StopwatchAdapterEJB implements IStopwatchAdapter {
+    private final StopwatchAdapter adapter;
 
-    public MotorAdapterEJB() {
-        this.adapter = MotorAdapter.getInstance();
+    public StopwatchAdapterEJB() {
+        this.adapter = StopwatchAdapter.getInstance();
     }
 
     // @Override
