@@ -1,9 +1,10 @@
-package org.fiteagle.adapters.motor;
+package org.fiteagle.adapters;
 
 import java.beans.PropertyChangeListener;
 import java.io.InputStream;
 
-public interface IMotorAdapter {
+public interface IAbstractAdapter {
+
     public String getAdapterDescription(String serializationFormat);
 
     public boolean createInstance(int instanceID);

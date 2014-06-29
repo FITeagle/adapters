@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.DependsOn;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -18,7 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.fiteagle.adapters.motor.IMotorAdapter;
+import org.fiteagle.adapters.AbstractAdapter;
 import org.fiteagle.adapters.motor.MotorAdapter;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -51,7 +49,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 @Path("/rest2/")
 //@DependsOn("MotorAdapter")
 public class MotorAdapterREST2 {
-    private IMotorAdapter motorAdapterEJB;
+    private AbstractAdapter motorAdapterEJB;
 
     @PostConstruct
     public void setup() throws NamingException {

@@ -1,17 +1,7 @@
 package org.fiteagle.adapters.motor.dm;
 
-import java.util.logging.Logger;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.DependsOn;
-import javax.ejb.MessageDriven;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.fiteagle.adapters.motor.IMotorAdapter;
 
 //@DependsOn("MotorAdapter")
 //@MessageDriven(name = "MotorAdapterMDB", activationConfig = {

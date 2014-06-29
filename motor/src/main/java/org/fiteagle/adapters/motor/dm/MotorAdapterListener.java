@@ -1,19 +1,6 @@
 package org.fiteagle.adapters.motor.dm;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.annotation.PostConstruct;
-import javax.ejb.DependsOn;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.inject.Inject;
-import javax.jms.JMSException;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.fiteagle.adapters.motor.IAdapterListener;
-import org.fiteagle.adapters.motor.IMotorAdapter;
 
 //@Singleton
 //@Startup
