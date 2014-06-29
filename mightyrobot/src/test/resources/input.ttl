@@ -1,0 +1,15 @@
+@prefix :      <http://fiteagle.org/ontology/adapter/mightyrobot#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+:m1     a             :MightyRobotResource ;
+        rdfs:label    "1" ;
+        :rpm          "88"^^xsd:long .
+        
+:m911     a             rdfs:comment ;
+        rdfs:label    "911" ;
+        :rpm          "800"^^xsd:long .
+        
+:m2     a             :MightyRobotResource ;
+        rdfs:label    "2" ;
+        :rpm          "800"^^xsd:long .

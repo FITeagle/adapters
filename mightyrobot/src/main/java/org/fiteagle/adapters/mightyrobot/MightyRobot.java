@@ -1,71 +1,58 @@
 package org.fiteagle.adapters.mightyrobot;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+public class MightyRobot {    
 
-@Path("/")
-public class MightyRobot{
+    public String getManufacturer() {
+        return manufacturer;
+    }
+    public void setManufacturer(String manufacturer) {
+        owningAdapter.notifyListeners(this, "manufacturer", this.manufacturer, this.manufacturer = manufacturer);
+    }
+    public int getRpm() {
+        return rpm;
+    }
+    public void setRpm(int rpm) {
+        owningAdapter.notifyListeners(this, "rpm", "" + this.rpm, "" + rpm);
+        this.rpm = rpm;
+    }
+    public int getMaxRpm() {
+        return maxRpm;
+    }
+    public void setMaxRpm(int maxRpm) {
+        owningAdapter.notifyListeners(this, "maxRpm", "" + this.maxRpm, "" + maxRpm);
+        this.maxRpm = maxRpm;
+    }
+    public int getThrottle() {
+        return throttle;
+    }
+    public void setThrottle(int throttle) {
+        owningAdapter.notifyListeners(this, "throttle", "" + this.throttle, "" + throttle);
+        this.throttle = throttle;
+    }
+    
+    public MightyRobot(MightyRobotAdapter owningAdapter) {
+    	
+        this.manufacturer = "Fraunhofer FOKUS";
+        this.rpm = 0;
+        this.maxRpm = 3000;
+        this.throttle = 0;
+        this.owningAdapter = owningAdapter;
+    }
+    
+    public String toString(){
+        
+        return "Motor";
+    }
 
-	@GET
-	@Path("/description.ttl")
-	@Produces("text/plain")
-	public String getDescription(){
-		
-		return MRHandler.getDescription();
-	
-	} 
-	
-	@GET
-	@Path("/instances.ttl")
-	@Produces("text/plain")
-	public String getInstances(){
-		
-		return MRHandler.getInstances();
 
-	}
-	
-	@GET
-	@Path("/instance/{instanceName}/description.ttl")
-	@Produces("text/plain")
-	public String getInstanceDescription(@PathParam("instanceName") String instanceName){
-		
-		return "Description for instance " + instanceName + " is\n" + MRHandler.getInstanceDescription(instanceName);
-		
-	}
-	
-	@POST
-	@Path("/instance/{instanceName}")
-	public String provisionInstance(@PathParam("instanceName") String instanceName){
+    private String manufacturer;    
+    private int rpm;
+    private int maxRpm;
+    private int throttle;
+    private MightyRobotAdapter owningAdapter;
+    
+    
 
-		
-		return (MRHandler.provisionInstance(instanceName)) ? 
-				"Instance " + instanceName + " provisioned.\n" : 
-				"Instance " + instanceName + " not provisioned. Invalid name or already exists.\n";
 
-	}
-	
-	@PUT
-	@Path("/instance/{instanceName}/description.ttl")
-	@Produces("text/plain")
-	public String putInstanceDescription(@PathParam("instanceName") String instanceName, @FormParam("Description") String description){
-		
-		return MRHandler.putInstanceDescription(instanceName, description);
-		
-	}	
-	
-	@DELETE
-	@Path("/instance/{instanceName}")
-	public String deleteInstance(@PathParam("instanceName") String instanceName){
-
-		return (MRHandler.deleteInstance(instanceName)) ?
-			"Instance " + instanceName + " deleted.\n" : 
-			"Instance " + instanceName + " not deleted. Does not exist.\n";
-
-	}
+    
 }
