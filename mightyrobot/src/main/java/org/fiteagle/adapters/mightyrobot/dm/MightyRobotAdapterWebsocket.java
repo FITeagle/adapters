@@ -2,8 +2,8 @@ package org.fiteagle.adapters.mightyrobot.dm;
 
 import javax.websocket.server.ServerEndpoint;
 
-import org.fiteagle.adapters.AbstractAdapter;
-import org.fiteagle.adapters.abstractdm.AbstractAdapterWebsocket;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.abstractdm.AbstractAdapterWebsocket;
 import org.fiteagle.adapters.mightyrobot.MightyRobotAdapter;
 
 @ServerEndpoint("/websocket")

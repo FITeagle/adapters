@@ -4,7 +4,7 @@ import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.fiteagle.adapters.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

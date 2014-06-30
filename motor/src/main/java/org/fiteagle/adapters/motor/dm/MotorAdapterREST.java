@@ -2,8 +2,8 @@ package org.fiteagle.adapters.motor.dm;
 
 import javax.ws.rs.Path;
 
-import org.fiteagle.adapters.AbstractAdapter;
-import org.fiteagle.adapters.abstractdm.AbstractAdapterREST;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.abstractdm.AbstractAdapterREST;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
 @Path("/")

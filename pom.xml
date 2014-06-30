@@ -13,7 +13,8 @@
         <module>motor</module>
         <module>mightyrobot</module>
         <module>stopwatch</module>
-	</modules>
+        <module>abstractAdapter</module>
+    </modules>
 
 	<description>
         FITeagle | Future Internet Testbed Experimentation and Management Framework

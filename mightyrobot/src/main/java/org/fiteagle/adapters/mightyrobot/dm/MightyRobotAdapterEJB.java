@@ -6,7 +6,7 @@ import java.io.InputStream;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
-import org.fiteagle.adapters.IAbstractAdapter;
+import org.fiteagle.abstractAdapter.IAbstractAdapter;
 import org.fiteagle.adapters.mightyrobot.MightyRobotAdapter;
 
 @Singleton(name = "MightyRobotAdapter")

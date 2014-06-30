@@ -1,4 +1,4 @@
-package org.fiteagle.adapters;
+package org.fiteagle.abstractAdapter;
 
 import java.beans.PropertyChangeListener;
 import java.io.InputStream;

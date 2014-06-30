@@ -2,6 +2,36 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f7352547-52a3-4e45-a7be-6a92dcf0d168" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/abstractAdapter/pom.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__javax_javaee_web_api_6_0.xml" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/IAbstractAdapter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/abstractdm/AbstractAdapterREST.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/AbstractAdapter.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/abstractdm/AbstractAdapterWebsocket.java" afterPath="" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/AbstractAdapter.java" afterPath="$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/AbstractAdapter.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/abstractdm/AbstractAdapterWebsocket.java" afterPath="$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/abstractdm/AbstractAdapterWebsocket.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/IAbstractAdapter.java" afterPath="$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/IAbstractAdapter.java" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/abstractdm/AbstractAdapterREST.java" afterPath="$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/abstractdm/AbstractAdapterREST.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/motor/AdapterMotor.iml" afterPath="$PROJECT_DIR$/motor/AdapterMotor.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/AdapterMotor_war_exploded.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/AdapterMotor_war_exploded.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/MightyRobotAdapter.java" afterPath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/MightyRobotAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterEJB.java" afterPath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterEJB.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterREST.java" afterPath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterREST.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterREST2.java" afterPath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterREST2.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterWebsocket.java" afterPath="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/dm/MightyRobotAdapterWebsocket.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/MotorAdapter.java" afterPath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/MotorAdapter.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterEJB.java" afterPath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterEJB.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST.java" afterPath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST2.java" afterPath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST2.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterWebsocket.java" afterPath="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterWebsocket.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/mightyrobot/pom.xml" afterPath="$PROJECT_DIR$/mightyrobot/pom.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/motor/pom.xml" afterPath="$PROJECT_DIR$/motor/pom.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="adapters.iws" />
@@ -66,10 +96,37 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="pom.xml" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/pom.xml">
+      <file leaf-file-name="MotorAdapter.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/MotorAdapter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="17" selection-start="624" selection-end="624" vertical-scroll-proportion="0.4009434" vertical-offset="0" max-vertical-offset="8100">
+            <state line="19" column="19" selection-start="620" selection-end="620" vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="2535">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IAdapterListener.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/IAdapterListener.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="2" column="17" selection-start="61" selection-end="61" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MightyRobot.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/MightyRobot.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="2" column="13" selection-start="57" selection-end="57" vertical-scroll-proportion="0.03521127" vertical-offset="15" max-vertical-offset="840">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="pom.xml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/motor/pom.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="200" column="36" selection-start="5668" selection-end="5672" vertical-scroll-proportion="0.0" vertical-offset="3000" max-vertical-offset="5010">
               <folding />
             </state>
           </provider>
@@ -89,6 +146,18 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/IAbstractAdapter.java" />
+        <option value="$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/abstractdm/AbstractAdapterREST.java" />
+        <option value="$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/abstractdm/AbstractAdapterWebsocket.java" />
+        <option value="$PROJECT_DIR$/abstractAdapter/pom.xml" />
+        <option value="$PROJECT_DIR$/motor/pom.xml" />
+        <option value="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/MotorAdapter.java" />
+        <option value="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterEJB.java" />
+        <option value="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST.java" />
+        <option value="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST2.java" />
+        <option value="$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterWebsocket.java" />
+        <option value="$PROJECT_DIR$/mightyrobot/pom.xml" />
+        <option value="$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/MightyRobotAdapter.java" />
       </list>
     </option>
   </component>
@@ -126,6 +195,17 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="adapters" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -144,10 +224,22 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="adapters" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="adapters" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="mightyrobot" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -158,7 +250,16 @@
     <property name="MemberChooser.showClasses" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/stopwatch" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/mightyrobot/pom.xml" />
+    <property name="FullScreen" value="false" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/abstractAdapter/src/main/java" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin" singleton="true">
@@ -389,46 +490,52 @@
       <workItem from="1403951286811" duration="43000" />
       <workItem from="1403951351751" duration="17000" />
       <workItem from="1403952616467" duration="107000" />
+      <workItem from="1404118423403" duration="106000" />
+      <workItem from="1404120308291" duration="1879000" />
+      <workItem from="1404123177952" duration="2425000" />
+      <workItem from="1404125625306" duration="300000" />
+      <workItem from="1404125947140" duration="404000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="227000" />
+    <option name="totallyTimeSpent" value="5341000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="65" y="24" width="1301" height="744" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Bean Validation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Bean Validation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
+      <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32988167" sideWeight="0.5" order="10" side_tool="true" content_ui="tabs" />
+      <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="JSF" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="CDI" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24980783" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24980783" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32988167" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -452,6 +559,77 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/mightyrobot/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="239" column="0" selection-start="6635" selection-end="6635" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4980">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/MotorAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="19" selection-start="620" selection-end="620" vertical-scroll-proportion="0.0" vertical-offset="285" max-vertical-offset="2790">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="200" column="36" selection-start="5668" selection-end="5672" vertical-scroll-proportion="0.0" vertical-offset="3000" max-vertical-offset="5010">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mightyrobot/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="191" column="21" selection-start="5510" selection-end="5510" vertical-scroll-proportion="0.0" vertical-offset="2718" max-vertical-offset="4980">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="200" column="36" selection-start="5668" selection-end="5672" vertical-scroll-proportion="0.0" vertical-offset="3000" max-vertical-offset="5010">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/AbstractAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="22" selection-start="519" selection-end="519" vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="2640" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/abstractdm/AbstractAdapterWebsocket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="22" selection-start="630" selection-end="630" vertical-scroll-proportion="0.0" vertical-offset="360" max-vertical-offset="1815" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="19" selection-start="1150" selection-end="1150" vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="2925" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="33" column="4" selection-start="1225" selection-end="1388" vertical-scroll-proportion="0.0" vertical-offset="335" max-vertical-offset="4920">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="17" selection-start="624" selection-end="624" vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="8100">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="17" selection-start="624" selection-end="624" vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="8100">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="42" selection-start="481" selection-end="481" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="8100">
@@ -461,11 +639,220 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="17" selection-start="624" selection-end="624" vertical-scroll-proportion="0.4009434" vertical-offset="0" max-vertical-offset="8100">
+        <state line="30" column="66" selection-start="1046" selection-end="1046" vertical-scroll-proportion="0.0" vertical-offset="270" max-vertical-offset="8115">
           <folding />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/abstractdm/AbstractAdapterREST.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="48" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3585" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/abstractdm/AbstractAdapterWebsocket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="48" selection-start="48" selection-end="48" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1620" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/IAbstractAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="0" selection-start="625" selection-end="625" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="405" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mightyrobot/src/test/java/org/fiteagle/adapters/mightyrobot/MightyRobotAdapterTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="16" selection-start="159" selection-end="159" vertical-scroll-proportion="0.14354067" vertical-offset="0" max-vertical-offset="1080" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="35" selection-start="434" selection-end="434" vertical-scroll-proportion="0.19292605" vertical-offset="0" max-vertical-offset="3285" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/IAdapterListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="17" selection-start="55" selection-end="55" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterBean.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="0" selection-start="41" selection-end="41" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="690" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterEJB.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="8" column="52" selection-start="218" selection-end="218" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1005" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="13" selection-start="161" selection-end="161" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="660" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterMDB.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="13" selection-start="649" selection-end="649" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="4" selection-start="405" selection-end="405" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="345" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterREST2.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="23" selection-start="347" selection-end="347" vertical-scroll-proportion="0.0" vertical-offset="270" max-vertical-offset="3480" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/dm/MotorAdapterWebsocket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="0" selection-start="467" selection-end="467" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="345" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/Motor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="23" selection-start="498" selection-end="498" vertical-scroll-proportion="0.27272728" vertical-offset="0" max-vertical-offset="870" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/abstractAdapter/src/main/java/org/fiteagle/abstractAdapter/AbstractAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="22" selection-start="526" selection-end="526" vertical-scroll-proportion="-0.28846154" vertical-offset="255" max-vertical-offset="2505" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="200" column="36" selection-start="5668" selection-end="5672" vertical-scroll-proportion="0.0" vertical-offset="3000" max-vertical-offset="5010">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mightyrobot/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="239" column="0" selection-start="6635" selection-end="6635" vertical-scroll-proportion="8.415493" vertical-offset="0" max-vertical-offset="4980">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/motor/src/main/java/org/fiteagle/adapters/motor/MotorAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="19" selection-start="620" selection-end="620" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2760">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/IAdapterListener.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="17" selection-start="61" selection-end="61" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/MightyRobotAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="4" selection-start="836" selection-end="836" vertical-scroll-proportion="0.8353511" vertical-offset="0" max-vertical-offset="2760">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/mightyrobot/src/main/java/org/fiteagle/adapters/mightyrobot/MightyRobot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="13" selection-start="57" selection-end="57" vertical-scroll-proportion="0.03521127" vertical-offset="15" max-vertical-offset="840">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <last-edited>AdapterMightyRobot:war</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.5" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Web</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>abstractAdapter</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectJDKs.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>Maven: cglib:cglib-nodep:2.2</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
 

@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.abstractdm;
+package org.fiteagle.abstractAdapter.abstractdm;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -13,7 +13,7 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
-import org.fiteagle.adapters.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 
 //@Named
 //@DependsOn("MightyRobotAdapter")

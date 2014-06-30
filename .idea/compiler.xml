@@ -22,12 +22,16 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="abstractAdapter" />
+        <module name="AdapterMightyRobot" />
         <module name="AdapterMotor" />
         <module name="AdapterStopwatch" />
         <module name="mightyrobot" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="abstractAdapter" target="1.7" />
+      <module name="AdapterMightyRobot" target="1.7" />
       <module name="AdapterMotor" target="1.7" />
       <module name="adapters" target="1.7" />
       <module name="AdapterStopwatch" target="1.7" />

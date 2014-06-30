@@ -4,8 +4,10 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/motor/AdapterMotor.iml" filepath="$PROJECT_DIR$/motor/AdapterMotor.iml" />
       <module fileurl="file://$PROJECT_DIR$/stopwatch/AdapterStopwatch.iml" filepath="$PROJECT_DIR$/stopwatch/AdapterStopwatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/abstractAdapter/abstractAdapter.iml" filepath="$PROJECT_DIR$/abstractAdapter/abstractAdapter.iml" />
       <module fileurl="file://$PROJECT_DIR$/adapters.iml" filepath="$PROJECT_DIR$/adapters.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mightyrobot/mightyrobot.iml" filepath="$PROJECT_DIR$/mightyrobot/mightyrobot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mightyrobot/src/main/main.iml" filepath="$PROJECT_DIR$/mightyrobot/src/main/main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mightyrobot/src/test/test.iml" filepath="$PROJECT_DIR$/mightyrobot/src/test/test.iml" />
     </modules>
   </component>
 </project>

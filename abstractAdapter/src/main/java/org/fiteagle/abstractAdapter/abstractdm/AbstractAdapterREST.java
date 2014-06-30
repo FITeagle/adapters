@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.abstractdm;
+package org.fiteagle.abstractAdapter.abstractdm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.fiteagle.adapters.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
