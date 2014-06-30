@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="mightyrobot:war">
-    <output-path>$PROJECT_DIR$/mightyrobot/target</output-path>
-    <root id="archive" name="mightyrobot.war">
-      <element id="artifact" artifact-name="mightyrobot:war exploded" />
-    </root>
-  </artifact>
-</component>

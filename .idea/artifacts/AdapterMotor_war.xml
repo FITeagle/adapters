@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="war" name="AdapterMotor:war">
-    <output-path>$PROJECT_DIR$/motor/target</output-path>
-    <root id="archive" name="AdapterMotor.war">
-      <element id="artifact" artifact-name="AdapterMotor:war exploded" />
-    </root>
-  </artifact>
-</component>
