@@ -109,6 +109,7 @@ function restWriteToScreen(isCommand, message) {
 	if (isCommand) {
 		pre.style.color = "blue";
 	} else {
+		$("#restOutput").append(message);
 
 		if (restSerialization == "ttl") {
 			message = message.split('\n').join('<br/>');
@@ -127,6 +128,8 @@ function restWriteToScreen(isCommand, message) {
 	}
 	pre.innerHTML = message;
 	restOutput.appendChild(pre);
+	
+	$("#restOutput").append(message);
 
 	restOutput.scrollTop = restOutput.scrollHeight;
 }

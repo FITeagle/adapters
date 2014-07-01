@@ -86,7 +86,10 @@ public abstract class AbstractAdapterREST {
     @Path("description.rdf-text")
     @Produces("text/html")
     public String getDescriptionRDFAsText() {
-        return abstractAdapterEJB.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
+        String result = abstractAdapterEJB.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
+        result.replace("<", "&lt;");
+        result.replace(">", "&gt;");
+        return result;
     }
 
     @GET
