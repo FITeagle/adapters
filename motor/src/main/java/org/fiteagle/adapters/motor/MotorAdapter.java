@@ -17,19 +17,16 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-public final class MotorAdapter extends AbstractAdapter{
+public final class MotorAdapter extends AbstractAdapter {
 
-	private String adapterSpecificPrefix = "http://fiteagle.org/ontology/adapter/motor#";
-    private static MotorAdapter mightyRobotAdapterSingleton; 
-    
-   
-    public static synchronized MotorAdapter getInstance() 
-    { 
-      if ( mightyRobotAdapterSingleton == null ) 
-    	  mightyRobotAdapterSingleton = new MotorAdapter(); 
-      return mightyRobotAdapterSingleton; 
-    } 
+    private String adapterSpecificPrefix = "http://fiteagle.org/ontology/adapter/motor#";
+    private static MotorAdapter motorAdapterSingleton;
 
+    public static synchronized MotorAdapter getInstance() {
+        if (motorAdapterSingleton == null)
+            motorAdapterSingleton = new MotorAdapter();
+        return motorAdapterSingleton;
+    }
 
     private Resource motorResource;
     private Resource MotorAdapter;
@@ -91,48 +88,48 @@ public final class MotorAdapter extends AbstractAdapter{
         individualMotorAdapter1.addProperty(RDFS.comment, modelGeneral.createLiteral("A Motor Adapter 1", "en"));
 
     }
-    
-    @Override 
-    public Object handleCreateInstance(){
-    	return new Motor(this);
-    }
-    
-    @Override
-    public Model handleMonitorInstance(int instanceID, Model modelInstances){
-    	Motor currentMotor = (Motor) instanceList.get(instanceID);
 
-        Resource mightyRobotInstance = modelInstances.createResource("http://fiteagle.org/ontology/adapter/motor#m" + instanceID);
-        mightyRobotInstance.addProperty(RDF.type, motorResource);
-        mightyRobotInstance.addProperty(RDFS.label, "" + instanceID);
-        mightyRobotInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("Motor in the garage " + instanceID, "en"));
-        mightyRobotInstance.addLiteral(motorPropertyRPM, currentMotor.getRpm());
-        mightyRobotInstance.addLiteral(motorPropertyMaxRPM, currentMotor.getMaxRpm());
-        mightyRobotInstance.addLiteral(motorPropertyThrottle, currentMotor.getThrottle());
-        mightyRobotInstance.addLiteral(motorPropertyManufacturer, "Fraunhofer FOKUS");
-        
+    @Override
+    public Object handleCreateInstance() {
+        return new Motor(this);
+    }
+
+    @Override
+    public Model handleMonitorInstance(int instanceID, Model modelInstances) {
+        Motor currentMotor = (Motor) instanceList.get(instanceID);
+
+        Resource motorInstance = modelInstances.createResource("http://fiteagle.org/ontology/adapter/motor#m" + instanceID);
+        motorInstance.addProperty(RDF.type, motorResource);
+        motorInstance.addProperty(RDFS.label, "" + instanceID);
+        motorInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("Motor in the garage " + instanceID, "en"));
+        motorInstance.addLiteral(motorPropertyRPM, currentMotor.getRpm());
+        motorInstance.addLiteral(motorPropertyMaxRPM, currentMotor.getMaxRpm());
+        motorInstance.addLiteral(motorPropertyThrottle, currentMotor.getThrottle());
+        motorInstance.addLiteral(motorPropertyManufacturer, "Fraunhofer FOKUS");
+
         return modelInstances;
     }
 
-	@Override
-	public Model handleGetAllInstances(Model modelInstances) {
-		for (Integer key : instanceList.keySet()) {
-        	
-        	Motor currentMotor= (Motor) instanceList.get(key);
+    @Override
+    public Model handleGetAllInstances(Model modelInstances) {
+        for (Integer key : instanceList.keySet()) {
 
-            Resource mightyRobotInstance = modelInstances.createResource("http://fiteagle.org/ontology/adapter/motor#m" + key);
-            mightyRobotInstance.addProperty(RDF.type, motorResource);
-            mightyRobotInstance.addProperty(RDFS.label, "" + key);
-            mightyRobotInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("Motor in the garage " + key, "en"));
-            mightyRobotInstance.addLiteral(motorPropertyRPM, currentMotor.getRpm());
-            mightyRobotInstance.addLiteral(motorPropertyMaxRPM, currentMotor.getMaxRpm());
-            mightyRobotInstance.addLiteral(motorPropertyThrottle, currentMotor.getThrottle());
-            mightyRobotInstance.addLiteral(motorPropertyManufacturer, "Fraunhofer FOKUS");
+            Motor currentMotor = (Motor) instanceList.get(key);
+
+            Resource motorInstance = modelInstances.createResource("http://fiteagle.org/ontology/adapter/motor#m" + key);
+            motorInstance.addProperty(RDF.type, motorResource);
+            motorInstance.addProperty(RDFS.label, "" + key);
+            motorInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("Motor in the garage " + key, "en"));
+            motorInstance.addLiteral(motorPropertyRPM, currentMotor.getRpm());
+            motorInstance.addLiteral(motorPropertyMaxRPM, currentMotor.getMaxRpm());
+            motorInstance.addLiteral(motorPropertyThrottle, currentMotor.getThrottle());
+            motorInstance.addLiteral(motorPropertyManufacturer, "Fraunhofer FOKUS");
         }
-		return modelInstances;
-	}
+        return modelInstances;
+    }
 
-	@Override
-	public String handleControlInstance(Model model2) {
+    @Override
+    public String handleControlInstance(Model model2) {
         StringWriter sw = new StringWriter();
 
         StmtIterator iter = model2.listStatements(new SimpleSelector(null, RDF.type, motorResource));
@@ -141,7 +138,7 @@ public final class MotorAdapter extends AbstractAdapter{
             // sw.write(currentResource.getProperty(RDFS.label).getObject().toString());
             int key = Integer.parseInt(currentResource.getProperty(RDFS.label).getObject().toString());
             if (instanceList.containsKey(key)) {
-            	Motor currentMotor = (Motor) instanceList.get(key);
+                Motor currentMotor = (Motor) instanceList.get(key);
 
                 for (Property currentProperty : motorControlProperties) {
                     StmtIterator iter2 = currentResource.listProperties(currentProperty);
@@ -150,11 +147,11 @@ public final class MotorAdapter extends AbstractAdapter{
                         int value = (int) iter2.nextStatement().getObject().asLiteral().getLong();
 
                         if (currentProperty == motorPropertyRPM) {
-                        	currentMotor.setRpm(value);
+                            currentMotor.setRpm(value);
                         } else if (currentProperty == motorPropertyMaxRPM) {
-                        	currentMotor.setMaxRpm(value);
+                            currentMotor.setMaxRpm(value);
                         } else if (currentProperty == motorPropertyThrottle) {
-                        	currentMotor.setThrottle(value);
+                            currentMotor.setThrottle(value);
                         }
 
                         sw.write("Changed motor instance " + key + " property " + currentProperty.toString() + " to value " + value + "\n");
@@ -165,16 +162,16 @@ public final class MotorAdapter extends AbstractAdapter{
         }
 
         return sw.toString();
-	}
-	
-	@Override
-	public String getInstanceClassName() {
-		return Motor.class.getName();
-	}
+    }
 
-	@Override
-	public String getAdapterSpecificPrefix() {
-		return adapterSpecificPrefix;
-	}
+    @Override
+    public String getInstanceClassName() {
+        return Motor.class.getName();
+    }
+
+    @Override
+    public String getAdapterSpecificPrefix() {
+        return adapterSpecificPrefix;
+    }
 
 }

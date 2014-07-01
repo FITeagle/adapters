@@ -1,4 +1,4 @@
-package org.fiteagle.abstractAdapter.abstractdm;
+package org.fiteagle.abstractAdapter.dm;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,11 +20,6 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
-//Label 
-//As a Developer, I want to play around with a Motor adapter, so that I know how to develop my own adapter.
-//Description 
-//See mytestbed.net/doc/omf/file.DEVELOPERS.html
-//
 //The adapter should:
 //* Be located at github.com/fiteagle/adapters
 //* Has the namespace: org.fiteagle.adapters.ADAPTERNAME.*
@@ -37,6 +32,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 // * Monitor: HTTP GET localhost:8080/ADAPTERNAME/instance/1/descripti...
 // * Control: HTTP PUT localhost:8080/ADAPTERNAME/instance/1/descripti...
 // * Terminate: HTTP DELETE localhost:8080/ADAPTERNAME/instance/1
+
 //Themes  
 //Qualities .
 //Test  cd adapters/ADAPTERNAME
@@ -47,21 +43,21 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 /**
  * subclasses must be annotated as
- * @Path("/")
- * for this to work!
+ * 
+ * @Path("/") for this to work!
  */
 public abstract class AbstractAdapterREST {
     private AbstractAdapter abstractAdapterEJB;
 
     @PostConstruct
     public void setup() throws NamingException {
-       // this.abstractAdapterEJB = (IAbstractAdapter) new InitialContext().lookup("java:module/AbstractAdapter");
+        // this.abstractAdapterEJB = (IAbstractAdapter) new InitialContext().lookup("java:module/AbstractAdapter");
         this.abstractAdapterEJB = handleSetup();
     }
-    
+
     /**
      * Subclasses must return the desired adapter singleton for use in this context
-     */     
+     */
     public abstract AbstractAdapter handleSetup();
 
     public static final String UPLOADED_FILE_PARAMETER_NAME = "file";
@@ -71,7 +67,6 @@ public abstract class AbstractAdapterREST {
 
     // TODO!!!!!
     // replace form upload
-    // 2x @path no ending (ttl, rdf)
 
     @GET
     @Path("description.ttl")
@@ -84,6 +79,13 @@ public abstract class AbstractAdapterREST {
     @Path("description.rdf")
     @Produces("application/rdf+xml")
     public String getDescriptionRDF() {
+        return abstractAdapterEJB.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
+    }
+    
+    @GET
+    @Path("description.rdf-text")
+    @Produces("text/html")
+    public String getDescriptionRDFAsText() {
         return abstractAdapterEJB.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
     }
 
