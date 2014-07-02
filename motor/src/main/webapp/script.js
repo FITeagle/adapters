@@ -13,9 +13,43 @@ var currentInstanceID = 1;
 var restMotors = [];
 var wsMotors = [];
 
-function getRootUri() {
-	return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":" + (document.location.port == "" ? "8080" : document.location.port);
-}
+google.load('visualization', '1', {
+	packages : [ 'gauge' ]
+});
+// google.setOnLoadCallback(drawChart);
+
+var wsGaugeData;
+
+
+window.addEventListener("load", init, false);
+
+var gaugeOptions = {
+	// width: 400,
+	height : 200,
+	min : 0,
+	max : 1000,
+	redFrom : 900,
+	redTo : 1000,
+	yellowFrom : 750,
+	yellowTo : 900,
+	minorTicks : 50,
+    animation:{
+        duration: 3000,
+        easing: 'out',
+      }
+
+};
+
+String.prototype.escape = function() {
+	var tagsToReplace = {
+		'&' : '&amp;',
+		'<' : '&lt;',
+		'>' : '&gt;'
+	};
+	return this.replace(/[&<>]/g, function(tag) {
+		return tagsToReplace[tag] || tag;
+	});
+};
 
 function init() {
 	restOutput = document.getElementById("restOutput");
@@ -31,9 +65,33 @@ function init() {
 	websocket.onerror = function(evt) {
 		onError(evt);
 	};
+	
+	wsGaugeData = new google.visualization.DataTable();
+	wsGaugeData.addColumn('string', 'Motor');
+	wsGaugeData.addColumn('number', 'RPM');
 
 	refresGUIInstanceIDs();
+}
 
+function drawChart(data, element) {
+	// var data = google.visualization.arrayToDataTable([
+	// ['Label', 'Value'],
+	// ['Memory', 80],
+	// ['CPU', 55],
+	// ['Network', 68]
+	// ]);
+
+	// var data = new google.visualization.DataTable();
+	// data.addColumn('string', 'Motor');
+	// data.addColumn('number', 'RPM');
+	// data.addRow(['V', 200]);
+
+	var chart = new google.visualization.Gauge(document.getElementById(element));
+	chart.draw(data, gaugeOptions);
+}
+
+function getRootUri() {
+	return "ws://" + (document.location.hostname == "" ? "localhost" : document.location.hostname) + ":" + (document.location.port == "" ? "8080" : document.location.port);
 }
 
 function wsGetDescription() {
@@ -51,7 +109,12 @@ function onOpen(evt) {
 
 function onMessage(evt) {
 	wsWriteToScreen(false, "Message Received: <br/>" + evt.data);
-	wsRefreshInstanceGraphics(evt.data);
+	
+	if(evt.data.indexOf("Event Notification:") > -1){
+		wsRefreshInstanceGraphics(evt.data, true);
+	} else {
+		wsRefreshInstanceGraphics(evt.data, false);
+	}
 }
 
 function onError(evt) {
@@ -63,16 +126,66 @@ function wsDoSend(message) {
 	websocket.send(message);
 }
 
-function wsRefreshInstanceGraphics(ttlString) {
+function wsRefreshInstanceGraphics(ttlString, isEvent) {
 	wsMotors = [];
-	wsMotorRPMs = [];
-	if (wsSerialization == "ttl") {
-		parseTTL(ttlString, wsMotors);
+	
+	if(isEvent){
+		if(ttlString.indexOf("terminated:") > 0){
+			var pos = ttlString.indexOf("terminated:");
+			var pos2 = ttlString.indexOf(";;");
+			var instanceIdToTerminate = ttlString.slice(pos+10,pos2);
+			
+			
+			for(var i = 0; i < wsGaugeData.getNumberOfRows(); i++){
+				if(wsGaugeData.getValue(i, 0) == instanceIdToTerminate){
+					wsGaugeData.removeRow(i);
+				}
+			}
+			
+			
+		} else if(ttlString.indexOf("provisioned:") > 0){
+			var pos = ttlString.indexOf("provisioned:");
+			var pos2 = ttlString.indexOf("::");
+			var instanceIdToProvision = ttlString.slice(pos+10,pos2);
+			var pos3 = ttlString.indexOf(";;");
+			var rpmToProvision = parseInt(ttlString.slice(pos2+2,pos3));
+			wsGaugeData.insertRows(parseInt(instanceIdToProvision), [ "M" + instanceIdToProvision, rpmToProvision ]);
+			
+			
+		} else if(ttlString.indexOf("changedRPM:") > 0){
+			var pos = ttlString.indexOf("changeRPM:");
+			var pos2 = ttlString.indexOf("::");
+			var instanceIdToChange = parseInt(ttlString.slice(pos+13,pos2));
+			var pos3 = ttlString.indexOf(";;");
+			var rpmToChange = parseInt(ttlString.slice(pos2+2,pos3));
+			
+			//var newValue = 1000 - data.getValue(0, 1);
+			wsGaugeData.setValue(instanceIdToProvision, 1, rpmToChange);
+		    //  drawChart();
+
+			//wsGaugeData.addRow([ "M" + instanceIdToProvision, rpmToChange ]);
+			
+		}
+		
+	} else {
+
+		if (wsSerialization == "ttl") {
+			parseTTL(ttlString, wsMotors);
+		}
+	
+		wsGaugeData = new google.visualization.DataTable();
+		wsGaugeData.addColumn('string', 'Motor');
+		wsGaugeData.addColumn('number', 'RPM');
+	
+		for ( var index = 0; index < wsMotors.length; ++index) {
+			// $("#restGraphics").append(restMotors[index].instanceID + " -> " +
+			// restMotors[index].rpm + "<br/>");
+			wsGaugeData.insertsRows(index, [ "M" + wsMotors[index].instanceID, parseInt(wsMotors[index].rpm) ]);
+		}
 	}
-	$("#wsGraphics").html("");
-	for ( var index = 0; index < wsMotors.length; ++index) {
-		$("#wsGraphics").append(wsMotors[index].instanceID + " -> " + wsMotors[index].rpm + "<br/>");
-	}
+
+	drawChart(wsGaugeData, 'wsGraphics');
+
 }
 
 function wsWriteToScreen(isCommand, message) {
@@ -82,20 +195,7 @@ function wsWriteToScreen(isCommand, message) {
 	if (isCommand) {
 		pre.style.color = "blue";
 	} else {
-
-		if (restSerialization == "ttl") {
-			message = message.split('\n').join('<br/>');
-		} else {
-			// message = vkbeautify.xml(message);
-			// $('#myText').append(getXmlString(message));
-			message = vkbeautify.xml(message);
-
-			// test it (for the example, I assume #targetDiv is there but empty)
-		//	var xmlString = "<this><is_some><xml with='attributes' /></is_some></this>";
-		//	var targetElement = restOutput;
-		//	var xmlTextNode = insertLiteral(xmlString, targetElement);
-			// message = xmlString;
-		}
+		message = formatInput(message);
 	}
 
 	pre.innerHTML = message;
@@ -109,45 +209,36 @@ function restWriteToScreen(isCommand, message) {
 	if (isCommand) {
 		pre.style.color = "blue";
 	} else {
-		$("#restOutput").append(message);
-
-		if (restSerialization == "ttl") {
-			message = message.split('\n').join('<br/>');
-		} else {
-			 message = getXmlString(message);
-			// $('#myText').append(getXmlString(message));
-			//message = vkbeautify.xml(message.firstElementChild.innerHTML);
-
-			// test it (for the example, I assume #targetDiv is there but empty)
-		//	var xmlString = "<this><is_some><xml with='attributes' /></is_some></this>";
-		//	var targetElement = restOutput;
-		//	var xmlTextNode = insertLiteral(xmlString, targetElement);
-			// message = xmlString;
-
-		}
+		message = formatInput(message);
 	}
 	pre.innerHTML = message;
 	restOutput.appendChild(pre);
-	
-	$("#restOutput").append(message);
-
 	restOutput.scrollTop = restOutput.scrollHeight;
 }
 
-function insertLiteral(literalString, targetElement) {
-	var textNode = document.createTextNode(literalString);
-	targetElement.appendChild(textNode);
-	return textNode;
-}
+function formatInput(inputString) {
 
-function getXmlString(xml) {
-	if (window.ActiveXObject) {
-		return xml.xml;
+	if (restSerialization != "ttl") {
+		inputString = inputString.escape();
 	}
-	return new XMLSerializer().serializeToString(xml);
+	inputString = inputString.split('\n').join('<br/>');
+
+	return inputString;
 }
 
-window.addEventListener("load", init, false);
+//function insertLiteral(literalString, targetElement) {
+//	var textNode = document.createTextNode(literalString);
+//	targetElement.appendChild(textNode);
+//	return textNode;
+//}
+//
+//function getXmlString(xml) {
+//	if (window.ActiveXObject) {
+//		return xml.xml;
+//	}
+//	return new XMLSerializer().serializeToString(xml);
+//}
+
 
 function refresGUIInstanceIDs() {
 	$("#restInstanceNumber").val(currentInstanceID);
@@ -169,10 +260,20 @@ function restRefreshInstanceGraphics(ttlString) {
 	if (restSerialization == "ttl") {
 		parseTTL(ttlString, restMotors);
 	}
-	$("#restGraphics").html("");
+
+	var data = new google.visualization.DataTable();
+	data.addColumn('string', 'Motor');
+	data.addColumn('number', 'RPM');
+	// data.addRow(['Motor 1', 200]);
+
+	// $("#restGraphics").html("");
 	for ( var index = 0; index < restMotors.length; ++index) {
-		$("#restGraphics").append(restMotors[index].instanceID + " -> " + restMotors[index].rpm + "<br/>");
+		// $("#restGraphics").append(restMotors[index].instanceID + " -> " +
+		// restMotors[index].rpm + "<br/>");
+		data.addRow([ "M" + restMotors[index].instanceID + " RPM", parseInt(restMotors[index].rpm) ]);
 	}
+
+	drawChart(data, 'restGraphics');
 }
 
 function parseTTL(ttlString, motors) {
@@ -200,7 +301,7 @@ function parseTTL(ttlString, motors) {
 			rpm : currentRPM
 		};
 
-		motors[index] = motor;
+		motors[parseInt(currentInstanceID)] = motor;
 
 		index++;
 		pos = ttlString.indexOf("rdfs:label");

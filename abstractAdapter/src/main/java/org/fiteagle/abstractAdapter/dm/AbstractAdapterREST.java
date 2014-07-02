@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -82,14 +83,16 @@ public abstract class AbstractAdapterREST {
         return abstractAdapterEJB.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
     }
     
+    /**
+     * Only for JavaScript Weblclient
+     * 
+     * @return
+     */
     @GET
     @Path("description.rdf-text")
     @Produces("text/html")
     public String getDescriptionRDFAsText() {
-        String result = abstractAdapterEJB.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
-        result.replace("<", "&lt;");
-        result.replace(">", "&gt;");
-        return result;
+        return abstractAdapterEJB.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
     }
 
     @GET
@@ -110,6 +113,13 @@ public abstract class AbstractAdapterREST {
     @Path("instances.rdf")
     @Produces("application/rdf+xml")
     public String getAllInstancesRDF() {
+        return abstractAdapterEJB.getAllInstances(AbstractAdapter.PARAM_RDFXML);
+    }
+    
+    @GET
+    @Path("instances.rdf-text")
+    @Produces("text/html")
+    public String getAllInstancesRDFAsText() {
         return abstractAdapterEJB.getAllInstances(AbstractAdapter.PARAM_RDFXML);
     }
 
@@ -151,6 +161,13 @@ public abstract class AbstractAdapterREST {
     @Path("instance/{instanceNumber}/description.rdf")
     @Produces("application/rdf+xml")
     public String monitorInstanceRDF(@PathParam("instanceNumber") int instanceNumber) {
+        return abstractAdapterEJB.monitorInstance(instanceNumber, AbstractAdapter.PARAM_RDFXML);
+    }
+    
+    @GET
+    @Path("instance/{instanceNumber}/description.rdf-text")
+    @Produces("text/html")
+    public String monitorInstanceRDFAsText(@PathParam("instanceNumber") int instanceNumber) {
         return abstractAdapterEJB.monitorInstance(instanceNumber, AbstractAdapter.PARAM_RDFXML);
     }
 
@@ -234,5 +251,28 @@ public abstract class AbstractAdapterREST {
             }
         }
         return "Failure";
+    }
+    
+    /**
+     * Control adapter's instance property directly via REST
+     * Good for testing
+     * 
+     * @param instanceNumber
+     * @param paramProperty
+     * @param paramValue
+     * @return
+     */
+    @PUT
+    @Path("instance/{instanceNumber}/{paramProperty}/{paramValue}")
+    @Produces("text/html")
+    public String controlInstanceProperty(@PathParam("instanceNumber") int instanceNumber,  @PathParam("paramProperty") String paramProperty,  @PathParam("paramValue") String paramValue) {
+        String controlString = "@prefix :      <http://fiteagle.org/ontology/adapter/motor#> .\n";
+        controlString += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
+        controlString += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
+        controlString += ":m" + instanceNumber + "     a             :MotorResource ;\n";
+        controlString += "rdfs:label    \"" + instanceNumber + "\" ;\n";
+        controlString += ":" + paramProperty + "          \"" + paramValue + "\"^^xsd:long .\n";
+        InputStream is = new ByteArrayInputStream( controlString.getBytes() );
+        return abstractAdapterEJB.controlInstance(is, AbstractAdapter.PARAM_TURTLE);
     }
 }

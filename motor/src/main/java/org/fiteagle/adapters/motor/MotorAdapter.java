@@ -90,8 +90,8 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
-    public Object handleCreateInstance() {
-        return new Motor(this);
+    public Object handleCreateInstance(int instanceID) {
+        return new Motor(this, instanceID);
     }
 
     @Override

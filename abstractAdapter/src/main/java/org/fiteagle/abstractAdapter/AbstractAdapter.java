@@ -41,11 +41,11 @@ public abstract class AbstractAdapter {
         }
 
         // handling done by adapter, handleCreateInstance has to be implemented by all subclasses!
-    	Object newInstance = handleCreateInstance();    
+    	Object newInstance = handleCreateInstance(instanceID);    
 
         instanceList.put(instanceID, newInstance);
         
-        notifyListeners(newInstance, "new instance (ID: " + instanceID + ")", "null", "" + instanceID);
+        notifyListeners(newInstance, "provisioned:" + instanceID + "::0;;" + " (ID: " + instanceID + ")", "null", "" + instanceID);
 
         return true;
 
@@ -55,7 +55,7 @@ public abstract class AbstractAdapter {
     public boolean terminateInstance(int instanceID){
 
         if (instanceList.containsKey(instanceID)) {
-            notifyListeners(instanceList.get(instanceID), "terminated instance (ID: " + instanceID + ")", "" + instanceID, "null");
+            notifyListeners(instanceList.get(instanceID), "terminated:"+ instanceID + ";; " + " (ID: " + instanceID + ")", "" + instanceID, "null");
             instanceList.remove(instanceID);
             return true;
         }
@@ -127,6 +127,9 @@ public abstract class AbstractAdapter {
             name.propertyChange(new PropertyChangeEvent(this, property, oldValue, newValue));
         }
     }
+    
+    
+    
 
     public boolean addChangeListener(PropertyChangeListener newListener) {
         listener.add(newListener);
@@ -137,7 +140,7 @@ public abstract class AbstractAdapter {
      * Needs to return a new instance of the class this adapter is supposed to handle
      * @return Object - the newly created instance
      */
-    public abstract Object handleCreateInstance();
+    public abstract Object handleCreateInstance(int instanceID);
     
     /**
      * Needs to return the base class for this adapter's instance objects as a String

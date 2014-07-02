@@ -15,7 +15,7 @@ public class Motor {
     }
 
     public void setRpm(int rpm) {
-        owningAdapter.notifyListeners(this, "rpm", "" + this.rpm, "" + rpm);
+        owningAdapter.notifyListeners(this, "changedRPM:" + instanceID + "::" + rpm + ";; rpm", "" + this.rpm, "" + rpm);
         this.rpm = rpm;
     }
 
@@ -37,7 +37,7 @@ public class Motor {
         this.throttle = throttle;
     }
 
-    public Motor(MotorAdapter owningAdapter) {
+    public Motor(MotorAdapter owningAdapter, int instanceID) {
         super();
         this.manufacturer = "Fraunhofer FOKUS";
         this.rpm = 0;
@@ -45,6 +45,7 @@ public class Motor {
         this.throttle = 0;
 
         this.owningAdapter = owningAdapter;
+        this.instanceID = instanceID;
     }
 
     public String toString() {
@@ -57,5 +58,6 @@ public class Motor {
     private int maxRpm;
     private int throttle;
     private MotorAdapter owningAdapter;
+    private int instanceID;
 
 }
