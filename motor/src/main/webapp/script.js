@@ -34,7 +34,7 @@ var gaugeOptions = {
 	yellowTo : 900,
 	minorTicks : 50,
     animation:{
-        duration: 3000,
+        duration: 30000,
         easing: 'out',
       }
 
@@ -133,8 +133,7 @@ function wsRefreshInstanceGraphics(ttlString, isEvent) {
 		if(ttlString.indexOf("terminated:") > 0){
 			var pos = ttlString.indexOf("terminated:");
 			var pos2 = ttlString.indexOf(";;");
-			var instanceIdToTerminate = ttlString.slice(pos+10,pos2);
-			
+			var instanceIdToTerminate = ttlString.slice(pos+11,pos2);
 			
 			for(var i = 0; i < wsGaugeData.getNumberOfRows(); i++){
 				if(wsGaugeData.getValue(i, 0) == instanceIdToTerminate){
@@ -146,21 +145,28 @@ function wsRefreshInstanceGraphics(ttlString, isEvent) {
 		} else if(ttlString.indexOf("provisioned:") > 0){
 			var pos = ttlString.indexOf("provisioned:");
 			var pos2 = ttlString.indexOf("::");
-			var instanceIdToProvision = ttlString.slice(pos+10,pos2);
+			var instanceIdToProvision = ttlString.slice(pos+12,pos2);
 			var pos3 = ttlString.indexOf(";;");
 			var rpmToProvision = parseInt(ttlString.slice(pos2+2,pos3));
-			wsGaugeData.insertRows(parseInt(instanceIdToProvision), [ "M" + instanceIdToProvision, rpmToProvision ]);
+			wsGaugeData.addRow([ instanceIdToProvision, rpmToProvision ]);
 			
 			
 		} else if(ttlString.indexOf("changedRPM:") > 0){
-			var pos = ttlString.indexOf("changeRPM:");
+			var pos = ttlString.indexOf("changedRPM:");
 			var pos2 = ttlString.indexOf("::");
-			var instanceIdToChange = parseInt(ttlString.slice(pos+13,pos2));
+			var instanceIdToChange = ttlString.slice(pos+11,pos2);
 			var pos3 = ttlString.indexOf(";;");
 			var rpmToChange = parseInt(ttlString.slice(pos2+2,pos3));
 			
+			for(var i = 0; i < wsGaugeData.getNumberOfRows(); i++){
+				if(wsGaugeData.getValue(i, 0) == instanceIdToChange){
+					//wsGaugeData.removeRow(i);
+					wsGaugeData.setValue(i, 1, rpmToChange);
+				}
+			}
+			
 			//var newValue = 1000 - data.getValue(0, 1);
-			wsGaugeData.setValue(instanceIdToProvision, 1, rpmToChange);
+			//wsGaugeData.setValue(0, 1, rpmToChange);
 		    //  drawChart();
 
 			//wsGaugeData.addRow([ "M" + instanceIdToProvision, rpmToChange ]);
@@ -180,7 +186,7 @@ function wsRefreshInstanceGraphics(ttlString, isEvent) {
 		for ( var index = 0; index < wsMotors.length; ++index) {
 			// $("#restGraphics").append(restMotors[index].instanceID + " -> " +
 			// restMotors[index].rpm + "<br/>");
-			wsGaugeData.insertsRows(index, [ "M" + wsMotors[index].instanceID, parseInt(wsMotors[index].rpm) ]);
+			wsGaugeData.addRow([ wsMotors[index].instanceID, parseInt(wsMotors[index].rpm) ]);
 		}
 	}
 
@@ -301,7 +307,7 @@ function parseTTL(ttlString, motors) {
 			rpm : currentRPM
 		};
 
-		motors[parseInt(currentInstanceID)] = motor;
+		motors[index] = motor;
 
 		index++;
 		pos = ttlString.indexOf("rdfs:label");
