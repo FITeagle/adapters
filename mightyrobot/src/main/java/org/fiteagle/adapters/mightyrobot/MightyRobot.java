@@ -1,58 +1,77 @@
 package org.fiteagle.adapters.mightyrobot;
 
-public class MightyRobot {    
 
-    public String getManufacturer() {
-        return manufacturer;
-    }
-    public void setManufacturer(String manufacturer) {
-        owningAdapter.notifyListeners(this, "manufacturer", this.manufacturer, this.manufacturer = manufacturer);
-    }
-    public int getRpm() {
-        return rpm;
-    }
-    public void setRpm(int rpm) {
-        owningAdapter.notifyListeners(this, "rpm", "" + this.rpm, "" + rpm);
-        this.rpm = rpm;
-    }
-    public int getMaxRpm() {
-        return maxRpm;
-    }
-    public void setMaxRpm(int maxRpm) {
-        owningAdapter.notifyListeners(this, "maxRpm", "" + this.maxRpm, "" + maxRpm);
-        this.maxRpm = maxRpm;
-    }
-    public int getThrottle() {
-        return throttle;
-    }
-    public void setThrottle(int throttle) {
-        owningAdapter.notifyListeners(this, "throttle", "" + this.throttle, "" + throttle);
-        this.throttle = throttle;
-    }
+public class MightyRobot {
+
+    private boolean dancing;
+	private boolean exploded;
+    private int headRotation;
+    private String nickname;
+
+    private MightyRobotAdapter owningAdapter;
+    private int instanceID;
+
+    public MightyRobot(MightyRobotAdapter owningAdapter, int instanceID) {
     
-    public MightyRobot(MightyRobotAdapter owningAdapter) {
-    	
-        this.manufacturer = "Fraunhofer FOKUS";
-        this.rpm = 0;
-        this.maxRpm = 3000;
-        this.throttle = 0;
+        this.dancing = false;
+        this.exploded = false;
+        this.headRotation = 0;
+        this.nickname = "Mecha";
         this.owningAdapter = owningAdapter;
+        this.instanceID = instanceID;
     }
     
     public String toString(){
-        
-        return "Motor";
+        String reply = "";
+    	if (this.getExploded()){
+    		reply = "Might Robot " + this.nickname + " exploded due to unforeseen circumstances. Sorry about that.";
+    	} else {
+    		reply = "Mighty Robot " + this.nickname + " bids you a fond welcome. The robot is currently " 
+    				+ ((this.getDancing()) ? "" : "not ")
+    				+ "dancing, with its head turned by " + this.getHeadRotation() + " Degrees.";
+    	}
+        return reply;
     }
+ 
+    public boolean getExploded() {
+		return exploded;
+	}
 
+	public void setExploded(boolean exploded) {
+		this.exploded = exploded;
+	}
 
-    private String manufacturer;    
-    private int rpm;
-    private int maxRpm;
-    private int throttle;
-    private MightyRobotAdapter owningAdapter;
-    
-    
+	public boolean getDancing() {
+		return dancing;
+	}
 
+	public void setDancing(Boolean dancing) {
+		this.dancing = dancing;
+	}
 
-    
+	public int getHeadRotation() {
+		return headRotation;
+	}
+
+	public void setHeadRotation(int headRotation) {
+		this.headRotation = (headRotation % 360);
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public MightyRobotAdapter getOwningAdapter() {
+		return owningAdapter;
+	}
+
+	public void setOwningAdapter(MightyRobotAdapter owningAdapter) {
+		this.owningAdapter = owningAdapter;
+	}
+   
 }
+

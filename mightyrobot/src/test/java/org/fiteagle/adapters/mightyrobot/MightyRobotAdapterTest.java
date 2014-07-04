@@ -11,17 +11,16 @@ public class MightyRobotAdapterTest {
 
     @Test
     public void testCreateAndTerminate() {
-
-        MightyRobotAdapter mightyRobotAdapter = MightyRobotAdapter.getInstance();
+        MightyRobotAdapter mightyRobotAdapter = MightyRobotAdapter.getInstance(); 
 
         // create instance
-        Assert.assertEquals(true, mightyRobotAdapter.createInstance(1));
+        Assert.assertEquals(true, mightyRobotAdapter.createInstance(1)); 
 
         // check instance shows up
         String returnStringTurtle = mightyRobotAdapter.getAllInstances("TURTLE");
         Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":m1"));
-
-        // terminate instance
+ 
+        // terminate instance 
         Assert.assertEquals(true, mightyRobotAdapter.terminateInstance(1));
 
         // terminate again
@@ -34,24 +33,25 @@ public class MightyRobotAdapterTest {
 
     @Test
     public void testControl() {
-
         MightyRobotAdapter mightyRobotAdapter = MightyRobotAdapter.getInstance();
-
+ 
         Assert.assertEquals(true, mightyRobotAdapter.createInstance(1));
 
-        // Check initial rpm is 0
+        // Check initial headRotation is 0
         String returnStringTurtle = mightyRobotAdapter.monitorInstance(1, "TURTLE");
-        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"0\""));
+        returnStringTurtle = returnStringTurtle.replace(" ", "");
+        Assert.assertNotEquals(-1, returnStringTurtle.indexOf("headRotation\"0\""));
 
-        // Change rpm
+        // Change headRotation
         InputStream is;
         try {
             is = new FileInputStream("target/test-classes/input.ttl");
             mightyRobotAdapter.controlInstance(is, "TURTLE");
 
-            // Check new rpm is 88 (as defined in input.ttl
+            // Check new headRotation is 88 (as defined in input.ttl
             returnStringTurtle = mightyRobotAdapter.monitorInstance(1, "TURTLE");
-            Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
+            returnStringTurtle = returnStringTurtle.replace(" ", "");
+            Assert.assertNotEquals(-1, returnStringTurtle.indexOf("headRotation\"88\""));
 
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
