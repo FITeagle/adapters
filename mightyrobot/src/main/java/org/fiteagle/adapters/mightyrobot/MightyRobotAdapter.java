@@ -12,6 +12,10 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.modify.UpdateProcessRemote;
+import com.hp.hpl.jena.update.UpdateExecutionFactory;
+import com.hp.hpl.jena.update.UpdateFactory;
+import com.hp.hpl.jena.update.UpdateRequest;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -42,7 +46,7 @@ public final class MightyRobotAdapter extends AbstractAdapter{
     }     
     
     private MightyRobotAdapter() {
-	 
+    		 
         modelGeneral = ModelFactory.createDefaultModel();
 
         modelGeneral.setNsPrefix("", this.getAdapterSpecificPrefix());
@@ -89,7 +93,7 @@ public final class MightyRobotAdapter extends AbstractAdapter{
         mightyRobotPropertyNickname.addProperty(RDFS.range, XSD.xstring);
         adapterControlProperties.add(mightyRobotPropertyNickname); 
         */          
-        
+
         mightyRobotPropertyDancing = generateProperty(modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "dancing"), XSD.xboolean);
         adapterControlProperties.add(mightyRobotPropertyDancing);
 
@@ -100,7 +104,7 @@ public final class MightyRobotAdapter extends AbstractAdapter{
         adapterControlProperties.add(mightyRobotPropertyHeadRotation);
 
         mightyRobotPropertyNickname = generateProperty(modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "nickname"), XSD.xstring);
-        adapterControlProperties.add(mightyRobotPropertyNickname);    
+        adapterControlProperties.add(mightyRobotPropertyNickname); 
 
         Resource individualMightyRobotAdapter1 = modelGeneral.createResource(this.getAdapterSpecificPrefix() +  "individualMightyRobotAdapter1");
         individualMightyRobotAdapter1.addProperty(RDF.type, adapterResource);
@@ -118,7 +122,67 @@ public final class MightyRobotAdapter extends AbstractAdapter{
     
     @Override 
     public Object handleCreateInstance(int instanceID){
-    	return new MightyRobot(this, instanceID);
+    	MightyRobot temp = new MightyRobot(this, instanceID);
+    			postSparqlEntry(temp);
+    	return temp;
+    }
+   
+    private boolean postSparqlEntry(MightyRobot currentRobot){
+/* Get the entry
+PREFIX el: <http://purl.org/dc/elements/1.1/>
+SELECT ?InstanceID ?Dancing ?Exploded ?HeadRotation ?Nickname ?owningAdapter
+WHERE
+{
+?MightyRobot el:InstanceID ?InstanceID .
+?MightyRobot el:Dancing ?Dancing .
+?MightyRobot el:Exploded ?Exploded .
+?MightyRobot el:HeadRotation ?HeadRotation . 
+?MightyRobot el:Nickname ?Nickname .
+?MightyRobot el:owningAdapter ?owningAdapter .
+}		 
+ */			
+		String postString = 
+				"PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT DATA { <http://example.org/MR/0.1>"
+				+ " dc:InstanceID \"" + currentRobot.getInstanceID() + "\" ;"
+				+ " dc:Nickname \"" + currentRobot.getNickname() + "\" ;"
+				+ " dc:Dancing \"" + currentRobot.getDancing() + "\" ;"
+				+ " dc:Exploded \"" + currentRobot.getExploded() + "\" ;"
+				+ " dc:HeadRotation \"" + currentRobot.getHeadRotation() + "\" ;"				
+                + " dc:owningAdapter \"" + currentRobot.getOwningAdapter() + "\" .}";
+ 
+		String updateURL = "http://localhost:3030/ds/update";
+		System.out.println("Posting " + postString + "\nto" + updateURL);
+		UpdateRequest updateRequest = UpdateFactory.create(postString);
+		UpdateProcessRemote uPR = (UpdateProcessRemote) 
+				UpdateExecutionFactory.createRemote(updateRequest, updateURL);
+		uPR.execute();
+		return true;
+    }
+    
+    @Override
+    public void handleTerminateInstance(int instanceID){
+/*
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+DELETE DATA
+{
+  <http://example.org/book/book19> dc:title "A new book" ;
+                         dc:creator "A.N.Other" .
+}	
+ */
+    	//if (true) return; 
+    	String postString = "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
+						"DELETE DATA {\n" +
+						"<http://example.org/MR/0.1>" + 
+						"dc:InstanceID \"" + instanceID + "\" . \n" +
+								"}";
+
+
+		String updateURL = "http://localhost:3030/ds/update";
+		System.out.println("Posting " + postString + "\nto" + updateURL);
+		UpdateRequest updateRequest = UpdateFactory.create(postString);
+		UpdateProcessRemote uPR = (UpdateProcessRemote) 
+				UpdateExecutionFactory.createRemote(updateRequest, updateURL);
+		uPR.execute();
     }
     
     @Override

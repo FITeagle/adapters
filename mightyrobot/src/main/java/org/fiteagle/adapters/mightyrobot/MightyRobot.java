@@ -11,7 +11,7 @@ public class MightyRobot {
     private MightyRobotAdapter owningAdapter;
     private int instanceID;
 
-    public MightyRobot(MightyRobotAdapter owningAdapter, int instanceID) {
+	public MightyRobot(MightyRobotAdapter owningAdapter, int instanceID) {
     
         this.dancing = false;
         this.exploded = false;
@@ -71,6 +71,14 @@ public class MightyRobot {
 
 	public void setOwningAdapter(MightyRobotAdapter owningAdapter) {
 		this.owningAdapter = owningAdapter;
+	}
+	
+    public int getInstanceID() {
+		return instanceID;
+	}
+
+	public void setInstanceID(int instanceID) {
+		this.instanceID = instanceID;
 	}
    
 }

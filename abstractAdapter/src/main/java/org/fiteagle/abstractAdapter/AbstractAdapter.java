@@ -57,11 +57,19 @@ public abstract class AbstractAdapter {
         if (instanceList.containsKey(instanceID)) {
             notifyListeners(instanceList.get(instanceID), "terminated:"+ instanceID + ";; " + " (ID: " + instanceID + ")", "" + instanceID, "null");
             instanceList.remove(instanceID);
+            handleTerminateInstance(instanceID);
             return true;
         }
 
         return false;
     }
+    
+    /**
+     * Subclasses could override this to do whatever needs to be done when an instance is terminated
+     */
+    public void handleTerminateInstance(int instanceID){
+    	;
+    }     
 
     public String monitorInstance(int instanceID, String serializationFormat){
     	Model modelInstances = ModelFactory.createDefaultModel();
@@ -140,7 +148,7 @@ public abstract class AbstractAdapter {
      * Needs to return a new instance of the class this adapter is supposed to handle
      * @return Object - the newly created instance
      */
-    public abstract Object handleCreateInstance(int instanceID);
+    public abstract Object handleCreateInstance(int instanceID);  
     
     /**
      * Needs to return the base class for this adapter's instance objects as a String
