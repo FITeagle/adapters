@@ -110,6 +110,9 @@ public final class MightyRobotAdapter extends AbstractAdapter{
         individualMightyRobotAdapter1.addProperty(RDF.type, adapterResource);
         individualMightyRobotAdapter1.addProperty(RDFS.label, modelGeneral.createLiteral("MightyRobot Adapter 1", "en"));
         individualMightyRobotAdapter1.addProperty(RDFS.comment, modelGeneral.createLiteral("A MightyRobot Adapter 1", "en"));
+        System.out.println(instanceClassResource);
+        System.out.println(adapterResource);
+        System.out.println(mightyRobotPropertyDancing);
 
     }
     
@@ -128,61 +131,102 @@ public final class MightyRobotAdapter extends AbstractAdapter{
     }
    
     private boolean postSparqlEntry(MightyRobot currentRobot){
-/* Get the entry
-PREFIX el: <http://purl.org/dc/elements/1.1/>
-SELECT ?InstanceID ?Dancing ?Exploded ?HeadRotation ?Nickname ?owningAdapter
+/* 
+Post the entry
+INSERT DATA { 
+	<http://fiteagle.org/ontology/adapter/mightyrobot#MightyRobotResource> 
+		<http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> "1" ; 
+		<http://fiteagle.org/ontology/adapter/mightyrobot#dancing> "false" ; 
+		<http://fiteagle.org/ontology/adapter/mightyrobot#exploded> "false" ; 
+		<http://fiteagle.org/ontology/adapter/mightyrobot#headRotation> "0" ; 
+		<http://fiteagle.org/ontology/adapter/mightyrobot#nickname> "Mecha" ; 
+		<http://fiteagle.org/ontology/adapter/mightyrobot#owningAdapter> "org.fiteagle.adapters.mightyrobot.MightyRobotAdapter@13ad3f4" .
+} 
+
+Get the entry
+PREFIX mr: <http://fiteagle.org/ontology/adapter/mightyrobot#>
+SELECT ?InstanceID ?dancing ?exploded ?headRotation ?nickname ?owningAdapter
 WHERE
 {
-?MightyRobot el:InstanceID ?InstanceID .
-?MightyRobot el:Dancing ?Dancing .
-?MightyRobot el:Exploded ?Exploded .
-?MightyRobot el:HeadRotation ?HeadRotation . 
-?MightyRobot el:Nickname ?Nickname .
-?MightyRobot el:owningAdapter ?owningAdapter .
-}		 
- */			
-		String postString = 
-				"PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT DATA { <http://example.org/MR/0.1>"
-				+ " dc:InstanceID \"" + currentRobot.getInstanceID() + "\" ;"
-				+ " dc:Nickname \"" + currentRobot.getNickname() + "\" ;"
-				+ " dc:Dancing \"" + currentRobot.getDancing() + "\" ;"
-				+ " dc:Exploded \"" + currentRobot.getExploded() + "\" ;"
-				+ " dc:HeadRotation \"" + currentRobot.getHeadRotation() + "\" ;"				
-                + " dc:owningAdapter \"" + currentRobot.getOwningAdapter() + "\" .}";
- 
-		String updateURL = "http://localhost:3030/ds/update";
-		System.out.println("Posting " + postString + "\nto" + updateURL);
-		UpdateRequest updateRequest = UpdateFactory.create(postString);
-		UpdateProcessRemote uPR = (UpdateProcessRemote) 
-				UpdateExecutionFactory.createRemote(updateRequest, updateURL);
-		uPR.execute();
-		return true;
+	?mightyrobot mr:InstanceID ?InstanceID .
+	?mightyrobot mr:dancing ?dancing .
+	?mightyrobot mr:exploded ?exploded .
+	?mightyrobot mr:headRotation ?headRotation .
+	?mightyrobot mr:nickname ?nickname .
+	?mightyrobot mr:owningAdapter ?owningAdapter .
+}
+
+Change the nickname
+PREFIX mr: <http://fiteagle.org/ontology/adapter/mightyrobot#>
+DELETE { ?mightyrobot mr:nickname "Mecha" }
+INSERT { ?mightyrobot mr:nickname "Toni" }
+WHERE { ?mightyrobot mr:nickname "Mecha" } 
+
+Delete the entry
+DELETE
+{
+?mightyrobot ?property ?value 
+}
+WHERE
+{
+?mightyrobot ?property ?value ; <http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> "1"
+}	
+*/		
+    	
+    	try {
+
+			String postString = 
+					"INSERT DATA { <"+ instanceClassResource + currentRobot.getInstanceID() + ">" 
+					+ " \n<" + getAdapterSpecificPrefix() + "InstanceID> \"" + currentRobot.getInstanceID() + "\" ;"
+					+ " \n<" + mightyRobotPropertyDancing + "> \"" + currentRobot.getDancing() + "\" ;"
+					+ " \n<" + mightyRobotPropertyExploded + "> \"" + currentRobot.getExploded() + "\" ;"
+					+ " \n<" + mightyRobotPropertyHeadRotation + "> \"" + currentRobot.getHeadRotation() + "\" ;"
+					+ " \n<" + mightyRobotPropertyNickname + "> \"" + currentRobot.getNickname() + "\" ;"
+	                + " \n<" + getAdapterSpecificPrefix() + "owningAdapter> \"" + currentRobot.getOwningAdapter() + "\" .}";			
+	 
+			String updateURL = "http://localhost:3030/ds/update";
+			System.out.println("Posting \n\n" + postString + "\n\nto " + updateURL);
+			UpdateRequest updateRequest = UpdateFactory.create(postString);
+			UpdateProcessRemote uPR = (UpdateProcessRemote) 
+					UpdateExecutionFactory.createRemote(updateRequest, updateURL);
+			uPR.execute();
+			return true;
+ 		} catch (Exception e){
+ 			e.printStackTrace();
+ 		}
+ 		return false;
     }
     
     @Override
     public void handleTerminateInstance(int instanceID){
 /*
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
-DELETE DATA
+Delete the entry
+DELETE
 {
-  <http://example.org/book/book19> dc:title "A new book" ;
-                         dc:creator "A.N.Other" .
+?mightyrobot ?property ?value 
+}
+WHERE
+{
+?mightyrobot ?property ?value ; <http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> "5"
 }	
- */
-    	//if (true) return; 
-    	String postString = "PREFIX dc: <http://purl.org/dc/elements/1.1/>\n" +
-						"DELETE DATA {\n" +
-						"<http://example.org/MR/0.1>" + 
-						"dc:InstanceID \"" + instanceID + "\" . \n" +
-								"}";
+ */ 
+    	try {
+	    	String postString = 
+	    			"DELETE { ?mightyrobot ?property ?value } \n" +
+	    					"WHERE { ?mightyrobot ?property ?value ; " +
+	    					"<http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> \"" +
+	    					instanceID + 
+	    					"\"}";
 
-
-		String updateURL = "http://localhost:3030/ds/update";
-		System.out.println("Posting " + postString + "\nto" + updateURL);
-		UpdateRequest updateRequest = UpdateFactory.create(postString);
-		UpdateProcessRemote uPR = (UpdateProcessRemote) 
-				UpdateExecutionFactory.createRemote(updateRequest, updateURL);
-		uPR.execute();
+			String updateURL = "http://localhost:3030/ds/update";
+			System.out.println("Posting \n\n" + postString + "\n\nto " + updateURL);
+			UpdateRequest updateRequest = UpdateFactory.create(postString);
+			UpdateProcessRemote uPR = (UpdateProcessRemote) 
+					UpdateExecutionFactory.createRemote(updateRequest, updateURL);
+			uPR.execute();
+    	} catch (Exception e){
+    		e.printStackTrace();
+    	}
     }
     
     @Override

@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.mightyrobot;
 
+import java.util.Random;
+
 
 public class MightyRobot {
 
@@ -10,13 +12,15 @@ public class MightyRobot {
 
     private MightyRobotAdapter owningAdapter;
     private int instanceID;
+    
+    private String[] nicknames = {"Mecha", "RD5000", "Robocop", "R2-D2", "C3-PO"};
 
 	public MightyRobot(MightyRobotAdapter owningAdapter, int instanceID) {
     
         this.dancing = false;
         this.exploded = false;
         this.headRotation = 0;
-        this.nickname = "Mecha";
+        this.nickname = nicknames[new Random().nextInt(nicknames.length)];
         this.owningAdapter = owningAdapter;
         this.instanceID = instanceID;
     }
