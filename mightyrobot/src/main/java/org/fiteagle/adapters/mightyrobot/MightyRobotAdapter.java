@@ -4,12 +4,14 @@ import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
+
+
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+//import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.modify.UpdateProcessRemote;
@@ -20,15 +22,26 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
+import org.fiteagle.adapters.mightyrobot.dm.MightyRobotAdapterBean;
+import org.fiteagle.adapters.mightyrobot.dm.MightyRobotAdapterEJB;
 
-public final class MightyRobotAdapter extends AbstractAdapter{
+import javax.ejb.*;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.jms.*;
+
+import javax.annotation.Resource;
+import javax.naming.InitialContext;
+
+@ApplicationScoped
+public class MightyRobotAdapter extends AbstractAdapter{
 
 	private String adapterSpecificPrefix = "http://fiteagle.org/ontology/adapter/mightyrobot#";
     private static MightyRobotAdapter mightyRobotAdapterSingleton; 
     
-    private Resource instanceClassResource;
+    private com.hp.hpl.jena.rdf.model.Resource instanceClassResource;
     private String instanceClassResourceString = "MightyRobotResource";
-    private Resource adapterResource;
+    private com.hp.hpl.jena.rdf.model.Resource adapterResource;
     private String adapterResourceString = "MightyRobotAdapter";
 
     private Property mightyRobotPropertyDancing;
@@ -37,16 +50,15 @@ public final class MightyRobotAdapter extends AbstractAdapter{
     private Property mightyRobotPropertyNickname;    
     
     private List<Property> adapterControlProperties = new LinkedList<Property>();
-   
+
     public static synchronized MightyRobotAdapter getInstance() 
     { 
       if ( mightyRobotAdapterSingleton == null ) 
-    	  mightyRobotAdapterSingleton = new MightyRobotAdapter(); 
-      return mightyRobotAdapterSingleton; 
+    	  mightyRobotAdapterSingleton = new MightyRobotAdapter();
+      return mightyRobotAdapterSingleton;
     }     
     
-    private MightyRobotAdapter() {
-    		 
+    public MightyRobotAdapter() {
         modelGeneral = ModelFactory.createDefaultModel();
 
         modelGeneral.setNsPrefix("", this.getAdapterSpecificPrefix());
@@ -104,9 +116,9 @@ public final class MightyRobotAdapter extends AbstractAdapter{
         adapterControlProperties.add(mightyRobotPropertyHeadRotation);
 
         mightyRobotPropertyNickname = generateProperty(modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "nickname"), XSD.xstring);
-        adapterControlProperties.add(mightyRobotPropertyNickname); 
+        adapterControlProperties.add(mightyRobotPropertyNickname);
 
-        Resource individualMightyRobotAdapter1 = modelGeneral.createResource(this.getAdapterSpecificPrefix() +  "individualMightyRobotAdapter1");
+        com.hp.hpl.jena.rdf.model.Resource individualMightyRobotAdapter1 = modelGeneral.createResource(this.getAdapterSpecificPrefix() +  "individualMightyRobotAdapter1");
         individualMightyRobotAdapter1.addProperty(RDF.type, adapterResource);
         individualMightyRobotAdapter1.addProperty(RDFS.label, modelGeneral.createLiteral("MightyRobot Adapter 1", "en"));
         individualMightyRobotAdapter1.addProperty(RDFS.comment, modelGeneral.createLiteral("A MightyRobot Adapter 1", "en"));
@@ -116,18 +128,40 @@ public final class MightyRobotAdapter extends AbstractAdapter{
 
     }
     
-    private Property generateProperty(Property template, Resource XSDType){
+    private Property generateProperty(Property template, com.hp.hpl.jena.rdf.model.Resource XSDType){
     	template.addProperty(RDF.type, OWL.DatatypeProperty);
     	template.addProperty(RDFS.domain, instanceClassResource);
     	template.addProperty(RDFS.range, XSDType);
     	return template;
-    } 
-    
-    @Override 
+    }
+
+
+   /* @Resource(mappedName = "topic/core")
+    private Topic topic;*/
+    @Inject
+    private JMSContext context;
+    //@Inject
+    //private MightyRobotAdapterBean mightyRobotAdapterBean;
+
+
+    @Override
     public Object handleCreateInstance(int instanceID){
-    	MightyRobot temp = new MightyRobot(this, instanceID);
-    			postSparqlEntry(temp);
-    	return temp;
+
+        try{
+            final Message message= this.context.createMessage();
+            message.setStringProperty("request",
+                    "resources");
+           // mightyRobotAdapterBean.sendMessage(message);
+
+
+        }catch(Exception e){
+            System.out.println("ERROR" + e.toString());
+            e.printStackTrace();
+        }
+
+        MightyRobot temp = new MightyRobot(this, instanceID);
+        postSparqlEntry(temp);
+        return temp;
     }
    
     private boolean postSparqlEntry(MightyRobot currentRobot){
@@ -233,7 +267,7 @@ WHERE
     public Model handleMonitorInstance(int instanceID, Model modelInstances){
     	MightyRobot currentMightyRobot = (MightyRobot) instanceList.get(instanceID);
 
-        Resource mightyRobotInstance = modelInstances.createResource(this.getAdapterSpecificPrefix() +  "m" + instanceID);
+        com.hp.hpl.jena.rdf.model.Resource mightyRobotInstance = modelInstances.createResource(this.getAdapterSpecificPrefix() +  "m" + instanceID);
         mightyRobotInstance.addProperty(RDF.type, instanceClassResource);
         mightyRobotInstance.addProperty(RDFS.label, "" + instanceID);
         mightyRobotInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("MightyRobot in da house " + instanceID, "en"));
@@ -252,7 +286,7 @@ WHERE
         	
         	MightyRobot currentMightyRobot= (MightyRobot) instanceList.get(key);
 
-            Resource mightyRobotInstance = modelInstances.createResource(this.getAdapterSpecificPrefix() +  "m" + key);
+            com.hp.hpl.jena.rdf.model.Resource mightyRobotInstance = modelInstances.createResource(this.getAdapterSpecificPrefix() +  "m" + key);
             mightyRobotInstance.addProperty(RDF.type, instanceClassResource);
             mightyRobotInstance.addProperty(RDFS.label, "" + key);
             mightyRobotInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("MightyRobot in da house " + key, "en"));
@@ -271,7 +305,7 @@ WHERE
 
         StmtIterator iter = model2.listStatements(new SimpleSelector(null, RDF.type, instanceClassResource));
         while (iter.hasNext()) {
-            Resource currentResource = iter.nextStatement().getSubject();
+            com.hp.hpl.jena.rdf.model.Resource currentResource = iter.nextStatement().getSubject();
             // sw.write(currentResource.getProperty(RDFS.label).getObject().toString());
             int key = Integer.parseInt(currentResource.getProperty(RDFS.label).getObject().toString());
             if (instanceList.containsKey(key)) {

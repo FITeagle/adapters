@@ -7,6 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.jms.JMSContext;
+import javax.jms.Message;
+import javax.jms.Topic;
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -130,11 +137,19 @@ public abstract class AbstractAdapterREST {
         return abstractAdapterEJB.getAllInstances(AbstractAdapter.PARAM_NTRIPLE);
     }
 
+
+
+
     @POST
     @Path("instance/{instanceNumber}")
     @Produces("text/html")
     public String createInstance(@PathParam("instanceNumber") int instanceNumber) {
         if (abstractAdapterEJB.createInstance(instanceNumber)) {
+
+
+
+
+
             return "Created instance number : " + instanceNumber;
         }
         return "Invalid instance number";
