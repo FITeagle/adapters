@@ -51,12 +51,12 @@ public class MightyRobotAdapter extends AbstractAdapter{
     
     private List<Property> adapterControlProperties = new LinkedList<Property>();
 
-    /*public static synchronized MightyRobotAdapter getInstance()
+    public static synchronized MightyRobotAdapter getInstance()
     { 
       if ( mightyRobotAdapterSingleton == null ) 
     	  mightyRobotAdapterSingleton = new MightyRobotAdapter();
       return mightyRobotAdapterSingleton;
-    } */
+    }
     
     public MightyRobotAdapter() {
         modelGeneral = ModelFactory.createDefaultModel();
