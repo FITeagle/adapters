@@ -11,13 +11,6 @@ import java.util.List;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
-import javax.jms.JMSContext;
-import javax.jms.Message;
-import javax.jms.Topic;
-import javax.ejb.LocalBean;
-import javax.ejb.Stateless;
 
 /**
  * Abstract class defining the basics all the current adapters are following
@@ -27,7 +20,7 @@ public abstract class AbstractAdapter {
 	
     public static final String PARAM_TURTLE = "TURTLE";
     public static final String PARAM_RDFXML = "RDF/XML";
-    public static final String PARAM_NTRIPLE = "N-TRIPLE";	
+    public static final String PARAM_NTRIPLE = "N-TRIPLE";
 	
 	private List<PropertyChangeListener> listener = new ArrayList<PropertyChangeListener>();
     protected HashMap<Integer, Object> instanceList = new HashMap<Integer, Object>();	
@@ -41,26 +34,7 @@ public abstract class AbstractAdapter {
 
         return writer.toString();
     }
-  /*  @Resource(mappedName = "topic/core")
-    private Topic topic;
-    @Inject*/
-   // private JMSContext context;
     public boolean createInstance(int instanceID){
-
-     /*   try{
-            final Message message= this.context.createMessage();
-            message.setStringProperty("request",
-                    "resources");
-            System.out.println("TROOOLLLLLLL");
-            this.context.createProducer().send(this.topic, message);
-            //Connection con = this.cf.createConnection();
-
-
-        }catch(Exception e){
-            System.out.println("ERROR" + e.toString());
-            e.printStackTrace();
-        }*/
-
 
         if (instanceList.containsKey(instanceID)) {
             return false;
