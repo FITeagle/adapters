@@ -10,22 +10,23 @@ import javax.jms.Topic;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+@Stateless
 public class MightyRobotAdapterBean {
-/*
+
 	@Inject
     private JMSContext jmsContext;
-	//@Resource(mappedName = "java:/topic/core") //todo: get from api package
-    @Resource(mappedName = "topic/core")
+	 //todo: get from api package
+
+    @Resource(mappedName = "java:/topic/core")
     private Topic topic;
-	private static final Logger LOGGER = Logger.getLogger(MightyRobotAdapterBean.class
-            .getName());
+//	private static final Logger LOGGER = Logger.getLogger(MightyRobotAdapterBean.class
+   //         .getName());
 
 	public void sendMessage(Message message) throws JMSException {
-		LOGGER.log(Level.INFO, "Submitting request to JMS...");
+//		LOGGER.log(Level.INFO, "Submitting request to JMS...");
         System.out.println("Submitting request to JMS...");
 		jmsContext.createProducer().send(topic, message);
-	}*/
+	}
 //
 //	public Message createMessage() {
 //		if (null == jmsContext)

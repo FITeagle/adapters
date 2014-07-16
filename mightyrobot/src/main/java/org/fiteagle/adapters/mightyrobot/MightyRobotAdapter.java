@@ -51,12 +51,12 @@ public class MightyRobotAdapter extends AbstractAdapter{
     
     private List<Property> adapterControlProperties = new LinkedList<Property>();
 
-    public static synchronized MightyRobotAdapter getInstance() 
+    /*public static synchronized MightyRobotAdapter getInstance()
     { 
       if ( mightyRobotAdapterSingleton == null ) 
     	  mightyRobotAdapterSingleton = new MightyRobotAdapter();
       return mightyRobotAdapterSingleton;
-    }     
+    } */
     
     public MightyRobotAdapter() {
         modelGeneral = ModelFactory.createDefaultModel();
@@ -140,8 +140,8 @@ public class MightyRobotAdapter extends AbstractAdapter{
     private Topic topic;*/
     @Inject
     private JMSContext context;
-    //@Inject
-    //private MightyRobotAdapterBean mightyRobotAdapterBean;
+    @Inject
+    private MightyRobotAdapterBean mightyRobotAdapterBean;
 
 
     @Override
@@ -151,7 +151,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
             final Message message= this.context.createMessage();
             message.setStringProperty("request",
                     "resources");
-           // mightyRobotAdapterBean.sendMessage(message);
+             mightyRobotAdapterBean.sendMessage(message);
 
 
         }catch(Exception e){
