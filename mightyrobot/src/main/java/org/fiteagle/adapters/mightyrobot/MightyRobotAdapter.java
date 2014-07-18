@@ -149,8 +149,10 @@ public class MightyRobotAdapter extends AbstractAdapter{
 
         try{
             final Message message= this.context.createMessage();
-            message.setStringProperty("request",
-                    "resources");
+            message.setStringProperty("type",
+                    "update");
+            message.setStringProperty("data",
+                    "HalliHallo");
              mightyRobotAdapterBean.sendMessage(message);
 
 
@@ -160,7 +162,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
         }
 
         MightyRobot temp = new MightyRobot(this, instanceID);
-        postSparqlEntry(temp);
+  //      postSparqlEntry(temp);
         return temp;
     }
    
