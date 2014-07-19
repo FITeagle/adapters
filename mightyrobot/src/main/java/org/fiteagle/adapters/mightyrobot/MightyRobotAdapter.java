@@ -8,6 +8,11 @@ import java.util.List;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -69,7 +74,6 @@ public class MightyRobotAdapter extends AbstractAdapter{
         modelGeneral.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 
         // Property instantiatesProperty = new PropertyImpl("fiteagle:instantiates");
-
         instanceClassResource = modelGeneral.createResource(this.getAdapterSpecificPrefix() +  instanceClassResourceString);
         instanceClassResource.addProperty(RDF.type, OWL.Class);
         instanceClassResource.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
@@ -80,32 +84,6 @@ public class MightyRobotAdapter extends AbstractAdapter{
         adapterResource.addProperty(modelGeneral.createProperty("http://fiteagle.org/ontology#instantiates"), instanceClassResource);
 
         // create the properties
-        /*
-        mightyRobotPropertyDancing = modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "dancing");
-        mightyRobotPropertyDancing.addProperty(RDF.type, OWL.DatatypeProperty);
-        mightyRobotPropertyDancing.addProperty(RDFS.domain, instanceClassResource);
-        mightyRobotPropertyDancing.addProperty(RDFS.range, XSD.xboolean);
-        adapterControlProperties.add(mightyRobotPropertyDancing);        
-
-        mightyRobotPropertyExploded = modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "exploded");
-        mightyRobotPropertyExploded.addProperty(RDF.type, OWL.DatatypeProperty);
-        mightyRobotPropertyExploded.addProperty(RDFS.domain, instanceClassResource);
-        mightyRobotPropertyExploded.addProperty(RDFS.range, XSD.xboolean);
-        adapterControlProperties.add(mightyRobotPropertyExploded);        
-
-        mightyRobotPropertyHeadRotation = modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "headRotation");
-        mightyRobotPropertyHeadRotation.addProperty(RDF.type, OWL.DatatypeProperty);
-        mightyRobotPropertyHeadRotation.addProperty(RDFS.domain, instanceClassResource);
-        mightyRobotPropertyHeadRotation.addProperty(RDFS.range, XSD.integer);
-        adapterControlProperties.add(mightyRobotPropertyHeadRotation);         
- 
-        mightyRobotPropertyNickname = modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "nickname");
-        mightyRobotPropertyNickname.addProperty(RDF.type, OWL.DatatypeProperty);
-        mightyRobotPropertyNickname.addProperty(RDFS.domain, instanceClassResource);
-        mightyRobotPropertyNickname.addProperty(RDFS.range, XSD.xstring);
-        adapterControlProperties.add(mightyRobotPropertyNickname); 
-        */          
-
         mightyRobotPropertyDancing = generateProperty(modelGeneral.createProperty(this.getAdapterSpecificPrefix() +  "dancing"), XSD.xboolean);
         adapterControlProperties.add(mightyRobotPropertyDancing);
 
@@ -122,10 +100,6 @@ public class MightyRobotAdapter extends AbstractAdapter{
         individualMightyRobotAdapter1.addProperty(RDF.type, adapterResource);
         individualMightyRobotAdapter1.addProperty(RDFS.label, modelGeneral.createLiteral("MightyRobot Adapter 1", "en"));
         individualMightyRobotAdapter1.addProperty(RDFS.comment, modelGeneral.createLiteral("A MightyRobot Adapter 1", "en"));
-        System.out.println(instanceClassResource);
-        System.out.println(adapterResource);
-        System.out.println(mightyRobotPropertyDancing);
-
     }
     
     private Property generateProperty(Property template, com.hp.hpl.jena.rdf.model.Resource XSDType){
@@ -142,31 +116,40 @@ public class MightyRobotAdapter extends AbstractAdapter{
     private JMSContext context;
     @Inject
     private MightyRobotAdapterBean mightyRobotAdapterBean;
-
-
-    @Override
-    public Object handleCreateInstance(int instanceID){
-
+    
+    private void sendSparqlMessage(String data, String type){
         try{
             final Message message= this.context.createMessage();
             message.setStringProperty("type",
-                    "update");
+                    type);
             message.setStringProperty("data",
-                    "HalliHallo");
-             mightyRobotAdapterBean.sendMessage(message);
+            		data);
+            mightyRobotAdapterBean.sendMessage(message);
 
 
         }catch(Exception e){
-            System.out.println("ERROR" + e.toString());
             e.printStackTrace();
         }
+    }
 
+    @Override
+    public Object handleCreateInstance(int instanceID){
         MightyRobot temp = new MightyRobot(this, instanceID);
-  //      postSparqlEntry(temp);
+		String data = 
+				"INSERT DATA { <"+ instanceClassResource + temp.getInstanceID() + ">" 
+				+ " \n<" + getAdapterSpecificPrefix() + "InstanceID> \"" + temp.getInstanceID() + "\" ;"
+				+ " \n<" + mightyRobotPropertyDancing + "> \"" + temp.getDancing() + "\" ;"
+				+ " \n<" + mightyRobotPropertyExploded + "> \"" + temp.getExploded() + "\" ;"
+				+ " \n<" + mightyRobotPropertyHeadRotation + "> \"" + temp.getHeadRotation() + "\" ;"
+				+ " \n<" + mightyRobotPropertyNickname + "> \"" + temp.getNickname() + "\" ;"
+                + " \n<" + getAdapterSpecificPrefix() + "owningAdapter> \"" + temp.getOwningAdapter() + "\" .}";        
+        
+        
+        sendSparqlMessage(data, "update");
+        
         return temp;
     }
    
-    private boolean postSparqlEntry(MightyRobot currentRobot){
 /* 
 Post the entry
 INSERT DATA { 
@@ -207,35 +190,7 @@ WHERE
 {
 ?mightyrobot ?property ?value ; <http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> "1"
 }	
-*/		
-    	
-    	try {
 
-			String postString = 
-					"INSERT DATA { <"+ instanceClassResource + currentRobot.getInstanceID() + ">" 
-					+ " \n<" + getAdapterSpecificPrefix() + "InstanceID> \"" + currentRobot.getInstanceID() + "\" ;"
-					+ " \n<" + mightyRobotPropertyDancing + "> \"" + currentRobot.getDancing() + "\" ;"
-					+ " \n<" + mightyRobotPropertyExploded + "> \"" + currentRobot.getExploded() + "\" ;"
-					+ " \n<" + mightyRobotPropertyHeadRotation + "> \"" + currentRobot.getHeadRotation() + "\" ;"
-					+ " \n<" + mightyRobotPropertyNickname + "> \"" + currentRobot.getNickname() + "\" ;"
-	                + " \n<" + getAdapterSpecificPrefix() + "owningAdapter> \"" + currentRobot.getOwningAdapter() + "\" .}";			
-	 
-			String updateURL = "http://localhost:3030/ds/update";
-			System.out.println("Posting \n\n" + postString + "\n\nto " + updateURL);
-			UpdateRequest updateRequest = UpdateFactory.create(postString);
-			UpdateProcessRemote uPR = (UpdateProcessRemote) 
-					UpdateExecutionFactory.createRemote(updateRequest, updateURL);
-			uPR.execute();
-			return true;
- 		} catch (Exception e){
- 			e.printStackTrace();
- 		}
- 		return false;
-    }
-    
-    @Override
-    public void handleTerminateInstance(int instanceID){
-/*
 Delete the entry
 DELETE
 {
@@ -245,24 +200,20 @@ WHERE
 {
 ?mightyrobot ?property ?value ; <http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> "5"
 }	
- */ 
-    	try {
-	    	String postString = 
-	    			"DELETE { ?mightyrobot ?property ?value } \n" +
-	    					"WHERE { ?mightyrobot ?property ?value ; " +
-	    					"<http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> \"" +
-	    					instanceID + 
-	    					"\"}";
+*/		
+  
+    @Override
+    public void handleTerminateInstance(int instanceID){
 
-			String updateURL = "http://localhost:3030/ds/update";
-			System.out.println("Posting \n\n" + postString + "\n\nto " + updateURL);
-			UpdateRequest updateRequest = UpdateFactory.create(postString);
-			UpdateProcessRemote uPR = (UpdateProcessRemote) 
-					UpdateExecutionFactory.createRemote(updateRequest, updateURL);
-			uPR.execute();
-    	} catch (Exception e){
-    		e.printStackTrace();
-    	}
+    	String data = 
+    			"DELETE { ?mightyrobot ?property ?value } \n" +
+    					"WHERE { ?mightyrobot ?property ?value ; " +
+    					"<http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> \"" +
+    					instanceID + 
+    					"\"}";
+    	
+    	sendSparqlMessage(data, "update");
+
     }
     
     @Override
@@ -284,6 +235,23 @@ WHERE
 
 	@Override
 	public Model handleGetAllInstances(Model modelInstances) {
+
+		// db messaging should not happen here, it is not needed as the adapter keeps track of its resources without querying the db for their status
+		// this is just here for testing
+		String data = 
+				"PREFIX mr: <http://fiteagle.org/ontology/adapter/mightyrobot#>\n" +
+					"SELECT ?InstanceID ?dancing ?exploded ?headRotation ?nickname ?owningAdapter\n"+
+					"WHERE\n"+
+					"{\n"+
+						"?mightyrobot mr:InstanceID ?InstanceID .\n"+
+						"?mightyrobot mr:dancing ?dancing .\n"+
+						"?mightyrobot mr:exploded ?exploded .\n"+
+						"?mightyrobot mr:headRotation ?headRotation .\n"+
+						"?mightyrobot mr:nickname ?nickname .\n"+
+						"?mightyrobot mr:owningAdapter ?owningAdapter .\n"+
+					"}\n";	
+    	sendSparqlMessage(data, "query");
+    	
 		for (Integer key : instanceList.keySet()) {
         	
         	MightyRobot currentMightyRobot= (MightyRobot) instanceList.get(key);

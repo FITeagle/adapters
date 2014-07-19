@@ -61,6 +61,6 @@ public class MightyRobotAdapterTest {
         // terminate instance
         Assert.assertEquals(true, mightyRobotAdapter.terminateInstance(1));
     }
-
+    
 }
 
