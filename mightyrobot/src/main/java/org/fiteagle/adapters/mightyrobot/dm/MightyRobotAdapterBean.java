@@ -14,16 +14,17 @@ public class MightyRobotAdapterBean {
     private JMSContext jmsContext;
 	 //todo: get from api package
 
-   // @Resource(mappedName = "java:/topic/core")
-    @Resource(mappedName = "java:/jms/queue/sparqlModule")
-    private Queue queue;
+
+    //@Resource(mappedName = "java:/jms/queue/sparqlModule")
+    @Resource(mappedName = "java:/topic/core")
+    private Topic topic;
 //	private static final Logger LOGGER = Logger.getLogger(MightyRobotAdapterBean.class
    //         .getName());
 
 	public void sendMessage(Message message) throws JMSException {
 //		LOGGER.log(Level.INFO, "Submitting request to JMS...");
         System.out.println("Submitting request to JMS...");
-		jmsContext.createProducer().send(queue, message);
+		jmsContext.createProducer().send(topic, message);
 	}
 //
 //	public Message createMessage() {

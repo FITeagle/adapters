@@ -9,8 +9,8 @@ import javax.jms.Queue;
  * Created by vju on 7/18/14.
  */
 @MessageDriven(mappedName="jms/SparqlMDB", activationConfig = {
-        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/queue/sparqlModule"),
+        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/topic/core"),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class SparqlMDB implements MessageListener{
     public void onMessage(Message inMessage){
