@@ -17,8 +17,8 @@
     </modules>
 
 	<description>
-        FITeagle | Future Internet Testbed Experimentation and Management Framework
-    </description>
+           FITeagle | Future Internet Testbed Experimentation and Management Framework
+  </description>
 
 	<organization>
 		<name>Berlin University of Technology, Next Generation Networks (AV)</name>
@@ -58,6 +58,57 @@
 			<url>http://fiteagle.org/maven</url>
 		</repository>
 	</repositories>
+
+	<developers>
+		<developer>
+			<email>alexander.willner@tu-berlin.de</email>
+			<name>Alexander Willner</name>
+			<url>http://av.tu-berlin.de/willner</url>
+			<id>Alex</id>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:git://github.com/tubav/fiteagle.git</connection>
+		<developerConnection>scm:git:git@github.com:tubav/fiteagle.git</developerConnection>
+		<url>https://github.com/tubav/fiteagle</url>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>fiteagle</id>
+			<name>fiteagle</name>
+			<url>http://fiteagle.org/maven</url>
+		</repository>
+		<site>
+			<id>github</id>
+			<name>fiteagle</name>
+			<url>https://github.com/tubav/fiteagle/</url>
+		</site>
+	</distributionManagement>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>http://github.com/tubav/fiteagle</url>
+	</issueManagement>
+
+	<mailingLists>
+		<mailingList>
+			<name>fiteagle-dev</name>
+			<subscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/dev</subscribe>
+			<unsubscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/dev</unsubscribe>
+			<post>dev@lists.fiteagle.org</post>
+			<archive>http://lists.fiteagle.org/pipermail/dev/</archive>
+		</mailingList>
+		<mailingList>
+			<name>fiteagle-user</name>
+			<subscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/users</subscribe>
+			<unsubscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/users</unsubscribe>
+			<post>users@lists.fiteagle.org</post>
+			<archive>http://lists.fiteagle.org/pipermail/users/</archive>
+		</mailingList>
+	</mailingLists>
+
 
 	<dependencyManagement>
 		<dependencies>
@@ -393,55 +444,6 @@
 		</pluginManagement>
 	</build>
 
-	<developers>
-		<developer>
-			<email>alexander.willner@tu-berlin.de</email>
-			<name>Alexander Willner</name>
-			<url>http://av.tu-berlin.de/willner</url>
-			<id>Alex</id>
-		</developer>
-	</developers>
-	<scm>
-		<connection>scm:git:git://github.com/tubav/fiteagle.git</connection>
-		<developerConnection>scm:git:git@github.com:tubav/fiteagle.git</developerConnection>
-		<url>https://github.com/tubav/fiteagle</url>
-	</scm>
-
-	<distributionManagement>
-		<repository>
-			<uniqueVersion>false</uniqueVersion>
-			<id>fiteagle</id>
-			<name>fiteagle</name>
-			<url>http://fiteagle.org/maven</url>
-		</repository>
-		<site>
-			<id>github</id>
-			<name>fiteagle</name>
-			<url>https://github.com/tubav/fiteagle/</url>
-		</site>
-	</distributionManagement>
-
-	<issueManagement>
-		<system>GitHub</system>
-		<url>http://github.com/tubav/fiteagle</url>
-	</issueManagement>
-
-	<mailingLists>
-		<mailingList>
-			<name>fiteagle-dev</name>
-			<subscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/dev</subscribe>
-			<unsubscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/dev</unsubscribe>
-			<post>dev@lists.fiteagle.org</post>
-			<archive>http://lists.fiteagle.org/pipermail/dev/</archive>
-		</mailingList>
-		<mailingList>
-			<name>fiteagle-user</name>
-			<subscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/users</subscribe>
-			<unsubscribe>http://lists.fiteagle.org/cgi-bin/mailman/listinfo/users</unsubscribe>
-			<post>users@lists.fiteagle.org</post>
-			<archive>http://lists.fiteagle.org/pipermail/users/</archive>
-		</mailingList>
-	</mailingLists>
 
 	<reporting>
 		<plugins>
@@ -453,34 +455,28 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.4</version>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>index</report>
-							<report>scm</report>
-							<report>license</report>
-							<report>dependencies</report>
-							<report>dependency-convergence</report>
-							<report>dependency-management</report>
-							<report>mailing-list</report>
-							<report>modules</report>
-							<report>summary</report>
-						</reports>
-					</reportSet>
-				</reportSets>
+				<version>2.7</version>
 				<configuration>
-					<!-- Adding location information is very slow, so we disable it. -->
 					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
 				</configuration>
 			</plugin>
-			<plugin>
+			 <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<configuration>
-					<linkXref>true</linkXref>
-				</configuration>
-				<version>${pmd.version}</version>
-			</plugin>
+				<version>3.1</version>
+					<configuration>
+			  <linkXref>true</linkXref>
+			  <sourceEncoding>utf-8</sourceEncoding>
+			  <minimumTokens>100</minimumTokens>
+			  <targetJdk>1.7</targetJdk>
+			</configuration>
+			      </plugin>
+			      
+			     <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jxr-plugin</artifactId>
+			<version>2.4</version>
+		      </plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>taglist-maven-plugin</artifactId>
