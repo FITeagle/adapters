@@ -21,19 +21,20 @@ import com.hp.hpl.jena.update.UpdateRequest;
 @MessageDriven(mappedName="jms/SparqlMDB", activationConfig = {
         @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/topic/core"),
-        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
+        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge"),
+        @ActivationConfigProperty(propertyName = "messageSelector", propertyValue = "topic = 'Fuseki'")
+})
 public class SparqlMDB implements MessageListener{
 
     @Resource(mappedName = "java:/topic/core")
     private Topic topic;
-    @Resource(mappedName = "java:/topic/usermanagement")
-    private Topic topic2;
+
     @Inject
     private JMSContext jmsContext;
     public void onMessage(Message inMessage){
         System.out.println("received message in SparqlMDB  1");
         try{
-           /* String type = inMessage.getStringProperty("type");
+            String type = inMessage.getStringProperty("type");
             if(type.equals((String) "update")){
                 String data = inMessage.getStringProperty("data");
                 System.out.println("Sent data is:" + data + " and type is: " +type);
@@ -41,21 +42,15 @@ public class SparqlMDB implements MessageListener{
             } else if (type.equals("query")){
                 String data = inMessage.getStringProperty("data");
             	submitSparqlQuery(data);
-            }*/
-
-
-                String type = inMessage.getStringProperty("abc");
-            if(type.equals((String) "dafuq")){
-
-             System.out.println("received message in SparqlMDB  2 ");
+            }else if(type.equals("getAdapterList")){
+                System.out.println("received message in SparqlMDB  2 ");
                 Message m = jmsContext.createMessage();
-                m.setStringProperty("def","fubar");
-                jmsContext.createProducer().send(topic2, m);
-                System.out.println("answered");
+                System.out.println("Correlation ID is: " + inMessage.getJMSCorrelationID() );
+                m.setJMSCorrelationID(inMessage.getJMSCorrelationID());
+
+                m.setStringProperty("response","Goes here");
+                jmsContext.createProducer().send((Queue) inMessage.getJMSReplyTo(), m);
             }
-
-
-
         }catch(Exception e){
            e.printStackTrace();
         }
