@@ -120,6 +120,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
     private void sendSparqlMessage(String data, String type){
         try{
             final Message message= this.context.createMessage();
+            message.setStringProperty("topic", "Fuseki");
             message.setStringProperty("type",
                     type);
             message.setStringProperty("data",

@@ -84,8 +84,8 @@ public class SparqlMDB implements MessageListener{
 			Query query = QueryFactory.create(data);
 			QueryExecution qE = QueryExecutionFactory.sparqlService(updateURL, query);
 			ResultSet results = qE.execSelect();	
-			if (true){
-				System.out.println(results.nextSolution());
+			while (results.hasNext()){
+				System.out.println(results.next());
 			}
 
 			return true;
