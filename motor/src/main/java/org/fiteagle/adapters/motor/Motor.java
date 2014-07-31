@@ -1,10 +1,11 @@
 package org.fiteagle.adapters.motor;
 
+
 public class Motor {
 
     public String getManufacturer() {
         return manufacturer;
-    } 
+    }
 
     public void setManufacturer(String manufacturer) {
         owningAdapter.notifyListeners(this, "manufacturer", this.manufacturer, this.manufacturer = manufacturer);
@@ -47,6 +48,11 @@ public class Motor {
         this.owningAdapter = owningAdapter;
         this.instanceID = instanceID;
     }
+    
+    public Motor(){
+        super();
+        
+    }
 
     public String toString() {
 
@@ -58,6 +64,15 @@ public class Motor {
     private int maxRpm;
     private int throttle;
     private MotorAdapter owningAdapter;
+    
+    public int getInstanceID() {
+        return instanceID;
+    }
+
+    public void setInstanceID(int instanceID) {
+        this.instanceID = instanceID;
+    }
+
     private int instanceID;
 
 }

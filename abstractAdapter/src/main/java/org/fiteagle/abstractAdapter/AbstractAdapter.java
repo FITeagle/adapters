@@ -48,7 +48,6 @@ public abstract class AbstractAdapter {
         notifyListeners(newInstance, "provisioned:" + instanceID + "::0;;" + " (ID: " + instanceID + ")", "null", "" + instanceID);
 
         return true;
-
     }
 
 
