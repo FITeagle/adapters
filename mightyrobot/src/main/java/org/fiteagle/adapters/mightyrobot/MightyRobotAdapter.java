@@ -30,6 +30,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import org.fiteagle.adapters.mightyrobot.dm.MightyRobotAdapterBean;
 import org.fiteagle.adapters.mightyrobot.dm.MightyRobotAdapterEJB;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.*;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -39,6 +40,7 @@ import javax.annotation.Resource;
 import javax.naming.InitialContext;
 
 @ApplicationScoped
+@Startup
 public class MightyRobotAdapter extends AbstractAdapter{
 
 	private String adapterSpecificPrefix = "http://fiteagle.org/ontology/adapter/mightyrobot#";
@@ -101,7 +103,17 @@ public class MightyRobotAdapter extends AbstractAdapter{
         individualMightyRobotAdapter1.addProperty(RDFS.label, modelGeneral.createLiteral("MightyRobot Adapter 1", "en"));
         individualMightyRobotAdapter1.addProperty(RDFS.comment, modelGeneral.createLiteral("A MightyRobot Adapter 1", "en"));
     }
-    
+    @PostConstruct
+    private void postConstruct(){
+        System.out.println();
+        System.out.println("ALLLLLLLLLLLLLLLERT!!!!!!!!!!!!! POSTCONSTRUCT");
+        System.out.println();
+    }
+    // used to force the container to create an instance of this application scoped class
+    public void init(){
+
+    }
+
     private Property generateProperty(Property template, com.hp.hpl.jena.rdf.model.Resource XSDType){
     	template.addProperty(RDF.type, OWL.DatatypeProperty);
     	template.addProperty(RDFS.domain, instanceClassResource);
