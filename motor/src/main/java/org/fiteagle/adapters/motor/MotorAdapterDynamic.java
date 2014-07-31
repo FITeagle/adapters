@@ -67,7 +67,7 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
                     return;
 
                 }
-                adapter.getInstance(instanceID).setRpm(randomRPMGenerator.nextInt(5000));
+                adapter.getInstance(instanceID).setRpm(randomRPMGenerator.nextInt(1000));
             }
             return;
         }
