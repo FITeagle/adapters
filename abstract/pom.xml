@@ -1,28 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
     
-	<name>FITeagle :: Adapters :: Stopwatch</name>
+	<name>FITeagle :: Adapters :: Abstract</name>
 	<groupId>org.fiteagle.adapters</groupId>
-	<artifactId>stopwatch</artifactId>
-	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>abstract</artifactId>
+	<packaging>jar</packaging>
+	<version>0.1-SNAPSHOT</version>
     <parent>
         <groupId>org.fiteagle</groupId>
         <artifactId>adapters</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
-	
+
 	<dependencies>
-        <dependency>
-            <groupId>org.fiteagle.adapters</groupId>
-            <artifactId>abstract</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-multipart-provider</artifactId>
+			<version>3.0.6.Final</version>
+		</dependency>
 	</dependencies>
 
+	
 	<build>
-		<finalName>AdapterStopwatch</finalName>
+		<finalName>AdapterAbstract</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
