@@ -26,7 +26,11 @@ Access the Adapter
 
 First start the logger and commander webservice at: core/bus via mvn wildfly:deploy
 
-Control the Adapter via the Adapter Console GUI Interface in native/src/main/webapp/gui/admin/console2.html
+Then deploy the native GUI at: native via mvn wildfly:deploy
+
+Control the Adapter via the Adapter Console GUI Interface at 
+
+    http://localhost:8080/native/gui/admin/console2.html
 
 Discover, listResources, Provision, Monitor, Terminate via Buttons
 Create Control Input Strings via the box on the right and submit via Control button.
