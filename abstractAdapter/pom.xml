@@ -58,12 +58,6 @@
 	</dependencyManagement>
 	<dependencies>
 
-        <dependency>
-            <groupId>org.fiteagle.abstractAdapter</groupId>
-            <artifactId>abstractAdapter</artifactId>
-            <version>0.1-SNAPSHOT</version>
-        </dependency>
-
 		<!-- General FITeagle dependencies -->
 		<dependency>
 			<groupId>org.wildfly</groupId>
