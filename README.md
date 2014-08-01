@@ -7,3 +7,4 @@ To run the tests and build the documentation:
 
     mvn clean install test site site:stage
     open target/staging/adapters/index.html
+
