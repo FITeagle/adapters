@@ -8,11 +8,19 @@
 	<packaging>pom</packaging>
 	<version>0.1-SNAPSHOT</version>
 	<url>https://github.com/fiteagle</url>
+
     <parent>
         <groupId>org.fiteagle</groupId>
         <artifactId>bootstrap</artifactId>
         <version>0.1-SNAPSHOT</version>
     </parent>
+
+	<repositories>
+		<repository>
+			<id>fiteagle-repo</id>
+			<url>http://fiteagle.org/maven</url>
+		</repository>
+	</repositories>
 
 	<modules>
             <module>abstract</module>
