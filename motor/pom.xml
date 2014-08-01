@@ -35,6 +35,10 @@
 			<id>JBoss Repository</id>
 			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
 		</repository>
+		<repository>
+			<id>fiteagle-repo</id>
+			<url>http://fiteagle.org/maven</url>
+		</repository>
 	</repositories>
 	<dependencyManagement>
 		<dependencies>
