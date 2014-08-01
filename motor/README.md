@@ -2,7 +2,7 @@ FITeagle :: Adapter :: Motor
 =============================
 - Level: Demonstration
 - Technologies: REST
-- Summary: Test implementation of Motor Adapter with REST using RestEasy in Wildfly Environment
+- Summary: Test implementation of Motor Adapter with REST in a Wildfly Environment
 - Target Product: FITeagle
 - Source: <https://github.com/fiteagle/adapters/>
 
