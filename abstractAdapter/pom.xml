@@ -14,6 +14,20 @@
 	<description>
            FITeagle | Future Internet Testbed Experimentation and Management Framework
   </description>
+
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>fiteagle</id>
+			<name>fiteagle</name>
+			<url>http://fiteagle.org/maven</url>
+		</repository>
+		<site>
+			<id>github</id>
+			<name>fiteagle</name>
+			<url>https://github.com/fiteagle/</url>
+		</site>
+	</distributionManagement>
       
   <url>http://av.tu-berlin.de</url>
 
