@@ -23,17 +23,16 @@
 
 	<build>
 		<finalName>AdapterMightyRobot</finalName>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-				<filtering>true</filtering>
-			</testResource>
-		</testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
+                <version>${wildfly.version}</version>
+                <configuration>
+                    <skip>false</skip>
+                    <filename>${project.build.finalName}.war</filename>
+                </configuration>
+            </plugin>
+        </plugins>
 	</build>
 </project>
