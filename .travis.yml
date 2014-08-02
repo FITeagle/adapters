@@ -9,5 +9,3 @@ notifications:
     - leopalm@mailbox.tu-berlin.de
     - volker.jung@campus.tu-berlin.de
     - francoh@mail.tu-berlin.de
-after_success:
-  - mvn clean test jacoco:report coveralls:jacoco
