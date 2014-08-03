@@ -26,8 +26,6 @@ import org.fiteagle.api.core.IResourceRepository;
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class MotorAdapterMDBListener implements MessageListener {
 
-    // private final static Logger LOGGER = Logger
-    // .getLogger(MotorAdapterMDB.class.toString());
     private MotorAdapter adapter;
 
     @Inject
@@ -39,53 +37,96 @@ public class MotorAdapterMDBListener implements MessageListener {
     public void setup() throws NamingException {
         this.adapter = MotorAdapter.getInstance();
     }
+    
+    public String responseDescribe(Message requestMessage) throws JMSException{
+        return this.adapter.getAdapterDescription(getSerialization(requestMessage));
+    }
+    
+    public String responseInstances(Message requestMessage) throws JMSException{
+        return this.adapter.getAllInstances(getSerialization(requestMessage));
+    }
+    
+    public String responseMonitor(Message requestMessage) throws JMSException{
+        int instanceID = getInstanceID(requestMessage);
+        return this.adapter.monitorInstance(instanceID, getSerialization(requestMessage));
+    }
 
-    public void onMessage(final Message message) {
+    public String responseProvision(Message requestMessage) throws JMSException{
+        int instanceID = getInstanceID(requestMessage);
+        if (this.adapter.createInstance(instanceID)) {
+            return "Created instance " + instanceID;
+        } else {
+            return "Cannot create instance " + instanceID;
+        }
+    }
+    
+    public String responseControl(Message requestMessage) throws JMSException{
+        String controlString = requestMessage.getStringProperty(IResourceRepository.PROP_CONTROL);
+       
+        // Need to convert String to input stream for Apache Jena
+        InputStream in = new ByteArrayInputStream(controlString.getBytes());
+        return this.adapter.controlInstance(in, getSerialization(requestMessage));
+    }
+    
+    public String responseTerminate(Message requestMessage) throws JMSException{
+        int instanceID = getInstanceID(requestMessage);
+        if (this.adapter.terminateInstance(instanceID)) {
+            return "Terminated instance " + instanceID;
+        } else {
+            return "Cannot terminate instance " + instanceID;
+        }
+        
+    }
+
+    public String getSerialization(Message message) throws JMSException{
+        return message.getStringProperty(IResourceRepository.PROP_SERIALIZATION);
+    }
+    
+    public int getInstanceID(Message message) throws JMSException{
+        return Integer.parseInt(message.getStringProperty(IResourceRepository.PROP_INSTANCE_ID));
+    }
+    
+    public Message generateResponseMessage(Message requestMessage, String result) throws JMSException{
+        final Message responseMessage = this.context.createMessage();
+        
+        // TODO: What kind of response types will be available?
+        responseMessage.setStringProperty(IMessageBus.TYPE_RESPONSE, requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST));
+        responseMessage.setStringProperty(IMessageBus.TYPE_RESULT, result);
+        
+        return responseMessage;
+    }
+
+    public void onMessage(final Message requestMessage) {
         try {
 
-            if (message.getStringProperty(IMessageBus.TYPE_REQUEST) != null) {
+            if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST) != null) {
                 String result = "";
-                final String id = message.getJMSCorrelationID();
-                final Message responseMessage = this.context.createMessage();
 
                 try {
 
-                    if (message.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_DESCRIBE)) {
-                        String serializationFormat = message.getStringProperty(IResourceRepository.PROP_SERIALIZATION);
-                        result = this.adapter.getAdapterDescription(serializationFormat);
+                    if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_DESCRIBE)) {
+                        
+                        result = responseDescribe(requestMessage);
 
-                    } else if (message.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_LIST_RESOURCES)) {
-                        String serializationFormat = message.getStringProperty(IResourceRepository.PROP_SERIALIZATION);
-                        result = this.adapter.getAllInstances(serializationFormat);
+                    } else if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_LIST_RESOURCES)) {
+                        
+                        result = responseInstances(requestMessage);
 
-                    } else if (message.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_MONITOR)) {
-                        String serializationFormat = message.getStringProperty(IResourceRepository.PROP_SERIALIZATION);
-                        int instanceID = Integer.parseInt(message.getStringProperty(IResourceRepository.PROP_INSTANCE_ID));
-                        result = this.adapter.monitorInstance(instanceID, serializationFormat);
+                    } else if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_MONITOR)) {
+                        
+                        result = responseMonitor(requestMessage);
 
-                    } else if (message.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_PROVISION)) {
-                        int instanceID = Integer.parseInt(message.getStringProperty(IResourceRepository.PROP_INSTANCE_ID));
-                        if (this.adapter.createInstance(instanceID)) {
-                            result = "Created instance " + instanceID;
-                        } else {
-                            result = "Cannot create instance " + instanceID;
-                        }
+                    } else if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_PROVISION)) {
+                        
+                        result = responseProvision(requestMessage);
 
-                    } else if (message.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_CONTROL)) {
-                        String serializationFormat = message.getStringProperty(IResourceRepository.PROP_SERIALIZATION);
-                        String controlString = message.getStringProperty(IResourceRepository.PROP_CONTROL);
+                    } else if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_CONTROL)) {
                        
-                        // Need to convert String to input stream for Apache Jena
-                        InputStream in = new ByteArrayInputStream(controlString.getBytes());
-                        result = this.adapter.controlInstance(in, serializationFormat);
+                        result = responseControl(requestMessage);
 
-                    } else if (message.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_TERMINATE)) {
-                        int instanceID = Integer.parseInt(message.getStringProperty(IResourceRepository.PROP_INSTANCE_ID));
-                        if (this.adapter.terminateInstance(instanceID)) {
-                            result = "Terminated instance " + instanceID;
-                        } else {
-                            result = "Cannot terminate instance " + instanceID;
-                        }
+                    } else if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_TERMINATE)) {
+                        
+                        result = responseTerminate(requestMessage);
 
                     } else {
                         result = "Unknown request";
@@ -96,12 +137,10 @@ public class MotorAdapterMDBListener implements MessageListener {
 
                 }
                 
-                // TODO: What kind of response types will be available?
-                responseMessage.setStringProperty(IMessageBus.TYPE_RESPONSE, message.getStringProperty(IMessageBus.TYPE_REQUEST));
-                responseMessage.setStringProperty(IMessageBus.TYPE_RESULT, result);
+                Message responseMessage = generateResponseMessage(requestMessage, result);
 
-                if (null != id) {
-                    responseMessage.setJMSCorrelationID(id);
+                if (null != requestMessage.getJMSCorrelationID()) {
+                    responseMessage.setJMSCorrelationID(requestMessage.getJMSCorrelationID());
                 }
 
                 this.context.createProducer().send(topic, responseMessage);

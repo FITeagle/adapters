@@ -8,7 +8,7 @@ public class DynamicMotor extends Motor {
     public DynamicMotor(MotorAdapter owningAdapter, int instanceID) {
         super(owningAdapter, instanceID);
         this.isDynamicThreadRunning = false;
-        // setIsDynamic(true);
+        this.isDynamic = false;
     }
 
     public DynamicMotor() {
@@ -25,28 +25,33 @@ public class DynamicMotor extends Motor {
 
         try {
             if (this.isDynamic && !isDynamicThreadRunning) {
-
-                IMotorAdapterDynamic dynamicThread;
-                dynamicThread = (IMotorAdapterDynamic) new InitialContext().lookup("java:module/MotorAdapterDynamic");
-
-                dynamicThread.startThread(getInstanceID());
-
-                isDynamicThreadRunning = true;
+                makeMotorDynamic();
 
             } else if (!this.isDynamic && isDynamicThreadRunning) {
-
-                IMotorAdapterDynamic dynamicThread = (IMotorAdapterDynamic) new InitialContext().lookup("java:module/MotorAdapterDynamic");
-                dynamicThread.endThread(getInstanceID());
-
-                isDynamicThreadRunning = false;
+                makeMotorStatic();
             }
         } catch (NamingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public boolean getIsDynamic() {
+    private void makeMotorDynamic() throws NamingException {
+        IMotorAdapterDynamic dynamicThread;
+        dynamicThread = (IMotorAdapterDynamic) new InitialContext().lookup("java:module/MotorAdapterDynamic");
+
+        dynamicThread.startThread(getInstanceID());
+
+        isDynamicThreadRunning = true;
+    }
+
+    private void makeMotorStatic() throws NamingException {
+        IMotorAdapterDynamic dynamicThread = (IMotorAdapterDynamic) new InitialContext().lookup("java:module/MotorAdapterDynamic");
+        dynamicThread.endThread(getInstanceID());
+
+        isDynamicThreadRunning = false;
+    }
+
+    public boolean isDynamic() {
         return this.isDynamic;
     }
 

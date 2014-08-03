@@ -63,9 +63,7 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
                 try {
                     Thread.currentThread().sleep(SLEEP);
                 } catch (InterruptedException e) {
-                   // e.printStackTrace();
                     return;
-
                 }
                 adapter.getInstance(instanceID).setRpm(randomRPMGenerator.nextInt(1000));
             }

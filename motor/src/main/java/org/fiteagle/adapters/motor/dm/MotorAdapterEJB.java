@@ -6,12 +6,11 @@ import java.io.InputStream;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
-import org.fiteagle.abstractAdapter.IAbstractAdapter;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
 @Singleton(name = "MotorAdapter")
-@Remote(IAbstractAdapter.class)
-public class MotorAdapterEJB implements IAbstractAdapter {
+@Remote(IMotorAdapterEJB.class)
+public class MotorAdapterEJB implements IMotorAdapterEJB {
     private final MotorAdapter adapter;
 
     public MotorAdapterEJB() {

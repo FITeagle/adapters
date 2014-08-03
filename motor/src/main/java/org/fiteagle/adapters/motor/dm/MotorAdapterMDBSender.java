@@ -16,13 +16,14 @@ import javax.jms.Message;
 import javax.jms.Topic;
 
 import org.fiteagle.adapters.motor.MotorAdapter;
+import org.fiteagle.adapters.motor.dm.IMotorAdapterMDBSender;
 import org.fiteagle.api.core.IMessageBus;
 
 @Singleton(name = "MotorAdapterMDBSender")
 @Startup
 @Remote(IMotorAdapterMDBSender.class)
 public class MotorAdapterMDBSender implements IMotorAdapterMDBSender {
-    
+
     @Inject
     private JMSContext context;
     @Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
@@ -32,10 +33,9 @@ public class MotorAdapterMDBSender implements IMotorAdapterMDBSender {
 
     @SuppressWarnings("unused")
     @PostConstruct
-    private void startup() {      
+    private void startup() {
         adapter = MotorAdapter.getInstance();
         adapter.addChangeListener(new PropertyChangeListener() {
-
 
             @Override
             public void propertyChange(PropertyChangeEvent event) {
@@ -45,12 +45,12 @@ public class MotorAdapterMDBSender implements IMotorAdapterMDBSender {
             }
         });
     }
-    
-    public void registerAdapter(){
+
+    public void registerAdapter() {
         sendMessage("Register Motor Adapter");
     }
-    
-    public void unregisterAdapter(){
+
+    public void unregisterAdapter() {
         sendMessage("Unregister Motor Adapter");
     }
 
