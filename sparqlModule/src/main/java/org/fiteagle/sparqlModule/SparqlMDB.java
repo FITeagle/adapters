@@ -28,24 +28,26 @@ public class SparqlMDB implements MessageListener{
 
     @Resource(mappedName = "java:/topic/core")
     private Topic topic;
+    private boolean debugLogs = true;
+    private String baseURL = "http://localhost:3030/ds/";
 
     @Inject
     private JMSContext jmsContext;
     public void onMessage(Message inMessage){
-        System.out.println("received message in SparqlMDB  1");
+        if (debugLogs) System.out.println("Message received SparqlMDB");
         try{
             String type = inMessage.getStringProperty("type");
             if(type.equals((String) "update")){
                 String data = inMessage.getStringProperty("data");
-                System.out.println("Sent data is:" + data + " and type is: " +type);
-                System.out.println("Submit result : " + submitSparqlUpdate(data));
+                if (debugLogs) System.out.println("Sent data is:" + data + " and type is: " +type);
+                if (debugLogs) System.out.println("Submit result : " + submitSparqlUpdate(data));
             } else if (type.equals("query")){
                 String data = inMessage.getStringProperty("data");
             	submitSparqlQuery(data);
             }else if(type.equals("getAdapterList")){
-                System.out.println("received message in SparqlMDB  2 ");
+            	if (debugLogs) System.out.println("Got getAdapterList in SparqlMDB ");
                 Message m = jmsContext.createMessage();
-                System.out.println("Correlation ID is: " + inMessage.getJMSCorrelationID() );
+                if (debugLogs) System.out.println("Correlation ID is: " + inMessage.getJMSCorrelationID() );
                 m.setJMSCorrelationID(inMessage.getJMSCorrelationID());
 
                 m.setStringProperty("response","Goes here");
@@ -56,10 +58,15 @@ public class SparqlMDB implements MessageListener{
         }
     }
     
+    /**
+     * Submits a given sparql update string to the db
+     * @param data String containing the sparql update to be issued
+     * @return boolean indicating success of update
+     */    
     private boolean submitSparqlUpdate(String data){
     	try { 
-			String updateURL = "http://localhost:3030/ds/update";
-			System.out.println("Posting \n\n" + data + "\n\nto " + updateURL);
+			String updateURL =  baseURL + "update";
+			if (debugLogs) System.out.println("Posting \n\n" + data + "\n\nto " + updateURL);
 			UpdateRequest updateRequest = UpdateFactory.create(data);
 			UpdateProcessRemote uPR = (UpdateProcessRemote) 
 					UpdateExecutionFactory.createRemote(updateRequest, updateURL);
@@ -72,20 +79,20 @@ public class SparqlMDB implements MessageListener{
 	}
 
     /**
-     * DUNNO IF THIS WORKS; NEEDS TESTING
-     * @param data
-     * @return
+     * Submits a given sparql query string to the db
+     * @param data String containing the sparql query to be issued
+     * @return boolean indicating success of query
      */
     private boolean submitSparqlQuery(String data){
     	try { 
-			String updateURL = "http://localhost:3030/ds/query";
-			System.out.println("Querying \n\n" + data + "\n\nfrom " + updateURL);
+			String queryURL = baseURL + "query";
+			if (debugLogs) System.out.println("Querying \n\n" + data + "\n\nfrom " + queryURL);
 
 			Query query = QueryFactory.create(data);
-			QueryExecution qE = QueryExecutionFactory.sparqlService(updateURL, query);
+			QueryExecution qE = QueryExecutionFactory.sparqlService(queryURL, query);
 			ResultSet results = qE.execSelect();	
 			while (results.hasNext()){
-				System.out.println(results.next());
+				if (debugLogs) System.out.println(results.next());
 			}
 
 			return true;

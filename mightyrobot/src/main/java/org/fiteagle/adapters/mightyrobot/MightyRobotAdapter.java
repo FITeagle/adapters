@@ -1,28 +1,24 @@
 package org.fiteagle.adapters.mightyrobot;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 //import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.modify.UpdateProcessRemote;
-import com.hp.hpl.jena.update.UpdateExecutionFactory;
-import com.hp.hpl.jena.update.UpdateFactory;
-import com.hp.hpl.jena.update.UpdateRequest;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -102,12 +98,37 @@ public class MightyRobotAdapter extends AbstractAdapter{
         individualMightyRobotAdapter1.addProperty(RDF.type, adapterResource);
         individualMightyRobotAdapter1.addProperty(RDFS.label, modelGeneral.createLiteral("MightyRobot Adapter 1", "en"));
         individualMightyRobotAdapter1.addProperty(RDFS.comment, modelGeneral.createLiteral("A MightyRobot Adapter 1", "en"));
+        
+        
     }
+     
     @PostConstruct
     private void postConstruct(){
         System.out.println();
         System.out.println("ALLLLLLLLLLLLLLLERT!!!!!!!!!!!!! POSTCONSTRUCT");
         System.out.println();
+     // post to db ... maybe jena.query.DataSetAccessor?
+        String adapterDescription = this.getAdapterDescription(AbstractAdapter.PARAM_TURTLE);
+        String updateString = "";
+        BufferedReader bR = new BufferedReader(new StringReader(adapterDescription));
+        String lineRead = "";
+        try {
+
+	        while ((lineRead = bR.readLine()).startsWith("@")){
+	        	updateString += lineRead.substring(1, lineRead.length() - 1) + "\n";
+	        }
+	        
+	        updateString+= "\nINSERT DATA {\n";
+	        updateString+= lineRead;
+	        while ((lineRead = bR.readLine()) != null){
+	        	updateString += lineRead + "\n";
+	        }	  
+	        updateString+= "}";
+        } catch (Exception e){
+        	e.printStackTrace();
+        }
+        System.out.println("Adapter Description: \n\n" + updateString);
+        this.sendSparqlMessage(updateString, "update");
     }
     // used to force the container to create an instance of this application scoped class
     public void init(){
@@ -132,6 +153,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
     private void sendSparqlMessage(String data, String type){
         try{
             final Message message= this.context.createMessage();
+            message.setJMSCorrelationID(UUID.randomUUID().toString());
             message.setStringProperty("topic", "Fuseki");
             message.setStringProperty("type",
                     type);
