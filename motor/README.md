@@ -171,7 +171,7 @@ The adapter will be running at the following URL in the Browser: <http://localho
 
  * Control (file is path to local input ttl file)
 
-`curl -v -X PUT -F file=@"input.ttl" http://localhost:8080/AdapterMotor/api/instance/1/description.ttl`
+`curl -v -X PUT -d @"input.ttl" http://localhost:8080/AdapterMotor/api/instance/1/description.ttl`
 
  * Terminate:
 

@@ -2,6 +2,7 @@ package org.fiteagle.abstractAdapter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -106,13 +107,15 @@ public abstract class AbstractAdapter {
         return writer.toString();
     }
 
-    public String controlInstance(InputStream in, String serializationFormat){
+    public String controlInstance(String controlInput, String serializationFormat){
 
         // create an empty model
         Model model2 = ModelFactory.createDefaultModel();
 
+        InputStream is = new ByteArrayInputStream( controlInput.getBytes() );
+        
         // read the RDF/XML file
-        model2.read(in, null, serializationFormat);
+        model2.read(is, null, serializationFormat);
 
         // handling done by adapter, handleControlInstance has to be implemented by all subclasses!
         return handleControlInstance(model2);

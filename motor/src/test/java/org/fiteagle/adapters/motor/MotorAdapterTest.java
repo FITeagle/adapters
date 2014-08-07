@@ -1,8 +1,8 @@
 package org.fiteagle.adapters.motor;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,24 +43,31 @@ public class MotorAdapterTest {
         String returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
         Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"0\""));
 
-        // Change rpm
-        InputStream is;
+        String controlString = "";
+        BufferedReader reader;
+        String line;
+
         try {
-            is = new FileInputStream("target/test-classes/input.ttl");
-            motorAdapter.controlInstance(is, "TURTLE");
-
-            // Check new rpm is 88 (as defined in input.ttl
-            returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
-            Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
-
-        } catch (FileNotFoundException e) {
+            reader = new BufferedReader(new FileReader("target/test-classes/input.ttl"));
+            line = reader.readLine();
+            while (line != null) {
+                controlString += line;
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
+        // Change rpm
+        motorAdapter.controlInstance(controlString, "TURTLE");
+
+        // Check new rpm is 88 (as defined in input.ttl
+        returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
+        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
+
         // terminate instance
         Assert.assertEquals(true, motorAdapter.terminateInstance(1));
     }
 
 }
-

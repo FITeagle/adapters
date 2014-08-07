@@ -1,7 +1,5 @@
 package org.fiteagle.adapters.motor.dm;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -63,9 +61,7 @@ public class MotorAdapterMDBListener implements MessageListener {
     public String responseControl(Message requestMessage) throws JMSException{
         String controlString = requestMessage.getStringProperty(IResourceRepository.PROP_CONTROL);
        
-        // Need to convert String to input stream for Apache Jena
-        InputStream in = new ByteArrayInputStream(controlString.getBytes());
-        return this.adapter.controlInstance(in, getSerialization(requestMessage));
+        return this.adapter.controlInstance(controlString, getSerialization(requestMessage));
     }
     
     public String responseTerminate(Message requestMessage) throws JMSException{
@@ -109,7 +105,6 @@ public class MotorAdapterMDBListener implements MessageListener {
                         result = responseDescribe(requestMessage);
 
                     } else if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_LIST_RESOURCES)) {
-                        
                         result = responseInstances(requestMessage);
 
                     } else if (requestMessage.getStringProperty(IMessageBus.TYPE_REQUEST).equals(IMessageBus.REQUEST_MONITOR)) {

@@ -1,7 +1,6 @@
 package org.fiteagle.adapters.motor.dm;
 
 import java.beans.PropertyChangeListener;
-import java.io.InputStream;
 
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
@@ -48,8 +47,8 @@ public class MotorAdapterEJB implements IMotorAdapterEJB {
     }
 
     @Override
-    public String controlInstance(InputStream in, String serializationFormat) {
-        return this.adapter.controlInstance(in, serializationFormat);
+    public String controlInstance(String controlInput, String serializationFormat) {
+        return this.adapter.controlInstance(controlInput, serializationFormat);
     }
     
     @Override

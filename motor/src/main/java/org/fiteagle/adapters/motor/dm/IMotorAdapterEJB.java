@@ -1,7 +1,6 @@
 package org.fiteagle.adapters.motor.dm;
 
 import java.beans.PropertyChangeListener;
-import java.io.InputStream;
 
 public interface IMotorAdapterEJB {
 
@@ -15,7 +14,7 @@ public interface IMotorAdapterEJB {
 
     public String getAllInstances(String serializationFormat);
 
-    public String controlInstance(InputStream in, String serializationFormat);
+    public String controlInstance(String controlInput, String serializationFormat);
 
     public boolean addChangeListener(PropertyChangeListener newListener);
 
