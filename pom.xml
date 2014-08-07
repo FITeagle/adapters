@@ -14,6 +14,15 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
+	<dependencies>
+	    <dependency>
+	      <groupId>org.jboss.resteasy</groupId>
+	      <artifactId>resteasy-jaxrs</artifactId>
+	      <version>3.0.6.Final</version>
+	      <scope>provided</scope>
+	    </dependency>
+	</dependencies>
+
 	<repositories>
 		<repository>
 			<id>fiteagle-repo</id>
