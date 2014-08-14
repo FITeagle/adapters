@@ -21,6 +21,11 @@
 	      <version>3.0.6.Final</version>
 	      <scope>provided</scope>
 	    </dependency>
+	    <dependency>
+			<groupId>org.fiteagle</groupId>
+			<artifactId>api</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -35,5 +40,6 @@
             <module>motor</module>
             <module>mightyrobot</module>
             <module>stopwatch</module>
+            <module>fuseco</module>
     </modules>
 </project>
