@@ -1,11 +1,10 @@
 package org.fiteagle.adapters.motor.dm;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -15,9 +14,17 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Topic;
 
+import org.fiteagle.abstractAdapter.AdapterEventListener;
 import org.fiteagle.adapters.motor.MotorAdapter;
 import org.fiteagle.adapters.motor.dm.IMotorAdapterMDBSender;
 import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageBusOntologyModel;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.util.FileManager;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 @Singleton(name = "MotorAdapterMDBSender")
 @Startup
@@ -26,43 +33,63 @@ public class MotorAdapterMDBSender implements IMotorAdapterMDBSender {
 
     @Inject
     private JMSContext context;
-    @Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
+    @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
     private Topic topic;
 
     private MotorAdapter adapter;
+    //private Property propertyInform;
 
     @SuppressWarnings("unused")
     @PostConstruct
     private void startup() {
         adapter = MotorAdapter.getInstance();
-        adapter.addChangeListener(new PropertyChangeListener() {
-
+        adapter.addChangeListener(new AdapterEventListener() {
+            
             @Override
-            public void propertyChange(PropertyChangeEvent event) {
-                String message = "Event Notification: " + event.getSource().toString() + " " + event.getPropertyName() + ":" + event.getNewValue() + " [old -> " + event.getOldValue() + "] | [new -> "
-                        + event.getNewValue() + "]";
-                sendMessage(message);
+            public void rdfChange(Model eventRDF) {
+                sendInformMessage(eventRDF);
+                
             }
         });
+        
     }
 
     public void registerAdapter() {
-        sendMessage("Register Motor Adapter");
+        sendInformMessage(adapter.getAdapterDescriptionModel("TURTLE"));      
     }
 
+    // TODO: What message to send for releasing the adapter?
     public void unregisterAdapter() {
-        sendMessage("Unregister Motor Adapter");
+        //sendInformMessage("Unregister Motor Adapter");
+    }
+    
+    private String getSerializedRdfFromEventModel(Model eventRDF){
+        //Model messageRDF = ModelFactory.createDefaultModel();
+        
+        com.hp.hpl.jena.rdf.model.Resource message = eventRDF.createResource("http://fiteagleinternal#Message");
+        message.addProperty(RDF.type, MessageBusOntologyModel.propertyFiteagleInform);
+              
+        eventRDF.setNsPrefix("", "http://fiteagleinternal#");       
+        
+        StringWriter writer = new StringWriter();
+
+        eventRDF.write(writer, "TURTLE");
+        
+        return writer.toString();
     }
 
-    public void sendMessage(String message) {
+    public void sendInformMessage(Model eventRDF) {
         try {
 
             final Message eventMessage = this.context.createMessage();
+            
+            String serializedRDF = getSerializedRdfFromEventModel(eventRDF);
 
             eventMessage.setJMSCorrelationID(UUID.randomUUID().toString());
-            eventMessage.setStringProperty(IMessageBus.TYPE_NOTIFICATION, IMessageBus.EVENT_NOTIFICATION);
-            eventMessage.setStringProperty(IMessageBus.TYPE_RESULT, message);
-
+            eventMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_INFORM);
+            eventMessage.setStringProperty(IMessageBus.RDF, serializedRDF);
+            eventMessage.setStringProperty(IMessageBus.SERIALIZATION, "TURTLE");
+            
             this.context.createProducer().send(topic, eventMessage);
         } catch (JMSException e) {
             System.err.println("JMSException");

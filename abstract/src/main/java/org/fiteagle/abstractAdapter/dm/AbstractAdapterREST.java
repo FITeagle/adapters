@@ -124,55 +124,55 @@ public abstract class AbstractAdapterREST {
     }
 
     @POST
-    @Path("instance/{instanceNumber}")
+    @Path("instance/{instanceName}")
     @Produces("text/html")
-    public String createInstance(@PathParam("instanceNumber") int instanceNumber) {
-        if (abstractAdapter.createInstance(instanceNumber)) {
-            return "Created instance number : " + instanceNumber;
+    public String createInstance(@PathParam("instanceName") String instanceName) {
+        if (abstractAdapter.createInstance(instanceName)) {
+            return "Created instance number : " + instanceName;
         }
         return "Invalid instance number";
     }
 
     @DELETE
-    @Path("instance/{instanceNumber}")
+    @Path("instance/{instanceName}")
     @Produces("text/html")
-    public String terminateInstance(@PathParam("instanceNumber") int instanceNumber) {
-        if (abstractAdapter.terminateInstance(instanceNumber)) {
-            return "Terminated instance number : " + instanceNumber;
+    public String terminateInstance(@PathParam("instanceName") String instanceName) {
+        if (abstractAdapter.terminateInstance(instanceName)) {
+            return "Terminated instance number : " + instanceName;
         }
         return "Invalid instance number";
     }
 
     @GET
-    @Path("instance/{instanceNumber}/description.ttl")
+    @Path("instance/{instanceName}/description.ttl")
     @Produces("text/turtle")
-    public String monitorInstanceTurtle(@PathParam("instanceNumber") int instanceNumber) {
-        return abstractAdapter.monitorInstance(instanceNumber, AbstractAdapter.PARAM_TURTLE);
+    public String monitorInstanceTurtle(@PathParam("instanceName") String instanceName) {
+        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_TURTLE);
     }
 
     @GET
-    @Path("instance/{instanceNumber}/description.rdf")
+    @Path("instance/{instanceName}/description.rdf")
     @Produces("application/rdf+xml")
-    public String monitorInstanceRDF(@PathParam("instanceNumber") int instanceNumber) {
-        return abstractAdapter.monitorInstance(instanceNumber, AbstractAdapter.PARAM_RDFXML);
+    public String monitorInstanceRDF(@PathParam("instanceName") String instanceName) {
+        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_RDFXML);
     }
     
     @GET
-    @Path("instance/{instanceNumber}/description.rdf-text")
+    @Path("instance/{instanceName}/description.rdf-text")
     @Produces("text/html")
-    public String monitorInstanceRDFAsText(@PathParam("instanceNumber") int instanceNumber) {
-        return abstractAdapter.monitorInstance(instanceNumber, AbstractAdapter.PARAM_RDFXML);
+    public String monitorInstanceRDFAsText(@PathParam("instanceName") String instanceName) {
+        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_RDFXML);
     }
 
     @GET
-    @Path("instance/{instanceNumber}/description.ntriple")
+    @Path("instance/{instanceName}/description.ntriple")
     @Produces("application/n-triples")
-    public String monitorInstanceNTRIPLE(@PathParam("instanceNumber") int instanceNumber) {
-        return abstractAdapter.monitorInstance(instanceNumber, AbstractAdapter.PARAM_NTRIPLE);
+    public String monitorInstanceNTRIPLE(@PathParam("instanceName") String instanceName) {
+        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_NTRIPLE);
     }
     
     @PUT
-    @Path("instance/{instanceNumber}/description.ttl")
+    @Path("instance/{instanceName}/description.ttl")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("text/html")
     public String controlInstanceTurtle(final String controlInput) {
@@ -181,7 +181,7 @@ public abstract class AbstractAdapterREST {
 
 
     @PUT
-    @Path("instance/{instanceNumber}/description.rdf")
+    @Path("instance/{instanceName}/description.rdf")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("text/html")
     public String controlInstanceRDF(final String controlInput) {
@@ -189,7 +189,7 @@ public abstract class AbstractAdapterREST {
     }
 
     @PUT
-    @Path("instance/{instanceNumber}/description.ntriple")
+    @Path("instance/{instanceName}/description.ntriple")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("text/html")
     public String controlInstanceNTRIPLE(final String controlInput) {
@@ -200,20 +200,20 @@ public abstract class AbstractAdapterREST {
      * Control adapter's instance property directly via REST
      * Good for testing
      * 
-     * @param instanceNumber
+     * @param instanceName
      * @param paramProperty
      * @param paramValue
      * @return
      */
     @PUT
-    @Path("instance/{instanceNumber}/{paramProperty}/{paramValue}")
+    @Path("instance/{instanceName}/{paramProperty}/{paramValue}")
     @Produces("text/html")
-    public String controlInstanceProperty(@PathParam("instanceNumber") int instanceNumber,  @PathParam("paramProperty") String paramProperty,  @PathParam("paramValue") String paramValue) {
+    public String controlInstanceProperty(@PathParam("instanceName") String instanceName,  @PathParam("paramProperty") String paramProperty,  @PathParam("paramValue") String paramValue) {
         String controlString = "@prefix :      <http://fiteagle.org/ontology/adapter/motor#> .\n";
         controlString += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
         controlString += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
-        controlString += ":m" + instanceNumber + "     a             :MotorResource ;\n";
-        controlString += "rdfs:label    \"" + instanceNumber + "\" ;\n";
+        controlString += ":m" + instanceName + "     a             :MotorResource ;\n";
+        controlString += "rdfs:label    \"" + instanceName + "\" ;\n";
         controlString += ":" + paramProperty + "          \"" + paramValue + "\"^^xsd:long .\n";
         return abstractAdapter.controlInstance(controlString, AbstractAdapter.PARAM_TURTLE);
     }

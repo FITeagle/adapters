@@ -1,10 +1,9 @@
 package org.fiteagle.adapters.motor.dm;
 
-import java.beans.PropertyChangeListener;
-
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
+import org.fiteagle.abstractAdapter.AdapterEventListener;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
 @Singleton(name = "MotorAdapter")
@@ -27,18 +26,18 @@ public class MotorAdapterEJB implements IMotorAdapterEJB {
     }
 
     @Override
-    public boolean createInstance(int instanceID) {
-        return this.adapter.createInstance(instanceID);
+    public boolean createInstance(String instanceName) {
+        return this.adapter.createInstance(instanceName);
     }
 
     @Override
-    public boolean terminateInstance(int instanceID) {
-        return this.adapter.terminateInstance(instanceID);
+    public boolean terminateInstance(String instanceName) {
+        return this.adapter.terminateInstance(instanceName);
     }
 
     @Override
-    public String monitorInstance(int instanceID, String serializationFormat) {
-        return this.adapter.monitorInstance(instanceID, serializationFormat);
+    public String monitorInstance(String instanceName, String serializationFormat) {
+        return this.adapter.monitorInstance(instanceName, serializationFormat);
     }
 
     @Override
@@ -52,7 +51,7 @@ public class MotorAdapterEJB implements IMotorAdapterEJB {
     }
     
     @Override
-    public boolean addChangeListener(PropertyChangeListener newListener){
+    public boolean addChangeListener(AdapterEventListener newListener){
         return this.adapter.addChangeListener(newListener);
     }
 

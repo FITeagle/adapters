@@ -1,8 +1,7 @@
 package org.fiteagle.abstractAdapter.dm;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -14,27 +13,21 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AdapterEventListener;
 
-//@Named
-//@DependsOn("MightyRobotAdapter")
+import com.hp.hpl.jena.rdf.model.Model;
+
 /**
  * subclasses must be annotated as
  * 
  * @ServerEndpoint("/websocket") for this to work!
  */
-public abstract class AbstractAdapterWebsocket implements PropertyChangeListener {
+public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
 
     // private static final Logger LOGGER = Logger.getLogger(MightyRobotAdapterWebsocket.class.getName());
 
     private AbstractAdapter abstractAdapterEJB;
     private Session wsSession;
-
-    // @PostConstruct
-    // public void setup() throws NamingException {
-    // abstractAdapterEJB = (IMightyRobotAdapter) new InitialContext().lookup("java:module/MightyRobotAdapter");
-    // abstractAdapterEJB.addChangeListener(this);
-    // // this.motorLogic.registerForEvents(this);
-    // }
 
     @PostConstruct
     public void setup() throws NamingException {
@@ -85,13 +78,18 @@ public abstract class AbstractAdapterWebsocket implements PropertyChangeListener
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent event) {
+    public void rdfChange(Model eventRDF) {
         if (wsSession != null && wsSession.isOpen()) {
             Set<Session> sessions = wsSession.getOpenSessions();
+            
+            StringWriter writer = new StringWriter();
 
-            String message = "Event Notification: " + event.getSource().toString() + " " + event.getPropertyName() + ":" + event.getNewValue() + " [old -> " + event.getOldValue() + "] | [new -> " + event.getNewValue() + "]";
+            eventRDF.write(writer, "TURTLE");
+
+            String eventString =  writer.toString();
+
             for (Session client : sessions) {
-                client.getAsyncRemote().sendText(message);
+                client.getAsyncRemote().sendText(eventString);
             }
         }
         // else {

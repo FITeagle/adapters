@@ -7,11 +7,11 @@ public interface IAbstractAdapter {
 
     public String getAdapterDescription(String serializationFormat);
 
-    public boolean createInstance(int instanceID);
+    public boolean createInstance(String instanceName);
 
-    public boolean terminateInstance(int instanceID);
+    public boolean terminateInstance(String instanceName);
 
-    public String monitorInstance(int instanceID, String serializationFormat);
+    public String monitorInstance(String instanceName, String serializationFormat);
 
     public String getAllInstances(String serializationFormat);
 

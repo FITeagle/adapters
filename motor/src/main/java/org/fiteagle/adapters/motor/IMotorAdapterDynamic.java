@@ -2,7 +2,7 @@ package org.fiteagle.adapters.motor;
 
 public interface IMotorAdapterDynamic {
     
-    public void startThread(int instanceID);
-    public void endThread(int instanceID);
+    public void startThread(String instanceName);
+    public void endThread(String instanceName);
 
 }

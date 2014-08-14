@@ -5,8 +5,8 @@ import javax.naming.NamingException;
 
 public class DynamicMotor extends Motor {
 
-    public DynamicMotor(MotorAdapter owningAdapter, int instanceID) {
-        super(owningAdapter, instanceID);
+    public DynamicMotor(MotorAdapter owningAdapter, String instanceName) {
+        super(owningAdapter, instanceName);
         this.isDynamicThreadRunning = false;
         this.isDynamic = false;
     }
@@ -33,20 +33,21 @@ public class DynamicMotor extends Motor {
         } catch (NamingException e) {
             e.printStackTrace();
         }
+        owningAdapter.notifyListeners(owningAdapter.createInformRDF(getInstanceName()));
     }
 
     private void makeMotorDynamic() throws NamingException {
         IMotorAdapterDynamic dynamicThread;
         dynamicThread = (IMotorAdapterDynamic) new InitialContext().lookup("java:module/MotorAdapterDynamic");
 
-        dynamicThread.startThread(getInstanceID());
+        dynamicThread.startThread(getInstanceName());
 
         isDynamicThreadRunning = true;
     }
 
     private void makeMotorStatic() throws NamingException {
         IMotorAdapterDynamic dynamicThread = (IMotorAdapterDynamic) new InitialContext().lookup("java:module/MotorAdapterDynamic");
-        dynamicThread.endThread(getInstanceID());
+        dynamicThread.endThread(getInstanceName());
 
         isDynamicThreadRunning = false;
     }

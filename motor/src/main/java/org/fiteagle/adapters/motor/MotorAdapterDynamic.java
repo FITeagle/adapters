@@ -17,7 +17,7 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
 
     private static final Random randomRPMGenerator = new Random();
     
-    private HashMap<Integer, Thread> instanceThreadList; 
+    private HashMap<String, Thread> instanceThreadList; 
 
     @Resource(lookup = "java:jboss/ee/concurrency/factory/default")
     private ManagedThreadFactory threadFactory;
@@ -27,21 +27,21 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
     @SuppressWarnings("unused")
     @PostConstruct
     private void init(){
-        instanceThreadList = new HashMap<Integer, Thread>(); 
+        instanceThreadList = new HashMap<String, Thread>(); 
         this.adapter = MotorAdapter.getInstance();
     }
 
-    public void startThread(int instanceID) {
+    public void startThread(String instanceName) {
 
-            DynamicRPM dynamicRPM = new DynamicRPM(instanceID);
+            DynamicRPM dynamicRPM = new DynamicRPM(instanceName);
             Thread newDynamicThread = threadFactory.newThread(dynamicRPM);
             newDynamicThread.start();
             
-            instanceThreadList.put(instanceID, newDynamicThread);
+            instanceThreadList.put(instanceName, newDynamicThread);
     }
 
-    public void endThread(int instanceID){
-        instanceThreadList.get(instanceID).interrupt();
+    public void endThread(String instanceName){
+        instanceThreadList.get(instanceName).interrupt();
     }
 
 
@@ -49,10 +49,10 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
 
         private final int SLEEP = 5000;
         
-        private final int instanceID;
+        private final String instanceName;
         
-        public DynamicRPM(int instanceID){
-            this.instanceID = instanceID;
+        public DynamicRPM(String instanceName){
+            this.instanceName = instanceName;
                   
         }
 
@@ -65,7 +65,7 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
                 } catch (InterruptedException e) {
                     return;
                 }
-                adapter.getInstance(instanceID).setRpm(randomRPMGenerator.nextInt(1000));
+                adapter.getInstance(instanceName).setRpm(randomRPMGenerator.nextInt(1000));
             }
             return;
         }
