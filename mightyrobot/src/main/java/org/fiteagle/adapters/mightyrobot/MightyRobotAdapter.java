@@ -39,7 +39,7 @@ import javax.naming.InitialContext;
 @Startup
 public class MightyRobotAdapter extends AbstractAdapter{
 
-	private String adapterSpecificPrefix = "http://fiteagle.org/ontology/adapter/mightyrobot#";
+	private String [] adapterSpecificPrefix = {"http://fiteagle.org/ontology/adapter/mightyrobot#"};
     private static MightyRobotAdapter mightyRobotAdapterSingleton; 
     
     private com.hp.hpl.jena.rdf.model.Resource instanceClassResource;
@@ -64,7 +64,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
     public MightyRobotAdapter() {
         modelGeneral = ModelFactory.createDefaultModel();
 
-        modelGeneral.setNsPrefix("", this.getAdapterSpecificPrefix());
+        //modelGeneral.setNsPrefix("", this.getAdapterSpecificPrefix());
         modelGeneral.setNsPrefix("fiteagle", "http://fiteagle.org/ontology#");
         modelGeneral.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
         modelGeneral.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
@@ -168,9 +168,9 @@ public class MightyRobotAdapter extends AbstractAdapter{
     }
 
     @Override
-    public Object handleCreateInstance(int instanceID){
-        MightyRobot temp = new MightyRobot(this, instanceID);
-		String data = 
+    public Object handleCreateInstance(String instanceName){
+        MightyRobot temp = new MightyRobot(this, instanceName);
+		/*String data =
 				"INSERT DATA { <"+ instanceClassResource + temp.getInstanceID() + ">" 
 				+ " \n<" + getAdapterSpecificPrefix() + "InstanceID> \"" + temp.getInstanceID() + "\" ;"
 				+ " \n<" + mightyRobotPropertyDancing + "> \"" + temp.getDancing() + "\" ;"
@@ -178,9 +178,9 @@ public class MightyRobotAdapter extends AbstractAdapter{
 				+ " \n<" + mightyRobotPropertyHeadRotation + "> \"" + temp.getHeadRotation() + "\" ;"
 				+ " \n<" + mightyRobotPropertyNickname + "> \"" + temp.getNickname() + "\" ;"
                 + " \n<" + getAdapterSpecificPrefix() + "owningAdapter> \"" + temp.getOwningAdapter() + "\" .}";        
+        */
         
-        
-        sendSparqlMessage(data, "update");
+        //sendSparqlMessage(data, "update");
         
         return temp;
     }
@@ -236,29 +236,16 @@ WHERE
 ?mightyrobot ?property ?value ; <http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> "5"
 }	
 */		
-  
-    @Override
-    public void handleTerminateInstance(int instanceID){
 
-    	String data = 
-    			"DELETE { ?mightyrobot ?property ?value } \n" +
-    					"WHERE { ?mightyrobot ?property ?value ; " +
-    					"<http://fiteagle.org/ontology/adapter/mightyrobot#InstanceID> \"" +
-    					instanceID + 
-    					"\"}";
-    	
-    	sendSparqlMessage(data, "update");
-
-    }
     
     @Override
-    public Model handleMonitorInstance(int instanceID, Model modelInstances){
-    	MightyRobot currentMightyRobot = (MightyRobot) instanceList.get(instanceID);
+    public Model handleMonitorInstance(String instanceName, Model modelInstances){
+    	MightyRobot currentMightyRobot = (MightyRobot) instanceList.get(instanceName);
 
-        com.hp.hpl.jena.rdf.model.Resource mightyRobotInstance = modelInstances.createResource(this.getAdapterSpecificPrefix() +  "m" + instanceID);
+        com.hp.hpl.jena.rdf.model.Resource mightyRobotInstance = modelInstances.createResource(this.getAdapterSpecificPrefix() +  "m" + instanceName);
         mightyRobotInstance.addProperty(RDF.type, instanceClassResource);
-        mightyRobotInstance.addProperty(RDFS.label, "" + instanceID);
-        mightyRobotInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("MightyRobot in da house " + instanceID, "en"));
+        mightyRobotInstance.addProperty(RDFS.label, "" + instanceName);
+        mightyRobotInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("MightyRobot in da house " + instanceName, "en"));
 
         mightyRobotInstance.addLiteral(mightyRobotPropertyDancing, currentMightyRobot.getDancing());
         mightyRobotInstance.addLiteral(mightyRobotPropertyExploded, currentMightyRobot.getExploded());
@@ -287,7 +274,7 @@ WHERE
 					"}\n";	
     	sendSparqlMessage(data, "query");
     	
-		for (Integer key : instanceList.keySet()) {
+		for (String key : instanceList.keySet()) {
         	
         	MightyRobot currentMightyRobot= (MightyRobot) instanceList.get(key);
 
@@ -363,9 +350,9 @@ WHERE
 		return MightyRobot.class.getName();
 	}
 
-	@Override
-	public String getAdapterSpecificPrefix() {
-		return adapterSpecificPrefix;
-	}
+    @Override
+    public String[] getAdapterSpecificPrefix() {
+        return adapterSpecificPrefix;
+    }
 
 }
