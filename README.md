@@ -1,6 +1,14 @@
 [![Build Status](https://travis-ci.org/FITeagle/adapters.svg)](https://travis-ci.org/FITeagle/adapters)
 
-adapters
-========
+FITeagle Resource Adapters
+===========================
 
-Resource Adapters
+To run the tests and build the documentation:
+
+    mvn clean install test site site:stage
+    open target/staging/adapters/index.html
+
+To deploy all adapters:
+
+    mvn clean package wildfly:deploy
+

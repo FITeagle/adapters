@@ -1,13 +1,14 @@
 package org.fiteagle.adapters.motor;
 
+
 public class Motor {
 
     public String getManufacturer() {
         return manufacturer;
-    } 
+    }
 
     public void setManufacturer(String manufacturer) {
-        owningAdapter.notifyListeners(this, "manufacturer", this.manufacturer, this.manufacturer = manufacturer);
+        this.manufacturer = manufacturer;
     }
 
     public int getRpm() {
@@ -15,8 +16,8 @@ public class Motor {
     }
 
     public void setRpm(int rpm) {
-        owningAdapter.notifyListeners(this, "changedRPM:" + instanceID + "::" + rpm + ";; rpm", "" + this.rpm, "" + rpm);
         this.rpm = rpm;
+        owningAdapter.notifyListeners(owningAdapter.createInformRDF(instanceName));
     }
 
     public int getMaxRpm() {
@@ -24,8 +25,8 @@ public class Motor {
     }
 
     public void setMaxRpm(int maxRpm) {
-        owningAdapter.notifyListeners(this, "maxRpm", "" + this.maxRpm, "" + maxRpm);
         this.maxRpm = maxRpm;
+        owningAdapter.notifyListeners(owningAdapter.createInformRDF(instanceName));
     }
 
     public int getThrottle() {
@@ -33,11 +34,11 @@ public class Motor {
     }
 
     public void setThrottle(int throttle) {
-        owningAdapter.notifyListeners(this, "throttle", "" + this.throttle, "" + throttle);
         this.throttle = throttle;
+        owningAdapter.notifyListeners(owningAdapter.createInformRDF(instanceName));
     }
 
-    public Motor(MotorAdapter owningAdapter, int instanceID) {
+    public Motor(MotorAdapter owningAdapter, String instanceName) {
         super();
         this.manufacturer = "Fraunhofer FOKUS";
         this.rpm = 0;
@@ -45,7 +46,12 @@ public class Motor {
         this.throttle = 0;
 
         this.owningAdapter = owningAdapter;
-        this.instanceID = instanceID;
+        this.instanceName = instanceName;
+    }
+    
+    public Motor(){
+        super();
+        
     }
 
     public String toString() {
@@ -57,7 +63,12 @@ public class Motor {
     private int rpm;
     private int maxRpm;
     private int throttle;
-    private MotorAdapter owningAdapter;
-    private int instanceID;
+    protected MotorAdapter owningAdapter;
+    
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+    private String instanceName;
 
 }
