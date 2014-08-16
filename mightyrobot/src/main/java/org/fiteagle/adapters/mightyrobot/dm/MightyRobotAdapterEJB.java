@@ -1,11 +1,9 @@
 package org.fiteagle.adapters.mightyrobot.dm;
 
-import java.beans.PropertyChangeListener;
-import java.io.InputStream;
-
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
+import org.fiteagle.abstractAdapter.AdapterEventListener;
 import org.fiteagle.abstractAdapter.IAbstractAdapter;
 import org.fiteagle.adapters.mightyrobot.MightyRobotAdapter;
 
@@ -29,18 +27,18 @@ public class MightyRobotAdapterEJB implements IAbstractAdapter {
     }
 
     @Override
-    public boolean createInstance(int instanceID) {
-        return this.adapter.createInstance(instanceID);
+    public boolean createInstance(String instanceName) {
+        return this.adapter.createInstance(instanceName);
     }
 
     @Override
-    public boolean terminateInstance(int instanceID) {
-        return this.adapter.terminateInstance(instanceID);
+    public boolean terminateInstance(String instanceName) {
+        return this.adapter.terminateInstance(instanceName);
     }
 
     @Override
-    public String monitorInstance(int instanceID, String serializationFormat) {
-        return this.adapter.monitorInstance(instanceID, serializationFormat);
+    public String monitorInstance(String instanceName, String serializationFormat) {
+        return this.adapter.monitorInstance(instanceName, serializationFormat);
     }
 
     @Override
@@ -49,12 +47,12 @@ public class MightyRobotAdapterEJB implements IAbstractAdapter {
     }
 
     @Override
-    public String controlInstance(InputStream in, String serializationFormat) {
+    public String controlInstance(String in, String serializationFormat) {
         return this.adapter.controlInstance(in, serializationFormat);
     }
     
     @Override
-    public boolean addChangeListener(PropertyChangeListener newListener){
+    public boolean addChangeListener(AdapterEventListener newListener){
         return this.adapter.addChangeListener(newListener);
     }
 

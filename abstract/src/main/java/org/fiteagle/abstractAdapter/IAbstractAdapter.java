@@ -15,8 +15,8 @@ public interface IAbstractAdapter {
 
     public String getAllInstances(String serializationFormat);
 
-    public String controlInstance(InputStream in, String serializationFormat);
+    public String controlInstance(String in, String serializationFormat);
 
-    public boolean addChangeListener(PropertyChangeListener newListener);
+    public boolean addChangeListener(AdapterEventListener newListener);
 
 }

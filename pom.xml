@@ -40,7 +40,6 @@
             <module>abstract</module>
             <module>motor</module>
             <module>mightyrobot</module>
-            <module>stopwatch</module>
             <module>fuseco</module>
     </modules>
 </project>
