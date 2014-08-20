@@ -24,7 +24,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 import org.fiteagle.adapters.mightyrobot.dm.MightyRobotAdapterBean;
-import org.fiteagle.adapters.mightyrobot.dm.MightyRobotAdapterEJB;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import javax.annotation.PostConstruct;
@@ -33,8 +32,6 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.jms.*;
 
-import javax.annotation.Resource;
-import javax.naming.InitialContext;
 
 @ApplicationScoped
 @Startup
