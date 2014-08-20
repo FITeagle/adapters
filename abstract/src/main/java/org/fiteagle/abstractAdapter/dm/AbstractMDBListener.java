@@ -15,9 +15,7 @@ import javax.jms.*;
 /**
  * MDB to listen for incoming Messages
  */
-@MessageDriven(name = "MotorAdapterMDB", activationConfig = { @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
-        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
+
 public abstract class AbstractMDBListener implements MessageListener {
 
     @Inject
