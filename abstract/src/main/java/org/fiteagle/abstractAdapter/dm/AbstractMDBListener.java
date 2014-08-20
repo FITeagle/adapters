@@ -14,8 +14,11 @@ import javax.jms.*;
 
 /**
  * MDB to listen for incoming Messages
+ * Do not forget to annotate as MDB
  */
-
+@MessageDriven(name = "MotorAdapterMDB", activationConfig = { @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
+        @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public abstract class AbstractMDBListener implements MessageListener {
 
     @Inject
@@ -60,6 +63,7 @@ public abstract class AbstractMDBListener implements MessageListener {
      * @param requestMessage
      */
     public void onMessage(final Message requestMessage) {
+        messageBelongsToAdapter(requestMessage);
         try {
 
             if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
