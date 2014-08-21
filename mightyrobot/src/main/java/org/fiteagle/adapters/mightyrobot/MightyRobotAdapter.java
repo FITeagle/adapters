@@ -389,4 +389,8 @@ WHERE
         return adapterSpecificPrefix;
     }
 
+    public com.hp.hpl.jena.rdf.model.Resource getInstanceClassResource(){
+        return instanceClassResource;
+    }
+
 }

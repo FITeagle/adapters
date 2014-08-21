@@ -10,6 +10,7 @@ import java.util.List;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * Abstract class defining the basics all the current adapters are following Extend this class and implement the abstract methods to get this to work
@@ -192,5 +193,10 @@ public abstract class AbstractAdapter {
      * Handles the controlling of a specific instance for this adapter
      */
     public abstract String handleControlInstance(Model model2);
+
+    /**
+     * Get the Resource of the ClassInstances that this adapter is managing
+     */
+    public abstract Resource getInstanceClassResource();
 
 }

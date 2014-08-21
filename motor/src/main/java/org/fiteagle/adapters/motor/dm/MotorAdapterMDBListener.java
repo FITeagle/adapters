@@ -36,7 +36,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 @MessageDriven(name = "MotorAdapterMDB", activationConfig = { @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
-public class MotorAdapterMDBListener implements MessageListener {
+public class MotorAdapterMDBListener  {
 
     private static Logger LOGGER = Logger.getLogger(MotorAdapterMDBListener.class.toString());
 

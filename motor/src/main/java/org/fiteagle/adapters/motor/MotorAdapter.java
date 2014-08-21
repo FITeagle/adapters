@@ -4,15 +4,10 @@ import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.*;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.SimpleSelector;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -218,6 +213,11 @@ public final class MotorAdapter extends AbstractAdapter {
 
     public Motor getInstance(String instanceName) {
         return (Motor) instanceList.get(instanceName);
+    }
+
+    @Override
+    public Resource getInstanceClassResource(){
+        return getMotorResource();
     }
 
 }

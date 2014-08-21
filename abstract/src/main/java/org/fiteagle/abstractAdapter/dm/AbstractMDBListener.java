@@ -1,5 +1,11 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.SimpleSelector;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
 
 import javax.annotation.Resource;
@@ -7,6 +13,8 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.inject.Inject;
 import javax.jms.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * Created by vju on 8/20/14.
@@ -20,6 +28,9 @@ import javax.jms.*;
         @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public abstract class AbstractMDBListener implements MessageListener {
+
+
+    public abstract AbstractAdapter getAdapter();
 
     @Inject
     private JMSContext context;
@@ -56,7 +67,28 @@ public abstract class AbstractMDBListener implements MessageListener {
      * @param requestMessage
      * @return true if message belongs to adapter
      */
-    public abstract boolean messageBelongsToAdapter(Message requestMessage);
+    public boolean messageBelongsToAdapter(Message requestMessage) {
+        boolean isForAdapter = false;
+        try {
+            if (requestMessage.getStringProperty(IMessageBus.RDF) != null) {
+                String inputRDF = requestMessage.getStringProperty(IMessageBus.RDF);
+                Model inputModel = ModelFactory.createDefaultModel();
+                InputStream is = new ByteArrayInputStream(inputRDF.getBytes());
+                inputModel.read(is, null, requestMessage.getStringProperty(IMessageBus.SERIALIZATION));
+
+                StmtIterator mightyRobotIterator = inputModel.listStatements(new SimpleSelector(null, RDF.type, getAdapter().getInstanceClassResource()));
+                while(mightyRobotIterator.hasNext()){
+                    isForAdapter = true;
+                    break;
+                }
+
+
+            }
+        } catch (Exception e) {
+
+        }
+        return isForAdapter;
+    }
 
     /**
      * Implementation of the onMessage method to handle the request
