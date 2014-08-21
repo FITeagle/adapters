@@ -13,16 +13,20 @@ import javax.inject.Inject;
 import javax.jms.Message;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.logging.Logger;
+
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 
 
 /**
  * Created by vju on 8/20/14.
  */
-@MessageDriven(name = "MotorAdapterMDB", activationConfig = {@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
+@MessageDriven(name = "MightyRobotAdapterMDB", activationConfig = {@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge")})
 public class MightyRobotAdapterMDBListener extends AbstractMDBListener {
+
+    private static Logger LOGGER = Logger.getLogger(MightyRobotAdapterMDBListener.class.toString());
 
     @Inject
     MightyRobotAdapter mightyRobotAdapter;
@@ -33,23 +37,8 @@ public class MightyRobotAdapterMDBListener extends AbstractMDBListener {
     }
 
     @Override
-    public String responseConfigure(Message requestMessage) {
-        return null;
-    }
-
-    @Override
-    public String responseDiscover(Message requestMessage) {
-        return null;
-    }
-
-    @Override
-    public String responseCreate(Message requestMessage) {
-        return null;
-    }
-
-    @Override
-    public String responseRelease(Message requestMessage) {
-        return null;
+    public Logger getLogger(){
+        return LOGGER;
     }
 
 }
