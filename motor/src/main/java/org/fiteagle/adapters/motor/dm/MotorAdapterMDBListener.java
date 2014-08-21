@@ -53,10 +53,12 @@ public class MotorAdapterMDBListener extends AbstractMDBListener {
     public void setup() throws NamingException {
         this.adapter = MotorAdapter.getInstance();
     }
-
+    @Override
     public AbstractAdapter getAdapter(){
         return this.adapter;
     }
+
+    @Override
     public String responseDiscover(Message requestMessage) throws JMSException {
         
         String serialization = getSerialization(requestMessage);
@@ -125,7 +127,7 @@ public class MotorAdapterMDBListener extends AbstractMDBListener {
     // int instanceID = getInstanceID(requestMessage);
     // return this.adapter.monitorInstance(instanceName, getSerialization(requestMessage));
     // }
-
+    @Override
     public String responseCreate(Message requestMessage) throws JMSException {
 
         MotorAdapterMDBListener.LOGGER.log(Level.INFO, "Received a create message");
@@ -180,7 +182,7 @@ public class MotorAdapterMDBListener extends AbstractMDBListener {
 
         return "No instance created \n\n";
     }
-
+    @Override
     public String responseConfigure(Message requestMessage) throws JMSException {
         MotorAdapterMDBListener.LOGGER.log(Level.INFO, "Received a configure message");
 
@@ -218,7 +220,7 @@ public class MotorAdapterMDBListener extends AbstractMDBListener {
 
         return "No instance configured \n\n";
     }
-
+    @Override
     public String responseRelease(Message requestMessage) throws JMSException {
         MotorAdapterMDBListener.LOGGER.log(Level.INFO, "Received a release message");
 
@@ -278,64 +280,6 @@ public class MotorAdapterMDBListener extends AbstractMDBListener {
         return 10;
     }
 
-    public Message generateResponseMessage(Message requestMessage, String result) throws JMSException {
-        final Message responseMessage = this.context.createMessage();
 
-        // TODO: What kind of response types will be available?
-        responseMessage.setStringProperty(IMessageBus.TYPE_RESPONSE, requestMessage.getStringProperty(IMessageBus.METHOD_TYPE));
-        responseMessage.setStringProperty(IMessageBus.RDF, result);
-
-        return responseMessage;
-    }
-
-    public void onMessage(final Message requestMessage) {
-        try {
-
-            if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
-                String result = null;
-
-                if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
-
-                    result = responseDiscover(requestMessage);
-
-                    // } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
-                    // result = responseInstances(requestMessage);
-
-                    // } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
-                    //
-                    // result = responseMonitor(requestMessage);
-
-                } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_CREATE)) {
-
-                    result = responseCreate(requestMessage);
-
-                } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_CONFIGURE)) {
-
-                    result = responseConfigure(requestMessage);
-
-                } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_RELEASE)) {
-
-                    result = responseRelease(requestMessage);
-                }
-                //
-                // } else {
-                // result = "Unknown request";
-                // }
-
-                if (result != null) {
-                    Message responseMessage = generateResponseMessage(requestMessage, result);
-
-                    if (null != requestMessage.getJMSCorrelationID()) {
-                        responseMessage.setJMSCorrelationID(requestMessage.getJMSCorrelationID());
-                    }
-
-                    this.context.createProducer().send(topic, responseMessage);
-                }
-            }
-
-        } catch (JMSException e) {
-            System.err.println("JMSException");
-        }
-    }
 
 }
