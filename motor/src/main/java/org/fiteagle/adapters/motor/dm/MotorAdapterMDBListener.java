@@ -19,6 +19,8 @@ import javax.jms.Topic;
 import javax.naming.NamingException;
 
 import org.apache.jena.riot.RiotException;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.dm.AbstractMDBListener;
 import org.fiteagle.adapters.motor.MotorAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.IResourceRepository;
@@ -36,7 +38,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 @MessageDriven(name = "MotorAdapterMDB", activationConfig = { @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
-public class MotorAdapterMDBListener  {
+public class MotorAdapterMDBListener extends AbstractMDBListener {
 
     private static Logger LOGGER = Logger.getLogger(MotorAdapterMDBListener.class.toString());
 
@@ -52,6 +54,9 @@ public class MotorAdapterMDBListener  {
         this.adapter = MotorAdapter.getInstance();
     }
 
+    public AbstractAdapter getAdapter(){
+        return this.adapter;
+    }
     public String responseDiscover(Message requestMessage) throws JMSException {
         
         String serialization = getSerialization(requestMessage);

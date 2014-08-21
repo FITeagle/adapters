@@ -42,25 +42,25 @@ public abstract class AbstractMDBListener implements MessageListener {
      * @param requestMessage
      * @return
      */
-    public abstract String responseConfigure(Message requestMessage);
+    public abstract String responseConfigure(Message requestMessage) throws JMSException;
     /**
      * create a response String as response for this request message
      * @param requestMessage
      * @return
      */
-    public abstract String responseDiscover(Message requestMessage);
+    public abstract String responseDiscover(Message requestMessage) throws JMSException;
     /**
      * create a response String as response for this request message
      * @param requestMessage
      * @return
      */
-    public abstract String responseCreate(Message requestMessage);
+    public abstract String responseCreate(Message requestMessage) throws JMSException;
     /**
      * create a response String as response for this request message
      * @param requestMessage
      * @return
      */
-    public abstract String responseRelease(Message requestMessage);
+    public abstract String responseRelease(Message requestMessage) throws JMSException;
 
     /**
      * Method for checking if this message belongs to this adapter
@@ -81,8 +81,6 @@ public abstract class AbstractMDBListener implements MessageListener {
                     isForAdapter = true;
                     break;
                 }
-
-
             }
         } catch (Exception e) {
 
