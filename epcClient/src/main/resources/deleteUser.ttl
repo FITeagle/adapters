@@ -1,0 +1,8 @@
+@prefix fiteagle: <http://fiteagle.org/ontology#> .
+@prefix epcClient: <http://fiteagle.org/ontology/adapter/epcClient#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://fiteagleinternal#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+:EpcClientAdapter rdf:type epcClient:EpcClient ;
+epcClient:username "testUser" .
