@@ -28,35 +28,8 @@ public final class MotorAdapter extends AbstractAdapter {
             motorAdapterSingleton = new MotorAdapter();
         return motorAdapterSingleton;
     }
-    
-    // TODO: REMOVE
 
-    public Resource getMotorResource() {
-        return motorResource;
-    }
-
-    public Property getMotorPropertyRPM() {
-        return motorPropertyRPM;
-    }
-
-    public Property getMotorPropertyMaxRPM() {
-        return motorPropertyMaxRPM;
-    }
-
-    public Property getMotorPropertyThrottle() {
-        return motorPropertyThrottle;
-    }
-
-    public Property getMotorPropertyManufacturer() {
-        return motorPropertyManufacturer;
-    }
-
-    public Property getMotorPropertyIsDynamic() {
-        return motorPropertyIsDynamic;
-    }
-
-    private Resource motorResource;
-    private Resource motorAdapter;
+    private Resource motorResource;   
     private Property motorPropertyRPM;
     private Property motorPropertyMaxRPM;
     private Property motorPropertyThrottle;
@@ -76,13 +49,11 @@ public final class MotorAdapter extends AbstractAdapter {
         modelGeneral.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
         modelGeneral.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 
-        // Property instantiatesProperty = new PropertyImpl("fiteagle:instantiates");
-
         motorResource = modelGeneral.createResource("http://fiteagle.org/ontology/adapter/motor#Motor");
         motorResource.addProperty(RDF.type, OWL.Class);
         motorResource.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
 
-        motorAdapter = modelGeneral.createResource("http://fiteagle.org/ontology/adapter/motor#MotorGarage");
+        Resource motorAdapter = modelGeneral.createResource("http://fiteagle.org/ontology/adapter/motor#MotorGarage");
         motorAdapter.addProperty(RDF.type, OWL.Class);
         motorAdapter.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Adapter"));
         
@@ -119,10 +90,10 @@ public final class MotorAdapter extends AbstractAdapter {
         motorPropertyManufacturer.addProperty(RDFS.domain, motorResource);
         motorPropertyManufacturer.addProperty(RDFS.range, XSD.xstring);
 
-        Resource individualMotorAdapter1 = modelGeneral.createResource("http://fiteagleinternal#ADeployedMotorAdapter1");
-        individualMotorAdapter1.addProperty(RDF.type, motorAdapter);
-        individualMotorAdapter1.addProperty(RDFS.label, modelGeneral.createLiteral("A motor garage 1", "en"));
-        individualMotorAdapter1.addProperty(RDFS.comment, modelGeneral.createLiteral("A motor garage that can simulate different dynamic motor resources.", "en"));
+        adapterInstance = modelGeneral.createResource("http://fiteagleinternal#ADeployedMotorAdapter1");
+        adapterInstance.addProperty(RDF.type, motorAdapter);
+        adapterInstance.addProperty(RDFS.label, modelGeneral.createLiteral("A motor garage 1", "en"));
+        adapterInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("A motor garage that can simulate different dynamic motor resources.", "en"));
 
     }
 
@@ -165,16 +136,21 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
-    public String handleControlInstance(Model controlModel) {
+    public String handleConfigureInstance(Model configureModel, String requestID) {
         StringWriter sw = new StringWriter();
 
-        StmtIterator iter = controlModel.listStatements(new SimpleSelector(null, RDF.type, motorResource));
+        Model changedInstancesModel = ModelFactory.createDefaultModel();
+        this.setModelPrefixes(changedInstancesModel);
+        
+        StmtIterator iter = configureModel.listStatements(new SimpleSelector(null, RDF.type, motorResource));
         while (iter.hasNext()) {
             Resource currentResource = iter.nextStatement().getSubject();
             // sw.write(currentResource.getProperty(RDFS.label).getObject().toString());
             String instanceName = currentResource.getLocalName();
             if (instanceList.containsKey(instanceName)) {
                 Motor currentMotor = (Motor) instanceList.get(instanceName);
+                
+                List<String> updatedProperties = new LinkedList<String>();
 
                 for (Property currentProperty : motorControlProperties) {
                     StmtIterator iter2 = currentResource.listProperties(currentProperty);
@@ -184,32 +160,32 @@ public final class MotorAdapter extends AbstractAdapter {
                         String newValue = "";
 
                         if (currentProperty == motorPropertyRPM) {
-                            currentMotor.setRpm((int) iter2.nextStatement().getObject().asLiteral().getLong());
+                            currentMotor.setRpm((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
                             newValue = "" + currentMotor.getRpm();
                         } else if (currentProperty == motorPropertyMaxRPM) {
-                            currentMotor.setMaxRpm((int) iter2.nextStatement().getObject().asLiteral().getLong());
+                            currentMotor.setMaxRpm((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
                             newValue = "" + currentMotor.getMaxRpm();
                         } else if (currentProperty == motorPropertyThrottle) {
-                            currentMotor.setThrottle((int) iter2.nextStatement().getObject().asLiteral().getLong());
+                            currentMotor.setThrottle((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
                             newValue = "" + currentMotor.getThrottle();
                         } else if (currentProperty == motorPropertyIsDynamic) {
-                            ((DynamicMotor) currentMotor).setIsDynamic(iter2.nextStatement().getObject().asLiteral().getBoolean());
+                            ((DynamicMotor) currentMotor).setIsDynamic(iter2.nextStatement().getObject().asLiteral().getBoolean(), updatedProperties);
                             newValue = "" + ((DynamicMotor) currentMotor).isDynamic();
                         }
 
                         sw.write("Changed motor instance " + instanceName + " property " + currentProperty.toString() + " to value: " + newValue + "\n\n");
                     }
                 }
+                
+                changedInstancesModel.add(this.createInformConfigureRDF(instanceName,updatedProperties));
             }
         }
+        
+        this.notifyListeners(changedInstancesModel, requestID);
 
         return sw.toString();
     }
 
-    @Override
-    public String getInstanceClassName() {
-        return Motor.class.getName();
-    }
 
     @Override
     public String[] getAdapterSpecificPrefix() {
@@ -218,6 +194,11 @@ public final class MotorAdapter extends AbstractAdapter {
 
     public Motor getInstance(String instanceName) {
         return (Motor) instanceList.get(instanceName);
+    }
+
+    @Override
+    public Resource getAdapterManagedResource() {
+        return motorResource;
     }
 
 }

@@ -127,7 +127,7 @@ public abstract class AbstractAdapterREST {
     @Path("instance/{instanceName}")
     @Produces("text/html")
     public String createInstance(@PathParam("instanceName") String instanceName) {
-        if (abstractAdapter.createInstance(instanceName)) {
+        if (abstractAdapter.createInstance(instanceName, "REST")) {
             return "Created instance number : " + instanceName;
         }
         return "Invalid instance number";
@@ -137,7 +137,7 @@ public abstract class AbstractAdapterREST {
     @Path("instance/{instanceName}")
     @Produces("text/html")
     public String terminateInstance(@PathParam("instanceName") String instanceName) {
-        if (abstractAdapter.terminateInstance(instanceName)) {
+        if (abstractAdapter.terminateInstance(instanceName, "REST")) {
             return "Terminated instance number : " + instanceName;
         }
         return "Invalid instance number";
@@ -176,7 +176,7 @@ public abstract class AbstractAdapterREST {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("text/html")
     public String controlInstanceTurtle(final String controlInput) {
-        return abstractAdapter.controlInstance(controlInput, AbstractAdapter.PARAM_TURTLE);
+        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_TURTLE, "");
     }
 
 
@@ -185,7 +185,7 @@ public abstract class AbstractAdapterREST {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("text/html")
     public String controlInstanceRDF(final String controlInput) {
-        return abstractAdapter.controlInstance(controlInput, AbstractAdapter.PARAM_RDFXML);
+        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_RDFXML, "");
     }
 
     @PUT
@@ -193,7 +193,7 @@ public abstract class AbstractAdapterREST {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("text/html")
     public String controlInstanceNTRIPLE(final String controlInput) {
-        return abstractAdapter.controlInstance(controlInput, AbstractAdapter.PARAM_NTRIPLE);
+        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_NTRIPLE, "");
     }
     
     /**
@@ -215,6 +215,6 @@ public abstract class AbstractAdapterREST {
         controlString += ":m" + instanceName + "     a             :MotorResource ;\n";
         controlString += "rdfs:label    \"" + instanceName + "\" ;\n";
         controlString += ":" + paramProperty + "          \"" + paramValue + "\"^^xsd:long .\n";
-        return abstractAdapter.controlInstance(controlString, AbstractAdapter.PARAM_TURTLE);
+        return abstractAdapter.configureInstance(controlString, AbstractAdapter.PARAM_TURTLE, "");
     }
 }

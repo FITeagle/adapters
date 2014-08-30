@@ -78,7 +78,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
     }
 
     @Override
-    public void rdfChange(Model eventRDF) {
+    public void rdfChange(Model eventRDF, String requestID) {
         if (wsSession != null && wsSession.isOpen()) {
             Set<Session> sessions = wsSession.getOpenSessions();
             
@@ -92,21 +92,6 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
                 client.getAsyncRemote().sendText(eventString);
             }
         }
-        // else {
-        // LOGGER.log(Level.INFO, "No client to talk to");
-        // }
     }
 
-    // @Override
-    // public void onAdapterMessage(String message) {
-    // LOGGER.log(Level.INFO, "Received a message via Adapter listener...");
-    // if (null != this.wsSession && this.wsSession.isOpen()) {
-    // Set<Session> sessions = this.wsSession.getOpenSessions();
-    // for (Session client : sessions) {
-    // client.getAsyncRemote().sendText(message);
-    // }
-    // } else {
-    // LOGGER.log(Level.INFO, "No client to talk to");
-    // }
-    // }
 }

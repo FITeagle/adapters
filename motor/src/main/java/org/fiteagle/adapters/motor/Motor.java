@@ -1,7 +1,42 @@
 package org.fiteagle.adapters.motor;
 
+import java.util.LinkedList;
+import java.util.List;
+
 
 public class Motor {
+    
+
+    private String manufacturer;
+    private int rpm;
+    private int maxRpm;
+    private int throttle;
+    protected MotorAdapter owningAdapter;
+    protected List<String> updatedProperties = new LinkedList<String>();
+    
+    private String instanceName;
+    
+    public Motor(){
+        super();
+        
+    }
+    
+    public Motor(MotorAdapter owningAdapter, String instanceName) {
+        super();
+        this.manufacturer = "Fraunhofer FOKUS";
+        this.rpm = 0;
+        this.maxRpm = 3000;
+        this.throttle = 0;
+        
+        this.owningAdapter = owningAdapter;
+        this.instanceName = instanceName;
+    }
+    
+    
+    public String toString() {
+        
+        return "Motor";
+    }
 
     public String getManufacturer() {
         return manufacturer;
@@ -15,60 +50,31 @@ public class Motor {
         return rpm;
     }
 
-    public void setRpm(int rpm) {
+    public void setRpm(int rpm, List<String> updatedProperties) {
         this.rpm = rpm;
-        owningAdapter.notifyListeners(owningAdapter.createInformRDF(instanceName));
+        updatedProperties.add("rpm");
     }
 
     public int getMaxRpm() {
         return maxRpm;
     }
 
-    public void setMaxRpm(int maxRpm) {
+    public void setMaxRpm(int maxRpm, List<String> updatedProperties) {
         this.maxRpm = maxRpm;
-        owningAdapter.notifyListeners(owningAdapter.createInformRDF(instanceName));
+        updatedProperties.add("maxRpm");
     }
 
     public int getThrottle() {
         return throttle;
     }
 
-    public void setThrottle(int throttle) {
+    public void setThrottle(int throttle, List<String> updatedProperties) {
         this.throttle = throttle;
-        owningAdapter.notifyListeners(owningAdapter.createInformRDF(instanceName));
+        updatedProperties.add("throttle");
     }
 
-    public Motor(MotorAdapter owningAdapter, String instanceName) {
-        super();
-        this.manufacturer = "Fraunhofer FOKUS";
-        this.rpm = 0;
-        this.maxRpm = 3000;
-        this.throttle = 0;
-
-        this.owningAdapter = owningAdapter;
-        this.instanceName = instanceName;
-    }
-    
-    public Motor(){
-        super();
-        
-    }
-
-    public String toString() {
-
-        return "Motor";
-    }
-
-    private String manufacturer;
-    private int rpm;
-    private int maxRpm;
-    private int throttle;
-    protected MotorAdapter owningAdapter;
-    
     public String getInstanceName() {
         return instanceName;
     }
-
-    private String instanceName;
 
 }

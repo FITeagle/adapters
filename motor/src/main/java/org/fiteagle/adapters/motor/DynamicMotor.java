@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.motor;
 
+import java.util.List;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -20,7 +22,7 @@ public class DynamicMotor extends Motor {
     private boolean isDynamic;
     private boolean isDynamicThreadRunning;
 
-    public void setIsDynamic(boolean state) {
+    public void setIsDynamic(boolean state, List<String> updatedProperties) {
         this.isDynamic = state;
 
         try {
@@ -33,8 +35,10 @@ public class DynamicMotor extends Motor {
         } catch (NamingException e) {
             e.printStackTrace();
         }
-        owningAdapter.notifyListeners(owningAdapter.createInformRDF(getInstanceName()));
+        updatedProperties.add("isDynamic");
     }
+    
+
 
     private void makeMotorDynamic() throws NamingException {
         IMotorAdapterDynamic dynamicThread;
