@@ -97,6 +97,29 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         return "Not a valid fiteagle:create message \n\n";
     }
 
+    public String responseConfigure(Message requestMessage) throws JMSException {
+        
+        Model modelConfigure = getMessageModel(requestMessage);
+        
+        // This is a configure message, so do something with it
+        if (isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
+            return adapterRDFHandler.parseConfigureModel(modelConfigure, requestMessage.getJMSCorrelationID());
+        }
+        return "Not a valid fiteagle:configure message \n\n";
+    }
+    
+    public String responseRelease(Message requestMessage) throws JMSException {
+        Model modelRelease = getMessageModel(requestMessage);
+        
+        // This is a release message, so do something with it
+        if (isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
+            return adapterRDFHandler.parseReleaseModel(modelRelease, requestMessage.getJMSCorrelationID());
+        }
+        
+        return "Not a valid fiteagle:release message \n\n";
+    }
+    
+    
     private Model getMessageModel(Message jmsMessage) throws JMSException {
         // create an empty model
         Model messageModel = ModelFactory.createDefaultModel();
@@ -123,27 +146,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         return messageModel.contains(null, RDF.type, messageTypePropety);
     }
 
-    public String responseConfigure(Message requestMessage) throws JMSException {
-
-        Model modelConfigure = getMessageModel(requestMessage);
-
-        // This is a configure message, so do something with it
-        if (isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
-            return adapterRDFHandler.parseConfigureModel(modelConfigure, requestMessage.getJMSCorrelationID());
-        }
-        return "Not a valid fiteagle:configure message \n\n";
-    }
-
-    public String responseRelease(Message requestMessage) throws JMSException {
-        Model modelRelease = getMessageModel(requestMessage);
-
-        // This is a release message, so do something with it
-        if (isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
-            return adapterRDFHandler.parseReleaseModel(modelRelease, requestMessage.getJMSCorrelationID());
-        }
-
-        return "Not a valid fiteagle:release message \n\n";
-    }
 
     public Message generateResponseMessage(Message requestMessage, String result) throws JMSException {
         final Message responseMessage = this.context.createMessage();

@@ -1,6 +1,5 @@
 package org.fiteagle.adapters.motor;
 
-import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.SimpleSelector;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -20,7 +19,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 public final class MotorAdapter extends AbstractAdapter {
 
-    private String[] adapterSpecificPrefix = {"motor","http://fiteagle.org/ontology/adapter/motor#"};
+    private String[] adapterSpecificPrefix = { "motor", "http://fiteagle.org/ontology/adapter/motor#" };
     private static MotorAdapter motorAdapterSingleton;
 
     public static synchronized MotorAdapter getInstance() {
@@ -29,7 +28,7 @@ public final class MotorAdapter extends AbstractAdapter {
         return motorAdapterSingleton;
     }
 
-    private Resource motorResource;   
+    private Resource motorResource;
     private Property motorPropertyRPM;
     private Property motorPropertyMaxRPM;
     private Property motorPropertyThrottle;
@@ -56,7 +55,7 @@ public final class MotorAdapter extends AbstractAdapter {
         Resource motorAdapter = modelGeneral.createResource("http://fiteagle.org/ontology/adapter/motor#MotorGarage");
         motorAdapter.addProperty(RDF.type, OWL.Class);
         motorAdapter.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Adapter"));
-        
+
         motorAdapter.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, motorResource);
         motorResource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, motorAdapter);
 
@@ -136,56 +135,37 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
-    public String handleConfigureInstance(Model configureModel, String requestID) {
-        StringWriter sw = new StringWriter();
+    public List<String> handleConfigureInstance(Statement configureStatement) {
 
-        Model changedInstancesModel = ModelFactory.createDefaultModel();
-        this.setModelPrefixes(changedInstancesModel);
-        
-        StmtIterator iter = configureModel.listStatements(new SimpleSelector(null, RDF.type, motorResource));
-        while (iter.hasNext()) {
-            Resource currentResource = iter.nextStatement().getSubject();
-            // sw.write(currentResource.getProperty(RDFS.label).getObject().toString());
-            String instanceName = currentResource.getLocalName();
-            if (instanceList.containsKey(instanceName)) {
-                Motor currentMotor = (Motor) instanceList.get(instanceName);
-                
-                List<String> updatedProperties = new LinkedList<String>();
+        Resource currentResource = configureStatement.getSubject();
+        String instanceName = currentResource.getLocalName();
 
-                for (Property currentProperty : motorControlProperties) {
-                    StmtIterator iter2 = currentResource.listProperties(currentProperty);
+        List<String> updatedProperties = new LinkedList<String>();
 
-                    while (iter2.hasNext()) {
-                        // int value = (int) iter2.nextStatement().getObject().asLiteral().getString();
-                        String newValue = "";
+        if (instanceList.containsKey(instanceName)) {
+            Motor currentMotor = (Motor) instanceList.get(instanceName);
 
-                        if (currentProperty == motorPropertyRPM) {
-                            currentMotor.setRpm((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
-                            newValue = "" + currentMotor.getRpm();
-                        } else if (currentProperty == motorPropertyMaxRPM) {
-                            currentMotor.setMaxRpm((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
-                            newValue = "" + currentMotor.getMaxRpm();
-                        } else if (currentProperty == motorPropertyThrottle) {
-                            currentMotor.setThrottle((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
-                            newValue = "" + currentMotor.getThrottle();
-                        } else if (currentProperty == motorPropertyIsDynamic) {
-                            ((DynamicMotor) currentMotor).setIsDynamic(iter2.nextStatement().getObject().asLiteral().getBoolean(), updatedProperties);
-                            newValue = "" + ((DynamicMotor) currentMotor).isDynamic();
-                        }
+            for (Property currentProperty : motorControlProperties) {
+                StmtIterator iter2 = currentResource.listProperties(currentProperty);
 
-                        sw.write("Changed motor instance " + instanceName + " property " + currentProperty.toString() + " to value: " + newValue + "\n\n");
+                while (iter2.hasNext()) {
+
+                    if (currentProperty == motorPropertyRPM) {
+                        currentMotor.setRpm((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
+                    } else if (currentProperty == motorPropertyMaxRPM) {
+                        currentMotor.setMaxRpm((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
+                    } else if (currentProperty == motorPropertyThrottle) {
+                        currentMotor.setThrottle((int) iter2.nextStatement().getObject().asLiteral().getLong(), updatedProperties);
+                    } else if (currentProperty == motorPropertyIsDynamic) {
+                        ((DynamicMotor) currentMotor).setIsDynamic(iter2.nextStatement().getObject().asLiteral().getBoolean(), updatedProperties);
                     }
                 }
-                
-                changedInstancesModel.add(this.createInformConfigureRDF(instanceName,updatedProperties));
             }
+
         }
-        
-        this.notifyListeners(changedInstancesModel, requestID);
 
-        return sw.toString();
+        return updatedProperties;
     }
-
 
     @Override
     public String[] getAdapterSpecificPrefix() {

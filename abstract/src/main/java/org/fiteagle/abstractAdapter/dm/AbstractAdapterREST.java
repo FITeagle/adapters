@@ -127,7 +127,7 @@ public abstract class AbstractAdapterREST {
     @Path("instance/{instanceName}")
     @Produces("text/html")
     public String createInstance(@PathParam("instanceName") String instanceName) {
-        if (abstractAdapter.createInstance(instanceName, "REST")) {
+        if (abstractAdapter.createInstance(instanceName)) {
             return "Created instance number : " + instanceName;
         }
         return "Invalid instance number";
@@ -137,7 +137,7 @@ public abstract class AbstractAdapterREST {
     @Path("instance/{instanceName}")
     @Produces("text/html")
     public String terminateInstance(@PathParam("instanceName") String instanceName) {
-        if (abstractAdapter.terminateInstance(instanceName, "REST")) {
+        if (abstractAdapter.terminateInstance(instanceName)) {
             return "Terminated instance number : " + instanceName;
         }
         return "Invalid instance number";
@@ -171,50 +171,54 @@ public abstract class AbstractAdapterREST {
         return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_NTRIPLE);
     }
     
-    @PUT
-    @Path("instance/{instanceName}/description.ttl")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("text/html")
-    public String controlInstanceTurtle(final String controlInput) {
-        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_TURTLE, "");
-    }
-
-
-    @PUT
-    @Path("instance/{instanceName}/description.rdf")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("text/html")
-    public String controlInstanceRDF(final String controlInput) {
-        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_RDFXML, "");
-    }
-
-    @PUT
-    @Path("instance/{instanceName}/description.ntriple")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("text/html")
-    public String controlInstanceNTRIPLE(final String controlInput) {
-        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_NTRIPLE, "");
-    }
+    // TODO: Parse string and send rdf Model to RDF Handler class!
     
-    /**
-     * Control adapter's instance property directly via REST
-     * Good for testing
-     * 
-     * @param instanceName
-     * @param paramProperty
-     * @param paramValue
-     * @return
-     */
-    @PUT
-    @Path("instance/{instanceName}/{paramProperty}/{paramValue}")
-    @Produces("text/html")
-    public String controlInstanceProperty(@PathParam("instanceName") String instanceName,  @PathParam("paramProperty") String paramProperty,  @PathParam("paramValue") String paramValue) {
-        String controlString = "@prefix :      <http://fiteagle.org/ontology/adapter/motor#> .\n";
-        controlString += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
-        controlString += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
-        controlString += ":m" + instanceName + "     a             :MotorResource ;\n";
-        controlString += "rdfs:label    \"" + instanceName + "\" ;\n";
-        controlString += ":" + paramProperty + "          \"" + paramValue + "\"^^xsd:long .\n";
-        return abstractAdapter.configureInstance(controlString, AbstractAdapter.PARAM_TURTLE, "");
-    }
+//    @PUT
+//    @Path("instance/{instanceName}/description.ttl")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    @Produces("text/html")
+//    public String controlInstanceTurtle(final String controlInput) {
+//        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_TURTLE, "");
+//    }
+//
+//
+//    @PUT
+//    @Path("instance/{instanceName}/description.rdf")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    @Produces("text/html")
+//    public String controlInstanceRDF(final String controlInput) {
+//        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_RDFXML, "");
+//    }
+//
+//    @PUT
+//    @Path("instance/{instanceName}/description.ntriple")
+//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+//    @Produces("text/html")
+//    public String controlInstanceNTRIPLE(final String controlInput) {
+//        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_NTRIPLE, "");
+//    }
+ 
+    
+    // TODO: Optional: Re-implement using RDF Handler class
+//    /**
+//     * Control adapter's instance property directly via REST
+//     * Good for testing
+//     * 
+//     * @param instanceName
+//     * @param paramProperty
+//     * @param paramValue
+//     * @return
+//     */
+//    @PUT
+//    @Path("instance/{instanceName}/{paramProperty}/{paramValue}")
+//    @Produces("text/html")
+//    public String controlInstanceProperty(@PathParam("instanceName") String instanceName,  @PathParam("paramProperty") String paramProperty,  @PathParam("paramValue") String paramValue) {
+//        String controlString = "@prefix :      <http://fiteagle.org/ontology/adapter/motor#> .\n";
+//        controlString += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
+//        controlString += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
+//        controlString += ":m" + instanceName + "     a             :MotorResource ;\n";
+//        controlString += "rdfs:label    \"" + instanceName + "\" ;\n";
+//        controlString += ":" + paramProperty + "          \"" + paramValue + "\"^^xsd:long .\n";
+//        return abstractAdapter.configureInstance(controlString, AbstractAdapter.PARAM_TURTLE, "");
+//    }
 }

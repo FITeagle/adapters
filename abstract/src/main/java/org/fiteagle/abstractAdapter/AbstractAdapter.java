@@ -1,7 +1,5 @@
 package org.fiteagle.abstractAdapter;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +32,10 @@ public abstract class AbstractAdapter {
     protected Resource adapterInstance;
     
     public abstract Resource getAdapterManagedResource();
+    
+    public Resource getAdapterInstance(){
+        return adapterInstance;
+    }
 
     public String getAdapterDescription(String serializationFormat) {
         return MessageBusMsgFactory.serializeModel(modelGeneral);
@@ -46,7 +48,7 @@ public abstract class AbstractAdapter {
         return newModel;
     }
 
-    public boolean createInstance(String instanceName, String requestID) {
+    public boolean createInstance(String instanceName) {
 
         if (instanceList.containsKey(instanceName)) {
             return false;
@@ -57,18 +59,12 @@ public abstract class AbstractAdapter {
 
         instanceList.put(instanceName, newInstance);
 
-        notifyListeners(createInformRDF(instanceName), requestID);
-
         return true;
     }
 
-    public boolean terminateInstance(String instanceName, String requestID) {
+    public boolean terminateInstance(String instanceName) {
 
         if (instanceList.containsKey(instanceName)) {
-            // TODO: release event message
-            
-            notifyListeners(createInformReleaseRDF(instanceName), requestID);
-            // notifyListeners(instanceList.get(instanceID), "terminated:"+ instanceID + ";; " + " (ID: " + instanceID + ")", "" + instanceID, "null");
             instanceList.remove(instanceName);
             return true;
         }
@@ -81,7 +77,7 @@ public abstract class AbstractAdapter {
         return MessageBusMsgFactory.serializeModel(modelInstances);
     }
 
-    private Model getSingleInstanceModel(String instanceName) {
+    public Model getSingleInstanceModel(String instanceName) {
         Model modelInstances = ModelFactory.createDefaultModel();
 
         setModelPrefixes(modelInstances);
@@ -128,64 +124,27 @@ public abstract class AbstractAdapter {
         return MessageBusMsgFactory.serializeModel(modelDiscover);
     }
 
-    public String configureInstance(String controlInput, String serializationFormat, String requestID) {
+    public List<String> configureInstance(Statement configureStatement) {
 
-        // create an empty model
-        Model configureModel = ModelFactory.createDefaultModel();
-
-        InputStream is = new ByteArrayInputStream(controlInput.getBytes());
-
-        // read the RDF/XML file
-        configureModel.read(is, null, serializationFormat);
-
-        // handling done by adapter, handleControlInstance has to be implemented by all subclasses!handleControlInstance
-        return handleConfigureInstance(configureModel, requestID);
-    }
-    
-    public String configureInstance(Model configureModel, String requestID) {
-        // handling done by adapter, handleControlInstance has to be implemented by all subclasses!
-        return handleConfigureInstance(configureModel, requestID);
+//        // create an empty model
+//        Model configureModel = ModelFactory.createDefaultModel();
+//
+//        InputStream is = new ByteArrayInputStream(controlInput.getBytes());
+//
+//        // read the RDF/XML file
+//        configureModel.read(is, null, serializationFormat);
+//
+//        // handling done by adapter, handleControlInstance has to be implemented by all subclasses!handleControlInstance
+//        return handleConfigureInstance(configureModel, requestID);
+        
+        return handleConfigureInstance(configureStatement);
     }
 
     public void notifyListeners(Model eventRDF, String requestID) {
         for (AdapterEventListener name : listener) {
             name.rdfChange(eventRDF, requestID);
         }
-    }
-
-    public Model createInformRDF(String instanceName) {
-        return getSingleInstanceModel(instanceName);
-    }
-    
-    public Model createInformConfigureRDF(String instanceName, List<String> propertiesChanged) {
-        Model modelPropertiesChanged = ModelFactory.createDefaultModel();
-        setModelPrefixes(modelPropertiesChanged);
-        
-        Model wholeInstance = getSingleInstanceModel(instanceName);
-        Resource currentInstance = wholeInstance.getResource("http://fiteagleinternal#" + instanceName);
-        
-        for (String currentPropertyString : propertiesChanged) {             
-            Property currentProperty = wholeInstance.getProperty(getAdapterSpecificPrefix()[1] + currentPropertyString);
-            StmtIterator iter2 = currentInstance.listProperties(currentProperty);
-            Statement stmtToAdd = iter2.nextStatement();            
-            modelPropertiesChanged.add(stmtToAdd);            
-        }       
-        
-        return modelPropertiesChanged;
-    }
-    
-    public Model createInformReleaseRDF(String instanceName) {
-        
-        Model modelInstances = ModelFactory.createDefaultModel();
-
-        setModelPrefixes(modelInstances);
-        
-        Resource releaseInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
-        modelInstances.add(adapterInstance, MessageBusOntologyModel.methodReleases, releaseInstance);
-        
-        return modelInstances;
-    }
-    
+    }   
 
     public boolean addChangeListener(AdapterEventListener newListener) {
         listener.add(newListener);
@@ -204,6 +163,23 @@ public abstract class AbstractAdapter {
         messageModel.add(adapterInstance, MessageBusOntologyModel.methodReleases, adapterInstance);
   
         notifyListeners(messageModel, "0");
+    }
+    
+    public Model createInformConfigureRDF(String instanceName, List<String> propertiesChanged) {
+        Model modelPropertiesChanged = ModelFactory.createDefaultModel();
+        setModelPrefixes(modelPropertiesChanged);
+        
+        Model wholeInstance = getSingleInstanceModel(instanceName);
+        Resource currentInstance = wholeInstance.getResource("http://fiteagleinternal#" + instanceName);
+        
+        for (String currentPropertyString : propertiesChanged) {             
+            Property currentProperty = wholeInstance.getProperty(getAdapterSpecificPrefix()[1] + currentPropertyString);
+            StmtIterator iter2 = currentInstance.listProperties(currentProperty);
+            Statement stmtToAdd = iter2.nextStatement();            
+            modelPropertiesChanged.add(stmtToAdd);            
+        }       
+        
+        return modelPropertiesChanged;
     }
     
     /**
@@ -232,7 +208,7 @@ public abstract class AbstractAdapter {
     public abstract Model handleGetAllInstances(Model modelInstances);
 
     
-    public abstract String handleConfigureInstance(Model configureModel, String requestID);
+    public abstract List<String> handleConfigureInstance(Statement configureStatement);
    
     
 

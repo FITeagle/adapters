@@ -1,8 +1,6 @@
 package org.fiteagle.adapters.motor;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 import javax.annotation.PostConstruct;
@@ -69,9 +67,8 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
                 }
                 Motor instance = adapter.getInstance(instanceName);
                 if(instance != null){
-                    List<String> updatedProperties = new LinkedList<String>();
-                    adapter.getInstance(instanceName).setRpm(randomRPMGenerator.nextInt(1000), updatedProperties);
-                    adapter.notifyListeners(adapter.createInformConfigureRDF(instanceName,updatedProperties), "");
+                    adapter.getInstance(instanceName).setRpmWithNotify(randomRPMGenerator.nextInt(1000));
+
                 } else {
                     Thread.currentThread().interrupt();
                     instanceThreadList.remove(instanceName);

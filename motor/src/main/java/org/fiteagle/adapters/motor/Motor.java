@@ -3,6 +3,8 @@ package org.fiteagle.adapters.motor;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 
 public class Motor {
     
@@ -11,9 +13,7 @@ public class Motor {
     private int rpm;
     private int maxRpm;
     private int throttle;
-    protected MotorAdapter owningAdapter;
-    protected List<String> updatedProperties = new LinkedList<String>();
-    
+    protected MotorAdapter owningAdapter;   
     private String instanceName;
     
     public Motor(){
@@ -53,6 +53,17 @@ public class Motor {
     public void setRpm(int rpm, List<String> updatedProperties) {
         this.rpm = rpm;
         updatedProperties.add("rpm");
+    }
+    
+    public void setRpmWithNotify(int rpm) {
+        this.rpm = rpm;
+        
+        List<String> updatedProperties = new LinkedList<String>();
+        updatedProperties.add("rpm");
+        Model changedInstanceValues = owningAdapter.createInformConfigureRDF(instanceName,updatedProperties); 
+        owningAdapter.setModelPrefixes(changedInstanceValues);   
+        owningAdapter.notifyListeners(changedInstanceValues, "");
+
     }
 
     public int getMaxRpm() {

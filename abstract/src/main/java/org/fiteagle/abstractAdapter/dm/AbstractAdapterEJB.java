@@ -1,7 +1,11 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.List;
+
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
+
+import com.hp.hpl.jena.rdf.model.Statement;
 
 public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
 
@@ -14,12 +18,12 @@ public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
 
     @Override
     public boolean createInstance(String instanceName) {
-        return this.adapter.createInstance(instanceName, "");
+        return this.adapter.createInstance(instanceName);
     }
 
     @Override
     public boolean terminateInstance(String instanceName) {
-        return this.adapter.terminateInstance(instanceName, "");
+        return this.adapter.terminateInstance(instanceName);
     }
 
     @Override
@@ -33,8 +37,8 @@ public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
     }
 
     @Override
-    public String configureInstance(String configureInput, String serializationFormat) {
-        return this.adapter.configureInstance(configureInput, serializationFormat, "");
+    public List<String> configureInstance(Statement configureStatement) {
+        return this.adapter.configureInstance(configureStatement);
     }
 
     @Override
