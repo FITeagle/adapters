@@ -47,13 +47,13 @@ public abstract class AbstractAdapterRDFHandler {
             }            
         }           
         
-        adapter.notifyListeners(createdInstancesModel, requestID);
-        
-        if(!createdInstancesModel.isEmpty()){
-            return "";
+        if(createdInstancesModel.isEmpty()){
+            return IMessageBus.STATUS_400;
         }
+        
+        adapter.notifyListeners(createdInstancesModel, requestID);
 
-        return "No instances to create \n\n";
+        return IMessageBus.STATUS_200;
     }
 
     public String parseReleaseModel(Model modelRelease, String requestID) {
@@ -70,10 +70,10 @@ public abstract class AbstractAdapterRDFHandler {
 
             if (adapter.terminateInstance(instanceName)) {
                 adapter.notifyListeners(createInformReleaseRDF(instanceName), requestID);
-                return "";
+                return IMessageBus.STATUS_200;
             }
         }
-        return "No instances to release \n\n";
+        return IMessageBus.STATUS_404;
     }
 
     public String parseDiscoverModel(Model modelDiscover) {
@@ -88,7 +88,12 @@ public abstract class AbstractAdapterRDFHandler {
             String instanceName = currentInstanceStatement.getSubject().getLocalName();
             AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Discovering instance: " + instanceName + " (" + currentInstanceStatement.toString() + ")");
 
-            return adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
+            String response = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
+            if(response.isEmpty()){
+                return IMessageBus.STATUS_404;
+            } else {
+                return response;
+            }            
         }
         // No specific instance requested, show all
         return this.adapter.getDiscoverAll(IMessageBus.SERIALIZATION_DEFAULT);
@@ -116,13 +121,13 @@ public abstract class AbstractAdapterRDFHandler {
             changedInstancesModel.add(changedInstanceValues);
         }        
         
-        adapter.notifyListeners(changedInstancesModel, requestID);
-        
-        if(!changedInstancesModel.isEmpty()){
-            return "";
+        if(changedInstancesModel.isEmpty()){
+            return IMessageBus.STATUS_404;
         }
         
-        return "No instances to configure \n\n";
+        adapter.notifyListeners(changedInstancesModel, requestID);
+        
+        return IMessageBus.STATUS_200;
     }
     
     public Model createInformRDF(String instanceName) {

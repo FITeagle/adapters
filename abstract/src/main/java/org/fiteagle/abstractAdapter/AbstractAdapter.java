@@ -74,18 +74,21 @@ public abstract class AbstractAdapter {
 
     public String monitorInstance(String instanceName, String serializationFormat) {
         Model modelInstances = getSingleInstanceModel(instanceName);
+        if(modelInstances.isEmpty()){
+            return "";
+        }
         return MessageBusMsgFactory.serializeModel(modelInstances);
     }
 
     public Model getSingleInstanceModel(String instanceName) {
         Model modelInstances = ModelFactory.createDefaultModel();
 
-        setModelPrefixes(modelInstances);
-
         if (instanceList.containsKey(instanceName)) {
             // handling done by adapter, handleMonitorInstance has to be implemented by all subclasses!
             modelInstances = handleMonitorInstance(instanceName, modelInstances);
-        }
+            
+            setModelPrefixes(modelInstances);
+        } 
 
         return modelInstances;
     }

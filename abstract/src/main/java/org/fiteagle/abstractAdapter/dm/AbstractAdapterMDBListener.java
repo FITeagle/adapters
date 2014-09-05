@@ -45,18 +45,18 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                     result = responseDiscover(requestMessage);
                 } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_CREATE)) {
                     AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a create message");
-                    responseCreate(requestMessage);
+                    result = responseCreate(requestMessage);
 
                 } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_CONFIGURE)) {
                     AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a configure message");
-                    responseConfigure(requestMessage);
+                    result = responseConfigure(requestMessage);
 
                 } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_RELEASE)) {
                     AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a release message");
-                    responseRelease(requestMessage);
+                    result = responseRelease(requestMessage);
                 }
 
-                if (!result.isEmpty()) {
+                if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200)) {
                     Message responseMessage = generateResponseMessage(requestMessage, result);
 
                     if (null != requestMessage.getJMSCorrelationID()) {
