@@ -16,6 +16,8 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 //import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -23,7 +25,6 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
-import org.fiteagle.adapters.mightyrobot.dm.MightyRobotAdapterBean;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import javax.annotation.PostConstruct;
@@ -136,34 +137,36 @@ public class MightyRobotAdapter extends AbstractAdapter{
         
     }
      
-    @PostConstruct
-    private void postConstruct(){
-        System.out.println();
-        System.out.println("ALLLLLLLLLLLLLLLERT!!!!!!!!!!!!! POSTCONSTRUCT");
-        System.out.println();
-     // post to db ... maybe jena.query.DataSetAccessor?
-        String adapterDescription = this.getAdapterDescription(AbstractAdapter.PARAM_TURTLE);
-        String updateString = "";
-        BufferedReader bR = new BufferedReader(new StringReader(adapterDescription));
-        String lineRead = "";
-        try {
-
-	        while ((lineRead = bR.readLine()).startsWith("@")){
-	        	updateString += lineRead.substring(1, lineRead.length() - 1) + "\n";
-	        }
-	        
-	        updateString+= "\nINSERT DATA {\n";
-	        updateString+= lineRead;
-	        while ((lineRead = bR.readLine()) != null){
-	        	updateString += lineRead + "\n";
-	        }	  
-	        updateString+= "}";
-        } catch (Exception e){
-        	e.printStackTrace();
-        }
-        System.out.println("Adapter Description: \n\n" + updateString);
-        this.sendSparqlMessage(updateString, "update");
-    }
+    
+    // TODO: Use context listener for register
+//    @PostConstruct
+//    private void postConstruct(){
+//        System.out.println();
+//        System.out.println("ALLLLLLLLLLLLLLLERT!!!!!!!!!!!!! POSTCONSTRUCT");
+//        System.out.println();
+//     // post to db ... maybe jena.query.DataSetAccessor?
+//        String adapterDescription = this.getAdapterDescription(AbstractAdapter.PARAM_TURTLE);
+//        String updateString = "";
+//        BufferedReader bR = new BufferedReader(new StringReader(adapterDescription));
+//        String lineRead = "";
+//        try {
+//
+//	        while ((lineRead = bR.readLine()).startsWith("@")){
+//	        	updateString += lineRead.substring(1, lineRead.length() - 1) + "\n";
+//	        }
+//	        
+//	        updateString+= "\nINSERT DATA {\n";
+//	        updateString+= lineRead;
+//	        while ((lineRead = bR.readLine()) != null){
+//	        	updateString += lineRead + "\n";
+//	        }	  
+//	        updateString+= "}";
+//        } catch (Exception e){
+//        	e.printStackTrace();
+//        }
+//        System.out.println("Adapter Description: \n\n" + updateString);
+//        this.sendSparqlMessage(updateString, "update");
+//    }
     // used to force the container to create an instance of this application scoped class
     public void init(){
 
@@ -175,31 +178,23 @@ public class MightyRobotAdapter extends AbstractAdapter{
     	template.addProperty(RDFS.range, XSDType);
     	return template;
     }
-
-
-   /* @Resource(mappedName = "topic/core")
-    private Topic topic;*/
-    @Inject
-    private JMSContext context;
-    @Inject
-    private MightyRobotAdapterBean mightyRobotAdapterBean;
     
-    private void sendSparqlMessage(String data, String type){
-        try{
-            final Message message= this.context.createMessage();
-            message.setJMSCorrelationID(UUID.randomUUID().toString());
-            message.setStringProperty("topic", "Fuseki");
-            message.setStringProperty("type",
-                    type);
-            message.setStringProperty("data",
-            		data);
-            mightyRobotAdapterBean.sendMessage(message);
-
-
-        }catch(Exception e){
-            e.printStackTrace();
-        }
-    }
+//    private void sendSparqlMessage(String data, String type){
+//        try{
+//            final Message message= this.context.createMessage();
+//            message.setJMSCorrelationID(UUID.randomUUID().toString());
+//            message.setStringProperty("topic", "Fuseki");
+//            message.setStringProperty("type",
+//                    type);
+//            message.setStringProperty("data",
+//            		data);
+//         //   mightyRobotAdapterBean.sendMessage(message);
+//
+//
+//        }catch(Exception e){
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     public Object handleCreateInstance(String instanceName){
@@ -306,7 +301,7 @@ WHERE
 						"?mightyrobot mr:nickname ?nickname .\n"+
 						"?mightyrobot mr:owningAdapter ?owningAdapter .\n"+
 					"}\n";	
-    	sendSparqlMessage(data, "query");
+    //	sendSparqlMessage(data, "query");
     	
 		for (String key : instanceList.keySet()) {
         	
@@ -325,64 +320,7 @@ WHERE
 		return modelInstances;
 	}
 
-	@Override
-	public String handleControlInstance(Model model2) {
-        StringWriter sw = new StringWriter();
 
-        StmtIterator iter = model2.listStatements(new SimpleSelector(null, RDF.type, instanceClassResource));
-        while (iter.hasNext()) {
-            com.hp.hpl.jena.rdf.model.Resource currentResource = iter.nextStatement().getSubject();
-            // sw.write(currentResource.getProperty(RDFS.label).getObject().toString());
-            int key = Integer.parseInt(currentResource.getProperty(RDFS.label).getObject().toString());
-            if (instanceList.containsKey(key)) {
-            	MightyRobot currentMightyRobot = (MightyRobot) instanceList.get(key);
-
-                for (Property currentProperty : resourceControlProperties) {
-                    StmtIterator iter2 = currentResource.listProperties(currentProperty);
-
-                    while (iter2.hasNext()) {
-
-                    	String newValue = "";
-                        if (currentProperty == mightyRobotPropertyDancing) {
-                        	
-                        	boolean value = iter2.nextStatement().getObject().asLiteral().getBoolean();
-                        	currentMightyRobot.setDancing(value);
-                        	newValue = value + "";
-                        	
-                        } else if (currentProperty == mightyRobotPropertyExploded) {
-                        	
-                        	boolean value = iter2.nextStatement().getObject().asLiteral().getBoolean();
-                        	currentMightyRobot.setExploded(value);
-                        	newValue = value + "";
-                        	 
-                        } else if (currentProperty == mightyRobotPropertyHeadRotation) {
-                        	
-                        	int value = (int) iter2.nextStatement().getObject().asLiteral().getLong();
-                        	currentMightyRobot.setHeadRotation(value);
-                        	newValue = value + "";
-                        	
-                        } else if (currentProperty == mightyRobotPropertyNickname) {
-
-                        	String value = iter2.nextStatement().getObject().asLiteral().getString();
-                        	currentMightyRobot.setNickname(value);
-                        	newValue = value + "";
-                        	
-                        }
-
-                        sw.write("Changed mightyrobot instance " + key + " property " + currentProperty.toString() + " to value " + newValue + "\n");
-                    }
-                }
-
-            }
-        }
-
-        return sw.toString(); 
-	}
-	
-	@Override
-	public String getInstanceClassName() {
-		return MightyRobot.class.getName();
-	}
 
     @Override
     public String[] getAdapterSpecificPrefix() {
@@ -391,6 +329,78 @@ WHERE
 
     public com.hp.hpl.jena.rdf.model.Resource getInstanceClassResource(){
         return instanceClassResource;
+    }
+
+    @Override
+    public Resource getAdapterManagedResource() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<String> handleConfigureInstance(Statement configureStatement) {
+        // TODO Auto-generated method stub
+        
+        
+        
+        
+    //  @Override
+    //  public String handleControlInstance(Model model2) {
+//            StringWriter sw = new StringWriter();
+    //
+//            StmtIterator iter = model2.listStatements(new SimpleSelector(null, RDF.type, instanceClassResource));
+//            while (iter.hasNext()) {
+//                com.hp.hpl.jena.rdf.model.Resource currentResource = iter.nextStatement().getSubject();
+//                // sw.write(currentResource.getProperty(RDFS.label).getObject().toString());
+//                int key = Integer.parseInt(currentResource.getProperty(RDFS.label).getObject().toString());
+//                if (instanceList.containsKey(key)) {
+//                  MightyRobot currentMightyRobot = (MightyRobot) instanceList.get(key);
+    //
+//                    for (Property currentProperty : resourceControlProperties) {
+//                        StmtIterator iter2 = currentResource.listProperties(currentProperty);
+    //
+//                        while (iter2.hasNext()) {
+    //
+//                          String newValue = "";
+//                            if (currentProperty == mightyRobotPropertyDancing) {
+//                              
+//                              boolean value = iter2.nextStatement().getObject().asLiteral().getBoolean();
+//                              currentMightyRobot.setDancing(value);
+//                              newValue = value + "";
+//                              
+//                            } else if (currentProperty == mightyRobotPropertyExploded) {
+//                              
+//                              boolean value = iter2.nextStatement().getObject().asLiteral().getBoolean();
+//                              currentMightyRobot.setExploded(value);
+//                              newValue = value + "";
+//                               
+//                            } else if (currentProperty == mightyRobotPropertyHeadRotation) {
+//                              
+//                              int value = (int) iter2.nextStatement().getObject().asLiteral().getLong();
+//                              currentMightyRobot.setHeadRotation(value);
+//                              newValue = value + "";
+//                              
+//                            } else if (currentProperty == mightyRobotPropertyNickname) {
+    //
+//                              String value = iter2.nextStatement().getObject().asLiteral().getString();
+//                              currentMightyRobot.setNickname(value);
+//                              newValue = value + "";
+//                              
+//                            }
+    //
+//                            sw.write("Changed mightyrobot instance " + key + " property " + currentProperty.toString() + " to value " + newValue + "\n");
+//                        }
+//                    }
+    //
+//                }
+//            }
+    //
+//            return sw.toString(); 
+    //  }
+      
+        
+        
+        return null;
     }
 
 }
