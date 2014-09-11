@@ -1,17 +1,16 @@
-package org.fiteagle.adapters.motor.dm;
+package org.fiteagle.adapters.motor;
 
 
 import javax.servlet.annotation.WebListener;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.fiteagle.adapters.motor.MotorAdapter;
 
 @WebListener
 public class MotorAdapterContextListener implements ServletContextListener {
     
   public void contextInitialized(ServletContextEvent event) {
-      MotorAdapter.getInstance().registerAdapter();
+      // see StateRestorator Class
   }
 
   public void contextDestroyed(ServletContextEvent event) {

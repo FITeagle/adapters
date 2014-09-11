@@ -4,13 +4,13 @@ import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 
 public class MotorAdapterRDFHandler extends AbstractAdapterRDFHandler {
 
-    private static AbstractAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
+    private static MotorAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
 
     public MotorAdapterRDFHandler(){
         super.adapter = MotorAdapter.getInstance();
     }
 
-    public static synchronized AbstractAdapterRDFHandler getInstance() {
+    public static synchronized MotorAdapterRDFHandler getInstance() {
         if (abstractAdapterRDFHandlerSingleton == null) {
             abstractAdapterRDFHandlerSingleton = new MotorAdapterRDFHandler();
         }

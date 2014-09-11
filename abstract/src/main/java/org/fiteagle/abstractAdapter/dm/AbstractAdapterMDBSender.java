@@ -58,6 +58,7 @@ public abstract class AbstractAdapterMDBSender {
             System.err.println("JMSException in AbstractAdapterMDBSender");
         }
     }
+    
 
 }
 

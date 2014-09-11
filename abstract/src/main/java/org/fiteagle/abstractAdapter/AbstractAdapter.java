@@ -30,11 +30,17 @@ public abstract class AbstractAdapter {
 
     protected Model modelGeneral = ModelFactory.createDefaultModel();
     protected Resource adapterInstance;
+    protected Resource adapterType;
+    protected String adapterName;
     
     public abstract Resource getAdapterManagedResource();
     
     public Resource getAdapterInstance(){
         return adapterInstance;
+    }
+    
+    public Resource getAdapterType(){
+        return adapterType;
     }
 
     public String getAdapterDescription(String serializationFormat) {
@@ -155,7 +161,11 @@ public abstract class AbstractAdapter {
     }
     
     public void registerAdapter(){
-        notifyListeners(getAdapterDescriptionModel(), "0");
+        notifyListeners(getAdapterDescriptionModel(), null);
+    }
+    
+    public void restoreResourceInstances(){
+        notifyListeners(getAdapterDescriptionModel(), null);
     }
 
     public void deregisterAdapter(){

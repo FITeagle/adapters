@@ -30,20 +30,22 @@ public abstract class AbstractAdapterRDFHandler {
         Model createdInstancesModel = ModelFactory.createDefaultModel();
         adapter.setModelPrefixes(createdInstancesModel);
         
-        StmtIterator iteratorMotorResource = getResourceInstanceIterator(modelCreate);
+        StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelCreate);
 
-        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for motor resources to create...");
+        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to create...");
 
-        Statement currentMotorStatement = null;
-        while (iteratorMotorResource.hasNext()) {
-            currentMotorStatement = iteratorMotorResource.nextStatement();
+        Statement currentResourceInstanceStatement = null;
+        while (iteratorResourceInstance.hasNext()) {
+            currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
 
-            String instanceName = currentMotorStatement.getSubject().getLocalName();
-            AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Creating instance: " + instanceName + " (" + currentMotorStatement.toString() + ")");
+            String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
+            AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Creating instance: " + instanceName + " (" + currentResourceInstanceStatement.toString() + ")");
 
             if(adapter.createInstance(instanceName)){
+                // Configure additional parameters directly after creation
+                adapter.configureInstance(currentResourceInstanceStatement);
                 Model createdInstanceValues = createInformRDF(instanceName);
-                createdInstancesModel.add(createdInstanceValues);       
+                createdInstancesModel.add(createdInstanceValues);    
             }            
         }           
         
@@ -57,16 +59,16 @@ public abstract class AbstractAdapterRDFHandler {
     }
 
     public String parseReleaseModel(Model modelRelease, String requestID) {
-        StmtIterator iteratorMotorResource = getResourceInstanceIterator(modelRelease);
+        StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelRelease);
 
-        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for motor resources to release...");
+        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to release...");
 
-        Statement currentMotorStatement = null;
-        while (iteratorMotorResource.hasNext()) {
-            currentMotorStatement = iteratorMotorResource.nextStatement();
+        Statement currentResourceInstanceStatement = null;
+        while (iteratorResourceInstance.hasNext()) {
+            currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
 
-            String instanceName = currentMotorStatement.getSubject().getLocalName();
-            AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Releasing instance: " + instanceName + " (" + currentMotorStatement.toString() + ")");
+            String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
+            AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Releasing instance: " + instanceName + " (" + currentResourceInstanceStatement.toString() + ")");
 
             if (adapter.terminateInstance(instanceName)) {
                 adapter.notifyListeners(createInformReleaseRDF(instanceName), requestID);
@@ -77,13 +79,13 @@ public abstract class AbstractAdapterRDFHandler {
     }
 
     public String parseDiscoverModel(Model modelDiscover) {
-        StmtIterator iteratorMotorResource = getResourceInstanceIterator(modelDiscover);
+        StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelDiscover);
 
-        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for motor resources to discover...");
+        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to discover...");
 
         Statement currentInstanceStatement = null;
-        while (iteratorMotorResource.hasNext()) {
-            currentInstanceStatement = iteratorMotorResource.nextStatement();
+        while (iteratorResourceInstance.hasNext()) {
+            currentInstanceStatement = iteratorResourceInstance.nextStatement();
 
             String instanceName = currentInstanceStatement.getSubject().getLocalName();
             AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Discovering instance: " + instanceName + " (" + currentInstanceStatement.toString() + ")");
@@ -104,13 +106,13 @@ public abstract class AbstractAdapterRDFHandler {
         Model changedInstancesModel = ModelFactory.createDefaultModel();
         adapter.setModelPrefixes(changedInstancesModel);
         
-        StmtIterator iteratorMotorResource = getResourceInstanceIterator(modelConfigure);
+        StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelConfigure);
 
-        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for motor resources to configure...");
+        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to configure...");
 
         Statement currentConfigureStatement = null;
-        while (iteratorMotorResource.hasNext()) {
-            currentConfigureStatement = iteratorMotorResource.nextStatement();
+        while (iteratorResourceInstance.hasNext()) {
+            currentConfigureStatement = iteratorResourceInstance.nextStatement();
             
             String instanceName = currentConfigureStatement.getSubject().getLocalName();
             
