@@ -34,10 +34,15 @@ public abstract class AbstractAdapterStateRestorator {
         // At this point maybe some parameters of the adapter itself should be restored as well?!
         // adapter.restoreAdapterParameters();
         
-        restoreState();        
+        try {
+            restoreState();
+        } catch (JMSException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }        
     }
 
-    public void restoreState() {
+    public void restoreState() throws JMSException {
 
         Model messageModel = ModelFactory.createDefaultModel();
         messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
@@ -47,10 +52,10 @@ public abstract class AbstractAdapterStateRestorator {
         Message responseMessage = this.context.createConsumer(this.topic, filterCorrelationID).receive(IMessageBus.TIMEOUT);
 
         if (responseMessage != null) {
-            Model modelCreate = getMessageModel(responseMessage);
+            Model modelCreate = MessageBusMsgFactory.getMessageRDFModel(responseMessage);
 
             // In this case the inform message is used to create instances internally in the adapter
-            if (isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleInform)) {
+            if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleInform)) {
                 adapterRDFHandler.parseCreateModel(modelCreate, filterCorrelationID);
             }
         }
@@ -79,29 +84,5 @@ public abstract class AbstractAdapterStateRestorator {
         return correlationID;
     }
 
-    private boolean isMessageType(Model messageModel, Property messageTypePropety) {
-
-        return messageModel.contains(null, RDF.type, messageTypePropety);
-    }
-
-    private Model getMessageModel(Message jmsMessage) {
-        // create an empty model
-        Model messageModel = null;
-
-        try {
-            if (jmsMessage.getStringProperty(IMessageBus.RDF) != null) {
-
-                String inputRDF = jmsMessage.getStringProperty(IMessageBus.RDF);
-
-                messageModel = MessageBusMsgFactory.parseSerializedModel(inputRDF);
-            }
-        } catch (JMSException e) {
-            e.printStackTrace();
-        } catch (RiotException e) {
-            System.err.println("MDB Listener: Received invalid RDF");
-        }
-
-        return messageModel;
-    }
 
 }

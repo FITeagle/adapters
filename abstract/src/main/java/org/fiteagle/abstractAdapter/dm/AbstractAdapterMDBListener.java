@@ -11,7 +11,6 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Topic;
 
-import org.apache.jena.riot.RiotException;
 import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusMsgFactory;
@@ -38,7 +37,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
             if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
                 String result = "";
                 
-                Model modelMessage = getMessageModel(requestMessage);
+                Model modelMessage = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
                 
                 if(modelMessage != null){
                   if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
@@ -79,7 +78,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseDiscover(Model modelDiscover) throws JMSException {
 
         // This is a create message, so do something with it
-        if (isMessageType(modelDiscover, MessageBusOntologyModel.propertyFiteagleDiscover)) {
+        if (MessageBusMsgFactory.isMessageType(modelDiscover, MessageBusOntologyModel.propertyFiteagleDiscover)) {
             
             return adapterRDFHandler.parseDiscoverModel(modelDiscover);
         }
@@ -90,7 +89,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseCreate(Model modelCreate, String jmsCorrelationID) throws JMSException {
 
         // This is a create message, so do something with it
-        if (isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleCreate)) {            
+        if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleCreate)) {            
             return adapterRDFHandler.parseCreateModel(modelCreate, jmsCorrelationID);
         }
 
@@ -100,7 +99,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseConfigure(Model modelConfigure, String jmsCorrelationID) throws JMSException {
         
         // This is a configure message, so do something with it
-        if (isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
+        if (MessageBusMsgFactory.isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
             return adapterRDFHandler.parseConfigureModel(modelConfigure, jmsCorrelationID);
         }
         return "Not a valid fiteagle:configure message \n\n";
@@ -109,35 +108,11 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseRelease(Model modelRelease, String jmsCorrelationID) throws JMSException {
 
         // This is a release message, so do something with it
-        if (isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
+        if (MessageBusMsgFactory.isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
             return adapterRDFHandler.parseReleaseModel(modelRelease, jmsCorrelationID);
         }
         
         return "Not a valid fiteagle:release message \n\n";
-    }
-    
-    
-    private Model getMessageModel(Message jmsMessage) throws JMSException {
-        // create an empty model
-        Model messageModel = null;
-
-        if (jmsMessage.getStringProperty(IMessageBus.RDF) != null) {
-
-            String inputRDF = jmsMessage.getStringProperty(IMessageBus.RDF);
-            
-            try {
-                messageModel = MessageBusMsgFactory.parseSerializedModel(inputRDF);
-            } catch (RiotException e) {
-                System.err.println("MDB Listener: Received invalid RDF");
-            }
-        }
-
-        return messageModel;
-    }
-
-    private boolean isMessageType(Model messageModel, Property messageTypePropety) {
-
-        return messageModel.contains(null, RDF.type, messageTypePropety);
     }
 
 
