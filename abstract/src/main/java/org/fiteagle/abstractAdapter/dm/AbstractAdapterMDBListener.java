@@ -17,8 +17,6 @@ import org.fiteagle.api.core.MessageBusMsgFactory;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBListener implements MessageListener {
 
