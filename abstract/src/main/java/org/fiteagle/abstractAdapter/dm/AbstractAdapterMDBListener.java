@@ -11,18 +11,21 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Topic;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusMsgFactory;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBListener implements MessageListener {
 
     private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBListener.class.toString());
 
     protected AbstractAdapterRDFHandler adapterRDFHandler;
+    protected AbstractAdapter adapter;
 
     @Inject
     private JMSContext context;
@@ -54,7 +57,14 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                       AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a release message");
                       result = responseRelease(modelMessage, requestMessage.getJMSCorrelationID());
                       
+                  } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_INFORM)) {
+                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a inform message");
+                      responseInform(modelMessage, requestMessage.getJMSCorrelationID());
+                      
                   }
+                  
+                  
+                  
                 }
 
                 if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200)) {
@@ -71,6 +81,28 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         } catch (JMSException e) {
             System.err.println(this.toString() + "JMSException");
         }
+    }
+    
+    
+    public String responseInform(Model modelInform, String jmsCorrelationID) throws JMSException {
+        
+    //  AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.toString() + " : Got response");
+    //  Model modelCreate = MessageBusMsgFactory.getMessageRDFModel(responseMessage);
+    //
+    //  // In this case the inform message is used to create instances internally in the adapter
+    //  if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleInform)) {
+//          System.err.println("is inform");
+//          adapterRDFHandler.parseCreateModel(modelCreate, filterCorrelationID);
+//          System.err.println("parsed create model");
+
+        // This is a create message, so do something with it
+        if (MessageBusMsgFactory.isMessageType(modelInform, MessageBusOntologyModel.propertyFiteagleInform)) {  
+            if (modelInform.contains(null, MessageBusOntologyModel.methodRestores, adapter.getAdapterInstance())) {  
+                return adapterRDFHandler.parseCreateModel(modelInform, jmsCorrelationID);                
+            }
+        }
+
+        return "Not a valid fiteagle:create message \n\n";
     }
 
     public String responseDiscover(Model modelDiscover) throws JMSException {
