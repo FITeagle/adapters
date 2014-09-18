@@ -55,6 +55,9 @@ public final class MotorAdapter extends AbstractAdapter {
         motorResource.addProperty(RDF.type, OWL.Class);
         motorResource.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
 
+
+
+
         adapterType = modelGeneral.createResource("http://fiteagle.org/ontology/adapter/motor#MotorGarageAdapter");
         adapterType.addProperty(RDF.type, OWL.Class);
         adapterType.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Adapter"));
@@ -81,6 +84,8 @@ public final class MotorAdapter extends AbstractAdapter {
         motorPropertyThrottle.addProperty(RDFS.range, XSD.integer);
         motorControlProperties.add(motorPropertyThrottle);
 
+
+
         motorPropertyIsDynamic = modelGeneral.createProperty("http://fiteagle.org/ontology/adapter/motor#isDynamic");
         motorPropertyIsDynamic.addProperty(RDF.type, OWL.DatatypeProperty);
         motorPropertyIsDynamic.addProperty(RDFS.domain, motorResource);
@@ -96,6 +101,8 @@ public final class MotorAdapter extends AbstractAdapter {
         adapterInstance.addProperty(RDF.type, adapterType);
         adapterInstance.addProperty(RDFS.label, modelGeneral.createLiteral("A motor garage adapter named: " + adapterName, "en"));
         adapterInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("A motor garage adpter that can simulate different dynamic motor resources.", "en"));
+
+        adapterInstance.addProperty(modelGeneral.createProperty("http://fiteagleinternal#isAdapterIn"), modelGeneral.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
 
     }
 
