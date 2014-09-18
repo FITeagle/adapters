@@ -30,10 +30,10 @@ public class ModelInformerBean {
 
     private static Logger LOGGER = Logger.getLogger(ModelInformerBean.class.toString());
     @PostConstruct
-    public void onStartup() {
+    public void sendModel() {
         try{
-            Model motorModel = OntologyReader.getTestbedModel();
-            Model messageModel = MessageBusMsgFactory.createMsgInform(motorModel);
+            Model testbedModel = OntologyReader.getTestbedModel();
+            Model messageModel = MessageBusMsgFactory.createMsgInform(testbedModel);
             String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
 
 
@@ -49,4 +49,6 @@ public class ModelInformerBean {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
+
+
 }
