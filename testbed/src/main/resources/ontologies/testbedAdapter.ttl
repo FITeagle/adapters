@@ -1,0 +1,53 @@
+@prefix wgs: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fiteagle: <http://fiteagleinternal#> .
+@base <http://fiteagleinternal> .
+
+
+###  http://fiteagle.org/ontology#Resource
+fiteagle:Resource rdf:type owl:Class .
+
+###  http://fiteagle.org/ontology#isAdapterIn
+fiteagle:isAdapterIn rdf:type owl:ObjectProperty .
+
+
+
+###  http://www.w3.org/2002/07/owl#versionInfo
+
+owl:versionInfo rdf:type owl:AnnotationProperty .
+
+
+
+###  http://www.w3.org/2003/01/geo/wgs84_pos#lat
+
+wgs:lat rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2003/01/geo/wgs84_pos#long
+
+wgs:long rdf:type owl:AnnotationProperty .
+
+
+
+#fiteagle:FITEAGLE_Testbed rdf:type owl:Class ;
+
+#       rdfs:subClassOf fiteagle:Resource .
+
+
+fiteagle:Federation rdf:type owl:Class ;
+
+            rdfs:subClassOf fiteagle:Resource .
+
+fiteagle:Adapter rdf:type owl:Class .
+
+fiteagle:FITEAGLE_Testbed rdf:type fiteagle:Federation,
+                                        owl:NamedIndividual;
+                                         rdfs:label "FITEAGLE_Testbed" ;
+                                         rdfs:seeAlso "https://github.com/FITeagle"^^xsd:anyURI ;
+                                         wgs:lat       "52.516377" ;
+                                         wgs:long      "13.323732" .
