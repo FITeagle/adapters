@@ -5,8 +5,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix fiteagle: <http://fiteagleinternal#> .
-@base <http://fiteagleinternal> .
+@prefix fiteagle: <http://fiteagle.org/ontology#> .
+@prefix :      <http://fiteagleinternal#> .
 
 
 ###  http://fiteagle.org/ontology#Resource
@@ -51,3 +51,12 @@ fiteagle:FITEAGLE_Testbed rdf:type fiteagle:Federation,
                                          rdfs:seeAlso "https://github.com/FITeagle"^^xsd:anyURI ;
                                          wgs:lat       "52.516377" ;
                                          wgs:long      "13.323732" .
+              
+### CORRECT ONTOLOGY!!!!                           
+                                                                
+                                         
+:FITEAGLE_Testbed rdf:type fiteagle:Testbed.
+
+:FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedMotorAdapter1.
+
+:FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedStopwatchAdapter1.

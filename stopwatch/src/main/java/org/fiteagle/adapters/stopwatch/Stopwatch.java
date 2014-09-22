@@ -1,60 +1,130 @@
 package org.fiteagle.adapters.stopwatch;
 
-public class Stopwatch {
+import java.util.LinkedList;
+import java.util.List;
 
-    public String getManufacturer() {
-        return manufacturer;
-    }
-    public void setManufacturer(String manufacturer) {
-        owningAdapter.notifyListeners(this, "manufacturer", this.manufacturer, this.manufacturer = manufacturer);
-    }
-    public int getRpm() {
-        return rpm;
-    }
-    public void setRpm(int rpm) {
-        owningAdapter.notifyListeners(this, "rpm", "" + this.rpm, "" + rpm);
-        this.rpm = rpm;
-    }
-    public int getMaxRpm() {
-        return maxRpm;
-    }
-    public void setMaxRpm(int maxRpm) {
-        owningAdapter.notifyListeners(this, "maxRpm", "" + this.maxRpm, "" + maxRpm);
-        this.maxRpm = maxRpm;
-    }
-    public int getThrottle() {
-        return throttle;
-    }
-    public void setThrottle(int throttle) {
-        owningAdapter.notifyListeners(this, "throttle", "" + this.throttle, "" + throttle);
-        this.throttle = throttle;
-    }
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import com.hp.hpl.jena.rdf.model.Model;
+
+
+public class Stopwatch {
     
+
+    private long startTime;
+    private long currentTime;
+    private int refreshInterval;
+    private boolean isRunning;
     
-    public Stopwatch(StopwatchAdapter owningAdapter) {
+    protected StopWatchAdapter owningAdapter;   
+    private String instanceName;
+    
+    public Stopwatch(){
         super();
-        this.manufacturer = "Fraunhofer FOKUS";
-        this.rpm = 0;
-        this.maxRpm = 3000;
-        this.throttle = 0;
+        
+    }
+    
+    public Stopwatch(StopWatchAdapter owningAdapter, String instanceName) {
+        super();
+        this.currentTime = 0;
+        this.startTime = 0;
+        this.refreshInterval = 1000;
+        this.isRunning = false;     
+        this.isDynamicThreadRunning = false;
         
         this.owningAdapter = owningAdapter;
+        this.instanceName = instanceName;
     }
     
-    public String toString(){
+    
+    public String toString() {        
+        return "Stop Watch";
+    }
+    
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public int getRefreshInterval() {
+        return refreshInterval;
+    }
+
+    public void setRefreshInterval(int refreshInterval, List<String> updatedProperties) {
+        this.refreshInterval = refreshInterval;
+        updatedProperties.add("refreshInterval");
+    }
+    
+    public void setCurrentTimeWithNotify(long currentTime) {
+        this.currentTime = currentTime;
         
-        return "Stopwatch";
+        List<String> updatedProperties = new LinkedList<String>();
+        updatedProperties.add("currentTime");
+        Model changedInstanceValues = owningAdapter.createInformConfigureRDF(instanceName,updatedProperties); 
+        owningAdapter.setModelPrefixes(changedInstanceValues);   
+        owningAdapter.notifyListeners(changedInstanceValues, "");
+
+    }
+
+    public long getCurrentTime() {
+        return currentTime;
+    }
+
+    public void setCurrentTime(long currentTime, List<String> updatedProperties) {
+        this.currentTime = currentTime;
+        updatedProperties.add("currentTime");
     }
 
 
-    private String manufacturer;    
-    private int rpm;
-    private int maxRpm;
-    private int throttle;
-    private StopwatchAdapter owningAdapter;
-    
+    public String getInstanceName() {
+        return instanceName;
+    }
+
+
+    // SIMULATE DYNAMICALLY CHANGING MOTOR
+
+    private boolean isDynamicThreadRunning;
+
+    public void setIsRunning(boolean state, List<String> updatedProperties) {
+        this.isRunning = state;
+
+        try {
+            if (this.isRunning && !isDynamicThreadRunning) {
+                startStopwatch();
+
+            } else if (!this.isRunning && isDynamicThreadRunning) {
+                stopStopwatch();
+            }
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
+        updatedProperties.add("isDynamic");
+    }
     
 
 
-    
+    private void startStopwatch() throws NamingException {
+        IStopWatchAdapterDynamic dynamicThread;
+        dynamicThread = (IStopWatchAdapterDynamic) new InitialContext().lookup("java:module/StopWatchAdapterDynamic");
+
+        dynamicThread.startThread(getInstanceName(), refreshInterval);
+
+        isDynamicThreadRunning = true;
+    }
+
+    private void stopStopwatch() throws NamingException {
+        IStopWatchAdapterDynamic dynamicThread = (IStopWatchAdapterDynamic) new InitialContext().lookup("java:module/StopWatchAdapterDynamic");
+        dynamicThread.endThread(getInstanceName());
+
+        isDynamicThreadRunning = false;
+    }
+
+    public boolean isRunning() {
+        return this.isRunning;
+    }
+
 }
