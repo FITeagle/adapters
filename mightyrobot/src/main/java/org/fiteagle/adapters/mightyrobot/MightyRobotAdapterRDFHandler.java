@@ -2,17 +2,17 @@ package org.fiteagle.adapters.mightyrobot;
 
 import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 
-public class RobotAdapterRDFHandler extends AbstractAdapterRDFHandler {
+public class MightyRobotAdapterRDFHandler extends AbstractAdapterRDFHandler {
 
-    private static AbstractAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
+    private static MightyRobotAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
 
-    public RobotAdapterRDFHandler(){
+    public MightyRobotAdapterRDFHandler(){
         super.adapter = MightyRobotAdapter.getInstance();
     }
 
     public static synchronized AbstractAdapterRDFHandler getInstance() {
         if (abstractAdapterRDFHandlerSingleton == null) {
-            abstractAdapterRDFHandlerSingleton = new RobotAdapterRDFHandler();
+            abstractAdapterRDFHandlerSingleton = new MightyRobotAdapterRDFHandler();
         }
         return abstractAdapterRDFHandlerSingleton;
     }

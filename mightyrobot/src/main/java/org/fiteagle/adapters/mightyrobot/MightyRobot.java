@@ -5,14 +5,14 @@ import java.util.Random;
 
 public class MightyRobot {
 
-    private String instanceName;
+
     private boolean dancing;
 	private boolean exploded;
     private int headRotation;
     private String nickname;
 
     private MightyRobotAdapter owningAdapter;
-    private int instanceID;
+    private String instanceName;
     
     private String[] nicknames = {"Mecha", "RD5000", "Robocop", "R2-D2", "C3-PO"};
 
@@ -73,18 +73,10 @@ public class MightyRobot {
 	public MightyRobotAdapter getOwningAdapter() {
 		return owningAdapter;
 	}
-
-	public void setOwningAdapter(MightyRobotAdapter owningAdapter) {
-		this.owningAdapter = owningAdapter;
-	}
 	
-    public int getInstanceID() {
-		return instanceID;
+    public String getInstanceName() {
+		return instanceName;
 	}
 
-	public void setInstanceID(int instanceID) {
-		this.instanceID = instanceID;
-	}
-   
 }
 
