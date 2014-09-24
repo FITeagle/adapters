@@ -40,7 +40,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                 
                 Model modelMessage = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
                 
-                if(modelMessage != null){
+                if(modelMessage != null && adapterIsRecipient(modelMessage)){
                   if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
                       AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a discover message");
                       result = responseDiscover(modelMessage);
@@ -64,18 +64,18 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                   }
                   
                   
+                  if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200)) {
+                      Message responseMessage = generateResponseMessage(requestMessage, result);
+                      
+                      if (null != requestMessage.getJMSCorrelationID()) {
+                          responseMessage.setJMSCorrelationID(requestMessage.getJMSCorrelationID());
+                      }
+                      
+                      this.context.createProducer().send(topic, responseMessage);
+                  }
                   
                 }
 
-                if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200)) {
-                    Message responseMessage = generateResponseMessage(requestMessage, result);
-
-                    if (null != requestMessage.getJMSCorrelationID()) {
-                        responseMessage.setJMSCorrelationID(requestMessage.getJMSCorrelationID());
-                    }
-
-                    this.context.createProducer().send(topic, responseMessage);
-                }
             }
 
         } catch (JMSException e) {
@@ -153,6 +153,10 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         responseMessage.setStringProperty(IMessageBus.RDF, result);
 
         return responseMessage;
+    }
+    
+    private boolean adapterIsRecipient(Model messageModel){
+        return messageModel.contains(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
     }
 
 }
