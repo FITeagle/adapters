@@ -14,6 +14,7 @@ import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusMsgFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBSender {
     
@@ -37,7 +38,9 @@ public abstract class AbstractAdapterMDBSender {
     public void sendInformMessage(Model eventRDF, String requestID) {
         try {
             
-            Model messageModel = MessageBusMsgFactory.createMsgInform(eventRDF);           
+            Model messageModel = MessageBusMsgFactory.createMsgInform(eventRDF);
+            messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
+
             String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
 
             String correlationID = "";

@@ -50,6 +50,7 @@ public class StopWatchAdapterDynamic implements IStopWatchAdapterDynamic{
         public DynamicRPM(String instanceName, int refreshInterval){
             this.instanceName = instanceName;
             this.refreshInterval = refreshInterval;
+            adapter.getInstance(instanceName).setStartTime(System.currentTimeMillis());
         }
 
         @SuppressWarnings("static-access")
