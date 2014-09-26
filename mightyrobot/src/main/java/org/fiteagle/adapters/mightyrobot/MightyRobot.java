@@ -32,7 +32,7 @@ public class MightyRobot {
     		reply = "Might Robot " + this.nickname + " exploded due to unforeseen circumstances. Sorry about that.";
     	} else {
     		reply = "Mighty Robot " + this.nickname + " bids you a fond welcome. The robot is currently " 
-    				+ ((this.getDancing()) ? "" : "not ")
+    				+ (this.getDancing() ? "" : "not ")
     				+ "dancing, with its head turned by " + this.getHeadRotation() + " Degrees.";
     	}
         return reply;
@@ -59,7 +59,7 @@ public class MightyRobot {
 	}
 
 	public void setHeadRotation(int headRotation) {
-		this.headRotation = (headRotation % 360);
+		this.headRotation = headRotation % 360;
 	}
 
 	public String getNickname() {
