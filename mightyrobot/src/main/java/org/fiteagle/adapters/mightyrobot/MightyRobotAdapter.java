@@ -97,7 +97,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
         adapterInstance.addProperty(modelGeneral.createProperty("http://fiteagleinternal#isAdapterIn"), modelGeneral.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
     }
     
-    private Property generateProperty(Property template, com.hp.hpl.jena.rdf.model.Resource XSDType){
+    private Property generateProperty(Property template, Resource XSDType){
     	template.addProperty(RDF.type, OWL.DatatypeProperty);
     	template.addProperty(RDFS.domain, instanceClassResource);
     	template.addProperty(RDFS.range, XSDType);
@@ -188,7 +188,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
     
     @Override
     public String[] getAdapterSpecificPrefix() {
-        return adapterSpecificPrefix;
+        return adapterSpecificPrefix.clone();
     }
 
     @Override
