@@ -102,7 +102,7 @@ public class Stopwatch {
         } catch (NamingException e) {
             e.printStackTrace();
         }
-        updatedProperties.add("isDynamic");
+        updatedProperties.add("isRunning");
     }
     
 
