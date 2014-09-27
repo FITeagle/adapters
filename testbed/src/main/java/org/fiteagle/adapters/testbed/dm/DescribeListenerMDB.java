@@ -48,7 +48,7 @@ public class DescribeListenerMDB implements MessageListener {
                 if (modelMessage != null) {
                     if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
                         DescribeListenerMDB.LOGGER.log(Level.INFO, this.toString() + " : Received a discover message");
-                        mib.sendModel();
+                        mib.sendModel(requestMessage.getJMSCorrelationID());
                     }
                 }
             }

@@ -29,8 +29,15 @@ public class ModelInformerBean {
     private Topic topic;
 
     private static Logger LOGGER = Logger.getLogger(ModelInformerBean.class.toString());
+    
     @PostConstruct
     public void sendModel() {
+        sendModel("");
+    }
+    
+    
+    
+    public void sendModel(String correlationID) {
         try{
             Model testbedModel = OntologyReader.getTestbedModel();
             Model messageModel = MessageBusMsgFactory.createMsgInform(testbedModel);
@@ -43,6 +50,7 @@ public class ModelInformerBean {
             eventMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_INFORM);
             eventMessage.setStringProperty(IMessageBus.RDF, serializedRDF);
             eventMessage.setStringProperty(IMessageBus.SERIALIZATION, IMessageBus.SERIALIZATION_DEFAULT);
+            eventMessage.setJMSCorrelationID(correlationID);
             LOGGER.log(Level.INFO, "Sending Testbed Model as Inform Message");
             this.context.createProducer().send(topic, eventMessage);
         } catch (Exception e) {

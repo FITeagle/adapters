@@ -6,10 +6,4 @@
 :ADeployedMotorAdapter1 rdf:type motor:MotorGarageAdapter .
 
 :Motor1 rdf:type motor:Motor ;
-                            motor:rpm 23 .
-:Motor2 rdf:type motor:Motor ;
-                            motor:rpm 123 .
-:Motor10 rdf:type motor:Motor ;
-                            motor:rpm 223 .
-:Motor12 rdf:type motor:Motor ;
-                            motor:rpm 800 .
+                            motor:isDynamic false .

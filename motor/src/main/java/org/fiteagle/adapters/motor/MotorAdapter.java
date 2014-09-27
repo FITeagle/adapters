@@ -105,8 +105,6 @@ public final class MotorAdapter extends AbstractAdapter {
         adapterInstance.addProperty(RDFS.label, modelGeneral.createLiteral("A deployed motor garage adapter named: " + adapterName, "en"));
         adapterInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("A motor garage adapter that can simulate different dynamic motor resources.", "en"));
 
-        adapterInstance.addProperty(modelGeneral.createProperty("http://fiteagleinternal#isAdapterIn"), modelGeneral.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
-
     }
 
     @Override

@@ -9,53 +9,21 @@
 @prefix :      <http://fiteagleinternal#> .
 
 
-###  http://fiteagle.org/ontology#Resource
-fiteagle:Resource rdf:type owl:Class .
 
-###  http://fiteagle.org/ontology#isAdapterIn
-fiteagle:isAdapterIn rdf:type owl:ObjectProperty .
-
-
-
-###  http://www.w3.org/2002/07/owl#versionInfo
-
-owl:versionInfo rdf:type owl:AnnotationProperty .
-
-
-
-###  http://www.w3.org/2003/01/geo/wgs84_pos#lat
-
-wgs:lat rdf:type owl:AnnotationProperty .
-
-
-###  http://www.w3.org/2003/01/geo/wgs84_pos#long
-
-wgs:long rdf:type owl:AnnotationProperty .
-
-
-
-#fiteagle:FITEAGLE_Testbed rdf:type owl:Class ;
-
-#       rdfs:subClassOf fiteagle:Resource .
-
-
-fiteagle:Federation rdf:type owl:Class ;
+fiteagle:Testbed rdf:type owl:Class ;
 
             rdfs:subClassOf fiteagle:Resource .
 
-fiteagle:Adapter rdf:type owl:Class .
 
-fiteagle:FITEAGLE_Testbed rdf:type fiteagle:Federation,
+fiteagle:FITEAGLE_Testbed rdf:type fiteagle:Testbed,
                                         owl:NamedIndividual;
                                          rdfs:label "FITEAGLE_Testbed" ;
                                          rdfs:seeAlso "https://github.com/FITeagle"^^xsd:anyURI ;
                                          wgs:lat       "52.516377" ;
                                          wgs:long      "13.323732" .
               
-### CORRECT ONTOLOGY!!!!                           
-                                                                
-                                         
-:FITEAGLE_Testbed rdf:type fiteagle:Testbed.
+
+# Temporary static solution, this should become a dynamic process
 
 :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedMotorAdapter1.
 
