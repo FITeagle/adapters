@@ -182,7 +182,7 @@ public final class MotorAdapter extends AbstractAdapter {
 
     @Override
     public String[] getAdapterSpecificPrefix() {
-        return adapterSpecificPrefix;
+        return adapterSpecificPrefix.clone();
     }
 
     public Motor getInstance(String instanceName) {

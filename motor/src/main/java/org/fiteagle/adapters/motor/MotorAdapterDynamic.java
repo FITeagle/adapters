@@ -47,7 +47,7 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
 
     public class DynamicRPM implements Runnable {
 
-        private final int SLEEP = 5000;
+        private static final int SLEEP = 5000;
         
         private final String instanceName;
         
@@ -74,7 +74,7 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
                     instanceThreadList.remove(instanceName);
                 }
             }
-            return;
+            
         }
     }
 

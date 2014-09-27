@@ -47,7 +47,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
     
     public MightyRobotAdapter() {
     	
-    	adapterName = "RunningMightyRobotAdapter1";
+    	adapterName = "ADeployedMightyRobotAdapter1";
     	
     	// Provide model with needed prefixes
         modelGeneral = ModelFactory.createDefaultModel();

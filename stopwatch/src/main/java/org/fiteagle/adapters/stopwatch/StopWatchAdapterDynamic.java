@@ -73,7 +73,6 @@ public class StopWatchAdapterDynamic implements IStopWatchAdapterDynamic{
                     instanceThreadList.remove(instanceName);
                 }
             }
-            return;
         }
     }
 

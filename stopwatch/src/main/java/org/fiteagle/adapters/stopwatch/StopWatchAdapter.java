@@ -158,7 +158,7 @@ public final class StopWatchAdapter extends AbstractAdapter {
 
     @Override
     public String[] getAdapterSpecificPrefix() {
-        return adapterSpecificPrefix;
+        return adapterSpecificPrefix.clone();
     }
 
     public Stopwatch getInstance(String instanceName) {
