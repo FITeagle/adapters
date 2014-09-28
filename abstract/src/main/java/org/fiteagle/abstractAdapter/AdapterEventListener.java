@@ -4,5 +4,5 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 public interface AdapterEventListener {
 
-    public void rdfChange(Model eventRDF, String requestID);
+    void rdfChange(Model eventRDF, String requestID);
 }

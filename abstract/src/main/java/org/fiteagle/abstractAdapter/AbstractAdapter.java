@@ -14,8 +14,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import org.fiteagle.api.core.MessageBusMsgFactory;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
-import org.fiteagle.abstractAdapter.AdapterEventListener;
-
 /**
  * Abstract class defining the basics all the current adapters are following Extend this class and implement the abstract methods to get this to work
  */
@@ -29,9 +27,10 @@ public abstract class AbstractAdapter {
     protected HashMap<String, Object> instanceList = new HashMap<String, Object>();
 
     protected Model modelGeneral = ModelFactory.createDefaultModel();
-    protected Resource adapterInstance;
-    protected Resource adapterType;
-    protected String adapterName;
+    // Subclasses need to set these three values appropriately for this to work!
+    protected Resource adapterInstance = null;
+    protected Resource adapterType = null;;
+    protected String adapterName = "";
     
     public abstract Resource getAdapterManagedResource();
     

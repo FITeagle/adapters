@@ -18,7 +18,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBSender {
     
-    protected AbstractAdapter adapter;
+	// Subclasses need to set this to the appropriate Adapter to work!
+    protected AbstractAdapter adapter = null;
     
     @Inject
     private JMSContext context;

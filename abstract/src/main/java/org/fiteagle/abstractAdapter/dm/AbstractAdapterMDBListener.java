@@ -100,11 +100,12 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
 //          System.err.println("parsed create model");
 
         // This is a inform message, so do something with it
-        if (MessageBusMsgFactory.isMessageType(modelInform, MessageBusOntologyModel.propertyFiteagleInform)) {  
-            // Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
-            if (modelInform.contains(null, MessageBusOntologyModel.methodRestores, adapter.getAdapterInstance())) {  
-                return adapterRDFHandler.parseCreateModel(modelInform, jmsCorrelationID);                
-            }
+    	// Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
+        if (MessageBusMsgFactory.isMessageType(modelInform, MessageBusOntologyModel.propertyFiteagleInform) && 
+        		modelInform.contains(null, MessageBusOntologyModel.methodRestores, adapter.getAdapterInstance())) {  
+            
+            return adapterRDFHandler.parseCreateModel(modelInform, jmsCorrelationID);                
+
         }
 
         return "Not a valid fiteagle:create message \n\n";

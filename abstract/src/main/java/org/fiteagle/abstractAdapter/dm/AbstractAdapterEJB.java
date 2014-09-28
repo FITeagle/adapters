@@ -9,7 +9,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 
 public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
 
-    protected AbstractAdapter adapter;
+	// Subclasses need to set this to the appropriate Adapter to work!
+    protected AbstractAdapter adapter = null;
 
     @Override
     public String getAdapterDescription(String serializationFormat) {
