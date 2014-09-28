@@ -25,6 +25,6 @@ fiteagle:FITEAGLE_Testbed rdf:type fiteagle:Testbed,
 
 # Temporary static solution, this should become a dynamic process
 
-:FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedMotorAdapter1.
+# :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedMotorAdapter1.
 
-:FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedStopwatchAdapter1.
+# :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedStopwatchAdapter1.
