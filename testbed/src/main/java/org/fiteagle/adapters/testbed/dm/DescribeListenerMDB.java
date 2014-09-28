@@ -1,20 +1,20 @@
 package org.fiteagle.adapters.testbed.dm;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageBusMsgFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.inject.Inject;
-import javax.jms.JMSContext;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Topic;
-import javax.ws.rs.BeanParam;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageBusMsgFactory;
+
+import com.hp.hpl.jena.rdf.model.Model;
 
 /**
  * Created by vju on 9/18/14.
@@ -30,8 +30,6 @@ public class DescribeListenerMDB implements MessageListener {
 
     @Inject
     private ModelInformerBean mib;
-    @Inject
-    private JMSContext context;
     @Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
     private Topic topic;
 
@@ -40,27 +38,24 @@ public class DescribeListenerMDB implements MessageListener {
 
     public void onMessage(final Message requestMessage) {
         try {
+        	
             if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
-                String result = "";
 
                 Model modelMessage = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
 
-                if (modelMessage != null) {
-                    if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
+                if (modelMessage != null &&
+                		requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
+
                         DescribeListenerMDB.LOGGER.log(Level.INFO, this.toString() + " : Received a discover message");
                         mib.sendModel(requestMessage.getJMSCorrelationID());
-                    }
+
                 }
             }
-
 
         } catch (Exception e) {
             return;
         }
     }
-
-
-
 
 }
 
