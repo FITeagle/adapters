@@ -1,14 +1,93 @@
 package org.fiteagle.adapters.motor;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
+import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class MotorAdapterTest {
 
+
+    /**
+     * Test proper work of singleton.
+     */
+    @Test
+    public void testSingleton() {
+        MotorAdapter MotorAdapterOne = MotorAdapter.getInstance();
+        
+        MotorAdapter MotorAdapterTwo = MotorAdapter.getInstance();
+
+        // Only one instance of the Adapter can exist
+        Assert.assertEquals(MotorAdapterOne, MotorAdapterTwo);    
+    }
+    
+    /**
+     * Test creation and termination of instances
+     */
+    @Test
+    public void testCreateAndTerminate() {
+        MotorAdapter adapter = MotorAdapter.getInstance();
+
+        // Creating first instance works
+        Assert.assertTrue(adapter.createInstance("InstanceOne"));
+        // Creating another instance with the same name FAILS
+        Assert.assertFalse(adapter.createInstance("InstanceOne"));
+        // Creating another instance with another name works fine
+        Assert.assertTrue(adapter.createInstance("InstanceTwo"));
+        
+        // Terminate existing instance
+        Assert.assertTrue(adapter.terminateInstance("InstanceOne"));
+        // Terminate non-existing instance
+        Assert.assertFalse(adapter.terminateInstance("InstanceOne"));
+        // Terminate remaining instance
+        Assert.assertTrue(adapter.terminateInstance("InstanceTwo"));
+    }   
+    
+    /**
+     * Test Monitoring of instances
+     */
+    @Test
+    public void testMonitor() {
+        MotorAdapter adapter = MotorAdapter.getInstance();
+        
+        String instanceName = "InstanceOne";
+        
+        // Monitor non-existing instance yields empty String
+        Assert.assertEquals("", adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT));
+        // create the instance
+        adapter.createInstance(instanceName);
+        
+        // Monitoring existing instance yields a non-empty result
+        String monitorData = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
+        Assert.assertNotEquals("", monitorData);
+        
+        // Monitoring data contains the instance name
+        Assert.assertTrue(monitorData.contains(instanceName));
+        
+        // Monitoring data contains the adapter specific prefix
+        Assert.assertTrue(monitorData.contains(adapter.getAdapterSpecificPrefix()[0]) && 
+        		monitorData.contains(adapter.getAdapterSpecificPrefix()[1]));
+  
+        // release instances
+        adapter.terminateInstance("InstanceOne");
+    }   
+    
+    /**
+     * Test getter methods, those must not return null if everything was initialized properly
+     */
+    @Test
+    public void testGetters(){
+    	MotorAdapter adapter = MotorAdapter.getInstance();
+    	
+    	// Getting Adapter Managed Resource must be implemented
+    	Assert.assertNotNull(adapter.getAdapterManagedResource());
+    	// Same for Getting Adapter Instance
+    	Assert.assertNotNull(adapter.getAdapterInstance());
+    	// And Adapter Type
+    	Assert.assertNotNull(adapter.getAdapterType());
+    	// And Adapter Description
+    	Assert.assertNotNull(adapter.getAdapterDescription(IMessageBus.SERIALIZATION_DEFAULT));
+    }
+    
 //    @Test
 //    public void testCreateAndTerminate() {
 //

@@ -1,23 +1,23 @@
-package org.fiteagle.adapters.mightyrobot;
+package org.fiteagle.adapters.stopwatch;
 
 import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class MightyRobotAdapterTest {
 
+public class StopwatchAdapterTest {
 
     /**
      * Test proper work of singleton.
      */
     @Test
     public void testSingleton() {
-        MightyRobotAdapter mightyRobotAdapterOne = MightyRobotAdapter.getInstance();
+        StopWatchAdapter StopWatchAdapterOne = StopWatchAdapter.getInstance();
         
-        MightyRobotAdapter mightyRobotAdapterTwo = MightyRobotAdapter.getInstance();
+        StopWatchAdapter StopWatchAdapterTwo = StopWatchAdapter.getInstance();
         
         // Only one instance of the Adapter can exist        
-        Assert.assertEquals(mightyRobotAdapterOne, mightyRobotAdapterTwo);    
+        Assert.assertEquals(StopWatchAdapterOne, StopWatchAdapterTwo);    
     }
     
     /**
@@ -25,7 +25,7 @@ public class MightyRobotAdapterTest {
      */
     @Test
     public void testCreateAndTerminate() {
-        MightyRobotAdapter adapter = MightyRobotAdapter.getInstance();
+        StopWatchAdapter adapter = StopWatchAdapter.getInstance();
 
         // Creating first instance works
         Assert.assertTrue(adapter.createInstance("InstanceOne"));
@@ -47,7 +47,7 @@ public class MightyRobotAdapterTest {
      */
     @Test
     public void testMonitor() {
-        MightyRobotAdapter adapter = MightyRobotAdapter.getInstance();
+        StopWatchAdapter adapter = StopWatchAdapter.getInstance();
         
         String instanceName = "InstanceOne";
         
@@ -66,17 +66,17 @@ public class MightyRobotAdapterTest {
         // Monitoring data contains the adapter specific prefix
         Assert.assertTrue(monitorData.contains(adapter.getAdapterSpecificPrefix()[0]) && 
         		monitorData.contains(adapter.getAdapterSpecificPrefix()[1]));
-
+        
         // release instances
         adapter.terminateInstance("InstanceOne");
-    }      
+    } 
     
     /**
      * Test getter methods, those must not return null if everything was initialized properly
      */
     @Test
     public void testGetters(){
-    	MightyRobotAdapter adapter = MightyRobotAdapter.getInstance();
+    	StopWatchAdapter adapter = StopWatchAdapter.getInstance();
     	
     	// Getting Adapter Managed Resource must be implemented
     	Assert.assertNotNull(adapter.getAdapterManagedResource());
@@ -86,6 +86,66 @@ public class MightyRobotAdapterTest {
     	Assert.assertNotNull(adapter.getAdapterType());
     	// And Adapter Description
     	Assert.assertNotNull(adapter.getAdapterDescription(IMessageBus.SERIALIZATION_DEFAULT));
-    }  
-}
+    }
+//    @Test
+//    public void testCreateAndTerminate() {
+//
+//        MotorAdapter motorAdapter = MotorAdapter.getInstance();
+//
+//        // create instance
+//        Assert.assertEquals(true, motorAdapter.createInstance("Motor1"));
+//
+//        // check instance shows up
+//        String returnStringTurtle = motorAdapter.getAllInstances("TURTLE");
+//        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":m1"));
+//
+//        // terminate instance
+//        Assert.assertEquals(true, motorAdapter.terminateInstance("Motor1"));
+//
+//        // terminate again
+//        Assert.assertEquals(false, motorAdapter.terminateInstance("Motor1"));
+//
+//        // check instance is gone
+//        returnStringTurtle = motorAdapter.getAllInstances("TURTLE");
+//        Assert.assertEquals(-1, returnStringTurtle.indexOf(":m1"));
+//    }
+//
+//    @Test
+//    public void testControl() {
+//
+//        MotorAdapter motorAdapter = MotorAdapter.getInstance();
+//
+//        Assert.assertEquals(true, motorAdapter.createInstance("Motor1"));
+//
+//        // Check initial rpm is 0
+//        String returnStringTurtle = motorAdapter.monitorInstance("Motor1", "TURTLE");
+//        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"0\""));
+//
+//        String controlString = "";
+//        BufferedReader reader;
+//        String line;
+//
+//        try {
+//            reader = new BufferedReader(new FileReader("target/test-classes/input.ttl"));
+//            line = reader.readLine();
+//            while (line != null) {
+//                controlString += line;
+//                line = reader.readLine();
+//            }
+//        } catch (IOException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//
+//        // Change rpm
+//        motorAdapter.controlInstance(controlString, "TURTLE");
+//
+//        // Check new rpm is 88 (as defined in input.ttl
+//        returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
+//        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
+//
+//        // terminate instance
+//        Assert.assertEquals(true, motorAdapter.terminateInstance(1));
+//    }
 
+}
