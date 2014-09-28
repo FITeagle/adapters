@@ -55,7 +55,7 @@ public abstract class AbstractAdapterRDFHandler {
 
         adapter.notifyListeners(createdInstancesModel, requestID);
 
-        return IMessageBus.STATUS_200;
+        return IMessageBus.STATUS_201;
     }
 
     public String parseReleaseModel(Model modelRelease, String requestID) {
