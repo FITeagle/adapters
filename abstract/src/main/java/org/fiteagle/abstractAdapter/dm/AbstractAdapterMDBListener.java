@@ -70,7 +70,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                 }
                 
                 
-                if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200)) {
+                if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200) && !result.equals(IMessageBus.STATUS_201)) {
                     Message responseMessage = generateResponseMessage(requestMessage, result);
                     
                     if (null != requestMessage.getJMSCorrelationID()) {
