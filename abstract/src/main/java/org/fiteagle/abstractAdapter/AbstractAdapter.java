@@ -32,6 +32,8 @@ public abstract class AbstractAdapter {
     protected Resource adapterType = null;;
     protected String adapterName = "";
     
+    private boolean isFinishedRegistering = false;
+    
     public abstract Resource getAdapterManagedResource();
     
     public Resource getAdapterInstance(){
@@ -161,6 +163,17 @@ public abstract class AbstractAdapter {
     
     public void registerAdapter(){
         notifyListeners(getAdapterDescriptionModel(), null);
+        // Wait a short while, so the repository has time to process the registering before the restore request
+        try {
+            Thread.sleep(1000);                 //1000 milliseconds is one second.
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        isFinishedRegistering = true;
+    }
+    
+    public boolean isFinishedRegistering(){
+        return this.isFinishedRegistering;
     }
     
     public void restoreResourceInstances(){

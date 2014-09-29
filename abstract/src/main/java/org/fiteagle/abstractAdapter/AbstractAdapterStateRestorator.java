@@ -39,6 +39,9 @@ public abstract class AbstractAdapterStateRestorator {
         // adapter.restoreAdapterParameters();
 
         try {
+            while(!adapter.isFinishedRegistering()){
+                
+            }
             restoreState();
         } catch (JMSException e) {
             e.printStackTrace();
