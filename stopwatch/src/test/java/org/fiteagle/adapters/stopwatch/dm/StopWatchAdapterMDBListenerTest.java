@@ -1,11 +1,11 @@
-package org.fiteagle.adapters.motor.dm;
+package org.fiteagle.adapters.stopwatch.dm;
 
 import javax.naming.NamingException;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class MotorAdapterMDBListenerTest {
+public class StopWatchAdapterMDBListenerTest {
 
 	/**
 	 * Test setup of MDBListener
@@ -13,7 +13,7 @@ public class MotorAdapterMDBListenerTest {
     @Test
     public void testInit() {
 
-        MotorAdapterMDBListener listener = new MotorAdapterMDBListener();
+        StopWatchAdapterMDBListener listener = new StopWatchAdapterMDBListener();
         try {
             listener.setup();
         } catch (NamingException e) {

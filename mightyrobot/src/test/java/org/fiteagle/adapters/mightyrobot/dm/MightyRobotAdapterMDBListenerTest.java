@@ -1,24 +1,26 @@
-package org.fiteagle.adapters.stopwatch.dm;
+package org.fiteagle.adapters.mightyrobot.dm;
 
 import javax.naming.NamingException;
 
-import org.fiteagle.adapters.stopwatch.dm.StopWatchAdapterMDBListener;
+import org.junit.Assert;
 import org.junit.Test;
 
-public class StopwatchAdapterMDBListenerTest {
-
+public class MightyRobotAdapterMDBListenerTest {
+	
+	/**
+	 * Test setup of MDBListener
+	 */
     @Test
     public void testInit() {
 
-        StopWatchAdapterMDBListener listener = new StopWatchAdapterMDBListener();
+        MightyRobotAdapterMDBListener listener = new MightyRobotAdapterMDBListener();
         try {
             listener.setup();
         } catch (NamingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            Assert.fail();
         }
     }
-
-
+    
 }
-

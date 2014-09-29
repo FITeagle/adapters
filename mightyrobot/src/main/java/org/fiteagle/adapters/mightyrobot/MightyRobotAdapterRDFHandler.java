@@ -10,7 +10,7 @@ public class MightyRobotAdapterRDFHandler extends AbstractAdapterRDFHandler {
         super.adapter = MightyRobotAdapter.getInstance();
     }
 
-    public static synchronized AbstractAdapterRDFHandler getInstance() {
+    public static synchronized MightyRobotAdapterRDFHandler getInstance() {
         if (abstractAdapterRDFHandlerSingleton == null) {
             abstractAdapterRDFHandlerSingleton = new MightyRobotAdapterRDFHandler();
         }

@@ -4,6 +4,9 @@ import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+
 public class MightyRobotAdapterTest {
 
 
@@ -17,7 +20,7 @@ public class MightyRobotAdapterTest {
         MightyRobotAdapter mightyRobotAdapterTwo = MightyRobotAdapter.getInstance();
         
         // Only one instance of the Adapter can exist        
-        Assert.assertEquals(mightyRobotAdapterOne, mightyRobotAdapterTwo);    
+        Assert.assertEquals(mightyRobotAdapterOne, mightyRobotAdapterTwo);
     }
     
     /**
@@ -72,20 +75,24 @@ public class MightyRobotAdapterTest {
     }      
     
     /**
-     * Test getter methods, those must not return null if everything was initialized properly
+     * Test getter methods, those must return actual data if everything was initialized properly
      */
     @Test
     public void testGetters(){
-    	MightyRobotAdapter adapter = MightyRobotAdapter.getInstance();
+    	MightyRobotAdapter adapter = MightyRobotAdapter.getInstance(); 
     	
-    	// Getting Adapter Managed Resource must be implemented
+    	// Getting Adapter Managed Resource must be implemented and return actual data
     	Assert.assertNotNull(adapter.getAdapterManagedResource());
+    	Assert.assertTrue(adapter.getAdapterManagedResource() instanceof Resource);
     	// Same for Getting Adapter Instance
     	Assert.assertNotNull(adapter.getAdapterInstance());
+    	Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);    	
     	// And Adapter Type
     	Assert.assertNotNull(adapter.getAdapterType());
-    	// And Adapter Description
-    	Assert.assertNotNull(adapter.getAdapterDescription(IMessageBus.SERIALIZATION_DEFAULT));
+    	Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);       	
+    	// And Adapter DescriptionModel
+    	Assert.assertNotNull(adapter.getAdapterDescriptionModel());
+    	Assert.assertTrue(adapter.getAdapterDescriptionModel() instanceof Model); 
     }  
 }
 

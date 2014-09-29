@@ -4,6 +4,9 @@ import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+
 public class MotorAdapterTest {
 
 
@@ -72,20 +75,24 @@ public class MotorAdapterTest {
     }   
     
     /**
-     * Test getter methods, those must not return null if everything was initialized properly
+     * Test getter methods, those must return actual data if everything was initialized properly
      */
     @Test
     public void testGetters(){
     	MotorAdapter adapter = MotorAdapter.getInstance();
     	
-    	// Getting Adapter Managed Resource must be implemented
+    	// Getting Adapter Managed Resource must be implemented and return actual data
     	Assert.assertNotNull(adapter.getAdapterManagedResource());
+    	Assert.assertTrue(adapter.getAdapterManagedResource() instanceof Resource);
     	// Same for Getting Adapter Instance
     	Assert.assertNotNull(adapter.getAdapterInstance());
+    	Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);    	
     	// And Adapter Type
     	Assert.assertNotNull(adapter.getAdapterType());
-    	// And Adapter Description
-    	Assert.assertNotNull(adapter.getAdapterDescription(IMessageBus.SERIALIZATION_DEFAULT));
+    	Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);       	
+    	// And Adapter DescriptionModel
+    	Assert.assertNotNull(adapter.getAdapterDescriptionModel());
+    	Assert.assertTrue(adapter.getAdapterDescriptionModel() instanceof Model); 
     }
     
 //    @Test
