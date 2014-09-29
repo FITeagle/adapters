@@ -20,22 +20,65 @@ Build and Deploy the Adapter
 Access the Adapter
 ------------------
 
-###JMS Delivery Mechanism
+The adapter can be accessed via different delivery mechanisms: direct REST, Websocket, EJB or JMS (via Northbound REST or Web GUI)
 
-**JMS Adapter Admin Console**
 
-First start the logger and commander webservice at: core/bus via mvn wildfly:deploy
+JMS/MDB Delivery Mechanism
+--------------------------------
 
-Then deploy the native GUI at: native via mvn wildfly:deploy
+### Open the at the adapter manager
 
-Control the Adapter via the Adapter Console GUI Interface at 
+Open the adapter manager to see a list of the deployed adapters and manage them:
 
-    http://localhost:8080/native/gui/admin/console2.html
+[http://localhost:8080/native/gui/admin/adapter-manager.html](http://localhost:8080/native/gui/admin/adapter-manager.html)
 
-Discover, listResources, Provision, Monitor, Terminate via Buttons
-Create Control Input Strings via the box on the right and submit via Control button.
+Monitor, create, terminate and configure resource adapters.
 
-Instances are visualized as gauge charts at the bottom.
+
+### Experimenting via curl REST calls
+
+
+The example RDF files that are used in some calls can be found in the adapters/motor directory.
+
+* Create a single new motor instance using an attached, detailed RDF description:
+  * ```curl -i -X PUT -d @createMotor.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
+  * Response should be HTTP 201 + New motor instance RDF description
+  
+  
+* Create four new motor instances at once using an attached, detailed RDF description:
+  * ```curl -i -X PUT -d @createManyMotors.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
+  * Response should be HTTP 201 + New motor instance RDF description
+   
+* Create a single new motor resource instance named "ARunningMotor01" with no attached RDF description and default parameters (just using the path):
+  * ```curl -i -X PUT http://localhost:8080/native/api/resources/ADeployedMotorAdapter1/ARunningMotor01```
+  * Response should be HTTP 201 + New motor instance RDF description
+
+* To get a description of all resources instances managed by the adapter:
+  * ```curl -i -X GET http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
+
+* To get a description of the properties of a single resource instance managed by the adapter:
+  * ```curl -i -X GET http://localhost:8080/native/api/resources/ADeployedMotorAdapter1/ARunningMotor01```
+  
+* Release a single motor resource instance (just using the path):
+  * ```curl -i -X DELETE http://localhost:8080/native/api/resources/ADeployedMotorAdapter1/ARunningMotor01```
+  * Response should be HTTP 200 + motor instance release RDF description
+  
+* Configure a single motor resource instance using attached RDF description:
+  * ```curl -i -X POST -d @configureMotor.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
+  * Response should be HTTP 200 + motor instance updated properties RDF description
+
+* Configure a two motor resource instances at the same time using attached RDF description:
+  * ```curl -i -X POST -d @configureManyMotors.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1 ```
+  * Response should be HTTP 200 + motor instances updated properties RDF description
+ 
+* Configure "Motor1" instance so it becomes dynamic:
+  * ```curl -i -X POST -d @configureDynamicMotorTrue.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1 ```
+  * Response should be HTTP 200 + motor instances updated properties RDF description
+  * A motor resource instance that is configured with the property isDynamic = true will randomly change its RPM property every 5 seconds and send a corresponding notification (fitealge:inform Message).
+  * Open the log viewer to see those notifications. Alternatively keep requesting the motor instances details using GET (see above) to see the updated RPM values. Also keep refreshing the FUSEKI web interface to see the live updates made in the repository.
+  
+* Configure "Motor1" instance so it it no longer dynamic:
+  * ```curl -i -X POST -d @configureDynamicMotorFalse.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1 ```
 
 **Dynamic Motor Instances**
 
@@ -44,59 +87,27 @@ To create a dynamic motor that automatically changes its RPM every 5 seconds:
 - Change this instance's property "isDynamic" to true via Control box.
 
 
-The JMS DM listens at the Topic: topic/core
+**Example configure input string:**
 
-Send the following messages:
-
- * Describe:
- 
-`request:::description,,,serialization:::[SERIALIZATION]`
-
- * Instances:
- 
-`request:::listResources,,,serialization:::[SERIALIZATION]`
-
- * Provision (create instance):
- * 
-`request:::provision,,,instanceID:::[INSTANCE_ID]`
-
- * Monitor:
-
-`request:::monitor,,,instanceID:::[INSTANCE_ID],,,serialization:::[SERIALIZATION]`
-
- * Control (file is path to local input ttl file)
-
-`request:::terminate,,,instanceID:::[INSTANCE_ID]`
-
- * Terminate:
- 
-`request:::control,,,control:::[CONTROL_INPUT],,,serialization:::[SERIALIZATION]`
-
-
-- [INSTANCE_ID] - Integer
-- [CONTROL_INPUT] - Control input string as ttl, rdf or n-triple
-- [SERIALIZATION] - TURTLE, RDF/XML or N-TRIPLE
-
-
-**Example control input string:**
-
-To change the RPM of motor instance number 3 to 500:
+To change the RPM of motor resource instance named "Motor1" to 500:
 
 
 ```
-@prefix :      <http://fiteagle.org/ontology/adapter/motor#> .
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix fiteagle: <http://fiteagle.org/ontology#> .
+@prefix motor: <http://fiteagle.org/ontology/adapter/motor#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://fiteagleinternal#> .
 
-:m3     a             :MotorResource ;
-        rdfs:label    "3" ;
-        :rpm          "500"^^xsd:long .`
 
+:ADeployedMotorAdapter1 rdf:type motor:MotorGarageAdapter .
+
+:Motor1 rdf:type motor:Motor ;
+                            motor:rpm 500 .
 ```
 
 
-
-### EJB Delivery Mechanism
+EJB Delivery Mechanism
+-----------------------------
 
 Access the Adapter as EJB:
 
@@ -104,9 +115,10 @@ Access the Adapter as EJB:
 
 
 
-### WebSocket Delivery Mechanism 
+WebSocket Delivery Mechanism 
+-----------------------------
 
-Connet to WebSocket at:
+Connect to WebSocket at:
 
 `ws://localhost:8080/AdapterMotor/websocket`
 
@@ -140,7 +152,12 @@ Not implemented so far.
 
 
 
-### REST Delivery Mechanism
+REST Delivery Mechanism
+----------------------------
+
+IMPORTANT: REST DM is not working at the moment together with wildfly 8 + resteasy + beans.xml because of:
+
+https://developer.jboss.org/thread/242654?_sscc=t
 
 The REST DM is located at:
 

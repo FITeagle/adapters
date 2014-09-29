@@ -1,0 +1,9 @@
+@prefix fiteagle: <http://fiteagle.org/ontology#> .
+@prefix stopwatch: <http://fiteagle.org/ontology/adapter/stopwatch#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://fiteagleinternal#> .
+
+:ADeployedStopwatchAdapter1 rdf:type stopwatch:StopwatchAdapter .
+
+:watch1 rdf:type stopwatch:Stopwatch ;
+                            stopwatch:refreshInterval 2000 .

@@ -49,20 +49,20 @@ public final class StopWatchAdapter extends AbstractAdapter {
         modelGeneral.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
         modelGeneral.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 
-        stopwatchResource = modelGeneral.createResource(adapterSpecificPrefix[1] + "StopWatch");
+        stopwatchResource = modelGeneral.createResource(adapterSpecificPrefix[1] + "Stopwatch");
         stopwatchResource.addProperty(RDF.type, OWL.Class);
         stopwatchResource.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
 
         
-        adapterType = modelGeneral.createResource(adapterSpecificPrefix[1] + "StopWatchAdapter");
+        adapterType = modelGeneral.createResource(adapterSpecificPrefix[1] + "StopwatchAdapter");
         adapterType.addProperty(RDF.type, OWL.Class);
         adapterType.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Adapter"));
 
         adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, stopwatchResource);
-        adapterType.addProperty(RDFS.label, modelGeneral.createLiteral("StopWatchAdapterType ", "en"));
+        adapterType.addProperty(RDFS.label, modelGeneral.createLiteral("StopwatchAdapterType ", "en"));
 
         stopwatchResource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
-        stopwatchResource.addProperty(RDFS.label, modelGeneral.createLiteral("StopWatch Resource", "en"));
+        stopwatchResource.addProperty(RDFS.label, modelGeneral.createLiteral("Stopwatch Resource", "en"));
 
         // create the property
         stopwatchPropertyRefreshInterval = modelGeneral.createProperty(adapterSpecificPrefix[1] + "refreshInterval");
