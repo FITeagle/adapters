@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<name>FITeagle :: Adapters</name>
@@ -8,21 +9,21 @@
 	<packaging>pom</packaging>
 	<version>0.1-SNAPSHOT</version>
 
-    <parent>
-        <groupId>org.fiteagle</groupId>
-        <artifactId>bootstrap</artifactId>
-        <version>0.1-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>org.fiteagle</groupId>
+		<artifactId>bootstrap</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
 
 	<dependencies>
-	    <dependency>
-	      <groupId>org.jboss.resteasy</groupId>
-	      <artifactId>resteasy-jaxrs</artifactId>
-	      <version>3.0.6.Final</version>
-	      <scope>provided</scope>
-	    </dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>3.0.6.Final</version>
+			<scope>provided</scope>
+		</dependency>
 
-	    <dependency>
+		<dependency>
 			<groupId>org.fiteagle</groupId>
 			<artifactId>api</artifactId>
 			<version>0.1-SNAPSHOT</version>
@@ -37,13 +38,14 @@
 	</repositories>
 
 	<modules>
-            <module>abstract</module>
-            <module>motor</module>
-            <module>mightyrobot</module>
-            <module>fuseco</module>
-    <module>common</module>
-    <module>epcClient</module>
-    <module>epcMeasurementServer</module>
-        <module>testbed</module>
-    </modules>
+		<module>abstract</module>
+		<module>motor</module>
+		<module>mightyrobot</module>
+		<module>fuseco</module>
+		<module>common</module>
+		<module>epcClient</module>
+		<module>epcMeasurementServer</module>
+		<module>testbed</module>
+		<module>openstack</module>
+	</modules>
 </project>
