@@ -23,11 +23,17 @@ import com.woorea.openstack.nova.model.SecurityGroup;
 @JsonRootName("server")
 public class Server implements Serializable {
 	
-	public static final class Addresses implements Serializable {
+  private static final long serialVersionUID = -4603224862276203986L;
+
+  public static final class Addresses implements Serializable {
 		
-		public static final class Address implements Serializable {
+    private static final long serialVersionUID = 5607565613236872157L;
+
+    public static final class Address implements Serializable {
 			
-			@JsonProperty("OS-EXT-IPS-MAC:mac_addr")
+      private static final long serialVersionUID = 677107294894609195L;
+
+      @JsonProperty("OS-EXT-IPS-MAC:mac_addr")
 			private String macAddr;
 
 			private String version;

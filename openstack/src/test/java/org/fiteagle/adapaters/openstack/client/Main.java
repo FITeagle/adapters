@@ -1,17 +1,14 @@
 package org.fiteagle.adapaters.openstack.client;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.fiteagle.adapters.openstack.OpenstackVMAdapter;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.model.Image;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
-import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 
 import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.Flavors;
 import com.woorea.openstack.nova.model.FloatingIp;
-import com.woorea.openstack.nova.model.FloatingIpDomains;
 import com.woorea.openstack.nova.model.FloatingIpPools;
 
 public class Main {
@@ -26,8 +23,8 @@ public class Main {
 		new OpenstackVMAdapter();
 		OpenstackClient client = new OpenstackClient();
 //		listFlavors(client);
-//		listImages(client);
-		listonlyPrivateImages(client);
+		listImages(client);
+//		listonlyPrivateImages(client);
 //		client.checkEveryThing();
 //		getServerDetail(client);
 		
@@ -85,14 +82,6 @@ public class Main {
 		}
 	}
 	
-	private static void listonlyPrivateImages(OpenstackClient client) {
-//		Images images = client.listOnlyPrivateImages();
-		client.listOnlyPrivateImages();
-//		for (Image image : images) {
-//			System.out.println(image);
-//		}
-	}
-
 	private static void listFlavors(OpenstackClient client) {
 		Flavors flavors = client.listFlavors();
 		for (Flavor flavor : flavors) {

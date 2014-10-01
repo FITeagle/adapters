@@ -1,10 +1,12 @@
-package org.fiteagle.adapters.common;
+package org.fiteagle.adapters.openstack;
 
-import java.rmi.server.ObjID;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+
+import org.fiteagle.adapters.common.AdapterConfiguration;
+import org.fiteagle.adapters.common.ResourceAdapterStatus;
 
 public abstract class ResourceAdapter {
 
@@ -17,9 +19,6 @@ public abstract class ResourceAdapter {
 	public static List<ResourceAdapter> getJavaInstances() throws IllegalAccessException{
 		throw new IllegalAccessException();
 	}
-	
-	public abstract boolean isLoaded();
-	public abstract void setLoaded(boolean loaded);
 	
 	private HashMap<String, Object> properties = new HashMap<String, Object>();
 	private String type;//class of the implementing adapter

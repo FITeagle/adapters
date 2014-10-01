@@ -1,9 +1,11 @@
-package org.fiteagle.adapters.common;
+package org.fiteagle.adapters.openstack;
 
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import org.fiteagle.adapters.common.AdapterConfiguration;
+import org.fiteagle.adapters.common.ResourceAdapterStatus;
 
 
 public interface OpenstackResourceAdapter {
@@ -54,23 +56,12 @@ public interface OpenstackResourceAdapter {
 	public static final String VM_OSEXTSTSVmState = "vm_OSEXTSTSVmState";
 	public static final String VM_FloatingIP = "floatingIP";
 	
-	
-
-	
-	
-	
-	
 
 	HashMap<String, String> getImageProperties();
 
 	List<HashMap<String, String>> getFlavorsProperties();
 	
 	String getId();
-	
-//	OpenstackResourceAdapter create(String imageId, String flavorId, String vmName, X509Certificate x509Certificate);
-//	public OpenstackResourceAdapter create(String imageId, String flavorId, String vmName, String keyPairName, X509Certificate cert);
-//	public OpenstackResourceAdapter create(String imageId, String flavorId,
-//			String vmName, String keyPairName, X509Certificate cert);
 	
 	public OpenstackResourceAdapter create(String imageId, String flavorId,
 			String vmName, String keyPairName);
@@ -101,8 +92,5 @@ public interface OpenstackResourceAdapter {
 	void setParentNodeId(String nodeId);
 	
 	public void checkAndSetRAReady();
-	
-	
-	
 
 }

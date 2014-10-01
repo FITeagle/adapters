@@ -18,7 +18,9 @@ import com.woorea.openstack.nova.model.Link;
 @JsonRootName("image")
 public class Image implements Serializable {
 
-	private String id;
+  private static final long serialVersionUID = 4288800671541514548L;
+
+  private String id;
 
 	private String status;
 

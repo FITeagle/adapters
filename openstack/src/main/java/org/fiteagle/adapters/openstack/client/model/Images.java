@@ -14,7 +14,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 @JsonIgnoreProperties(ignoreUnknown = true)//changed
 public class Images implements Iterable<Image>, Serializable {
 
-	@JsonProperty("images")
+  private static final long serialVersionUID = -1945698118256231004L;
+  @JsonProperty("images")
 	private List<Image> list;
 
 	/**
@@ -29,10 +30,6 @@ public class Images implements Iterable<Image>, Serializable {
 		return list.iterator();
 	}
 	
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return "Images [list=" + list + "]";

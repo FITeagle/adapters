@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
-
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.fiteagle.adapters.openstack.client.model.Images;
@@ -18,7 +16,6 @@ import com.woorea.openstack.base.client.HttpMethod;
 import com.woorea.openstack.base.client.OpenStackRequest;
 import com.woorea.openstack.base.client.OpenStackSimpleTokenProvider;
 import com.woorea.openstack.connector.JerseyConnector;
-import com.woorea.openstack.glance.Glance;
 import com.woorea.openstack.keystone.Keystone;
 import com.woorea.openstack.keystone.api.TokensResource;
 import com.woorea.openstack.keystone.model.Access;
@@ -28,13 +25,10 @@ import com.woorea.openstack.keystone.model.authentication.TokenAuthentication;
 import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
 import com.woorea.openstack.nova.Nova;
 import com.woorea.openstack.nova.api.ServersResource.AssociateFloatingIp;
-import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.Flavors;
 import com.woorea.openstack.nova.model.FloatingIp;
-import com.woorea.openstack.nova.model.FloatingIpDomains;
 import com.woorea.openstack.nova.model.FloatingIpPools;
 import com.woorea.openstack.nova.model.FloatingIpPools.FloatingIpPool;
-import com.woorea.openstack.nova.model.KeyPairs;
 import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
@@ -67,7 +61,6 @@ public class OpenstackClient {
 	}
 
 	public Images listImages() {
-
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
 				tenantId));
@@ -94,43 +87,6 @@ public class OpenstackClient {
 		return images;
 	}
 	
-	public void listOnlyPrivateImages(){
-		
-		Access access = getAccessWithTenantId();
-		
-		Glance glanceClient = new Glance(Utils.GLANCE_ENDPOINT.concat("/").concat(tenantId));
-		
-//		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
-//				tenantId));
-		glanceClient.token(access.getToken().getId());
-
-//		OpenStackRequest<String> request = new OpenStackRequest<String>(
-//				novaClient, HttpMethod.GET, "/images/detail", null,
-//				String.class);
-		
-		OpenStackRequest<String> request = new OpenStackRequest<String>(
-				glanceClient, HttpMethod.GET, "/images", null,
-				String.class);
-		
-		request.queryParam("visibility", "private");
-		
-		String responseImagesString = glanceClient.execute(request);
-		System.out.println(responseImagesString);
-
-		Images images;
-		try {
-			images = this.openstackParser.parseToImages(responseImagesString);
-		} catch (JsonParseException e) {
-			throw new RuntimeException(e);
-		} catch (JsonMappingException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-//		return images;
-	}
-
 	private Access getAccessWithTenantId() {
 		Keystone keystone = new Keystone(Utils.KEYSTONE_AUTH_URL,
 				new JerseyConnector());
@@ -147,7 +103,7 @@ public class OpenstackClient {
 		List<Tenant> tenantsList = tenants.getList();
 
 		if (tenants.getList().size() > 0) {
-			for (Iterator iterator = tenantsList.iterator(); iterator.hasNext();) {
+			for (Iterator<Tenant> iterator = tenantsList.iterator(); iterator.hasNext();) {
 				Tenant tenant = (Tenant) iterator.next();
 				if (tenant.getName().compareTo(Utils.TENANT_NAME) == 0) {
 					tenantId = tenant.getId();
@@ -173,8 +129,6 @@ public class OpenstackClient {
 		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
 				tenantId));
 		novaClient.token(access.getToken().getId());
-
-//		KeyPairs keysPairs = novaClient.keyPairs().list().execute();
 
 		org.fiteagle.adapters.openstack.client.model.ServerForCreate serverForCreate = new org.fiteagle.adapters.openstack.client.model.ServerForCreate();
 		serverForCreate.setName(serverName);
@@ -233,7 +187,8 @@ public class OpenstackClient {
 		com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp action = new com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp(floatingIp);
 		AssociateFloatingIp associateFloatingIp = new AssociateFloatingIp(serverId, action);
 		
-		OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp> request = new OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp>(novaClient,
+		@SuppressWarnings("unchecked")
+    OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp> request = new OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp>(novaClient,
 				HttpMethod.POST,"/servers/"+serverId+"/action",
 				associateFloatingIp.json(action),
 				com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp.class);
@@ -312,7 +267,6 @@ public class OpenstackClient {
 	}
 	
 	public void deleteServer(String id){
-		
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
 				tenantId));
@@ -324,9 +278,7 @@ public class OpenstackClient {
 				new StringBuilder("/servers/").append(id).toString(),
 				null,
 				org.fiteagle.adapters.openstack.client.model.Server.class);
-		org.fiteagle.adapters.openstack.client.model.Server serverDetail = novaClient
-				.execute(request);
-		
+		novaClient.execute(request);
 	}
 
 	public String getNetworkId() {
@@ -342,7 +294,7 @@ public class OpenstackClient {
 		quantum.setTokenProvider(new OpenStackSimpleTokenProvider(access.getToken().getId()));
 		Networks networks = quantum.networks().list().execute();
 		List<Network> networkList = networks.getList();
-		for (Iterator iterator = networkList.iterator(); iterator.hasNext();) {
+		for (Iterator<Network> iterator = networkList.iterator(); iterator.hasNext();) {
 			Network network = (Network) iterator.next();
 			if(network.getName().compareToIgnoreCase(networkName)==0)
 				return network.getId();
@@ -353,6 +305,5 @@ public class OpenstackClient {
 	public void setNetworkId(String networkId) {
 		this.networkId = networkId;
 	}
-	
 
 }

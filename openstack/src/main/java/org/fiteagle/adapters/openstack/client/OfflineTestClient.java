@@ -2,18 +2,13 @@ package org.fiteagle.adapters.openstack.client;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 
-import com.woorea.openstack.base.client.Entity;
 import com.woorea.openstack.base.client.HttpMethod;
 import com.woorea.openstack.base.client.OpenStackRequest;
 import com.woorea.openstack.connector.JerseyConnector;
@@ -29,7 +24,6 @@ import com.woorea.openstack.nova.api.ServersResource.AssociateFloatingIp;
 import com.woorea.openstack.nova.model.Flavors;
 import com.woorea.openstack.nova.model.FloatingIp;
 import com.woorea.openstack.nova.model.FloatingIpPools;
-import com.woorea.openstack.nova.model.FloatingIpPools.FloatingIpPool;
 
 public class OfflineTestClient extends OpenstackClient {
 
@@ -41,20 +35,13 @@ public class OfflineTestClient extends OpenstackClient {
 	}
 
 	public Flavors listFlavors() {
-
+		String flavorsString = getRessourceString("/flavors.json");
 		try {
-			String flavorsString = getRessourceString("/flavors.json");
-			return openstackParser.parseToFlavors(flavorsString);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+      return openstackParser.parseToFlavors(flavorsString);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 		return null;
 	}
 
@@ -62,16 +49,10 @@ public class OfflineTestClient extends OpenstackClient {
 		String imagesString = getRessourceString("/images.json");
 		try {
 			return openstackParser.parseToImages(imagesString);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 		return null;
 	}
 
@@ -79,23 +60,11 @@ public class OfflineTestClient extends OpenstackClient {
 		String serverString = getRessourceString("/server.json");
 		try {
 			return openstackParser.parseToServer(serverString);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 		return null;
-		// Server server = new Server();
-		// Flavors flavors = this.listFlavors();
-		// Images images = this.listImages();
-		// server.setFlavor(flavors.getList().get(0));
-		// server.setImage(images.getList().get(0));
-
 	}
 
 	public org.fiteagle.adapters.openstack.client.model.Server createServer(
@@ -107,24 +76,15 @@ public class OfflineTestClient extends OpenstackClient {
 		String serverString = getRessourceString("/serverDetail.json");
 		try {
 			return openstackParser.parseToServer(serverString);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
 		return null;
 	}
 
 	private Access getAccessWithTenantId() {
-//		Keystone keystone = new Keystone(Utils.KEYSTONE_AUTH_URL,
-//				new JaxRs20Connector());
-		Keystone keystone = new Keystone(Utils.KEYSTONE_AUTH_URL,
-				new JerseyConnector());
+		Keystone keystone = new Keystone(Utils.KEYSTONE_AUTH_URL,	new JerseyConnector());
 
 		TokensResource tokens = keystone.tokens();
 		Access access = tokens
@@ -139,7 +99,7 @@ public class OfflineTestClient extends OpenstackClient {
 		List<Tenant> tenantsList = tenants.getList();
 
 		if (tenants.getList().size() > 0) {
-			for (Iterator iterator = tenantsList.iterator(); iterator.hasNext();) {
+			for (Iterator<Tenant> iterator = tenantsList.iterator(); iterator.hasNext();) {
 				Tenant tenant = (Tenant) iterator.next();
 				if (tenant.getName().compareTo(Utils.TENANT_NAME) == 0) {
 					tenantId = tenant.getId();
@@ -169,7 +129,8 @@ public class OfflineTestClient extends OpenstackClient {
 				floatingIp);
 		AssociateFloatingIp associateFloatingIp = new AssociateFloatingIp(
 				serverId, action);
-		OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp> request = new OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp>(
+		@SuppressWarnings("unchecked")
+    OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp> request = new OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp>(
 				novaClient,
 				HttpMethod.POST,
 				"/servers/" + serverId + "/action",
@@ -179,27 +140,8 @@ public class OfflineTestClient extends OpenstackClient {
 		try {
 			novaClient.execute(request);
 		} catch (Exception e) {
-//			if ((e instanceof org.glassfish.jersey.message.internal.MessageBodyProviderNotFoundException))
-//				throw new RuntimeException(e);
-
 			System.out.println(e);
 		}
-		//
-		// com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp
-		//
-		// request.json(action);
-		// org.fiteagle.adapters.openstack.client.model.Server
-		// serverDetail = novaClient
-		// .execute(request);
-
-		// com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp
-		// associateFloatingIp =
-		// (com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp)
-		// novaClient.servers()
-		// .associateFloatingIp(serverId, floatingIp).execute();
-		// Object associated = associateFloatingIp.execute();
-		// return associated;
-		// return response;
 	}
 
 	public FloatingIpPools getFloatingIpPools() {
@@ -208,32 +150,17 @@ public class OfflineTestClient extends OpenstackClient {
 				tenantId));
 		novaClient.token(access.getToken().getId());
 
-		// OpenStackRequest<FloatingIpDomains> request = new
-		// OpenStackRequest<FloatingIpDomains>(
-		// novaClient, HttpMethod.GET, "/os-floating-ip-dns", null,
-		// FloatingIpDomains.class);
-
 		OpenStackRequest<FloatingIpPools> request = new OpenStackRequest<FloatingIpPools>(
 				novaClient, HttpMethod.GET, "/os-floating-ip-pools", null,
 				FloatingIpPools.class);
 		FloatingIpPools floatingIpPools = novaClient.execute(request);
 		return floatingIpPools;
-
-		// FloatingIpDomains floatingIpDomains = novaClient.execute(request);
-		// return floatingIpDomains;
 	}
 
 	public FloatingIp addFloatingIp() {
-
 		String floatingIpString = getRessourceString("/floatingIp.json");
 		try {
 			return openstackParser.parseToFloatingIp(floatingIpString);
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

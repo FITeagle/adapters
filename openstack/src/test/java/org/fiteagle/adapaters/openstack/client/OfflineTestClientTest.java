@@ -1,7 +1,5 @@
 package org.fiteagle.adapaters.openstack.client;
 
-import static org.junit.Assert.*;
-
 import org.fiteagle.adapters.openstack.client.OfflineTestClient;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;

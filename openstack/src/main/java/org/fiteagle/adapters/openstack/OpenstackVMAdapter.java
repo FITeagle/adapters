@@ -1,12 +1,5 @@
 package org.fiteagle.adapters.openstack;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.interfaces.DSAParams;
-import java.security.interfaces.DSAPublicKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -15,11 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.prefs.Preferences;
 
-import net.iharder.Base64;
-
 import org.fiteagle.adapters.common.AdapterConfiguration;
-import org.fiteagle.adapters.common.OpenstackResourceAdapter;
-import org.fiteagle.adapters.common.ResourceAdapter;
 import org.fiteagle.adapters.openstack.client.OfflineTestClient;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.Utils;
@@ -55,7 +44,6 @@ public class OpenstackVMAdapter extends ResourceAdapter implements
 			this.configureUtils();
 		}
 		this.setType("org.fiteagle.adapters.openstack.OpenstackVMAdapter");
-
 	}
 
 	private void configureUtils() {
@@ -137,39 +125,15 @@ public class OpenstackVMAdapter extends ResourceAdapter implements
 	}
 
 	public static List<ResourceAdapter> getJavaInstances() {
-//		List<ResourceAdapter> resultList = new ArrayList<ResourceAdapter>();
-//
-//		if (!utilsConfigured) {
-//			new OpenstackVMAdapter();
-//		}
-//
-//		Flavors flavors = createClient().listFlavors();
-//		List<Flavor> flavorsList = flavors.getList();
-//		
-//		Images images = createClient().listImages();
-//		List<Image> imagesList = images.getList();
-//
-//		for (Image image : imagesList) {
-//			OpenstackVMAdapter openstackVMAdapter = new OpenstackVMAdapter();
-//			openstackVMAdapter.setExclusive(false);
-//			openstackVMAdapter.setAvailable(true);
-//			openstackVMAdapter.setImage(image);
-//			openstackVMAdapter.setFlavorsList(flavorsList);
-//			resultList.add(openstackVMAdapter);
-//		}
-//
-//		return resultList;
 		return new ArrayList<ResourceAdapter>();
 	}
 
-	@Override
-	public boolean isLoaded() {
-		return this.loaded;
+	public static boolean isLoaded() {
+		return loaded;
 	}
 
-	@Override
-	public void setLoaded(boolean loaded) {
-		this.loaded = loaded;
+	public static void setLoaded(boolean ld) {
+		loaded = ld;
 	}
 
 	public Image getImage() {
@@ -188,19 +152,7 @@ public class OpenstackVMAdapter extends ResourceAdapter implements
 		this.flavorsList = flavorsList;
 	}
 
-	private static OpenstackClient createClient() {
-		OpenstackClient newClient = null;
-		if (offlineTestMode) {
-			newClient = new OfflineTestClient();
-		} else {
-			newClient = new OpenstackClient();
-		}
-
-		return newClient;
-	}
-
 	public OpenstackClient getClient() {
-
 		if (this.client == null) {
 			if (offlineTestMode) {
 				this.client = new OfflineTestClient();
@@ -258,7 +210,7 @@ public class OpenstackVMAdapter extends ResourceAdapter implements
 		if (this.flavorsList == null || this.flavorsList.isEmpty())
 			return null;
 
-		for (Iterator iterator = flavorsList.iterator(); iterator.hasNext();) {
+		for (Iterator<Flavor> iterator = flavorsList.iterator(); iterator.hasNext();) {
 
 			Flavor flavor = (Flavor) iterator.next();
 			HashMap<String, String> tmpProperties = new HashMap<String, String>();
@@ -317,46 +269,6 @@ public class OpenstackVMAdapter extends ResourceAdapter implements
 
 	private String generateRandomString() {
 		return UUID.randomUUID().toString();
-	}
-
-	private String getPubKeyString(PublicKey pubKey) throws IOException {
-		String publicKeyEncoded;
-		if (pubKey.getAlgorithm().equals("RSA")) {
-			RSAPublicKey rsaPublicKey = (RSAPublicKey) pubKey;
-			ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
-			DataOutputStream dos = new DataOutputStream(byteOs);
-			dos.writeInt("ssh-rsa".getBytes().length);
-			dos.write("ssh-rsa".getBytes());
-			dos.writeInt(rsaPublicKey.getPublicExponent().toByteArray().length);
-			dos.write(rsaPublicKey.getPublicExponent().toByteArray());
-			dos.writeInt(rsaPublicKey.getModulus().toByteArray().length);
-			dos.write(rsaPublicKey.getModulus().toByteArray());
-			publicKeyEncoded = new String(Base64.encodeBytes(byteOs
-					.toByteArray()));
-			return "ssh-rsa " + publicKeyEncoded;
-		} else if (pubKey.getAlgorithm().equals("DSA")) {
-			DSAPublicKey dsaPublicKey = (DSAPublicKey) pubKey;
-			DSAParams dsaParams = dsaPublicKey.getParams();
-
-			ByteArrayOutputStream byteOs = new ByteArrayOutputStream();
-			DataOutputStream dos = new DataOutputStream(byteOs);
-			dos.writeInt("ssh-dss".getBytes().length);
-			dos.write("ssh-dss".getBytes());
-			dos.writeInt(dsaParams.getP().toByteArray().length);
-			dos.write(dsaParams.getP().toByteArray());
-			dos.writeInt(dsaParams.getQ().toByteArray().length);
-			dos.write(dsaParams.getQ().toByteArray());
-			dos.writeInt(dsaParams.getG().toByteArray().length);
-			dos.write(dsaParams.getG().toByteArray());
-			dos.writeInt(dsaPublicKey.getY().toByteArray().length);
-			dos.write(dsaPublicKey.getY().toByteArray());
-			publicKeyEncoded = new String(Base64.encodeBytes(byteOs
-					.toByteArray()));
-			return "ssh-dss " + publicKeyEncoded;
-		} else {
-			throw new RuntimeException("Unknown public key encoding: "
-					+ pubKey.getAlgorithm());
-		}
 	}
 
 	public Server getServer() {

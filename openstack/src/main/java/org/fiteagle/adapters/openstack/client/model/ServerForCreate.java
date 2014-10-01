@@ -20,9 +20,12 @@ import com.woorea.openstack.nova.model.PersonalityFile;
 @JsonRootName("server")
 public class ServerForCreate implements Serializable {
 	
-	public static final class SecurityGroup implements Serializable {
+  private static final long serialVersionUID = 113539200883523167L;
+
+  public static final class SecurityGroup implements Serializable {
 		
-		private String name;
+    private static final long serialVersionUID = -4920416303308070588L;
+    private String name;
 
 		public SecurityGroup() {
 		}
@@ -31,16 +34,10 @@ public class ServerForCreate implements Serializable {
 			this.name = name;
 		}
 
-		/**
-		 * @return the name
-		 */
 		public String getName() {
 			return name;
 		}
 
-		/**
-		 * @param name the name to set
-		 */
 		public void setName(String name) {
 			this.name = name;
 		}
@@ -49,7 +46,9 @@ public class ServerForCreate implements Serializable {
 //	--------------------changed------------
 	public static final class Network implements Serializable { 
 		
-		private String uuid;
+    private static final long serialVersionUID = 581280677901622617L;
+
+    private String uuid;
 		
 		private String fixed_ip;
 		
@@ -64,44 +63,26 @@ public class ServerForCreate implements Serializable {
 			this.port = port;
 		}
 
-		/**
-		 * @return the network uuid
-		 */
 		public String getUuid() {
 			return uuid;
 		}
 
-		/**
-		 * @param uuid the network uuid to set
-		 */
 		public void setUuid(String uuid) {
 			this.uuid = uuid;
 		}
 
-		/**
-		 * @return the IP address to assign to the interface
-		 */
 		public String getFixed_ip() {
 			return fixed_ip;
 		}
 
-		/**
-		 * @param name the IP address to set
-		 */
 		public void setFixed_ip(String fixed_ip) {
 			this.fixed_ip = fixed_ip;
 		}
 
-		/**
-		 * @return the port uuid
-		 */
 		public String getPort() {
 			return port;
 		}
 
-		/**
-		 * @param port the port uuid to set
-		 */
 		public void setPort(String port) {
 			this.port = port;
 		}
@@ -150,177 +131,102 @@ public class ServerForCreate implements Serializable {
 	@JsonProperty("config_drive")
 	private boolean configDrive;
 
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	/**
-	 * @return the adminPass
-	 */
 	public String getAdminPass() {
 		return adminPass;
 	}
 
-	/**
-	 * @param adminPass the adminPass to set
-	 */
 	public void setAdminPass(String adminPass) {
 		this.adminPass = adminPass;
 	}
 
-	/**
-	 * @return the imageRef
-	 */
 	public String getImageRef() {
 		return imageRef;
 	}
 
-	/**
-	 * @param imageRef the imageRef to set
-	 */
 	public void setImageRef(String imageRef) {
 		this.imageRef = imageRef;
 	}
 
-	/**
-	 * @return the flavorRef
-	 */
 	public String getFlavorRef() {
 		return flavorRef;
 	}
 
-	/**
-	 * @param flavorRef the flavorRef to set
-	 */
 	public void setFlavorRef(String flavorRef) {
 		this.flavorRef = flavorRef;
 	}
 
-	/**
-	 * @return the accessIPv4
-	 */
 	public String getAccessIPv4() {
 		return accessIPv4;
 	}
 
-	/**
-	 * @param accessIPv4 the accessIPv4 to set
-	 */
 	public void setAccessIPv4(String accessIPv4) {
 		this.accessIPv4 = accessIPv4;
 	}
 
-	/**
-	 * @return the accessIPv6
-	 */
 	public String getAccessIPv6() {
 		return accessIPv6;
 	}
 
-	/**
-	 * @param accessIPv6 the accessIPv6 to set
-	 */
 	public void setAccessIPv6(String accessIPv6) {
 		this.accessIPv6 = accessIPv6;
 	}
 
-	/**
-	 * @return the min
-	 */
 	public Integer getMin() {
 		return min;
 	}
 
-	/**
-	 * @param min the min to set
-	 */
 	public void setMin(Integer min) {
 		this.min = min;
 	}
 
-	/**
-	 * @return the max
-	 */
 	public Integer getMax() {
 		return max;
 	}
 
-	/**
-	 * @param max the max to set
-	 */
 	public void setMax(Integer max) {
 		this.max = max;
 	}
 
-	/**
-	 * @return the diskConfig
-	 */
 	public String getDiskConfig() {
 		return diskConfig;
 	}
 
-	/**
-	 * @param diskConfig the diskConfig to set
-	 */
 	public void setDiskConfig(String diskConfig) {
 		this.diskConfig = diskConfig;
 	}
 
-	/**
-	 * @return the keyName
-	 */
 	public String getKeyName() {
 		return keyName;
 	}
 
-	/**
-	 * @param keyName the keyName to set
-	 */
 	public void setKeyName(String keyName) {
 		this.keyName = keyName;
 	}
 
-	/**
-	 * @return the personality
-	 */
 	public List<PersonalityFile> getPersonality() {
 		return personality;
 	}
 
-	/**
-	 * @param personality the personality to set
-	 */
 	public void setPersonality(List<PersonalityFile> personality) {
 		this.personality = personality;
 	}
 
-	/**
-	 * @return the metadata
-	 */
 	public Map<String, String> getMetadata() {
 		return metadata;
 	}
 
-	/**
-	 * @param metadata the metadata to set
-	 */
 	public void setMetadata(Map<String, String> metadata) {
 		this.metadata = metadata;
 	}
 
-	/**
-	 * @return the securityGroups
-	 */
 	public List<SecurityGroup> getSecurityGroups() {
 		if(securityGroups == null) {
 			securityGroups = new ArrayList<SecurityGroup>();
@@ -330,9 +236,6 @@ public class ServerForCreate implements Serializable {
 
 	
 //	----------------------changed----------------------
-	/**
-	 * @return the networks
-	 */
 	public List<Network> getNetworks() {
 		if(networks == null) {
 			networks = new ArrayList<Network>();
@@ -342,30 +245,18 @@ public class ServerForCreate implements Serializable {
 	
 //	----------------------/changed----------------------
 	
-	/**
-	 * @return the userData
-	 */
 	public String getUserData() {
 		return userData;
 	}
 
-	/**
-	 * @param userData the userData to set
-	 */
 	public void setUserData(String userData) {
 		this.userData = userData;
 	}
 
-	/**
-	 * @return the availabilityZone
-	 */
 	public String getAvailabilityZone() {
 		return availabilityZone;
 	}
 
-	/**
-	 * @param availabilityZone the availabilityZone to set
-	 */
 	public void setAvailabilityZone(String availabilityZone) {
 		this.availabilityZone = availabilityZone;
 	}
