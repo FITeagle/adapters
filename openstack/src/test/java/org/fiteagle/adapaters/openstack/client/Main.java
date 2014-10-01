@@ -5,74 +5,44 @@ import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.model.Image;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
+import org.fiteagle.adapters.openstack.client.model.Servers;
 
 import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.Flavors;
-import com.woorea.openstack.nova.model.FloatingIp;
-import com.woorea.openstack.nova.model.FloatingIpPools;
 
 public class Main {
 	static String serverName = "testServer";
-	static String imageId = "";
+	static String imageId = "f4603773-82cb-4931-9b6f-919335dfdc79";
 	static String flavorId = "1";
-	static String keyPairName = "testKeyPair";
-	static String tentantId="";
+	static String keyPairName = "mitja_tub";
 	
 	public static void main(String[] args) {
 		
 		new OpenstackVMAdapter();
 		OpenstackClient client = new OpenstackClient();
+		
+		Servers servers = client.listServers();
+		for(Server server : servers.getList()){
+		  System.out.println(server);
+		}
+		
 //		listFlavors(client);
-		listImages(client);
-//		listonlyPrivateImages(client);
-//		client.checkEveryThing();
+//		listImages(client);
 //		getServerDetail(client);
-		
-//		getFloatingIps(client);
-//		createServer(client);
-//		addFloatingIp(client);
-		
-//		getFloatingIpPools(client);
+//		Server server = client.createServer(imageId, flavorId, serverName, keyPairName);
+//		client.deleteServer(server.getId());
 		
 //		client.addKeyPair("test", "");
-//		Server server = client.createServer(imageId, flavorId, serverName, keyPairName);
-////		
 //		Server serverDetails = client.getServerDetails(server.getId());
-////		Server serverDetails = client.getServerDetails("");
-////		
-//		FloatingIp floatingIp = client.addFloatingIp();
-		
-//		client.allocateFloatingIpForServer("", floatingIp.getIp());
-//		client.allocateFloatingIpForServer(serverDetails.getId(), floatingIp.getIp());
-////		client.allocateFloatingIpForServer(server.getId(), "");
-		
-		
-//		client.deleteServer("");
-		
+//		Server serverDetails = client.getServerDetails("");
 //		client.deleteKeyPair(keyPairName);
 //		String network = client.getNetworkId();
 //		System.out.println(network);
-
-	}
-
-	private static void addFloatingIp(OpenstackClient client) {
-		FloatingIp floatingIp = client.addFloatingIp();
-		System.out.println(floatingIp);
-	}
-
-	private static void getFloatingIpPools(OpenstackClient client) {
-		FloatingIpPools floaingIpPools = client.getFloatingIpPools();
-		System.out.println(floaingIpPools);
 	}
 
 	private static void getServerDetail(OpenstackClient client) {
 		Server serverDetail = client.getServerDetails(client.createServer(imageId, flavorId, serverName, keyPairName).getId());
 		System.out.println(serverDetail);
-	}
-
-	private static void createServer(OpenstackClient client) {
-		org.fiteagle.adapters.openstack.client.model.Server server = client.createServer(imageId, flavorId, serverName, keyPairName);
-		System.out.println(server);
 	}
 
 	private static void listImages(OpenstackClient client) {

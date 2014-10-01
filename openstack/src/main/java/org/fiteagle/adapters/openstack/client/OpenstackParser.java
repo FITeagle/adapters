@@ -8,6 +8,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
+import org.fiteagle.adapters.openstack.client.model.Servers;
 
 import com.woorea.openstack.nova.model.Flavors;
 import com.woorea.openstack.nova.model.FloatingIp;
@@ -42,5 +43,10 @@ public class OpenstackParser {
 						org.fiteagle.adapters.openstack.client.model.Server.class);
 		return server;
 	}
+	
+	public Servers parseToServers(String serversString)
+      throws JsonParseException, JsonMappingException, IOException {
+    return mapper.readValue(serversString, Servers.class);
+  }
 
 }
