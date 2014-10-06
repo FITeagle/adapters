@@ -14,6 +14,6 @@ public class OpenstackAdapterMDBSender extends AbstractAdapterMDBSender{
   @PostConstruct
   protected void startup() {  
      super.adapter = OpenstackAdapter.getInstance();
-     super.startup();       
- }
+     super.startup();   
+  }
 }

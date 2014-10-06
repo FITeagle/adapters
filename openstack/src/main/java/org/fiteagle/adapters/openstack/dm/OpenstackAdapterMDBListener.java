@@ -3,7 +3,6 @@ package org.fiteagle.adapters.openstack.dm;
 import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
-import javax.naming.NamingException;
 
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
@@ -16,7 +15,7 @@ import org.fiteagle.api.core.IMessageBus;
 public class OpenstackAdapterMDBListener extends AbstractAdapterMDBListener {
   
   @PostConstruct
-  public void setup() throws NamingException {
+  public void setup() {
       this.adapterRDFHandler = OpenstackAdapterRDFHandler.getInstance();
       this.adapter = OpenstackAdapter.getInstance();
   }
