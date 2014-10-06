@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
+import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate.SecurityGroup;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 
@@ -29,29 +31,68 @@ import com.woorea.openstack.nova.model.Flavors;
 import com.woorea.openstack.nova.model.FloatingIp;
 import com.woorea.openstack.nova.model.FloatingIpPools;
 import com.woorea.openstack.nova.model.FloatingIpPools.FloatingIpPool;
+import com.woorea.openstack.nova.model.ServerAction;
 import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
 
-/**
- * this client uses the woorea client and offers simple methods using openstack API.
- *
- */
 public class OpenstackClient {
 
-	OpenstackParser openstackParser;
-	String tenantId = "";
+	private static String KEYSTONE_AUTH_URL;
+	private static String KEYSTONE_USERNAME;
+	private static String KEYSTONE_PASSWORD;
+	private static String KEYSTONE_ENDPOINT;
+	private static String TENANT_NAME;
+	private static String NOVA_ENDPOINT;
+	private static String GLANCE_ENDPOINT;
+	private static String NET_ENDPOINT;
+	private static String FLOATINGIP_POOL_NAME;
+	private static String NET_NAME;
+	private static String TENANT_ID = "";
+	
 	private String networkId = "";
 
-	public OpenstackClient() {
-		this.openstackParser = new OpenstackParser();
+	private static OpenstackClient instance;
+	public static OpenstackClient getInstance(){
+		if(instance == null){
+			instance = new OpenstackClient();
+		}
+		return instance;
 	}
+	
+	private OpenstackClient() {
+		loadPreferences();
+	}
+	
+	private void loadPreferences() {
+		Preferences preferences = Preferences.userNodeForPackage(getClass());
+
+		if (preferences.get("floating_ip_pool_name", null) != null)
+			FLOATINGIP_POOL_NAME = preferences.get("floating_ip_pool_name",	null);
+		if (preferences.get("keystone_auth_URL", null) != null)
+			KEYSTONE_AUTH_URL = preferences.get("keystone_auth_URL", null);
+		if (preferences.get("keystone_endpoint", null) != null)
+			KEYSTONE_ENDPOINT = preferences.get("keystone_endpoint", null);
+		if (preferences.get("keystone_password", null) != null)
+			KEYSTONE_PASSWORD = preferences.get("keystone_password", null);
+		if (preferences.get("keystone_username", null) != null)
+			KEYSTONE_USERNAME = preferences.get("keystone_username", null);
+		if (preferences.get("net_endpoint", null) != null)
+			NET_ENDPOINT = preferences.get("net_endpoint", null);
+		if (preferences.get("net_name", null) != null)
+			NET_NAME = preferences.get("net_name", null);
+		if (preferences.get("nova_endpoint", null) != null)
+			NOVA_ENDPOINT = preferences.get("nova_endpoint", null);
+		if (preferences.get("tenant_name", null) != null)
+			TENANT_NAME = preferences.get("tenant_name", null);
+	}
+	
 
 	public Flavors listFlavors() {
 		Access access = getAccessWithTenantId();
 
 		Flavors flavors = null;
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
 		flavors = novaClient.flavors().list(true).execute();
@@ -62,7 +103,7 @@ public class OpenstackClient {
 	public Images listImages() {
 		Access access = getAccessWithTenantId();
 		
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
 		OpenStackRequest<String> request = new OpenStackRequest<String>(
@@ -73,7 +114,7 @@ public class OpenstackClient {
 
 		Images images;
 		try {
-			images = this.openstackParser.parseToImages(responseImagesString);
+			images = OpenstackParser.parseToImages(responseImagesString);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -82,32 +123,32 @@ public class OpenstackClient {
 	}
 	
 	public Servers listServers() {
-    Access access = getAccessWithTenantId();
+	    Access access = getAccessWithTenantId();
+	    
+	    Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
+	    novaClient.token(access.getToken().getId());
+	
+	    OpenStackRequest<String> request = new OpenStackRequest<String>(
+	        novaClient, HttpMethod.GET, "/servers/detail", null,
+	        String.class);
+	    
+	    String responseImagesString = novaClient.execute(request);
+	    Servers servers;
+	    try {
+	      servers = OpenstackParser.parseToServers(responseImagesString);
+	    } catch (IOException e) {
+	      throw new RuntimeException(e);
+	    }
     
-    Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(tenantId));
-    novaClient.token(access.getToken().getId());
-
-    OpenStackRequest<String> request = new OpenStackRequest<String>(
-        novaClient, HttpMethod.GET, "/servers/detail", null,
-        String.class);
-    
-    String responseImagesString = novaClient.execute(request);
-    Servers servers;
-    try {
-      servers = this.openstackParser.parseToServers(responseImagesString);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    
-    return servers;
-  }
+	    return servers;
+	}
 	
 	
 	private Access getAccessWithTenantId() {
-		Keystone keystone = new Keystone(Utils.KEYSTONE_AUTH_URL,	new JerseyConnector());
+		Keystone keystone = new Keystone(KEYSTONE_AUTH_URL,	new JerseyConnector());
 		TokensResource tokens = keystone.tokens();
-		UsernamePassword credentials = new UsernamePassword(Utils.KEYSTONE_USERNAME,  Utils.KEYSTONE_PASSWORD);
-		Access access = tokens.authenticate(credentials).withTenantName(Utils.TENANT_NAME).execute();
+		UsernamePassword credentials = new UsernamePassword(KEYSTONE_USERNAME,  KEYSTONE_PASSWORD);
+		Access access = tokens.authenticate(credentials).withTenantName(TENANT_NAME).execute();
 		keystone.token(access.getToken().getId());
 
 		Tenants tenants = keystone.tenants().list().execute();
@@ -117,8 +158,8 @@ public class OpenstackClient {
 		if (tenants.getList().size() > 0) {
 			for (Iterator<Tenant> iterator = tenantsList.iterator(); iterator.hasNext();) {
 				Tenant tenant = (Tenant) iterator.next();
-				if (tenant.getName().compareTo(Utils.TENANT_NAME) == 0) {
-					tenantId = tenant.getId();
+				if (tenant.getName().compareTo(TENANT_NAME) == 0) {
+					TENANT_ID = tenant.getId();
 					break;
 				}
 			}
@@ -127,76 +168,74 @@ public class OpenstackClient {
 		}
 
 		TokenAuthentication tokenAuth = new TokenAuthentication(access.getToken().getId());
-		access = tokens.authenticate(tokenAuth).withTenantId(tenantId).execute();
+		access = tokens.authenticate(tokenAuth).withTenantId(TENANT_ID).execute();
 
 		return access;
 	}
 
-	public org.fiteagle.adapters.openstack.client.model.Server createServer(String imageId, String flavorId, String serverName, String keyPairName) {
+	public Server createServer(String imageId, String flavorId, String serverName, String keyPairName) {
 
 		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
-		org.fiteagle.adapters.openstack.client.model.ServerForCreate serverForCreate = new org.fiteagle.adapters.openstack.client.model.ServerForCreate();
+		ServerForCreate serverForCreate = new ServerForCreate();
 		serverForCreate.setName(serverName);
 		serverForCreate.setFlavorRef(flavorId);
 		serverForCreate.setImageRef(imageId);
 		serverForCreate.setKeyName(keyPairName);
-		SecurityGroup sGroup = new org.fiteagle.adapters.openstack.client.model.ServerForCreate.SecurityGroup("default");
+		SecurityGroup sGroup = new ServerForCreate.SecurityGroup("default");
 		serverForCreate.getSecurityGroups().add(sGroup);
 
-		List<org.fiteagle.adapters.openstack.client.model.ServerForCreate.Network> networkList = serverForCreate
+		List<ServerForCreate.Network> networkList = serverForCreate
 				.getNetworks();
-		org.fiteagle.adapters.openstack.client.model.ServerForCreate.Network net_demo = new org.fiteagle.adapters.openstack.client.model.ServerForCreate.Network();
+		ServerForCreate.Network net_demo = new ServerForCreate.Network();
 		
 		net_demo.setUuid(this.getNetworkId());
 		
 		networkList.add(net_demo);
 
-		OpenStackRequest<org.fiteagle.adapters.openstack.client.model.Server> createServerRequest = new OpenStackRequest<org.fiteagle.adapters.openstack.client.model.Server>(
+		OpenStackRequest<Server> createServerRequest = new OpenStackRequest<Server>(
 				novaClient,
 				HttpMethod.POST,
 				"/servers",
 				Entity.json(serverForCreate),
 				org.fiteagle.adapters.openstack.client.model.Server.class);
 		
-		org.fiteagle.adapters.openstack.client.model.Server responseServer = novaClient
-				.execute(createServerRequest);
+		Server responseServer = novaClient.execute(createServerRequest);
 		return responseServer;
 	}
 
 	public Server getServerDetails(String id) {
 		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
-				tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
+				TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
-		OpenStackRequest<org.fiteagle.adapters.openstack.client.model.Server> request = new OpenStackRequest<org.fiteagle.adapters.openstack.client.model.Server>(
+		OpenStackRequest<Server> request = new OpenStackRequest<Server>(
 				novaClient,
 				HttpMethod.GET,
 				new StringBuilder("/servers/").append(id).toString(),
 				null,
-				org.fiteagle.adapters.openstack.client.model.Server.class);
-		org.fiteagle.adapters.openstack.client.model.Server serverDetail = novaClient
-				.execute(request);
+				Server.class);
+		Server serverDetail = novaClient.execute(request);
 		return serverDetail;
 	}
 
 	public void allocateFloatingIpForServer(String serverId, String floatingIp) {
 		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
-				tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
+				TENANT_ID));
 		novaClient.token(access.getToken().getId());
 		
-		com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp action = new com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp(floatingIp);
+		ServerAction.AssociateFloatingIp action = new ServerAction.AssociateFloatingIp(floatingIp);
 		AssociateFloatingIp associateFloatingIp = new AssociateFloatingIp(serverId, action);
 		
 		@SuppressWarnings("unchecked")
-    OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp> request = new OpenStackRequest<com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp>(novaClient,
+    OpenStackRequest<ServerAction.AssociateFloatingIp> request = new OpenStackRequest<ServerAction.AssociateFloatingIp>(novaClient,
 				HttpMethod.POST,"/servers/"+serverId+"/action",
 				associateFloatingIp.json(action),
-				com.woorea.openstack.nova.model.ServerAction.AssociateFloatingIp.class);
+				ServerAction.AssociateFloatingIp.class);
 		
 		try {
 			novaClient.execute(request);
@@ -208,7 +247,7 @@ public class OpenstackClient {
 
 	public FloatingIpPools getFloatingIpPools(){
 		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 		
 		OpenStackRequest<FloatingIpPools> request = new OpenStackRequest<FloatingIpPools>(
@@ -222,7 +261,7 @@ public class OpenstackClient {
 		
 		String poolName="";
 		
-		if (Utils.FLOATINGIP_POOL_NAME.compareTo("")==0) {
+		if (FLOATINGIP_POOL_NAME.compareTo("")==0) {
 			List<FloatingIpPool> poolList = this.getFloatingIpPools().getList();
 			if (poolList!=null && poolList.size()>0) {
 				poolName = poolList.get(0).getName();
@@ -230,7 +269,7 @@ public class OpenstackClient {
 				throw new RuntimeException("there isn't any floating ip pool defined");
 			}
 		}else {
-			poolName = Utils.FLOATINGIP_POOL_NAME;
+			poolName = FLOATINGIP_POOL_NAME;
 		}
 		
 		Map<String, String> body = new HashMap<String, String>();
@@ -238,7 +277,7 @@ public class OpenstackClient {
 		Entity<Map<String, String>> entity = Entity.json(body);
 		
 		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 		
 		OpenStackRequest<FloatingIp> request = new OpenStackRequest<FloatingIp>(
@@ -251,8 +290,8 @@ public class OpenstackClient {
 	public void addKeyPair(String name, String publicKey){
 		Access access = getAccessWithTenantId();
 
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
-				tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
+				TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
 		novaClient.keyPairs().create(name, publicKey).execute();
@@ -261,8 +300,8 @@ public class OpenstackClient {
 	public void deleteKeyPair(String name){
 		Access access = getAccessWithTenantId();
 
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
-				tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
+				TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
 		novaClient.keyPairs().delete(name).execute();
@@ -270,28 +309,28 @@ public class OpenstackClient {
 	
 	public void deleteServer(String id){
 		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(Utils.NOVA_ENDPOINT.concat("/").concat(
-				tenantId));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
+				TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
-		OpenStackRequest<org.fiteagle.adapters.openstack.client.model.Server> request = new OpenStackRequest<org.fiteagle.adapters.openstack.client.model.Server>(
+		OpenStackRequest<Server> request = new OpenStackRequest<Server>(
 				novaClient,
 				HttpMethod.DELETE,
 				new StringBuilder("/servers/").append(id).toString(),
 				null,
-				org.fiteagle.adapters.openstack.client.model.Server.class);
+				Server.class);
 		novaClient.execute(request);
 	}
 
 	public String getNetworkId() {
 		if(this.networkId==null || this.networkId.compareTo("")==0)
-			this.setNetworkId(getNetworkIdByName(Utils.NET_NAME));
+			this.setNetworkId(getNetworkIdByName(NET_NAME));
 		return networkId;
 	}
 
 	private String getNetworkIdByName(String networkName) {
 		Access access = getAccessWithTenantId();
-		Quantum quantum = new Quantum(Utils.NET_ENDPOINT);
+		Quantum quantum = new Quantum(NET_ENDPOINT);
 		
 		quantum.setTokenProvider(new OpenStackSimpleTokenProvider(access.getToken().getId()));
 		Networks networks = quantum.networks().list().execute();
@@ -308,4 +347,11 @@ public class OpenstackClient {
 		this.networkId = networkId;
 	}
 
+	public static String getKEYSTONE_ENDPOINT() {
+		return KEYSTONE_ENDPOINT;
+	}
+
+	public static String getGLANCE_ENDPOINT() {
+		return GLANCE_ENDPOINT;
+	}
 }

@@ -106,9 +106,10 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   private void addPropertiesToResource(Resource openstackInstance, Server server, String instanceName) {
     openstackInstance.addProperty(RDF.type, openstackResourceInstance);
-    openstackInstance.addProperty(RDFS.label, "Openstack: " + instanceName);
+    openstackInstance.addProperty(RDFS.label, "OpenstackVM: " + instanceName);
     openstackInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("Openstack Virtual Machine " + instanceName));
-//    openstackInstance.addLiteral(motorPropertyRPM, currentMotor.getRpm());
+    
+    //	TODO: properties
   }
 
   @Override

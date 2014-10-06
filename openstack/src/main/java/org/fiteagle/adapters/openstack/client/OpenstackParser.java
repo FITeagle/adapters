@@ -15,38 +15,34 @@ import com.woorea.openstack.nova.model.FloatingIp;
 
 public class OpenstackParser {
 
-	private JsonFactory factory = new JsonFactory();
-	private ObjectMapper mapper = new ObjectMapper(factory);
+	private static JsonFactory factory = new JsonFactory();
+	private static ObjectMapper mapper = new ObjectMapper(factory);
 
-	public Images parseToImages(String imagesString) throws JsonParseException,
+	public static Images parseToImages(String imagesString) throws JsonParseException,
 			JsonMappingException, IOException {
 
 		return mapper.readValue(imagesString, Images.class);
 	}
 
-	public FloatingIp parseToFloatingIp(String floatingIpString) throws JsonParseException,
+	public static FloatingIp parseToFloatingIp(String floatingIpString) throws JsonParseException,
 			JsonMappingException, IOException {
 
 		return mapper.readValue(floatingIpString, FloatingIp.class);
 	}
 
-	public Flavors parseToFlavors(String flavorsString)
+	public static Flavors parseToFlavors(String flavorsString)
 			throws JsonParseException, JsonMappingException, IOException {
 		return mapper.readValue(flavorsString, Flavors.class);
 	}
 
-	public Server parseToServer(String serverString) throws JsonParseException,
+	public static Server parseToServer(String serverString) throws JsonParseException,
 			JsonMappingException, IOException {
-		Server server = mapper
-				.readValue(
-						serverString,
-						org.fiteagle.adapters.openstack.client.model.Server.class);
+		Server server = mapper.readValue(serverString, Server.class);
 		return server;
 	}
-	
-	public Servers parseToServers(String serversString)
-      throws JsonParseException, JsonMappingException, IOException {
-    return mapper.readValue(serversString, Servers.class);
-  }
 
+	public static Servers parseToServers(String serversString)
+      throws JsonParseException, JsonMappingException, IOException {
+		return mapper.readValue(serversString, Servers.class);
+	}
 }

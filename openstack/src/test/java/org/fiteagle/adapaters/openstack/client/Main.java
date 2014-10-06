@@ -1,11 +1,9 @@
 package org.fiteagle.adapaters.openstack.client;
 
-import org.fiteagle.adapters.openstack.OpenstackVMAdapter;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.model.Image;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
-import org.fiteagle.adapters.openstack.client.model.Servers;
 
 import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.Flavors;
@@ -18,16 +16,15 @@ public class Main {
 	
 	public static void main(String[] args) {
 		
-		new OpenstackVMAdapter();
-		OpenstackClient client = new OpenstackClient();
+		OpenstackClient client = OpenstackClient.getInstance();
 		
-		Servers servers = client.listServers();
-		for(Server server : servers.getList()){
-		  System.out.println(server);
-		}
+//		Servers servers = client.listServers();
+//		for(Server server : servers.getList()){
+//		  System.out.println(server);
+//		}
 		
 //		listFlavors(client);
-//		listImages(client);
+		listImages(client);
 //		getServerDetail(client);
 //		Server server = client.createServer(imageId, flavorId, serverName, keyPairName);
 //		client.deleteServer(server.getId());
