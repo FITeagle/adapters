@@ -44,19 +44,19 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                 
                       
                   if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_CREATE)) {
-                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a create message");
+                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getName() + " : Received a create message");
                       result = responseCreate(modelMessage, requestMessage.getJMSCorrelationID());
   
                   } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_CONFIGURE)) {
-                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a configure message");
+                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getName() + " : Received a configure message");
                       result = responseConfigure(modelMessage, requestMessage.getJMSCorrelationID());
   
                   } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_RELEASE)) {
-                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a release message");
+                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getName() + " : Received a release message");
                       result = responseRelease(modelMessage, requestMessage.getJMSCorrelationID());
                       
                   } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_INFORM)) {
-                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a inform message");
+                      AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getName() + " : Received a inform message");
                       responseInform(modelMessage, requestMessage.getJMSCorrelationID());
                       
                   }
@@ -65,7 +65,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                 
                 // DISCOVER message needs not to check for adapterIsRecipient()
                 if (modelMessage != null && requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
-                    AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.toString() + " : Received a discover message");
+                    AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getName() + " : Received a discover message");
                     result = responseDiscover(modelMessage);
                 }
                 
