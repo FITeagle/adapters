@@ -20,3 +20,5 @@
 # :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedMotorAdapter1.
 
 # :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedStopwatchAdapter1.
+
+# :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedOpenstackAdapter.
