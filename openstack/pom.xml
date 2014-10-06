@@ -20,11 +20,6 @@
       <version>0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
-      <groupId>org.fiteagle.adapters</groupId>
-      <artifactId>common</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>com.woorea</groupId>
       <artifactId>nova-client</artifactId>
       <version>3.0.0</version>
@@ -58,11 +53,6 @@
       <groupId>com.woorea</groupId>
       <artifactId>keystone-client</artifactId>
       <version>3.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>net.iharder</groupId>
-      <artifactId>base64</artifactId>
-      <version>2.3.8</version>
     </dependency>
   </dependencies>
 

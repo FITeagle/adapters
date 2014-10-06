@@ -23,8 +23,8 @@ public class Main {
 //		  System.out.println(server);
 //		}
 		
-//		listFlavors(client);
-		listImages(client);
+		listFlavors(client);
+//		listImages(client);
 //		getServerDetail(client);
 //		Server server = client.createServer(imageId, flavorId, serverName, keyPairName);
 //		client.deleteServer(server.getId());

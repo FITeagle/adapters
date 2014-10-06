@@ -3,6 +3,7 @@ package org.fiteagle.adapters.openstack;
 import java.util.List;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
@@ -20,11 +21,12 @@ public class OpenstackAdapter extends AbstractAdapter {
   private static final String[] ADAPTER_SPECIFIC_PREFIX = { "openstack", "http://fiteagle.org/ontology/adapter/openstack#" };
   private static final String RESOURCE_INSTANCE_NAME = "OpenstackVM";
   private static final String ADAPTER_CLASS_NAME = "OpenstackAdapter";
-  
-  private static OpenstackAdapter openstackAdapterSingleton;
 
   private Resource openstackResourceInstance;
   
+  private OpenstackClient openstackClient;
+  
+  private static OpenstackAdapter openstackAdapterSingleton;
   public static OpenstackAdapter getInstance(){
     if(openstackAdapterSingleton == null){
       openstackAdapterSingleton = new OpenstackAdapter();
@@ -33,7 +35,8 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   private OpenstackAdapter(){
-
+    openstackClient = OpenstackClient.getInstance();
+	  
     adapterName = "ADeployedOpenstackAdapter";
     
     modelGeneral = ModelFactory.createDefaultModel();
@@ -77,8 +80,12 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   @Override
   public Object handleCreateInstance(String instanceName) {
-    // TODO Auto-generated method stub
-    return null;
+//    String imageId_ubuntu = "7bef2175-b4cd-4302-be23-dbeb35b41702";
+    String imageId_centos = "c8ff1a3d-e475-49e7-a72a-da775a8a8e4e";
+    String flavorId_tiny = "1"; 
+    String keyPairName = "mitja_tub";
+    Server newServer = openstackClient.createServer(imageId_centos, flavorId_tiny, instanceName, keyPairName);
+    return newServer;
   }
 
   @Override
@@ -88,8 +95,12 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   @Override
   public Model handleMonitorInstance(String instanceName, Model modelInstances) {
-    // TODO Auto-generated method stub
-    return null;
+    Server currentServer = (Server) instanceList.get(instanceName);
+
+    Resource serverInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
+    addPropertiesToResource(serverInstance, currentServer, instanceName);
+
+    return modelInstances;
   }
 
   @Override

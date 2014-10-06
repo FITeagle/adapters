@@ -1,0 +1,8 @@
+@prefix fiteagle: <http://fiteagle.org/ontology#> .
+@prefix openstack: <http://fiteagle.org/ontology/adapter/openstack#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://fiteagleinternal#> .
+
+:ADeployedOpenstackAdapter rdf:type openstack:OpenstackAdapter .
+
+:OpenstackVM1 rdf:type openstack:OpenstackVM .
