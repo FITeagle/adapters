@@ -41,7 +41,6 @@
 		<module>abstract</module>
 		<module>motor</module>
 		<module>mightyrobot</module>
-		<module>fuseco</module>
 		<module>common</module>
 		<module>epcClient</module>
 		<module>epcMeasurementServer</module>
