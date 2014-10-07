@@ -2,3 +2,25 @@ target/
 .classpath
 .project
 .settings/
+.idea/
+
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+*~

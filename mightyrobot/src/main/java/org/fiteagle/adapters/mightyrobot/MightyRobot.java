@@ -1,71 +1,82 @@
 package org.fiteagle.adapters.mightyrobot;
 
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import java.util.Random;
 
-@Path("/")
-public class MightyRobot{
 
-	@GET
-	@Path("/description.ttl")
-	@Produces("text/plain")
-	public String getDescription(){
-		
-		return MRHandler.getDescription();
-	
-	} 
-	
-	@GET
-	@Path("/instances.ttl")
-	@Produces("text/plain")
-	public String getInstances(){
-		
-		return MRHandler.getInstances();
+public class MightyRobot {
 
+
+    private boolean dancing;
+	private boolean exploded;
+    private int headRotation;
+    private String nickname;
+
+    private MightyRobotAdapter owningAdapter;
+    private String instanceName;
+    
+    private String[] nicknames = {"Mecha", "RD5000", "Robocop", "R2-D2", "C3-PO"};
+
+	public MightyRobot(MightyRobotAdapter owningAdapter, String instanceName) {
+    
+        this.dancing = false;
+        this.exploded = false;
+        this.headRotation = 0;
+        this.nickname = nicknames[new Random().nextInt(nicknames.length)];
+        this.owningAdapter = owningAdapter;
+        this.instanceName = instanceName;
+    }
+    
+    public String toString(){
+        String reply = "";
+    	if (this.getExploded()){
+    		reply = "Might Robot " + this.nickname + " exploded due to unforeseen circumstances. Sorry about that.";
+    	} else {
+    		reply = "Mighty Robot " + this.nickname + " bids you a fond welcome. The robot is currently " 
+    				+ (this.getDancing() ? "" : "not ")
+    				+ "dancing, with its head turned by " + this.getHeadRotation() + " Degrees.";
+    	}
+        return reply;
+    }
+ 
+    public boolean getExploded() {
+		return exploded;
+	}
+
+	public void setExploded(boolean exploded) {
+		this.exploded = exploded;
+	}
+
+	public boolean getDancing() {
+		return dancing;
+	}
+
+	public void setDancing(Boolean dancing) {
+		this.dancing = dancing;
+	}
+
+	public int getHeadRotation() {
+		return headRotation;
+	}
+
+	public void setHeadRotation(int headRotation) {
+		this.headRotation = headRotation % 360;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public MightyRobotAdapter getOwningAdapter() {
+		return owningAdapter;
 	}
 	
-	@GET
-	@Path("/instance/{instanceName}/description.ttl")
-	@Produces("text/plain")
-	public String getInstanceDescription(@PathParam("instanceName") String instanceName){
-		
-		return "Description for instance " + instanceName + " is\n" + MRHandler.getInstanceDescription(instanceName);
-		
+    public String getInstanceName() {
+		return instanceName;
 	}
-	
-	@POST
-	@Path("/instance/{instanceName}")
-	public String provisionInstance(@PathParam("instanceName") String instanceName){
 
-		
-		return (MRHandler.provisionInstance(instanceName)) ? 
-				"Instance " + instanceName + " provisioned.\n" : 
-				"Instance " + instanceName + " not provisioned. Invalid name or already exists.\n";
-
-	}
-	
-	@PUT
-	@Path("/instance/{instanceName}/description.ttl")
-	@Produces("text/plain")
-	public String putInstanceDescription(@PathParam("instanceName") String instanceName, @FormParam("Description") String description){
-		
-		return MRHandler.putInstanceDescription(instanceName, description);
-		
-	}	
-	
-	@DELETE
-	@Path("/instance/{instanceName}")
-	public String deleteInstance(@PathParam("instanceName") String instanceName){
-
-		return (MRHandler.deleteInstance(instanceName)) ?
-			"Instance " + instanceName + " deleted.\n" : 
-			"Instance " + instanceName + " not deleted. Does not exist.\n";
-
-	}
 }
+

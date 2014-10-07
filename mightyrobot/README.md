@@ -1,52 +1,59 @@
 FITeagle :: Adapter :: MightyRobot
 =============================
-- Author: Alexander Willner & Franco le Herrmann de la Technische Universität in the city of Berlin
+- Dummy MightyRobot Adapter, low-feature descendant from Motor
 - Level: Demonstration
-- Technologies: JMS, EJB, MDB
-- Summary: Demonstrates the use of JMS 1.1 and EJB 3.1 Message-Driven Bean to implement a FITeagle Adapter for a mighty robot
+- Technologies: REST, Websockets, JMS
+- Summary: Prototype implementation of MightyRobot Adapter with REST using RestEasy in Wildfly Environment, as well as websockets and JMS messaging, working based on fiteagle ontology model
 - Target Product: FITeagle
 - Source: <https://github.com/fiteagle/adapters/>
-
-What is it?
------------
-
-This example demonstrates the use of *JMS 1.1* and *EJB 3.1 Message-Driven Bean* in WildFly to implement a FITeagle Adapter.
-It probably still does this, I don't get everything that's happening, yet. But it also simulates an epic robot now. YEAH!
 
 Build and Deploy the Adapter
 ----------------------------
 
-1. Make sure you have started the FITeagle environment (WildFly) ( ./bootstrap/fiteagle.sh startJ2EE )
-2. Open a command line and navigate to the root directory of this project. ( mightyrobot )
+1. Make sure you have started the FITeagle environment (WildFly).
+2. Open a command line and navigate to the root directory of this project.
 3. Type this command to build and deploy the archive:
 
-        mvn clean package wildfly:deploy
+        mvn clean verify wildfly:deploy
 
-4. This will deploy `target/mightyrobot.war` to the running instance of the server. Look at the JBoss Application Server console or Server log and you should see log messages corresponding to the deployment of the message-driven beans and the JMS destinations.
+4. This will deploy `target/AdapterMightyRobot.war` to the running instance of the server. Look at the JBoss Application Server console or Server log and you should see log messages corresponding to the deployment of the package.
 
 Access the Adapter
 ------------------
 
-The adapter will be running at the following URL: <http://localhost:8080/mightyrobot/> 
-If it's deployed it will pop up here http://localhost:9990/console/App.html#deployments
+Javascript Client is at:
 
-Available ressources:
+<http://localhost:8080/AdapterMightyRobot/test.html>
 
-Show adapter description
-curl -X GET http://localhost:8080/mightyrobot/api/description.ttl
+WebSocket is at:
 
-List all instances
-curl -X GET http://localhost:8080/mightyrobot/api/instances.ttl
+`ws://localhost:8080/AdapterMightyRobot/websocket`
 
-Add an instance
-curl -X POST http://localhost:8080/mightyrobot/api/instance/INSTANCENAME
-Delete an instance
-curl -X DELETE http://localhost:8080/mightyrobot/api/instance/INSTANCENAME
+REST is at:
 
-Put Description of an instance
-curl -X PUT -d "Description=DESCRIPTIONTEXT" http://localhost:8080/mightyrobot/api/instance/INSTANCENAME/description.ttl
-Query Description of an instance
-curl -X GET http://localhost:8080/mightyrobot/api/instance/INSTANCENAME/description.ttl
+<http://localhost:8080/AdapterMightyRobot/api/>
+
+
+Test the adapter with the following commands
+
+ * Describe:
+`curl -X GET http://localhost:8080/AdapterMightyRobot/api/description.ttl`
+
+ * Provision:
+`curl -X GET http://localhost:8080/AdapterMightyRobot/api/instances.ttl`
+
+ * Provision (create instance):
+`curl -X POST http://localhost:8080/AdapterMightyRobot/api/instance/1`
+
+ * Monitor:
+`curl -X GET http://localhost:8080/AdapterMightyRobot/api/instance/1/description.ttl`
+
+ * Control (file is path to local input ttl file that needs to be supplied)
+`curl -v -X PUT -F file=@"input.ttl" http://localhost:8080/AdapterMightyRobot/api/instance/1/description.ttl`
+
+ * Terminate:
+`curl -X DELETE http://localhost:8080/AdapterMightyRobot/api/instance/1`
+
 
 Undeploy the Adapter
 --------------------
@@ -56,3 +63,4 @@ Undeploy the Adapter
 3. When you are finished testing, type this command to undeploy the adapter:
 
         mvn wildfly:undeploy
+

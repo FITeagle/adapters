@@ -1,0 +1,9 @@
+@prefix fiteagle: <http://fiteagle.org/ontology#> .
+@prefix motor: <http://fiteagle.org/ontology/adapter/motor#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix : <http://fiteagleinternal#> .
+
+:ADeployedMotorAdapter1 rdf:type motor:MotorGarageAdapter .
+
+:Motor1 rdf:type motor:Motor ;
+                            motor:isDynamic false .
