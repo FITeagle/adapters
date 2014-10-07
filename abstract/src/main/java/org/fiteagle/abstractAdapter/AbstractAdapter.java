@@ -134,22 +134,6 @@ public abstract class AbstractAdapter {
         return MessageBusMsgFactory.serializeModel(modelDiscover);
     }
 
-    public List<String> configureInstance(Statement configureStatement) {
-
-//        // create an empty model
-//        Model configureModel = ModelFactory.createDefaultModel();
-//
-//        InputStream is = new ByteArrayInputStream(controlInput.getBytes());
-//
-//        // read the RDF/XML file
-//        configureModel.read(is, null, serializationFormat);
-//
-//        // handling done by adapter, handleControlInstance has to be implemented by all subclasses!handleControlInstance
-//        return handleConfigureInstance(configureModel, requestID);
-        
-        return handleConfigureInstance(configureStatement);
-    }
-
     public void notifyListeners(Model eventRDF, String requestID) {
         for (AdapterEventListener name : listener) {
             name.rdfChange(eventRDF, requestID);
@@ -207,6 +191,8 @@ public abstract class AbstractAdapter {
         return modelPropertiesChanged;
     }
     
+    public abstract List<String> configureInstance(Statement configureStatement);
+    
     /**
      * Needs to return a new instance of the class this adapter is supposed to handle
      * 
@@ -232,9 +218,5 @@ public abstract class AbstractAdapter {
      */
     public abstract Model handleGetAllInstances(Model modelInstances);
 
-    
-    public abstract List<String> handleConfigureInstance(Statement configureStatement);
-   
-    
 
 }

@@ -151,7 +151,7 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
-    public List<String> handleConfigureInstance(Statement configureStatement) {
+    public List<String> configureInstance(Statement configureStatement) {
 
         Resource currentResource = configureStatement.getSubject();
         String instanceName = currentResource.getLocalName();

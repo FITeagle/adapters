@@ -149,7 +149,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
     }  	
 
     @Override
-    public List<String> handleConfigureInstance(Statement configureStatement) {
+    public List<String> configureInstance(Statement configureStatement) {
         // TODO Auto-generated method stub
 
         Resource currentResource = configureStatement.getSubject();
