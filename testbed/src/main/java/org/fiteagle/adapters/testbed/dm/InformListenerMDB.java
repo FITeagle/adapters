@@ -73,7 +73,7 @@ public class InformListenerMDB implements MessageListener {
         return false;
     }
 
-    private com.hp.hpl.jena.rdf.model.Resource getAdapterInstance(Model messageModel) {
+    private Resource getAdapterInstance(Model messageModel) {
         StmtIterator adapterIterator = messageModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
         while (adapterIterator.hasNext()) {
             Statement currentStatement = adapterIterator.next();
