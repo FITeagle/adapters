@@ -20,7 +20,6 @@ public class StopWatchAdapterDynamic implements IStopWatchAdapterDynamic{
     
     private StopWatchAdapter adapter;
     
-    @SuppressWarnings("unused")
     @PostConstruct
     private void init(){
         instanceThreadList = new HashMap<String, Thread>(); 

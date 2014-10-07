@@ -24,7 +24,6 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
     
     private MotorAdapter adapter;
     
-    @SuppressWarnings("unused")
     @PostConstruct
     private void init(){
         instanceThreadList = new HashMap<String, Thread>(); 
