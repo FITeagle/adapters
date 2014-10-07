@@ -47,5 +47,6 @@
 		<module>epcMeasurementServer</module>
 		<module>testbed</module>
 		<module>openstack</module>
+		<module>stopwatch</module>
 	</modules>
 </project>
