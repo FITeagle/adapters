@@ -51,11 +51,11 @@ public class OpenstackAdapter extends AbstractAdapter {
 
     openstackResourceInstance = modelGeneral.createResource(ADAPTER_SPECIFIC_PREFIX[1]+RESOURCE_INSTANCE_NAME);
     openstackResourceInstance.addProperty(RDF.type, OWL.Class);
-    openstackResourceInstance.addProperty(RDFS.subClassOf, modelGeneral.createResource(FITEAGLE_ONTOLOGY_PREFIX+"Resource"));
+    openstackResourceInstance.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classResource);
 
     adapterType = modelGeneral.createResource(ADAPTER_SPECIFIC_PREFIX[1]+ADAPTER_CLASS_NAME);
     adapterType.addProperty(RDF.type, OWL.Class);
-    adapterType.addProperty(RDFS.subClassOf, modelGeneral.createResource(FITEAGLE_ONTOLOGY_PREFIX+"Adapter"));
+    adapterType.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
 
     adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, openstackResourceInstance);
     adapterType.addProperty(RDFS.label, modelGeneral.createLiteral("OpenstackAdapterType ", "en"));
@@ -64,7 +64,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     openstackResourceInstance.addProperty(RDFS.label, modelGeneral.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
     
     //TODO: properties
-   
+    
     adapterInstance = modelGeneral.createResource("http://fiteagleinternal#" + adapterName);
     adapterInstance.addProperty(RDF.type, adapterType);
     adapterInstance.addProperty(RDFS.label, modelGeneral.createLiteral("A deployed openstack adapter named: " + adapterName, "en"));
