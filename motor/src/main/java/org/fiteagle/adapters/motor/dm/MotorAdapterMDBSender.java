@@ -11,9 +11,9 @@ import org.fiteagle.adapters.motor.MotorAdapter;
 @Startup
 public class MotorAdapterMDBSender extends AbstractAdapterMDBSender {
 
+    @Override
     @PostConstruct
-     protected void startup() {  
-        super.adapter = MotorAdapter.getInstance();
-        super.startup();       
+    protected void startup() {  
+      startup(MotorAdapter.getInstance());       
     }
 }

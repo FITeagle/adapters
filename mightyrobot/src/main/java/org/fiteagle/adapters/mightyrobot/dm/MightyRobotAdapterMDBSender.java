@@ -11,10 +11,10 @@ import org.fiteagle.adapters.mightyrobot.MightyRobotAdapter;
 @Startup
 public class MightyRobotAdapterMDBSender extends AbstractAdapterMDBSender {
 
+    @Override
     @PostConstruct
-     protected void startup() {  
-        super.adapter = MightyRobotAdapter.getInstance();
-        super.startup();       
+    protected void startup() {  
+      startup(MightyRobotAdapter.getInstance());       
     }
 }
 

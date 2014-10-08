@@ -20,8 +20,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBSender {
     
-	// Subclasses need to set this to the appropriate Adapter to work!
-    protected AbstractAdapter adapter = null;
+    private AbstractAdapter adapter;
     
     private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBSender.class.toString());
     
@@ -30,16 +29,20 @@ public abstract class AbstractAdapterMDBSender {
     @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
     private Topic topic;
 
-    protected void startup() {
-        adapter.addChangeListener(new AdapterEventListener() {
-            
-            @Override
-            public void rdfChange(Model eventRDF, String requestID) {
-                sendInformMessage(eventRDF, requestID);                
-            }
-        });
+    protected void startup(AbstractAdapter adapter) {
+      this.adapter = adapter;
+
+      adapter.addChangeListener(new AdapterEventListener() {
+
+        @Override
+        public void rdfChange(Model eventRDF, String requestID) {
+            sendInformMessage(eventRDF, requestID);                
+        }
+      });
     }
 
+    protected abstract void startup();
+    
     public void sendInformMessage(Model eventRDF, String requestID) {
         try {
             

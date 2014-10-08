@@ -11,9 +11,9 @@ import org.fiteagle.adapters.stopwatch.StopWatchAdapter;
 @Startup
 public class StopWatchAdapterMDBSender extends AbstractAdapterMDBSender {
 
+    @Override
     @PostConstruct
      protected void startup() {  
-        super.adapter = StopWatchAdapter.getInstance();
-        super.startup();       
+        startup(StopWatchAdapter.getInstance());       
     }
 }

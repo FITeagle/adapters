@@ -11,9 +11,9 @@ import org.fiteagle.adapters.openstack.OpenstackAdapter;
 @Startup
 public class OpenstackAdapterMDBSender extends AbstractAdapterMDBSender{
   
+  @Override
   @PostConstruct
   protected void startup() {  
-     super.adapter = OpenstackAdapter.getInstance();
-     super.startup();   
+     startup(OpenstackAdapter.getInstance());   
   }
 }
