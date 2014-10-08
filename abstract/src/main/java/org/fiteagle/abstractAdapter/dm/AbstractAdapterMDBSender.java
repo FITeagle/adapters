@@ -65,7 +65,6 @@ public abstract class AbstractAdapterMDBSender {
             eventMessage.setStringProperty(IMessageBus.SERIALIZATION, IMessageBus.SERIALIZATION_DEFAULT);
             
             this.context.createProducer().send(topic, eventMessage);
-            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Sent inform message with adapter description");
         } catch (JMSException e) {
             System.err.println("JMSException in AbstractAdapterMDBSender");
         }
