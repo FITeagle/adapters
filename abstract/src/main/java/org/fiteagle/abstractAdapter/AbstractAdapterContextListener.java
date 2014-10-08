@@ -35,9 +35,6 @@ public abstract class AbstractAdapterContextListener implements ServletContextLi
     
     getAdapter().registerAdapter();
     
-    // At this point maybe some parameters of the adapter itself should be restored as well?!
-    // getAdapter().restoreAdapterParameters();
-    
     try {
       restoreState();
     } catch (JMSException e) {
