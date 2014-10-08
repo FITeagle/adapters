@@ -6,12 +6,11 @@ import javax.servlet.annotation.WebListener;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapterContextListener;
 
-
 @WebListener
 public class MotorAdapterContextListener extends AbstractAdapterContextListener {
 
   @Override
-  protected AbstractAdapter getAdapterInstance() {
+  protected AbstractAdapter getAdapter() {
     return MotorAdapter.getInstance();
   }
     

@@ -11,7 +11,7 @@ import org.fiteagle.abstractAdapter.AbstractAdapterContextListener;
 public class StopWatchAdapterContextListener extends AbstractAdapterContextListener {
 
   @Override
-  protected AbstractAdapter getAdapterInstance() {
+  protected AbstractAdapter getAdapter() {
     return StopWatchAdapter.getInstance();
   }
     

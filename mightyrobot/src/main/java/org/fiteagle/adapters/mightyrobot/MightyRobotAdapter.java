@@ -3,9 +3,6 @@ package org.fiteagle.adapters.mightyrobot;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.ejb.Startup;
-import javax.enterprise.context.ApplicationScoped;
-
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
@@ -20,8 +17,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
-@ApplicationScoped
-@Startup
 public class MightyRobotAdapter extends AbstractAdapter{
 
 	private String [] adapterSpecificPrefix = {"mightyrobot", "http://fiteagle.org/ontology/adapter/mightyrobot#"};
