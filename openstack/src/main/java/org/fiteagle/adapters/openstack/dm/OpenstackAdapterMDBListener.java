@@ -1,9 +1,10 @@
 package org.fiteagle.adapters.openstack.dm;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
 import org.fiteagle.adapters.openstack.OpenstackAdapterRDFHandler;
@@ -14,9 +15,13 @@ import org.fiteagle.api.core.IMessageBus;
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class OpenstackAdapterMDBListener extends AbstractAdapterMDBListener {
   
-  @PostConstruct
-  public void setup() {
-      this.adapterRDFHandler = OpenstackAdapterRDFHandler.getInstance();
-      this.adapter = OpenstackAdapter.getInstance();
+  @Override
+  protected AbstractAdapter getAdapter() {
+    return OpenstackAdapter.getInstance();
+  }
+
+  @Override
+  protected AbstractAdapterRDFHandler getAdapterRDFHandler() {
+    return OpenstackAdapterRDFHandler.getInstance();
   }
 }

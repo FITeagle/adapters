@@ -24,13 +24,13 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
 
     private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBListener.class.toString());
 
-    protected AbstractAdapterRDFHandler adapterRDFHandler;
-    protected AbstractAdapter adapter;
-
     @Inject
     private JMSContext context;
     @Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
     private Topic topic;
+    
+    protected abstract AbstractAdapter getAdapter();
+    protected abstract AbstractAdapterRDFHandler getAdapterRDFHandler();
     
     public void onMessage(final Message requestMessage) {
         try {
@@ -86,9 +86,9 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         // This is a inform message, so do something with it
     	  // Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
         if (MessageBusMsgFactory.isMessageType(modelInform, MessageBusOntologyModel.propertyFiteagleInform) && 
-        		modelInform.contains(null, MessageBusOntologyModel.methodRestores, adapter.getAdapterInstance())) {  
+        		modelInform.contains(null, MessageBusOntologyModel.methodRestores, getAdapter().getAdapterInstance())) {  
             
-            return adapterRDFHandler.parseCreateModel(modelInform, jmsCorrelationID);                
+            return getAdapterRDFHandler().parseCreateModel(modelInform, jmsCorrelationID);                
 
         }
 
@@ -99,7 +99,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelDiscover, MessageBusOntologyModel.propertyFiteagleDiscover)) {
             
-            return adapterRDFHandler.parseDiscoverModel(modelDiscover);
+            return getAdapterRDFHandler().parseDiscoverModel(modelDiscover);
         }
 
         return "Not a valid fiteagle:discover message \n\n";
@@ -108,7 +108,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseCreate(Model modelCreate, String jmsCorrelationID) throws JMSException {
         // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleCreate)) {            
-            return adapterRDFHandler.parseCreateModel(modelCreate, jmsCorrelationID);
+            return getAdapterRDFHandler().parseCreateModel(modelCreate, jmsCorrelationID);
         }
 
         return "Not a valid fiteagle:create message \n\n";
@@ -117,7 +117,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseConfigure(Model modelConfigure, String jmsCorrelationID) throws JMSException {
         // This is a configure message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
-            return adapterRDFHandler.parseConfigureModel(modelConfigure, jmsCorrelationID);
+            return getAdapterRDFHandler().parseConfigureModel(modelConfigure, jmsCorrelationID);
         }
         return "Not a valid fiteagle:configure message \n\n";
     }
@@ -125,7 +125,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseRelease(Model modelRelease, String jmsCorrelationID) throws JMSException {
         // This is a release message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
-            return adapterRDFHandler.parseReleaseModel(modelRelease, jmsCorrelationID);
+            return getAdapterRDFHandler().parseReleaseModel(modelRelease, jmsCorrelationID);
         }
         
         return "Not a valid fiteagle:release message \n\n";
@@ -141,6 +141,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
     
     private boolean adapterIsRecipient(Model messageModel){
-        return messageModel.contains(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
+        return messageModel.contains(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
     }
 }

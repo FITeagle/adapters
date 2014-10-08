@@ -1,9 +1,10 @@
 package org.fiteagle.adapters.motor.dm;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.motor.MotorAdapter;
 import org.fiteagle.adapters.motor.MotorAdapterRDFHandler;
@@ -14,9 +15,14 @@ import org.fiteagle.api.core.IMessageBus;
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class MotorAdapterMDBListener extends AbstractAdapterMDBListener {
 
-    @PostConstruct
-    public void setup() {
-        this.adapterRDFHandler = MotorAdapterRDFHandler.getInstance();
-        this.adapter = MotorAdapter.getInstance();
+    @Override
+    protected AbstractAdapter getAdapter() {
+      return MotorAdapter.getInstance();
     }
+
+    @Override
+    protected AbstractAdapterRDFHandler getAdapterRDFHandler() {
+      return MotorAdapterRDFHandler.getInstance();
+    }
+    
 }

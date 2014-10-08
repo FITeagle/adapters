@@ -1,9 +1,10 @@
 package org.fiteagle.adapters.stopwatch.dm;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.stopwatch.StopWatchAdapter;
 import org.fiteagle.adapters.stopwatch.StopWatchAdapterRDFHandler;
@@ -14,9 +15,13 @@ import org.fiteagle.api.core.IMessageBus;
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class StopWatchAdapterMDBListener extends AbstractAdapterMDBListener {
 
-    @PostConstruct
-    public void setup() {
-        this.adapterRDFHandler = StopWatchAdapterRDFHandler.getInstance();
-        this.adapter = StopWatchAdapter.getInstance();
+    @Override
+    protected AbstractAdapter getAdapter() {
+      return StopWatchAdapter.getInstance();
+    }
+
+    @Override
+    protected AbstractAdapterRDFHandler getAdapterRDFHandler() {
+      return  StopWatchAdapterRDFHandler.getInstance();
     }
 }
