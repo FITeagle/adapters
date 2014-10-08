@@ -1,6 +1,8 @@
 package org.fiteagle.abstractAdapter.dm;
 
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.jms.JMSContext;
@@ -21,6 +23,8 @@ public abstract class AbstractAdapterMDBSender {
 	// Subclasses need to set this to the appropriate Adapter to work!
     protected AbstractAdapter adapter = null;
     
+    private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBSender.class.toString());
+    
     @Inject
     private JMSContext context;
     @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
@@ -33,7 +37,7 @@ public abstract class AbstractAdapterMDBSender {
             public void rdfChange(Model eventRDF, String requestID) {
                 sendInformMessage(eventRDF, requestID);                
             }
-        });        
+        });
     }
 
     public void sendInformMessage(Model eventRDF, String requestID) {
@@ -58,6 +62,7 @@ public abstract class AbstractAdapterMDBSender {
             eventMessage.setStringProperty(IMessageBus.SERIALIZATION, IMessageBus.SERIALIZATION_DEFAULT);
             
             this.context.createProducer().send(topic, eventMessage);
+            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Sent inform message with adapter description");
         } catch (JMSException e) {
             System.err.println("JMSException in AbstractAdapterMDBSender");
         }
