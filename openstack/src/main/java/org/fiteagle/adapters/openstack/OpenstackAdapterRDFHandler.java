@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.openstack;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 
 public class OpenstackAdapterRDFHandler extends AbstractAdapterRDFHandler {
@@ -7,7 +8,6 @@ public class OpenstackAdapterRDFHandler extends AbstractAdapterRDFHandler {
   private static OpenstackAdapterRDFHandler RDFHandlerSingleton;
 
   private OpenstackAdapterRDFHandler(){
-      super.adapter = OpenstackAdapter.getInstance();
   }
 
   public static synchronized OpenstackAdapterRDFHandler getInstance() {
@@ -15,6 +15,11 @@ public class OpenstackAdapterRDFHandler extends AbstractAdapterRDFHandler {
         RDFHandlerSingleton = new OpenstackAdapterRDFHandler();
       }
       return RDFHandlerSingleton;
+  }
+  
+  @Override
+  protected AbstractAdapter getAdapter() {
+    return OpenstackAdapter.getInstance();
   }
   
 }

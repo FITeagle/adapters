@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.motor;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 
 public class MotorAdapterRDFHandler extends AbstractAdapterRDFHandler {
@@ -7,7 +8,6 @@ public class MotorAdapterRDFHandler extends AbstractAdapterRDFHandler {
     private static MotorAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
 
     private MotorAdapterRDFHandler(){
-        super.adapter = MotorAdapter.getInstance();
     }
 
     public static synchronized MotorAdapterRDFHandler getInstance() {
@@ -17,4 +17,8 @@ public class MotorAdapterRDFHandler extends AbstractAdapterRDFHandler {
         return abstractAdapterRDFHandlerSingleton;
     }
 
+    @Override
+    protected AbstractAdapter getAdapter() {
+      return MotorAdapter.getInstance();
+    }
 }

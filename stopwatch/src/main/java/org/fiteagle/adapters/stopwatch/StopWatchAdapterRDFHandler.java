@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.stopwatch;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
 
 public class StopWatchAdapterRDFHandler extends AbstractAdapterRDFHandler {
@@ -7,7 +8,6 @@ public class StopWatchAdapterRDFHandler extends AbstractAdapterRDFHandler {
     private static StopWatchAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
 
     private StopWatchAdapterRDFHandler(){
-        super.adapter = StopWatchAdapter.getInstance();
     }
 
     public static synchronized StopWatchAdapterRDFHandler getInstance() {
@@ -17,4 +17,8 @@ public class StopWatchAdapterRDFHandler extends AbstractAdapterRDFHandler {
         return abstractAdapterRDFHandlerSingleton;
     }
 
+    @Override
+    protected AbstractAdapter getAdapter() {
+      return StopWatchAdapter.getInstance();
+    }
 }

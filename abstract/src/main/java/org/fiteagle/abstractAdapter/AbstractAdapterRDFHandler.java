@@ -19,16 +19,16 @@ public abstract class AbstractAdapterRDFHandler {
 
     private static Logger LOGGER = Logger.getLogger(AbstractAdapterRDFHandler.class.toString());
 
-    protected AbstractAdapter adapter;
-
+    protected abstract AbstractAdapter getAdapter();
+    
     private StmtIterator getResourceInstanceIterator(Model model) {
-        return model.listStatements(new SimpleSelector(null, RDF.type, adapter.getAdapterManagedResource()));
+        return model.listStatements(new SimpleSelector(null, RDF.type, getAdapter().getAdapterManagedResource()));
     }
 
     public String parseCreateModel(Model modelCreate, String requestID) {
 
         Model createdInstancesModel = ModelFactory.createDefaultModel();
-        adapter.setModelPrefixes(createdInstancesModel);
+        getAdapter().setModelPrefixes(createdInstancesModel);
 
         StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelCreate);
 
@@ -41,9 +41,9 @@ public abstract class AbstractAdapterRDFHandler {
             String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
             AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Creating instance: " + instanceName + " (" + currentResourceInstanceStatement.toString() + ")");
 
-            if (adapter.createInstance(instanceName)) {
+            if (getAdapter().createInstance(instanceName)) {
                 // Configure additional parameters directly after creation
-                adapter.configureInstance(currentResourceInstanceStatement);
+                getAdapter().configureInstance(currentResourceInstanceStatement);
                 Model createdInstanceValues = createInformRDF(instanceName);
                 createdInstancesModel.add(createdInstanceValues);
             }
@@ -53,7 +53,7 @@ public abstract class AbstractAdapterRDFHandler {
             return IMessageBus.STATUS_400;
         }
 
-        adapter.notifyListeners(createdInstancesModel, requestID);
+        getAdapter().notifyListeners(createdInstancesModel, requestID);
 
         return IMessageBus.STATUS_200;
     }
@@ -70,8 +70,8 @@ public abstract class AbstractAdapterRDFHandler {
             String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
             AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Releasing instance: " + instanceName + " (" + currentResourceInstanceStatement.toString() + ")");
 
-            if (adapter.terminateInstance(instanceName)) {
-                adapter.notifyListeners(createInformReleaseRDF(instanceName), requestID);
+            if (getAdapter().terminateInstance(instanceName)) {
+                getAdapter().notifyListeners(createInformReleaseRDF(instanceName), requestID);
                 return IMessageBus.STATUS_200;
             }
         }
@@ -88,7 +88,7 @@ public abstract class AbstractAdapterRDFHandler {
             String instanceName = currentInstanceStatement.getSubject().getLocalName();
             AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Discovering instance: " + instanceName + " (" + currentInstanceStatement.toString() + ")");
 
-            String response = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
+            String response = getAdapter().monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
             if (response.isEmpty()) {
                 return IMessageBus.STATUS_404;
             } else {
@@ -96,13 +96,13 @@ public abstract class AbstractAdapterRDFHandler {
             }
         }
         // No specific instance requested, show all
-        return this.adapter.getDiscoverAll(IMessageBus.SERIALIZATION_DEFAULT);
+        return getAdapter().getDiscoverAll(IMessageBus.SERIALIZATION_DEFAULT);
     }
 
     public String parseConfigureModel(Model modelConfigure, String requestID) {
 
         Model changedInstancesModel = ModelFactory.createDefaultModel();
-        adapter.setModelPrefixes(changedInstancesModel);
+        getAdapter().setModelPrefixes(changedInstancesModel);
 
         StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelConfigure);
 
@@ -116,8 +116,8 @@ public abstract class AbstractAdapterRDFHandler {
 
             AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Configuring instance: " + currentConfigureStatement.getSubject().getLocalName() + " (" + currentConfigureStatement.toString() + ")");
 
-            List<String> updatedProperties = adapter.configureInstance(currentConfigureStatement);
-            Model changedInstanceValues = adapter.createInformConfigureRDF(instanceName, updatedProperties);
+            List<String> updatedProperties = getAdapter().configureInstance(currentConfigureStatement);
+            Model changedInstanceValues = getAdapter().createInformConfigureRDF(instanceName, updatedProperties);
             changedInstancesModel.add(changedInstanceValues);
         }
 
@@ -125,23 +125,23 @@ public abstract class AbstractAdapterRDFHandler {
             return IMessageBus.STATUS_404;
         }
 
-        adapter.notifyListeners(changedInstancesModel, requestID);
+        getAdapter().notifyListeners(changedInstancesModel, requestID);
 
         return IMessageBus.STATUS_200;
     }
 
     public Model createInformRDF(String instanceName) {
-        return adapter.getSingleInstanceModel(instanceName);
+        return getAdapter().getSingleInstanceModel(instanceName);
     }
 
     public Model createInformReleaseRDF(String instanceName) {
 
         Model modelInstances = ModelFactory.createDefaultModel();
 
-        adapter.setModelPrefixes(modelInstances);
+        getAdapter().setModelPrefixes(modelInstances);
 
         Resource releaseInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
-        modelInstances.add(adapter.getAdapterInstance(), MessageBusOntologyModel.methodReleases, releaseInstance);
+        modelInstances.add(getAdapter().getAdapterInstance(), MessageBusOntologyModel.methodReleases, releaseInstance);
 
         return modelInstances;
     }
