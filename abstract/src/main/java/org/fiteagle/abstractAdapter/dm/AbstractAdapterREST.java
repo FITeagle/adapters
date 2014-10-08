@@ -1,7 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
 import javax.annotation.PostConstruct;
-import javax.naming.NamingException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -41,7 +40,7 @@ public abstract class AbstractAdapterREST {
     private AbstractAdapter abstractAdapter;
 
     @PostConstruct
-    public void setup() throws NamingException {
+    public void setup() {
         // this.abstractAdapterEJB = (IAbstractAdapter) new InitialContext().lookup("java:module/AbstractAdapter");
         this.abstractAdapter = handleSetup();
     }
@@ -167,55 +166,4 @@ public abstract class AbstractAdapterREST {
     public String monitorInstanceNTRIPLE(@PathParam("instanceName") String instanceName) {
         return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_NTRIPLE);
     }
-    
-    // TODO: Parse string and send rdf Model to RDF Handler class!
-    
-//    @PUT
-//    @Path("instance/{instanceName}/description.ttl")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Produces("text/html")
-//    public String controlInstanceTurtle(final String controlInput) {
-//        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_TURTLE, "");
-//    }
-//
-//
-//    @PUT
-//    @Path("instance/{instanceName}/description.rdf")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Produces("text/html")
-//    public String controlInstanceRDF(final String controlInput) {
-//        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_RDFXML, "");
-//    }
-//
-//    @PUT
-//    @Path("instance/{instanceName}/description.ntriple")
-//    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-//    @Produces("text/html")
-//    public String controlInstanceNTRIPLE(final String controlInput) {
-//        return abstractAdapter.configureInstance(controlInput, AbstractAdapter.PARAM_NTRIPLE, "");
-//    }
- 
-    
-    // TODO: Optional: Re-implement using RDF Handler class
-//    /**
-//     * Control adapter's instance property directly via REST
-//     * Good for testing
-//     * 
-//     * @param instanceName
-//     * @param paramProperty
-//     * @param paramValue
-//     * @return
-//     */
-//    @PUT
-//    @Path("instance/{instanceName}/{paramProperty}/{paramValue}")
-//    @Produces("text/html")
-//    public String controlInstanceProperty(@PathParam("instanceName") String instanceName,  @PathParam("paramProperty") String paramProperty,  @PathParam("paramValue") String paramValue) {
-//        String controlString = "@prefix :      <http://fiteagle.org/ontology/adapter/motor#> .\n";
-//        controlString += "@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .\n";
-//        controlString += "@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .\n";
-//        controlString += ":m" + instanceName + "     a             :MotorResource ;\n";
-//        controlString += "rdfs:label    \"" + instanceName + "\" ;\n";
-//        controlString += ":" + paramProperty + "          \"" + paramValue + "\"^^xsd:long .\n";
-//        return abstractAdapter.configureInstance(controlString, AbstractAdapter.PARAM_TURTLE, "");
-//    }
 }
