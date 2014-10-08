@@ -2,18 +2,16 @@ package org.fiteagle.adapters.mightyrobot;
 
 
 import javax.servlet.annotation.WebListener;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapterContextListener;
 
 @WebListener
-public class MightyRobotAdapterContextListener implements ServletContextListener {
-    
-  public void contextInitialized(ServletContextEvent event) {
-      // see StateRestorator Class
-  }
+public class MightyRobotAdapterContextListener extends AbstractAdapterContextListener {
 
-  public void contextDestroyed(ServletContextEvent event) {
-      MightyRobotAdapter.getInstance().deregisterAdapter();
+  @Override
+  protected AbstractAdapter getAdapterInstance() {
+    return MightyRobotAdapter.getInstance();
   }
+    
 }

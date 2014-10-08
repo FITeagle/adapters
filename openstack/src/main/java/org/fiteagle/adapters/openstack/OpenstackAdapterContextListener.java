@@ -2,20 +2,16 @@ package org.fiteagle.adapters.openstack;
 
 
 import javax.servlet.annotation.WebListener;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapterContextListener;
 
 
 @WebListener
-public class OpenstackAdapterContextListener implements ServletContextListener {
-    
-  @Override
-  public void contextInitialized(ServletContextEvent event) {
-      // see StateRestorator Class
-  }
+public class OpenstackAdapterContextListener extends AbstractAdapterContextListener{
 
   @Override
-  public void contextDestroyed(ServletContextEvent event) {
-      OpenstackAdapter.getInstance().deregisterAdapter();
+  protected AbstractAdapter getAdapterInstance() {
+    return OpenstackAdapter.getInstance();
   }
 }

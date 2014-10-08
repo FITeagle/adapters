@@ -2,18 +2,17 @@ package org.fiteagle.adapters.stopwatch;
 
 
 import javax.servlet.annotation.WebListener;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapterContextListener;
 
 
 @WebListener
-public class StopWatchAdapterContextListener implements ServletContextListener {
-    
-  public void contextInitialized(ServletContextEvent event) {
-      // see StateRestorator Class
-  }
+public class StopWatchAdapterContextListener extends AbstractAdapterContextListener {
 
-  public void contextDestroyed(ServletContextEvent event) {
-      StopWatchAdapter.getInstance().deregisterAdapter();
+  @Override
+  protected AbstractAdapter getAdapterInstance() {
+    return StopWatchAdapter.getInstance();
   }
+    
 }
