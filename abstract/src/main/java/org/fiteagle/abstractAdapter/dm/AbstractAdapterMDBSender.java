@@ -1,7 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
 import java.util.UUID;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -22,6 +21,7 @@ public abstract class AbstractAdapterMDBSender {
     
     private AbstractAdapter adapter;
     
+    @SuppressWarnings("unused")
     private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBSender.class.toString());
     
     @Inject
