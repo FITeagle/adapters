@@ -81,8 +81,6 @@ public abstract class AbstractAdapterRDFHandler {
     public String parseDiscoverModel(Model modelDiscover) {
         StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelDiscover);
 
-        AbstractAdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to discover...");
-
         Statement currentInstanceStatement = null;
         while (iteratorResourceInstance.hasNext()) {
             currentInstanceStatement = iteratorResourceInstance.nextStatement();

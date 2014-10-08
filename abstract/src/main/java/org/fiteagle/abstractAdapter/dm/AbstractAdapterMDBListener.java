@@ -42,7 +42,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                 
                 if(modelMessage != null && adapterIsRecipient(modelMessage)){
                 
-                      
                   if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_CREATE)) {
                       AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a create message");
                       result = responseCreate(modelMessage, requestMessage.getJMSCorrelationID());
@@ -58,9 +57,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                   } else if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_INFORM)) {
                       AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a inform message");
                       responseInform(modelMessage, requestMessage.getJMSCorrelationID());
-                      
                   }
-
                 }
                 
                 // DISCOVER message needs not to check for adapterIsRecipient()
@@ -68,7 +65,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                     AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a discover message");
                     result = responseDiscover(modelMessage);
                 }
-                
                 
                 if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200)) {
                     Message responseMessage = generateResponseMessage(requestMessage, result);
@@ -79,7 +75,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                     
                     this.context.createProducer().send(topic, responseMessage);
                 }
-
             }
 
         } catch (JMSException e) {
@@ -87,20 +82,9 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         }
     }
     
-    
     public String responseInform(Model modelInform, String jmsCorrelationID) throws JMSException {
-        
-    //  AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Got response");
-    //  Model modelCreate = MessageBusMsgFactory.getMessageRDFModel(responseMessage);
-    //
-    //  // In this case the inform message is used to create instances internally in the adapter
-    //  if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleInform)) {
-//          System.err.println("is inform");
-//          adapterRDFHandler.parseCreateModel(modelCreate, filterCorrelationID);
-//          System.err.println("parsed create model");
-
         // This is a inform message, so do something with it
-    	// Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
+    	  // Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
         if (MessageBusMsgFactory.isMessageType(modelInform, MessageBusOntologyModel.propertyFiteagleInform) && 
         		modelInform.contains(null, MessageBusOntologyModel.methodRestores, adapter.getAdapterInstance())) {  
             
@@ -112,7 +96,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
 
     public String responseDiscover(Model modelDiscover) throws JMSException {
-
         // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelDiscover, MessageBusOntologyModel.propertyFiteagleDiscover)) {
             
@@ -123,7 +106,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
 
     public String responseCreate(Model modelCreate, String jmsCorrelationID) throws JMSException {
-
         // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleCreate)) {            
             return adapterRDFHandler.parseCreateModel(modelCreate, jmsCorrelationID);
@@ -133,7 +115,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
 
     public String responseConfigure(Model modelConfigure, String jmsCorrelationID) throws JMSException {
-        
         // This is a configure message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
             return adapterRDFHandler.parseConfigureModel(modelConfigure, jmsCorrelationID);
@@ -142,7 +123,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
     
     public String responseRelease(Model modelRelease, String jmsCorrelationID) throws JMSException {
-
         // This is a release message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
             return adapterRDFHandler.parseReleaseModel(modelRelease, jmsCorrelationID);
@@ -150,7 +130,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         
         return "Not a valid fiteagle:release message \n\n";
     }
-
 
     public Message generateResponseMessage(Message requestMessage, String result) throws JMSException {
         final Message responseMessage = this.context.createMessage();
@@ -164,5 +143,4 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     private boolean adapterIsRecipient(Model messageModel){
         return messageModel.contains(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
     }
-
 }
