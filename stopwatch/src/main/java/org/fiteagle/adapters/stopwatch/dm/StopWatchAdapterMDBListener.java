@@ -1,9 +1,8 @@
 package org.fiteagle.adapters.stopwatch.dm;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.MessageDriven;
 import javax.ejb.ActivationConfigProperty;
-import javax.naming.NamingException;
+import javax.ejb.MessageDriven;
 
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.stopwatch.StopWatchAdapter;
@@ -16,7 +15,7 @@ import org.fiteagle.api.core.IMessageBus;
 public class StopWatchAdapterMDBListener extends AbstractAdapterMDBListener {
 
     @PostConstruct
-    public void setup() throws NamingException {
+    public void setup() {
         this.adapterRDFHandler = StopWatchAdapterRDFHandler.getInstance();
         this.adapter = StopWatchAdapter.getInstance();
     }

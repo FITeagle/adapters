@@ -1,9 +1,8 @@
 package org.fiteagle.adapters.mightyrobot.dm;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.MessageDriven;
 import javax.ejb.ActivationConfigProperty;
-import javax.naming.NamingException;
+import javax.ejb.MessageDriven;
 
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.mightyrobot.MightyRobotAdapter;
@@ -16,7 +15,7 @@ import org.fiteagle.api.core.IMessageBus;
 public class MightyRobotAdapterMDBListener extends AbstractAdapterMDBListener {
 
     @PostConstruct
-    public void setup() throws NamingException {
+    public void setup() {
         this.adapterRDFHandler = MightyRobotAdapterRDFHandler.getInstance();
         this.adapter = MightyRobotAdapter.getInstance();
     }
