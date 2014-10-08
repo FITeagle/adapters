@@ -31,7 +31,7 @@ public abstract class AbstractAdapterStateRestorator {
     private Topic topic;
 
     protected void startup() {
-        AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.toString() + " : Registering adapter " + adapter.adapterName);
+        AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Registering adapter " + adapter.adapterName);
 
         adapter.registerAdapter();
 
@@ -55,7 +55,7 @@ public abstract class AbstractAdapterStateRestorator {
         messageModel.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodRestores, adapter.getAdapterInstance());
 
         sendRequestMessage(messageModel);
-        AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.toString() + " : Sent request restore Message");
+        AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Sent request restore Message");
     }
 
     private void sendRequestMessage(Model eventRDF) {
