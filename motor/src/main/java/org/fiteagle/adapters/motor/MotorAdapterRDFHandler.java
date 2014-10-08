@@ -6,7 +6,7 @@ public class MotorAdapterRDFHandler extends AbstractAdapterRDFHandler {
 
     private static MotorAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
 
-    public MotorAdapterRDFHandler(){
+    private MotorAdapterRDFHandler(){
         super.adapter = MotorAdapter.getInstance();
     }
 

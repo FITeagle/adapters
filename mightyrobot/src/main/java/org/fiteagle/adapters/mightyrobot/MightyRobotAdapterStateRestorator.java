@@ -14,9 +14,7 @@ public class MightyRobotAdapterStateRestorator extends AbstractAdapterStateResto
 
     @PostConstruct
     protected void startup() {  
-       super.adapter = MightyRobotAdapter.getInstance();
-       super.adapterRDFHandler = MightyRobotAdapterRDFHandler.getInstance();
-       super.startup();   
+       startup(MightyRobotAdapter.getInstance());   
    }
 
 }

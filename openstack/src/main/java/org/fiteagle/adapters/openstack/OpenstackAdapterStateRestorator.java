@@ -14,9 +14,7 @@ public class OpenstackAdapterStateRestorator extends AbstractAdapterStateRestora
 
     @PostConstruct
     protected void startup() {  
-       super.adapter = OpenstackAdapter.getInstance();
-       super.adapterRDFHandler = OpenstackAdapterRDFHandler.getInstance();
-       super.startup();   
+       startup(OpenstackAdapter.getInstance());   
    }
 
 }

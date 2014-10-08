@@ -6,7 +6,7 @@ public class OpenstackAdapterRDFHandler extends AbstractAdapterRDFHandler {
   
   private static OpenstackAdapterRDFHandler RDFHandlerSingleton;
 
-  public OpenstackAdapterRDFHandler(){
+  private OpenstackAdapterRDFHandler(){
       super.adapter = OpenstackAdapter.getInstance();
   }
 

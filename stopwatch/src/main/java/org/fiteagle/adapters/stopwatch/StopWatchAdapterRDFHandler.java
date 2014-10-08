@@ -6,7 +6,7 @@ public class StopWatchAdapterRDFHandler extends AbstractAdapterRDFHandler {
 
     private static StopWatchAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
 
-    public StopWatchAdapterRDFHandler(){
+    private StopWatchAdapterRDFHandler(){
         super.adapter = StopWatchAdapter.getInstance();
     }
 

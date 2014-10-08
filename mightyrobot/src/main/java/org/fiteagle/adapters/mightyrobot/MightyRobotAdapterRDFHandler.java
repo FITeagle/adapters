@@ -6,7 +6,7 @@ public class MightyRobotAdapterRDFHandler extends AbstractAdapterRDFHandler {
 
     private static MightyRobotAdapterRDFHandler abstractAdapterRDFHandlerSingleton;
 
-    public MightyRobotAdapterRDFHandler(){
+    private MightyRobotAdapterRDFHandler(){
         super.adapter = MightyRobotAdapter.getInstance();
     }
 

@@ -14,9 +14,7 @@ public class StopWatchAdapterStateRestorator extends AbstractAdapterStateRestora
 
     @PostConstruct
     protected void startup() {  
-       super.adapter = StopWatchAdapter.getInstance();
-       super.adapterRDFHandler = StopWatchAdapterRDFHandler.getInstance();
-       super.startup();   
+       startup(StopWatchAdapter.getInstance());   
    }
 
 }

@@ -22,27 +22,28 @@ public abstract class AbstractAdapterStateRestorator {
 
     private static Logger LOGGER = Logger.getLogger(AbstractAdapterStateRestorator.class.toString());
 
-    protected AbstractAdapterRDFHandler adapterRDFHandler;
-    protected AbstractAdapter adapter;
+    private AbstractAdapter adapter;
 
     @Inject
     private JMSContext context;
     @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
     private Topic topic;
 
-    protected void startup() {
-        AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering adapter " + adapter.adapterName);
+    protected void startup(AbstractAdapter adapter) {
+      this.adapter = adapter;
+      
+      AbstractAdapterStateRestorator.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering adapter " + adapter.adapterName);
 
-        adapter.registerAdapter();
+      adapter.registerAdapter();
 
-        // At this point maybe some parameters of the adapter itself should be restored as well?!
-        // adapter.restoreAdapterParameters();
+      // At this point maybe some parameters of the adapter itself should be restored as well?!
+      // adapter.restoreAdapterParameters();
 
-        try {
-          restoreState();
-        } catch (JMSException e) {
-          LOGGER.log(Level.SEVERE, e.getMessage());
-        }
+      try {
+        restoreState();
+      } catch (JMSException e) {
+        LOGGER.log(Level.SEVERE, e.getMessage());
+      }
     }
 
     public void restoreState() throws JMSException {
