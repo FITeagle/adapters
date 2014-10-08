@@ -35,14 +35,14 @@ public abstract class AbstractAdapter {
     
     public Resource getAdapterManagedResource(){
       return resourceType;
-    };
+    }
     
     public Resource getAdapterInstance(){
-        return adapterInstance;
+      return adapterInstance;
     }
     
     public Resource getAdapterType(){
-        return adapterType;
+      return adapterType;
     }
 
     public String getAdapterDescription(String serializationFormat) {
@@ -57,21 +57,17 @@ public abstract class AbstractAdapter {
     }
 
     public boolean createInstance(String instanceName) {
-
         if (instanceList.containsKey(instanceName)) {
             return false;
         }
 
-        // handling done by adapter, handleCreateInstance has to be implemented by all subclasses!
         Object newInstance = handleCreateInstance(instanceName);
 
         instanceList.put(instanceName, newInstance);
-
         return true;
     }
 
     public boolean terminateInstance(String instanceName) {
-
         if (instanceList.containsKey(instanceName)) {
             instanceList.remove(instanceName);
             return true;
@@ -92,9 +88,7 @@ public abstract class AbstractAdapter {
         Model modelInstances = ModelFactory.createDefaultModel();
 
         if (instanceList.containsKey(instanceName)) {
-            // handling done by adapter, handleMonitorInstance has to be implemented by all subclasses!
             modelInstances = handleMonitorInstance(instanceName, modelInstances);
-            
             setModelPrefixes(modelInstances);
         } 
 
@@ -102,16 +96,13 @@ public abstract class AbstractAdapter {
     }
 
     public String getAllInstances(String serializationFormat) {
-
-        return MessageBusMsgFactory.serializeModel(getAllInstancesModel());
+      //TODO: serializationFormat
+      return MessageBusMsgFactory.serializeModel(getAllInstancesModel());
     }
     
     public Model getAllInstancesModel() {
         Model modelInstances = ModelFactory.createDefaultModel();
-
         setModelPrefixes(modelInstances);
-
-        // handling done by adapter, handleGetAllInstances has to be implemented by all subclasses!
         modelInstances = handleGetAllInstances(modelInstances);
 
         return modelInstances;
@@ -148,9 +139,10 @@ public abstract class AbstractAdapter {
     
     public void registerAdapter(){
         notifyListeners(getAdapterDescriptionModel(), null);
+        // TODO: necessary?
         // Wait a short while, so the repository has time to process the registering before the restore request
         try {
-            Thread.sleep(1000);                 //1000 milliseconds is one second.
+            Thread.sleep(1000);
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
@@ -161,9 +153,6 @@ public abstract class AbstractAdapter {
     }
 
     public void deregisterAdapter(){
-     //   Model messageModel = MessageBusMsgFactory.createMsgRelease();
-     //   messageModel.add(adapterInstance.getProperty(RDF.type));  
-        
         Model messageModel = ModelFactory.createDefaultModel();
         messageModel.add(adapterInstance, MessageBusOntologyModel.methodReleases, adapterInstance);
   
