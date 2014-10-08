@@ -34,7 +34,6 @@ public class MightyRobotAdapter extends AbstractAdapter{
       return mightyRobotAdapterSingleton;
     }    
     
-    private Resource instanceClassResource;
     private String instanceClassResourceString = "MightyRobot";
     private String adapterResourceString = "MightyRobotAdapter";
 
@@ -60,20 +59,20 @@ public class MightyRobotAdapter extends AbstractAdapter{
         modelGeneral.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 
         // instantiate instance class resource
-        instanceClassResource = modelGeneral.createResource(adapterSpecificPrefix[1] + instanceClassResourceString);
-        instanceClassResource.addProperty(RDF.type, OWL.Class);
-        instanceClassResource.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
+        resourceType = modelGeneral.createResource(adapterSpecificPrefix[1] + instanceClassResourceString);
+        resourceType.addProperty(RDF.type, OWL.Class);
+        resourceType.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
 
         // instantiate adapter type resource
         adapterType = modelGeneral.createResource(adapterSpecificPrefix[1] + adapterResourceString);
         adapterType.addProperty(RDF.type, OWL.Class);
         adapterType.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Adapter"));
         
-        adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, instanceClassResource);
+        adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resourceType);
         adapterType.addProperty(RDFS.label, modelGeneral.createLiteral(adapterResourceString + "Type ", "en"));  
         
-        instanceClassResource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
-        instanceClassResource.addProperty(RDFS.label, modelGeneral.createLiteral(instanceClassResourceString + "Resource", "en"));        
+        resourceType.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
+        resourceType.addProperty(RDFS.label, modelGeneral.createLiteral(instanceClassResourceString + "Resource", "en"));        
         
         
         // create properties
@@ -99,7 +98,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
     
     private Property generateProperty(Property template, Resource XSDType){
     	template.addProperty(RDF.type, OWL.DatatypeProperty);
-    	template.addProperty(RDFS.domain, instanceClassResource);
+    	template.addProperty(RDFS.domain, resourceType);
     	template.addProperty(RDFS.range, XSDType);
     	return template;
     }   
@@ -139,7 +138,7 @@ public class MightyRobotAdapter extends AbstractAdapter{
 	}
 	
 	public void addPropertiesToResource(Resource mightyRobotInstance, MightyRobot currentMightyRobot, String instanceName) {
-    	mightyRobotInstance.addProperty(RDF.type, instanceClassResource);
+    	mightyRobotInstance.addProperty(RDF.type, resourceType);
     	mightyRobotInstance.addProperty(RDFS.label, "MightyRobot: " + instanceName);
     	mightyRobotInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("MightyRobot in da house " + instanceName, "en"));
     	mightyRobotInstance.addLiteral(mightyRobotPropertyDancing, currentMightyRobot.getDancing());
@@ -190,11 +189,5 @@ public class MightyRobotAdapter extends AbstractAdapter{
     public String[] getAdapterSpecificPrefix() {
         return adapterSpecificPrefix.clone();
     }
-
-    @Override
-    public Resource getAdapterManagedResource() {
-        // TODO Auto-generated method stub
-    	return instanceClassResource;
-    }    
 
 }

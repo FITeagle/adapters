@@ -27,14 +27,17 @@ public abstract class AbstractAdapter {
     protected HashMap<String, Object> instanceList = new HashMap<String, Object>();
 
     protected Model modelGeneral = ModelFactory.createDefaultModel();
-    // Subclasses need to set these three values appropriately for this to work!
+    // Subclasses need to set these four values appropriately for this to work!
     protected Resource adapterInstance = null;
-    protected Resource adapterType = null;;
+    protected Resource adapterType = null;
+    protected Resource resourceType;
     protected String adapterName = "";
     
     private boolean isFinishedRegistering = false;
     
-    public abstract Resource getAdapterManagedResource();
+    public Resource getAdapterManagedResource(){
+      return resourceType;
+    };
     
     public Resource getAdapterInstance(){
         return adapterInstance;

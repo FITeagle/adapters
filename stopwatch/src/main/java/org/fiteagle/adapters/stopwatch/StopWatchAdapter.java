@@ -28,7 +28,6 @@ public final class StopWatchAdapter extends AbstractAdapter {
         return stopwatchAdapterSingleton;
     }
 
-    private Resource stopwatchResource;
     private Property stopwatchPropertyRefreshInterval;
     private Property stopwatchPropertyIsRunning;
     private Property stopwatchPropertyCurrentTime;
@@ -49,37 +48,37 @@ public final class StopWatchAdapter extends AbstractAdapter {
         modelGeneral.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
         modelGeneral.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 
-        stopwatchResource = modelGeneral.createResource(adapterSpecificPrefix[1] + "Stopwatch");
-        stopwatchResource.addProperty(RDF.type, OWL.Class);
-        stopwatchResource.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
+        resourceType = modelGeneral.createResource(adapterSpecificPrefix[1] + "Stopwatch");
+        resourceType.addProperty(RDF.type, OWL.Class);
+        resourceType.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Resource"));
 
         
         adapterType = modelGeneral.createResource(adapterSpecificPrefix[1] + "StopwatchAdapter");
         adapterType.addProperty(RDF.type, OWL.Class);
         adapterType.addProperty(RDFS.subClassOf, modelGeneral.createResource("http://fiteagle.org/ontology#Adapter"));
 
-        adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, stopwatchResource);
+        adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resourceType);
         adapterType.addProperty(RDFS.label, modelGeneral.createLiteral("StopwatchAdapterType ", "en"));
 
-        stopwatchResource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
-        stopwatchResource.addProperty(RDFS.label, modelGeneral.createLiteral("Stopwatch Resource", "en"));
+        resourceType.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
+        resourceType.addProperty(RDFS.label, modelGeneral.createLiteral("Stopwatch Resource", "en"));
 
         // create the property
         stopwatchPropertyRefreshInterval = modelGeneral.createProperty(adapterSpecificPrefix[1] + "refreshInterval");
         stopwatchPropertyRefreshInterval.addProperty(RDF.type, OWL.DatatypeProperty);
-        stopwatchPropertyRefreshInterval.addProperty(RDFS.domain, stopwatchResource);
+        stopwatchPropertyRefreshInterval.addProperty(RDFS.domain, resourceType);
         stopwatchPropertyRefreshInterval.addProperty(RDFS.range, XSD.integer);
         stopwatchontrolProperties.add(stopwatchPropertyRefreshInterval);
 
         stopwatchPropertyCurrentTime = modelGeneral.createProperty(adapterSpecificPrefix[1] + "currentTime");
         stopwatchPropertyCurrentTime.addProperty(RDF.type, OWL.DatatypeProperty);
-        stopwatchPropertyCurrentTime.addProperty(RDFS.domain, stopwatchResource);
+        stopwatchPropertyCurrentTime.addProperty(RDFS.domain, resourceType);
         stopwatchPropertyCurrentTime.addProperty(RDFS.range, XSD.integer);
         stopwatchontrolProperties.add(stopwatchPropertyCurrentTime);
 
         stopwatchPropertyIsRunning = modelGeneral.createProperty(adapterSpecificPrefix[1] + "isRunning");
         stopwatchPropertyIsRunning.addProperty(RDF.type, OWL.DatatypeProperty);
-        stopwatchPropertyIsRunning.addProperty(RDFS.domain, stopwatchResource);
+        stopwatchPropertyIsRunning.addProperty(RDFS.domain, resourceType);
         stopwatchPropertyIsRunning.addProperty(RDFS.range, XSD.xboolean);
         stopwatchontrolProperties.add(stopwatchPropertyIsRunning);
 
@@ -117,7 +116,7 @@ public final class StopWatchAdapter extends AbstractAdapter {
     }
 
     public void addPropertiesToResource(Resource resourceInstance, Stopwatch currentStopwatch, String instanceName) {
-        resourceInstance.addProperty(RDF.type, stopwatchResource);
+        resourceInstance.addProperty(RDF.type, resourceType);
         resourceInstance.addProperty(RDFS.label, "Stopwatch: " + instanceName);
         resourceInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("A dynamic stopwatch resource " + instanceName, "en"));
         resourceInstance.addLiteral(stopwatchPropertyCurrentTime, currentStopwatch.getCurrentTime());
@@ -163,11 +162,6 @@ public final class StopWatchAdapter extends AbstractAdapter {
 
     public Stopwatch getInstance(String instanceName) {
         return (Stopwatch) instanceList.get(instanceName);
-    }
-
-    @Override
-    public Resource getAdapterManagedResource() {
-        return stopwatchResource;
     }
 
 }

@@ -21,23 +21,21 @@ public class OpenstackAdapter extends AbstractAdapter {
   private static final String[] ADAPTER_SPECIFIC_PREFIX = { "openstack", "http://fiteagle.org/ontology/adapter/openstack#" };
   private static final String RESOURCE_INSTANCE_NAME = "OpenstackVM";
   private static final String ADAPTER_CLASS_NAME = "OpenstackAdapter";
-
-  private Resource openstackResourceInstance;
   
   private OpenstackClient openstackClient;
   
   private static OpenstackAdapter openstackAdapterSingleton;
   public static OpenstackAdapter getInstance(){
     if(openstackAdapterSingleton == null){
-      openstackAdapterSingleton = new OpenstackAdapter();
+      openstackAdapterSingleton = new OpenstackAdapter("ADeployedOpenstackAdapter");
     }
     return openstackAdapterSingleton;
   }
   
-  private OpenstackAdapter(){
+  private OpenstackAdapter(String adapterName){
     openstackClient = OpenstackClient.getInstance();
 	  
-    adapterName = "ADeployedOpenstackAdapter";
+    this.adapterName = adapterName;
     
     modelGeneral = ModelFactory.createDefaultModel();
 
@@ -49,19 +47,19 @@ public class OpenstackAdapter extends AbstractAdapter {
     modelGeneral.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
     modelGeneral.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 
-    openstackResourceInstance = modelGeneral.createResource(ADAPTER_SPECIFIC_PREFIX[1]+RESOURCE_INSTANCE_NAME);
-    openstackResourceInstance.addProperty(RDF.type, OWL.Class);
-    openstackResourceInstance.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classResource);
+    resourceType = modelGeneral.createResource(ADAPTER_SPECIFIC_PREFIX[1]+RESOURCE_INSTANCE_NAME);
+    resourceType.addProperty(RDF.type, OWL.Class);
+    resourceType.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classResource);
 
     adapterType = modelGeneral.createResource(ADAPTER_SPECIFIC_PREFIX[1]+ADAPTER_CLASS_NAME);
     adapterType.addProperty(RDF.type, OWL.Class);
     adapterType.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
 
-    adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, openstackResourceInstance);
+    adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resourceType);
     adapterType.addProperty(RDFS.label, modelGeneral.createLiteral("OpenstackAdapterType ", "en"));
 
-    openstackResourceInstance.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
-    openstackResourceInstance.addProperty(RDFS.label, modelGeneral.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
+    resourceType.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
+    resourceType.addProperty(RDFS.label, modelGeneral.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
     
     //TODO: properties
     
@@ -73,11 +71,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapterInstance.addProperty(modelGeneral.createProperty("http://fiteagleinternal#isAdapterIn"), modelGeneral.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
   }
   
-  @Override
-  public Resource getAdapterManagedResource() {
-    return openstackResourceInstance;
-  }
-
   @Override
   public Object handleCreateInstance(String instanceName) {
 //    String imageId_ubuntu = "7bef2175-b4cd-4302-be23-dbeb35b41702";
@@ -116,7 +109,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   private void addPropertiesToResource(Resource openstackInstance, Server server, String instanceName) {
-    openstackInstance.addProperty(RDF.type, openstackResourceInstance);
+    openstackInstance.addProperty(RDF.type, resourceType);
     openstackInstance.addProperty(RDFS.label, "OpenstackVM: " + instanceName);
     openstackInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("Openstack Virtual Machine " + instanceName));
     
