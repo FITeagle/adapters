@@ -33,8 +33,6 @@ public abstract class AbstractAdapter {
     protected Resource resourceType;
     protected String adapterName = "";
     
-    private boolean isFinishedRegistering = false;
-    
     public Resource getAdapterManagedResource(){
       return resourceType;
     };
@@ -156,11 +154,6 @@ public abstract class AbstractAdapter {
         } catch(InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        isFinishedRegistering = true;
-    }
-    
-    public boolean isFinishedRegistering(){
-        return this.isFinishedRegistering;
     }
     
     public void restoreResourceInstances(){
