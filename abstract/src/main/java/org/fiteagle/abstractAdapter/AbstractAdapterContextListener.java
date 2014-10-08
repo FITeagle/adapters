@@ -31,7 +31,7 @@ public abstract class AbstractAdapterContextListener implements ServletContextLi
   
   @Override
   public void contextInitialized(ServletContextEvent event) {
-    LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering adapter " + getAdapter().adapterName);
+    LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering adapter " + getAdapter().getAdapterName());
     
     getAdapter().registerAdapter();
     

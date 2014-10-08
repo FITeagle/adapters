@@ -26,36 +26,21 @@ public abstract class AbstractAdapter {
     private List<AdapterEventListener> listener = new ArrayList<AdapterEventListener>();
     protected HashMap<String, Object> instanceList = new HashMap<String, Object>();
 
-    protected Model modelGeneral = ModelFactory.createDefaultModel();
-    // Subclasses need to set these four values appropriately for this to work!
-    protected Resource adapterInstance = null;
-    protected Resource adapterType = null;
-    protected Resource resourceType;
-    protected String adapterName = "";
+    public abstract Resource getAdapterManagedResource();
     
-    public Resource getAdapterManagedResource(){
-      return resourceType;
-    }
+    public abstract Resource getAdapterInstance();
+   
+    public abstract Resource getAdapterType();
     
-    public Resource getAdapterInstance(){
-      return adapterInstance;
-    }
-    
-    public Resource getAdapterType(){
-      return adapterType;
-    }
+    public abstract String getAdapterName();
 
+    public abstract Model getAdapterDescriptionModel();
+    
     public String getAdapterDescription(String serializationFormat) {
-        return MessageBusMsgFactory.serializeModel(modelGeneral);
+        return MessageBusMsgFactory.serializeModel(getAdapterDescriptionModel());
     }
 
-    public Model getAdapterDescriptionModel() {    
-        Model newModel = ModelFactory.createDefaultModel();
-        newModel.add(modelGeneral);
-        newModel.setNsPrefixes(modelGeneral.getNsPrefixMap());
-        return newModel;
-    }
-
+  
     public boolean createInstance(String instanceName) {
         if (instanceList.containsKey(instanceName)) {
             return false;
@@ -154,7 +139,7 @@ public abstract class AbstractAdapter {
 
     public void deregisterAdapter(){
         Model messageModel = ModelFactory.createDefaultModel();
-        messageModel.add(adapterInstance, MessageBusOntologyModel.methodReleases, adapterInstance);
+        messageModel.add(getAdapterInstance(), MessageBusOntologyModel.methodReleases, getAdapterInstance());
   
         notifyListeners(messageModel, "0");
     }

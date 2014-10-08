@@ -21,4 +21,4 @@
 
 # :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedStopwatchAdapter1.
 
-# :FITEAGLE_Testbed fiteagle:containsAdapter :ADeployedOpenstackAdapter.
+# :FITEAGLE_Testbed fiteagle:containsAdapter :OpenstackAdapter1.

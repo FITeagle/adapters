@@ -24,10 +24,16 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   private OpenstackClient openstackClient;
   
+  private Model adapterModel;
+  private Resource adapterInstance;
+  private Resource adapter;
+  private Resource resource;
+  private String adapterName;
+  
   private static OpenstackAdapter openstackAdapterSingleton;
   public static OpenstackAdapter getInstance(){
     if(openstackAdapterSingleton == null){
-      openstackAdapterSingleton = new OpenstackAdapter("ADeployedOpenstackAdapter");
+      openstackAdapterSingleton = new OpenstackAdapter("OpenstackAdapter1");
     }
     return openstackAdapterSingleton;
   }
@@ -37,38 +43,38 @@ public class OpenstackAdapter extends AbstractAdapter {
 	  
     this.adapterName = adapterName;
     
-    modelGeneral = ModelFactory.createDefaultModel();
+    adapterModel = ModelFactory.createDefaultModel();
 
-    modelGeneral.setNsPrefix("", "http://fiteagleinternal#");
-    modelGeneral.setNsPrefix(ADAPTER_SPECIFIC_PREFIX[0], ADAPTER_SPECIFIC_PREFIX[1]);
-    modelGeneral.setNsPrefix("fiteagle", FITEAGLE_ONTOLOGY_PREFIX);
-    modelGeneral.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
-    modelGeneral.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-    modelGeneral.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-    modelGeneral.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+    adapterModel.setNsPrefix("", "http://fiteagleinternal#");
+    adapterModel.setNsPrefix(ADAPTER_SPECIFIC_PREFIX[0], ADAPTER_SPECIFIC_PREFIX[1]);
+    adapterModel.setNsPrefix("fiteagle", FITEAGLE_ONTOLOGY_PREFIX);
+    adapterModel.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
+    adapterModel.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+    adapterModel.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
+    adapterModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
 
-    resourceType = modelGeneral.createResource(ADAPTER_SPECIFIC_PREFIX[1]+RESOURCE_INSTANCE_NAME);
-    resourceType.addProperty(RDF.type, OWL.Class);
-    resourceType.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classResource);
+    resource = adapterModel.createResource(ADAPTER_SPECIFIC_PREFIX[1]+RESOURCE_INSTANCE_NAME);
+    resource.addProperty(RDF.type, OWL.Class);
+    resource.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classResource);
 
-    adapterType = modelGeneral.createResource(ADAPTER_SPECIFIC_PREFIX[1]+ADAPTER_CLASS_NAME);
-    adapterType.addProperty(RDF.type, OWL.Class);
-    adapterType.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+    adapter = adapterModel.createResource(ADAPTER_SPECIFIC_PREFIX[1]+ADAPTER_CLASS_NAME);
+    adapter.addProperty(RDF.type, OWL.Class);
+    adapter.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
 
-    adapterType.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resourceType);
-    adapterType.addProperty(RDFS.label, modelGeneral.createLiteral("OpenstackAdapterType ", "en"));
+    adapter.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resource);
+    adapter.addProperty(RDFS.label, adapterModel.createLiteral("OpenstackAdapterType ", "en"));
 
-    resourceType.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapterType);
-    resourceType.addProperty(RDFS.label, modelGeneral.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
+    resource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapter);
+    resource.addProperty(RDFS.label, adapterModel.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
     
     //TODO: properties
     
-    adapterInstance = modelGeneral.createResource("http://fiteagleinternal#" + adapterName);
-    adapterInstance.addProperty(RDF.type, adapterType);
-    adapterInstance.addProperty(RDFS.label, modelGeneral.createLiteral("A deployed openstack adapter named: " + adapterName, "en"));
-    adapterInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("An openstack adapter that can handle VMs.", "en"));
+    adapterInstance = adapterModel.createResource("http://fiteagleinternal#" + adapterName);
+    adapterInstance.addProperty(RDF.type, adapter);
+    adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("A deployed openstack adapter named: " + adapterName, "en"));
+    adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("An openstack adapter that can handle VMs.", "en"));
     
-    adapterInstance.addProperty(modelGeneral.createProperty("http://fiteagleinternal#isAdapterIn"), modelGeneral.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
+    adapterInstance.addProperty(adapterModel.createProperty("http://fiteagleinternal#isAdapterIn"), adapterModel.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
   }
   
   @Override
@@ -109,9 +115,9 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   private void addPropertiesToResource(Resource openstackInstance, Server server, String instanceName) {
-    openstackInstance.addProperty(RDF.type, resourceType);
+    openstackInstance.addProperty(RDF.type, resource);
     openstackInstance.addProperty(RDFS.label, "OpenstackVM: " + instanceName);
-    openstackInstance.addProperty(RDFS.comment, modelGeneral.createLiteral("Openstack Virtual Machine " + instanceName));
+    openstackInstance.addProperty(RDFS.comment, adapterModel.createLiteral("Openstack Virtual Machine " + instanceName));
     
     //	TODO: properties
   }
@@ -120,6 +126,31 @@ public class OpenstackAdapter extends AbstractAdapter {
   public List<String> configureInstance(Statement configureStatement) {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public Resource getAdapterManagedResource() {
+    return resource;
+  }
+
+  @Override
+  public Resource getAdapterInstance() {
+    return adapterInstance;
+  }
+
+  @Override
+  public Resource getAdapterType() {
+    return adapter;
+  }
+
+  @Override
+  public Model getAdapterDescriptionModel() {
+    return adapterModel;
+  }
+  
+  @Override
+  public String getAdapterName() {
+    return adapterName;
   }
   
 }
