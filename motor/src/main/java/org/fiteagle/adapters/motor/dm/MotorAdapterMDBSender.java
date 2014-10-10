@@ -1,9 +1,9 @@
 package org.fiteagle.adapters.motor.dm;
 
-import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBSender;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
@@ -11,9 +11,8 @@ import org.fiteagle.adapters.motor.MotorAdapter;
 @Startup
 public class MotorAdapterMDBSender extends AbstractAdapterMDBSender {
 
-    @Override
-    @PostConstruct
-    protected void startup() {  
-      startup(MotorAdapter.getInstance());       
-    }
+  @Override
+  protected AbstractAdapter getAdapter() {
+    return MotorAdapter.getInstance();
+  }
 }
