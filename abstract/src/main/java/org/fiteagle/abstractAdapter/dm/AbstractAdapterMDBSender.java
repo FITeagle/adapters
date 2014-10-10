@@ -32,7 +32,8 @@ public abstract class AbstractAdapterMDBSender {
     private Topic topic;
 
     @PostConstruct
-    public void contextInitialized() {
+    public void initializeAdapter() {
+      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Adding change listener for " + getAdapter().getAdapterName());
       getAdapter().addChangeListener(new AdapterEventListener() {
 
         @Override
@@ -41,10 +42,10 @@ public abstract class AbstractAdapterMDBSender {
         }
       });
       
-      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering adapter " + getAdapter().getAdapterName());
-      
+      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterName());
       getAdapter().registerAdapter();
       
+      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Restoring previous state of " + getAdapter().getAdapterName());
       try {
         restoreState();
       } catch (JMSException e) {
@@ -52,7 +53,7 @@ public abstract class AbstractAdapterMDBSender {
       }
     }
     
-    public void sendInformMessage(Model eventRDF, String requestID) {
+    private void sendInformMessage(Model eventRDF, String requestID) {
         try {
             Model messageModel = MessageBusMsgFactory.createMsgInform(eventRDF);
             messageModel.add(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
@@ -79,13 +80,11 @@ public abstract class AbstractAdapterMDBSender {
     }
     
     public void restoreState() throws JMSException {
-      
       Model messageModel = ModelFactory.createDefaultModel();
       messageModel.add(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
       messageModel.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodRestores, getAdapter().getAdapterInstance());
       
       sendRequestMessage(messageModel);
-      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Sent request restore message");
     }
     
     private void sendRequestMessage(Model eventRDF) {
