@@ -12,7 +12,7 @@ import javax.jms.MessageListener;
 import javax.jms.Topic;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AbstractAdapterRDFHandler;
+import org.fiteagle.abstractAdapter.AdapterRDFHandler;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusMsgFactory;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -30,7 +30,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     private Topic topic;
     
     protected abstract AbstractAdapter getAdapter();
-    protected abstract AbstractAdapterRDFHandler getAdapterRDFHandler();
     
     public void onMessage(final Message requestMessage) {
         try {
@@ -88,7 +87,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         if (MessageBusMsgFactory.isMessageType(modelInform, MessageBusOntologyModel.propertyFiteagleInform) && 
         		modelInform.contains(null, MessageBusOntologyModel.methodRestores, getAdapter().getAdapterInstance())) {  
             
-            return getAdapterRDFHandler().parseCreateModel(modelInform, jmsCorrelationID);                
+            return AdapterRDFHandler.getInstance(getAdapter()).parseCreateModel(modelInform, jmsCorrelationID);                
 
         }
 
@@ -99,7 +98,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelDiscover, MessageBusOntologyModel.propertyFiteagleDiscover)) {
             
-            return getAdapterRDFHandler().parseDiscoverModel(modelDiscover);
+            return AdapterRDFHandler.getInstance(getAdapter()).parseDiscoverModel(modelDiscover);
         }
 
         return "Not a valid fiteagle:discover message \n\n";
@@ -108,7 +107,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseCreate(Model modelCreate, String jmsCorrelationID) throws JMSException {
         // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleCreate)) {            
-            return getAdapterRDFHandler().parseCreateModel(modelCreate, jmsCorrelationID);
+            return AdapterRDFHandler.getInstance(getAdapter()).parseCreateModel(modelCreate, jmsCorrelationID);
         }
 
         return "Not a valid fiteagle:create message \n\n";
@@ -117,7 +116,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseConfigure(Model modelConfigure, String jmsCorrelationID) throws JMSException {
         // This is a configure message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
-            return getAdapterRDFHandler().parseConfigureModel(modelConfigure, jmsCorrelationID);
+            return AdapterRDFHandler.getInstance(getAdapter()).parseConfigureModel(modelConfigure, jmsCorrelationID);
         }
         return "Not a valid fiteagle:configure message \n\n";
     }
@@ -125,7 +124,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     public String responseRelease(Model modelRelease, String jmsCorrelationID) throws JMSException {
         // This is a release message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
-            return getAdapterRDFHandler().parseReleaseModel(modelRelease, jmsCorrelationID);
+            return AdapterRDFHandler.getInstance(getAdapter()).parseReleaseModel(modelRelease, jmsCorrelationID);
         }
         
         return "Not a valid fiteagle:release message \n\n";
