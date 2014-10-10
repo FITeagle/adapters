@@ -124,13 +124,6 @@ public abstract class AbstractAdapter {
     
     public void registerAdapter(){
         notifyListeners(getAdapterDescriptionModel(), null);
-        // TODO: necessary?
-        // Wait a short while, so the repository has time to process the registering before the restore request
-        try {
-            Thread.sleep(1000);
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
     }
     
     public void restoreResourceInstances(){
