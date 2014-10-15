@@ -90,8 +90,8 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   @Override
   public void handleTerminateInstance(String instanceName) {
-    // TODO Auto-generated method stub
-    
+    Server serverToDelete = (Server) instanceList.get(instanceName);
+    openstackClient.deleteServer(serverToDelete.getId());
   }
   
   @Override

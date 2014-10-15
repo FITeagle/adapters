@@ -57,9 +57,9 @@ public abstract class AbstractAdapter {
 
     public boolean terminateInstance(String instanceName) {
         if (instanceList.containsKey(instanceName)) {
-            instanceList.remove(instanceName);
-            handleTerminateInstance(instanceName);
-            return true;
+          handleTerminateInstance(instanceName);
+          instanceList.remove(instanceName);
+          return true;
         }
 
         return false;
