@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.Response;
+
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
@@ -53,24 +55,26 @@ public class AdapterRDFHandler {
       currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
       
       String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
-      AdapterRDFHandler.LOGGER.log(Level.INFO, "Creating instance: " + instanceName + " ("
-          + currentResourceInstanceStatement.toString() + ")");
       
       if (adapter.createInstance(instanceName)) {
+        LOGGER.log(Level.INFO, "Created instance: " + instanceName + " (" + currentResourceInstanceStatement.toString() + ")");
         // Configure additional parameters directly after creation
         adapter.configureInstance(currentResourceInstanceStatement);
         Model createdInstanceValues = createInformRDF(instanceName);
         createdInstancesModel.add(createdInstanceValues);
       }
+      else{
+        return Response.Status.CONFLICT.name();
+      }
     }
-    
+
     if (createdInstancesModel.isEmpty()) {
-      return IMessageBus.STATUS_400;
+      return Response.Status.BAD_REQUEST.name();
     }
     
     adapter.notifyListeners(createdInstancesModel, requestID);
     
-    return IMessageBus.STATUS_200;
+    return Response.Status.OK.name();
   }
   
   public String parseReleaseModel(Model modelRelease, String requestID) {
@@ -88,10 +92,10 @@ public class AdapterRDFHandler {
       
       if (adapter.terminateInstance(instanceName)) {
         adapter.notifyListeners(createInformReleaseRDF(instanceName), requestID);
-        return IMessageBus.STATUS_200;
+        return Response.Status.OK.name();
       }
     }
-    return IMessageBus.STATUS_404;
+    return Response.Status.NOT_FOUND.name();
   }
   
   public String parseDiscoverModel(Model modelDiscover) {
@@ -107,7 +111,7 @@ public class AdapterRDFHandler {
       
       String response = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
       if (response.isEmpty()) {
-        return IMessageBus.STATUS_404;
+        return Response.Status.NOT_FOUND.name();
       } else {
         return response;
       }
@@ -140,12 +144,12 @@ public class AdapterRDFHandler {
     }
     
     if (changedInstancesModel.isEmpty()) {
-      return IMessageBus.STATUS_404;
+      return Response.Status.NOT_FOUND.name();
     }
     
     adapter.notifyListeners(changedInstancesModel, requestID);
     
-    return IMessageBus.STATUS_200;
+    return Response.Status.OK.name();
   }
   
   public Model createInformRDF(String instanceName) {

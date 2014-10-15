@@ -10,6 +10,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Topic;
+import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterRDFHandler;
@@ -65,7 +66,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
                     result = responseDiscover(modelMessage);
                 }
                 
-                if (!result.isEmpty() && !result.equals(IMessageBus.STATUS_200)) {
+                if (!result.isEmpty() && !result.equals(Response.Status.OK.name())) {
                     Message responseMessage = generateResponseMessage(requestMessage, result);
                     
                     if (null != requestMessage.getJMSCorrelationID()) {
