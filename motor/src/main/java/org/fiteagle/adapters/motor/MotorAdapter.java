@@ -220,4 +220,10 @@ public final class MotorAdapter extends AbstractAdapter {
     public String getAdapterName() {
       return adapterName;
     }
+
+    @Override
+    protected void updateInstanceList() {
+      // TODO Auto-generated method stub
+      
+    }
 }

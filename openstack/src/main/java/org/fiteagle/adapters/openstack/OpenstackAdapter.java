@@ -5,6 +5,7 @@ import java.util.List;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.model.Server;
+import org.fiteagle.adapters.openstack.client.model.Servers;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -112,6 +113,14 @@ public class OpenstackAdapter extends AbstractAdapter {
       addPropertiesToResource(openstackInstance, server, key);
     }
     return modelInstances;
+  }
+  
+  protected void updateInstanceList(){
+    instanceList.clear();
+    Servers servers = openstackClient.listServers();
+    for(Server server : servers.getList()){
+      instanceList.put(server.getName(), server);
+    }
   }
   
   private void addPropertiesToResource(Resource openstackInstance, Server server, String instanceName) {

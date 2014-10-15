@@ -199,5 +199,11 @@ public final class StopWatchAdapter extends AbstractAdapter {
   public String getAdapterName() {
     return adapterName;
   }
+
+  @Override
+  protected void updateInstanceList() {
+    // TODO Auto-generated method stub
+    
+  }
   
 }

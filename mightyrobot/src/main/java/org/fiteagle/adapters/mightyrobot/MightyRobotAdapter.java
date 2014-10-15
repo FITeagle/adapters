@@ -222,5 +222,11 @@ public class MightyRobotAdapter extends AbstractAdapter {
   public String getAdapterName() {
     return adapterName;
   }
+
+  @Override
+  protected void updateInstanceList() {
+    // TODO Auto-generated method stub
+    
+  }
   
 }

@@ -36,12 +36,15 @@ public abstract class AbstractAdapter {
 
     public abstract Model getAdapterDescriptionModel();
     
+    protected abstract void updateInstanceList();
+    
     public String getAdapterDescription(String serializationFormat) {
         return MessageBusMsgFactory.serializeModel(getAdapterDescriptionModel());
     }
 
   
     public boolean createInstance(String instanceName) {
+        updateInstanceList();
         if (instanceList.containsKey(instanceName)) {
             return false;
         }
