@@ -78,12 +78,11 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
             }
 
         } catch (JMSException e) {
-            System.err.println(this.getClass().getSimpleName() + "JMSException");
+          LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
     
     public String responseInform(Model modelInform, String jmsCorrelationID) throws JMSException {
-        // This is a inform message, so do something with it
     	  // Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
         if (MessageBusMsgFactory.isMessageType(modelInform, MessageBusOntologyModel.propertyFiteagleInform) && 
         		modelInform.contains(null, MessageBusOntologyModel.methodRestores, getAdapter().getAdapterInstance())) {  
@@ -96,7 +95,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
 
     public String responseDiscover(Model modelDiscover) throws JMSException {
-        // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelDiscover, MessageBusOntologyModel.propertyFiteagleDiscover)) {
             
             return AdapterRDFHandler.getInstance(getAdapter()).parseDiscoverModel(modelDiscover);
@@ -106,7 +104,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
 
     public String responseCreate(Model modelCreate, String jmsCorrelationID) throws JMSException {
-        // This is a create message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelCreate, MessageBusOntologyModel.propertyFiteagleCreate)) {            
             return AdapterRDFHandler.getInstance(getAdapter()).parseCreateModel(modelCreate, jmsCorrelationID);
         }
@@ -115,7 +112,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
 
     public String responseConfigure(Model modelConfigure, String jmsCorrelationID) throws JMSException {
-        // This is a configure message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelConfigure, MessageBusOntologyModel.propertyFiteagleConfigure)) {
             return AdapterRDFHandler.getInstance(getAdapter()).parseConfigureModel(modelConfigure, jmsCorrelationID);
         }
@@ -123,7 +119,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
     
     public String responseRelease(Model modelRelease, String jmsCorrelationID) throws JMSException {
-        // This is a release message, so do something with it
         if (MessageBusMsgFactory.isMessageType(modelRelease, MessageBusOntologyModel.propertyFiteagleRelease)) {
             return AdapterRDFHandler.getInstance(getAdapter()).parseReleaseModel(modelRelease, jmsCorrelationID);
         }
