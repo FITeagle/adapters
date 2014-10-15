@@ -24,45 +24,51 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-/**
- * Created by vju on 9/28/14.
- */
 @MessageDriven(name = "TestbedInformListener", activationConfig = { @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
         @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
         @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
-public class InformListenerMDB implements MessageListener {
+public class TestbedAdapterMDBListener implements MessageListener {
 
-    private static Logger LOGGER = Logger.getLogger(InformListenerMDB.class.toString());
+    private static Logger LOGGER = Logger.getLogger(TestbedAdapterMDBListener.class.toString());
 
     @Inject
     private JMSContext context;
     @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
     private Topic topic;
+    
+    @Inject
+    private ModelInformerBean mib;
 
     public void onMessage(final Message requestMessage) {
         try {
-
             if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
-
                 Model modelMessage = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
-                if (modelMessage != null && isAdapterMessage(modelMessage)) {
-                    if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_INFORM)) {
-                        Model adapterModel = OntologyReader.getTestbedModel();
-                        Resource adapterInstance = getAdapterInstance(modelMessage);
-                        if (adapterInstance == null) {
-                            LOGGER.log(Level.INFO, "http://fiteagle.org/ontology#Adapter could not be detected");
-                        } else {                            
-                             LOGGER.log(Level.INFO, "GOT INFORM MESSAGE IN TESTBEDADAPTER");
-                            Resource testbedResource = adapterModel.getResource("http://fiteagleinternal#FITEAGLE_Testbed");
-                            testbedResource.addProperty(MessageBusOntologyModel.propertyFiteagleContainsAdapter, adapterInstance);
-                            sendUpdateModel(adapterModel);
-                        }
-                    }
+                if(modelMessage != null){
+                
+                  if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
+                          LOGGER.log(Level.INFO, "Received a discover message");
+                          mib.sendModel(requestMessage.getJMSCorrelationID());
+                  }
+                  
+                  else if (isAdapterMessage(modelMessage)) {
+                      if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_INFORM)) {
+                          Model adapterModel = OntologyReader.getTestbedModel();
+                          Resource adapterInstance = getAdapterInstance(modelMessage);
+                          if (adapterInstance == null) {
+                              LOGGER.log(Level.INFO, "http://fiteagle.org/ontology#Adapter could not be detected");
+                          } else {                            
+                              LOGGER.log(Level.INFO, "Received an inform message");
+                              Resource testbedResource = adapterModel.getResource("http://fiteagleinternal#FITEAGLE_Testbed");
+                              testbedResource.addProperty(MessageBusOntologyModel.propertyFiteagleContainsAdapter, adapterInstance);
+                              sendUpdateModel(adapterModel);
+                          }
+                      }
+                  }
                 }
             }
 
         } catch (JMSException e) {
-            System.err.println(this.toString() + "JMSException");
+          LOGGER.log(Level.SEVERE, e.getMessage());
         }
     }
 
