@@ -58,6 +58,7 @@ public abstract class AbstractAdapter {
     public boolean terminateInstance(String instanceName) {
         if (instanceList.containsKey(instanceName)) {
             instanceList.remove(instanceName);
+            handleTerminateInstance(instanceName);
             return true;
         }
 
@@ -159,29 +160,14 @@ public abstract class AbstractAdapter {
     
     public abstract List<String> configureInstance(Statement configureStatement);
     
-    /**
-     * Needs to return a new instance of the class this adapter is supposed to handle
-     * 
-     * @return Object - the newly created instance
-     */
     public abstract Object handleCreateInstance(String instanceName);
+    
+    public abstract void handleTerminateInstance(String instanceName);
 
-
-    /**
-     * Returns a String containing the prefix that should be applied for the case "" for this specific adapter e.g. http://fiteagle.org/ontology/adapter/motor#
-     * 
-     * @return String containing the prefix to be applied
-     */
     public abstract String[] getAdapterSpecificPrefix();
 
-    /**
-     * Handles the monitoring of resources specifically for this adapter
-     */
     public abstract Model handleMonitorInstance(String instanceName, Model modelInstances);
 
-    /**
-     * Handles the getting of all instances for this adapter
-     */
     public abstract Model handleGetAllInstances(Model modelInstances);
 
 

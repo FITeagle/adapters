@@ -226,4 +226,10 @@ public final class MotorAdapter extends AbstractAdapter {
       // TODO Auto-generated method stub
       
     }
+
+    @Override
+    public void handleTerminateInstance(String instanceName) {
+      // TODO Auto-generated method stub
+      
+    }
 }

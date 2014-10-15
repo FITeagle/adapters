@@ -89,6 +89,12 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
   @Override
+  public void handleTerminateInstance(String instanceName) {
+    // TODO Auto-generated method stub
+    
+  }
+  
+  @Override
   public String[] getAdapterSpecificPrefix() {
     return ADAPTER_SPECIFIC_PREFIX.clone();
   }
@@ -161,5 +167,5 @@ public class OpenstackAdapter extends AbstractAdapter {
   public String getAdapterName() {
     return adapterName;
   }
-  
+
 }
