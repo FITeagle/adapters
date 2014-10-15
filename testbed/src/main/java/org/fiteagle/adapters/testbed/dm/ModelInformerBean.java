@@ -2,7 +2,7 @@ package org.fiteagle.adapters.testbed.dm;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
-import org.fiteagle.adapters.testbed.OntologyReader;
+import org.fiteagle.adapters.testbed.TestbedAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusMsgFactory;
 
@@ -37,7 +37,7 @@ public class ModelInformerBean {
     
     public void sendModel(String correlationID) {
         try{
-            Model testbedModel = OntologyReader.getTestbedModel();
+            Model testbedModel = TestbedAdapter.getTestbedModel();
             Model messageModel = MessageBusMsgFactory.createMsgInform(testbedModel);
             String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
 

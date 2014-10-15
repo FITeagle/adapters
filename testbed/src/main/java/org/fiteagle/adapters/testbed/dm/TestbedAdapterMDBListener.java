@@ -12,7 +12,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Topic;
 
-import org.fiteagle.adapters.testbed.OntologyReader;
+import org.fiteagle.adapters.testbed.TestbedAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusMsgFactory;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -52,13 +52,13 @@ public class TestbedAdapterMDBListener implements MessageListener {
                   
                   else if (isAdapterMessage(modelMessage)) {
                       if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_INFORM)) {
-                          Model adapterModel = OntologyReader.getTestbedModel();
+                          Model adapterModel = TestbedAdapter.getTestbedModel();
                           Resource adapterInstance = getAdapterInstance(modelMessage);
                           if (adapterInstance == null) {
                               LOGGER.log(Level.INFO, "http://fiteagle.org/ontology#Adapter could not be detected");
                           } else {                            
                               LOGGER.log(Level.INFO, "Received an inform message");
-                              Resource testbedResource = adapterModel.getResource("http://fiteagleinternal#FITEAGLE_Testbed");
+                              Resource testbedResource = adapterModel.getResource(TestbedAdapter.getTestbed().getURI());
                               testbedResource.addProperty(MessageBusOntologyModel.propertyFiteagleContainsAdapter, adapterInstance);
                               sendUpdateModel(adapterModel);
                           }
