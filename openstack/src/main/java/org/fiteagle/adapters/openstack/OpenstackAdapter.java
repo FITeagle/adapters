@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.openstack;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -11,11 +12,13 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
@@ -32,6 +35,9 @@ public class OpenstackAdapter extends AbstractAdapter {
   private Resource resource;
   private List<Model> resourceInstances = new ArrayList<Model>();
   private String adapterName;
+  
+  private List<Property> resourceInstanceProperties = new LinkedList<Property>();
+  private Property propertyID;
   
   private static OpenstackAdapter openstackAdapterSingleton;
   public static OpenstackAdapter getInstance(){
@@ -70,7 +76,12 @@ public class OpenstackAdapter extends AbstractAdapter {
     resource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapter);
     resource.addProperty(RDFS.label, adapterModel.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
     
-    //TODO: properties
+    propertyID = adapterModel.createProperty(ADAPTER_SPECIFIC_PREFIX[1]+"id");
+    propertyID.addProperty(RDF.type, OWL.DatatypeProperty);
+    propertyID.addProperty(RDFS.domain, resource);
+    propertyID.addProperty(RDFS.range, XSD.xstring);
+    propertyID.addProperty(RDFS.label, "The ID of the Openstack VM", "en");
+    resourceInstanceProperties.add(propertyID);
     
     adapterInstance = adapterModel.createResource("http://fiteagleinternal#" + adapterName);
     adapterInstance.addProperty(RDF.type, adapter);
@@ -142,7 +153,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     openstackInstance.addProperty(RDFS.label, "OpenstackVM: " + instanceName);
     openstackInstance.addProperty(RDFS.comment, adapterModel.createLiteral("Openstack Virtual Machine " + instanceName));
     
-    //	TODO: properties
+    openstackInstance.addLiteral(propertyID, server.getId());
   }
 
   @Override
