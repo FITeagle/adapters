@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.openstack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -29,6 +30,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   private Resource adapterInstance;
   private Resource adapter;
   private Resource resource;
+  private List<Model> resourceInstances = new ArrayList<Model>();
   private String adapterName;
   
   private static OpenstackAdapter openstackAdapterSingleton;
@@ -74,6 +76,11 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("A deployed openstack adapter named: " + adapterName, "en"));
     adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("An openstack adapter that can handle VMs.", "en"));
+    
+    updateInstanceList();
+    for(Model instance : resourceInstances){
+      adapterModel.add(instance);
+    }
     
     adapterInstance.addProperty(adapterModel.createProperty("http://fiteagleinternal#isAdapterIn"), adapterModel.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
   }
@@ -126,6 +133,9 @@ public class OpenstackAdapter extends AbstractAdapter {
     Servers servers = openstackClient.listServers();
     for(Server server : servers.getList()){
       instanceList.put(server.getName(), server);
+      
+      Model createdResourceInstanceModel = getSingleInstanceModel(server.getName());
+      resourceInstances.add(createdResourceInstanceModel);
     }
   }
   
