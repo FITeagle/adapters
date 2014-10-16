@@ -81,8 +81,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     for(Model instance : resourceInstances){
       adapterModel.add(instance);
     }
-    
-    adapterInstance.addProperty(adapterModel.createProperty("http://fiteagleinternal#isAdapterIn"), adapterModel.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
   }
   
   @Override
