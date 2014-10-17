@@ -4,11 +4,11 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix fiteagle: <http://fiteagle.org/ontology#> .
+@prefix omn: <http://fiteagle.org/ontology#> .
 @prefix :      <http://federation.av.tu-berlin.de/about#> .
 
 
-:AV_Smart_Communication_Testbed rdf:type fiteagle:Testbed,
+:AV_Smart_Communication_Testbed rdf:type omn:Testbed,
                                         owl:NamedIndividual;
                                          rdfs:label "AV Smart Communication Testbed" ;
                                          rdfs:seeAlso "https://federation.av.tu-berlin.de" ;
