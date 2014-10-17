@@ -1,97 +1,79 @@
 package org.fiteagle.adapters.openstack;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.Servers;
+import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
+import org.fiteagle.api.core.OntologyModels;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
-  private static final String FITEAGLE_ONTOLOGY_PREFIX = "http://fiteagle.org/ontology#";
   private static final String[] ADAPTER_SPECIFIC_PREFIX = { "openstack", "http://fiteagle.org/ontology/adapter/openstack#" };
-  private static final String RESOURCE_INSTANCE_NAME = "OpenstackVM";
-  private static final String ADAPTER_CLASS_NAME = "OpenstackAdapter";
   
   private OpenstackClient openstackClient;
   
+  private static Resource adapter;
+  private static Resource resource;
+  private static List<Property> resourceInstanceProperties = new ArrayList<Property>();
+  
   private Model adapterModel;
   private Resource adapterInstance;
-  private Resource adapter;
-  private Resource resource;
   private List<Model> resourceInstances = new ArrayList<Model>();
-  private String adapterName;
   
-  private List<Property> resourceInstanceProperties = new LinkedList<Property>();
-  private Property propertyID;
+  public static HashMap<String,OpenstackAdapter> openstackAdapterInstances = new HashMap<>();
   
-  private static OpenstackAdapter openstackAdapterSingleton;
-  public static OpenstackAdapter getInstance(){
-    if(openstackAdapterSingleton == null){
-      openstackAdapterSingleton = new OpenstackAdapter("OpenstackAdapter1");
-    }
-    return openstackAdapterSingleton;
+  public static OpenstackAdapter getInstance(String URI){
+    return openstackAdapterInstances.get(URI);
   }
   
-  private OpenstackAdapter(String adapterName){
+  static {
+    Model adapterModel = OntologyModels.loadModel("ontologies/openstackAdapter.ttl", IMessageBus.SERIALIZATION_TURTLE);
+    
+    StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+    if (adapterIterator.hasNext()) {
+      adapter = adapterIterator.next().getSubject();
+    }
+    
+    StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
+    if (resourceIterator.hasNext()) {
+      resource = resourceIterator.next().getObject().asResource();
+    }
+    
+    StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
+    while (propertiesIterator.hasNext()) {
+      Property p = adapterModel.getProperty(propertiesIterator.next().getSubject().getURI());
+      resourceInstanceProperties.add(p);
+    }
+    
+    StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
+    while (adapterInstanceIterator.hasNext()) {
+      Resource adapterInstance = adapterInstanceIterator.next().getSubject();
+      
+      OpenstackAdapter openstackAdapter = new OpenstackAdapter(adapterInstance, adapterModel);
+      openstackAdapterInstances.put(adapterInstance.getURI(), openstackAdapter);
+    }
+  }
+  
+  
+  private OpenstackAdapter(Resource adapterInstance, Model adapterModel){
     openstackClient = OpenstackClient.getInstance();
 	  
-    this.adapterName = adapterName;
-    
-    adapterModel = ModelFactory.createDefaultModel();
-
-    adapterModel.setNsPrefix("", "http://fiteagleinternal#");
-    adapterModel.setNsPrefix(ADAPTER_SPECIFIC_PREFIX[0], ADAPTER_SPECIFIC_PREFIX[1]);
-    adapterModel.setNsPrefix("fiteagle", FITEAGLE_ONTOLOGY_PREFIX);
-    adapterModel.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
-    adapterModel.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-    adapterModel.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-    adapterModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-
-    resource = adapterModel.createResource(ADAPTER_SPECIFIC_PREFIX[1]+RESOURCE_INSTANCE_NAME);
-    resource.addProperty(RDF.type, OWL.Class);
-    resource.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classResource);
-
-    adapter = adapterModel.createResource(ADAPTER_SPECIFIC_PREFIX[1]+ADAPTER_CLASS_NAME);
-    adapter.addProperty(RDF.type, OWL.Class);
-    adapter.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
-
-    adapter.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resource);
-    adapter.addProperty(RDFS.label, adapterModel.createLiteral("OpenstackAdapterType ", "en"));
-
-    resource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapter);
-    resource.addProperty(RDFS.label, adapterModel.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
-    
-    propertyID = adapterModel.createProperty(ADAPTER_SPECIFIC_PREFIX[1]+"id");
-    propertyID.addProperty(RDF.type, OWL.DatatypeProperty);
-    propertyID.addProperty(RDFS.domain, resource);
-    propertyID.addProperty(RDFS.range, XSD.xstring);
-    propertyID.addProperty(RDFS.label, "The ID of the Openstack VM", "en");
-    resourceInstanceProperties.add(propertyID);
-    
-    adapterInstance = adapterModel.createResource("http://fiteagleinternal#" + adapterName);
-    adapterInstance.addProperty(RDF.type, adapter);
-    adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("A deployed openstack adapter named: " + adapterName, "en"));
-    adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("An openstack adapter that can handle VMs.", "en"));
-    
-    updateInstanceList();
-    for(Model instance : resourceInstances){
-      adapterModel.add(instance);
-    }
+    this.adapterInstance = adapterInstance;
+    this.adapterModel = adapterModel;
   }
   
   @Override
@@ -136,7 +118,8 @@ public class OpenstackAdapter extends AbstractAdapter {
     return modelInstances;
   }
   
-  protected void updateInstanceList(){
+  @Override
+  public void updateInstanceList(){
     instanceList.clear();
     Servers servers = openstackClient.listServers();
     for(Server server : servers.getList()){
@@ -144,6 +127,7 @@ public class OpenstackAdapter extends AbstractAdapter {
       
       Model createdResourceInstanceModel = getSingleInstanceModel(server.getName());
       resourceInstances.add(createdResourceInstanceModel);
+      adapterModel.add(createdResourceInstanceModel);
     }
   }
   
@@ -152,7 +136,14 @@ public class OpenstackAdapter extends AbstractAdapter {
     openstackInstance.addProperty(RDFS.label, "OpenstackVM: " + instanceName);
     openstackInstance.addProperty(RDFS.comment, adapterModel.createLiteral("Openstack Virtual Machine " + instanceName));
     
-    openstackInstance.addLiteral(propertyID, server.getId());
+    for(Property p : resourceInstanceProperties){
+      switch(p.getLocalName()){
+        case "id": 
+          openstackInstance.addLiteral(p, server.getId());
+          break;
+      }
+    }
+   
   }
 
   @Override
@@ -179,11 +170,6 @@ public class OpenstackAdapter extends AbstractAdapter {
   @Override
   public Model getAdapterDescriptionModel() {
     return adapterModel;
-  }
-  
-  @Override
-  public String getAdapterName() {
-    return adapterName;
   }
 
 }
