@@ -100,7 +100,7 @@ public class MightyRobotAdapter extends AbstractAdapter {
         "A Mighty Robot Adapter that can handle multiple Robots and their shenanigans.", "en"));
     // Testbed Addendum
     adapterInstance.addProperty(adapterModel.createProperty("http://fiteagleinternal#isAdapterIn"),
-        adapterModel.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
+        adapterModel.createResource("http://fiteagleinternal#AV_Smart_Communication_Testbed"));
   }
   
   private Property generateProperty(Property template, Resource XSDType) {
