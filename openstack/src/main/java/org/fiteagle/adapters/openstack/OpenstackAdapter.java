@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.openstack;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -10,11 +12,13 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
@@ -29,7 +33,11 @@ public class OpenstackAdapter extends AbstractAdapter {
   private Resource adapterInstance;
   private Resource adapter;
   private Resource resource;
+  private List<Model> resourceInstances = new ArrayList<Model>();
   private String adapterName;
+  
+  private List<Property> resourceInstanceProperties = new LinkedList<Property>();
+  private Property propertyID;
   
   private static OpenstackAdapter openstackAdapterSingleton;
   public static OpenstackAdapter getInstance(){
@@ -68,23 +76,30 @@ public class OpenstackAdapter extends AbstractAdapter {
     resource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapter);
     resource.addProperty(RDFS.label, adapterModel.createLiteral(RESOURCE_INSTANCE_NAME, "en"));
     
-    //TODO: properties
+    propertyID = adapterModel.createProperty(ADAPTER_SPECIFIC_PREFIX[1]+"id");
+    propertyID.addProperty(RDF.type, OWL.DatatypeProperty);
+    propertyID.addProperty(RDFS.domain, resource);
+    propertyID.addProperty(RDFS.range, XSD.xstring);
+    propertyID.addProperty(RDFS.label, "The ID of the Openstack VM", "en");
+    resourceInstanceProperties.add(propertyID);
     
     adapterInstance = adapterModel.createResource("http://fiteagleinternal#" + adapterName);
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("A deployed openstack adapter named: " + adapterName, "en"));
     adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("An openstack adapter that can handle VMs.", "en"));
     
-    adapterInstance.addProperty(adapterModel.createProperty("http://fiteagleinternal#isAdapterIn"), adapterModel.createResource("http://fiteagleinternal#FITEAGLE_Testbed"));
+    updateInstanceList();
+    for(Model instance : resourceInstances){
+      adapterModel.add(instance);
+    }
   }
   
   @Override
   public Object handleCreateInstance(String instanceName) {
-//    String imageId_ubuntu = "7bef2175-b4cd-4302-be23-dbeb35b41702";
-    String imageId_cirros = "f4603773-82cb-4931-9b6f-919335dfdc79";
-    String flavorId_tiny = "1"; 
+    String imageId_ubuntu = "7bef2175-b4cd-4302-be23-dbeb35b41702";
+    String flavorId_small = "2"; 
     String keyPairName = "mitja_tub";
-    Server newServer = openstackClient.createServer(imageId_cirros, flavorId_tiny, instanceName, keyPairName);
+    Server newServer = openstackClient.createServer(imageId_ubuntu, flavorId_small, instanceName, keyPairName);
     return newServer;
   }
 
@@ -126,6 +141,9 @@ public class OpenstackAdapter extends AbstractAdapter {
     Servers servers = openstackClient.listServers();
     for(Server server : servers.getList()){
       instanceList.put(server.getName(), server);
+      
+      Model createdResourceInstanceModel = getSingleInstanceModel(server.getName());
+      resourceInstances.add(createdResourceInstanceModel);
     }
   }
   
@@ -134,7 +152,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     openstackInstance.addProperty(RDFS.label, "OpenstackVM: " + instanceName);
     openstackInstance.addProperty(RDFS.comment, adapterModel.createLiteral("Openstack Virtual Machine " + instanceName));
     
-    //	TODO: properties
+    openstackInstance.addLiteral(propertyID, server.getId());
   }
 
   @Override
