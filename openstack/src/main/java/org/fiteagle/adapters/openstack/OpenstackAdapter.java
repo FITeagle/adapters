@@ -96,11 +96,10 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   @Override
   public Object handleCreateInstance(String instanceName) {
-//    String imageId_ubuntu = "7bef2175-b4cd-4302-be23-dbeb35b41702";
-    String imageId_cirros = "f4603773-82cb-4931-9b6f-919335dfdc79";
-    String flavorId_tiny = "1"; 
+    String imageId_ubuntu = "7bef2175-b4cd-4302-be23-dbeb35b41702";
+    String flavorId_small = "2"; 
     String keyPairName = "mitja_tub";
-    Server newServer = openstackClient.createServer(imageId_cirros, flavorId_tiny, instanceName, keyPairName);
+    Server newServer = openstackClient.createServer(imageId_ubuntu, flavorId_small, instanceName, keyPairName);
     return newServer;
   }
 
