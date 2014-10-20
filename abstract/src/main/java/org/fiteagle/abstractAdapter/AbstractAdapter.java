@@ -32,11 +32,9 @@ public abstract class AbstractAdapter {
    
     public abstract Resource getAdapterType();
     
-    public abstract String getAdapterName();
-
     public abstract Model getAdapterDescriptionModel();
     
-    protected abstract void updateInstanceList();
+    public abstract void updateInstanceList();
     
     public String getAdapterDescription(String serializationFormat) {
         return MessageBusMsgFactory.serializeModel(getAdapterDescriptionModel());
@@ -127,7 +125,8 @@ public abstract class AbstractAdapter {
     }
     
     public void registerAdapter(){
-        notifyListeners(getAdapterDescriptionModel(), null);
+      updateInstanceList();
+      notifyListeners(getAdapterDescriptionModel(), null);
     }
     
     public void restoreResourceInstances(){

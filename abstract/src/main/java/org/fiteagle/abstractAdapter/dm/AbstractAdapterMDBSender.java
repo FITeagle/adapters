@@ -33,7 +33,7 @@ public abstract class AbstractAdapterMDBSender {
 
     @PostConstruct
     public void initializeAdapter() {
-      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Adding change listener for " + getAdapter().getAdapterName());
+      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Adding change listener for " + getAdapter().getAdapterInstance().getURI());
       getAdapter().addChangeListener(new AdapterEventListener() {
 
         @Override
@@ -42,7 +42,7 @@ public abstract class AbstractAdapterMDBSender {
         }
       });
       
-      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterName());
+      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterInstance().getURI());
       getAdapter().registerAdapter();
       
       // TODO: necessary?
@@ -53,7 +53,7 @@ public abstract class AbstractAdapterMDBSender {
           Thread.currentThread().interrupt();
       }
       
-      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Restoring previous state of " + getAdapter().getAdapterName());
+      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Restoring previous state of " + getAdapter().getAdapterInstance().getURI());
       try {
         restoreState();
       } catch (JMSException e) {

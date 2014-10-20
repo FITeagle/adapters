@@ -61,30 +61,64 @@ public class OpenstackClient {
 	}
 	
 	private OpenstackClient() {
-		loadPreferences();
 	}
+	
+	private static boolean PREFERENCES_INITIALIZED = false;
 	
 	private void loadPreferences() {
 		Preferences preferences = Preferences.userNodeForPackage(getClass());
 
-		if (preferences.get("floating_ip_pool_name", null) != null)
-			FLOATINGIP_POOL_NAME = preferences.get("floating_ip_pool_name",	null);
-		if (preferences.get("keystone_auth_URL", null) != null)
-			KEYSTONE_AUTH_URL = preferences.get("keystone_auth_URL", null);
-		if (preferences.get("keystone_endpoint", null) != null)
-			KEYSTONE_ENDPOINT = preferences.get("keystone_endpoint", null);
-		if (preferences.get("keystone_password", null) != null)
-			KEYSTONE_PASSWORD = preferences.get("keystone_password", null);
-		if (preferences.get("keystone_username", null) != null)
-			KEYSTONE_USERNAME = preferences.get("keystone_username", null);
-		if (preferences.get("net_endpoint", null) != null)
-			NET_ENDPOINT = preferences.get("net_endpoint", null);
-		if (preferences.get("net_name", null) != null)
-			NET_NAME = preferences.get("net_name", null);
-		if (preferences.get("nova_endpoint", null) != null)
-			NOVA_ENDPOINT = preferences.get("nova_endpoint", null);
-		if (preferences.get("tenant_name", null) != null)
-			TENANT_NAME = preferences.get("tenant_name", null);
+		if (preferences.get("floating_ip_pool_name", null) != null){
+		  FLOATINGIP_POOL_NAME = preferences.get("floating_ip_pool_name",	null);
+		}
+		if (preferences.get("keystone_auth_URL", null) != null){
+		  KEYSTONE_AUTH_URL = preferences.get("keystone_auth_URL", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_auth_URL");
+		}
+		if (preferences.get("keystone_endpoint", null) != null){
+		  KEYSTONE_ENDPOINT = preferences.get("keystone_endpoint", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_endpoint");
+		}
+		if (preferences.get("keystone_password", null) != null){
+		  KEYSTONE_PASSWORD = preferences.get("keystone_password", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_password");
+		}
+		if (preferences.get("keystone_username", null) != null){
+		  KEYSTONE_USERNAME = preferences.get("keystone_username", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_username");
+		}
+		if (preferences.get("net_endpoint", null) != null){
+		  NET_ENDPOINT = preferences.get("net_endpoint", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("net_endpoint");
+		}
+		if (preferences.get("net_name", null) != null){
+		  NET_NAME = preferences.get("net_name", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("net_name");
+		}
+		if (preferences.get("nova_endpoint", null) != null){
+		  NOVA_ENDPOINT = preferences.get("nova_endpoint", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("nova_endpoint");
+		}
+		if (preferences.get("tenant_name", null) != null){
+		  TENANT_NAME = preferences.get("tenant_name", null);
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("tenant_name");
+		}
 	}
 	
 
@@ -144,7 +178,11 @@ public class OpenstackClient {
 	}
 	
 	
-	private Access getAccessWithTenantId() {
+	private Access getAccessWithTenantId() throws InsufficientOpenstackPreferences{
+	  if(PREFERENCES_INITIALIZED == false){
+	    loadPreferences();
+	    PREFERENCES_INITIALIZED = true;
+	  }
 		Keystone keystone = new Keystone(KEYSTONE_AUTH_URL,	new JerseyConnector());
 		TokensResource tokens = keystone.tokens();
 		UsernamePassword credentials = new UsernamePassword(KEYSTONE_USERNAME,  KEYSTONE_PASSWORD);
@@ -354,4 +392,13 @@ public class OpenstackClient {
 	public static String getGLANCE_ENDPOINT() {
 		return GLANCE_ENDPOINT;
 	}
+	
+  public static class InsufficientOpenstackPreferences extends RuntimeException {
+    
+    private static final long serialVersionUID = 6511540487288262809L;
+
+    public InsufficientOpenstackPreferences(String preferenceName) {
+      super("Please set the preference: "+preferenceName);
+    }
+  }
 }
