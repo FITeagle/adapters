@@ -45,26 +45,27 @@ public final class MotorAdapter extends AbstractAdapter {
 
     private MotorAdapter() {
         
-        adapterName = "ADeployedMotorAdapter1";
+        adapterName = "ADeployedMotorGarage1";
         
         adapterModel = ModelFactory.createDefaultModel();
 
         adapterModel.setNsPrefix("", "http://fiteagleinternal#");
         adapterModel.setNsPrefix("motor", "http://fiteagle.org/ontology/adapter/motor#");
-        adapterModel.setNsPrefix("fiteagle", "http://fiteagle.org/ontology#");
+        adapterModel.setNsPrefix("omn","http://open-multinet.info/ontology#");
         adapterModel.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
         adapterModel.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         adapterModel.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
         adapterModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
+        adapterModel.setNsPrefix("av","http://federation.av.tu-berlin.de/about#");
 
         resource = adapterModel.createResource("http://fiteagle.org/ontology/adapter/motor#Motor");
         resource.addProperty(RDF.type, OWL.Class);
-        resource.addProperty(RDFS.subClassOf, adapterModel.createResource("http://fiteagle.org/ontology#Resource"));
+        resource.addProperty(RDFS.subClassOf, adapterModel.createResource("http://open-multinet.info/ontology#Resource"));
 
 
-        adapter = adapterModel.createResource("http://fiteagle.org/ontology/adapter/motor#MotorGarageAdapter");
+        adapter = adapterModel.createResource("http://open-multinet.info/ontology/resource#MotorGarage");
         adapter.addProperty(RDF.type, OWL.Class);
-        adapter.addProperty(RDFS.subClassOf, adapterModel.createResource("http://fiteagle.org/ontology#Adapter"));
+        adapter.addProperty(RDFS.subClassOf, adapterModel.createResource("http://open-multinet.info/ontology#Adapter"));
 
         adapter.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resource);
         adapter.addProperty(RDFS.label, adapterModel.createLiteral("MotorGarageAdapterType ", "en"));
@@ -108,12 +109,24 @@ public final class MotorAdapter extends AbstractAdapter {
         motorPropertyManufacturer.addProperty(RDFS.domain, resource);
         motorPropertyRPM.addProperty(RDFS.label, "Motor Property: Manufacturer", "en");
         motorPropertyManufacturer.addProperty(RDFS.range, XSD.xstring);
+        motorControlProperties.add(motorPropertyManufacturer);
 
-        adapterInstance = adapterModel.createResource("http://fiteagleinternal#" + adapterName);
+        adapterInstance = adapterModel.createResource("http://federation.av.tu-berlin.de/about#" + adapterName);
         adapterInstance.addProperty(RDF.type, adapter);
         adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("A deployed motor garage adapter named: " + adapterName, "en"));
         adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("A motor garage adapter that can simulate different dynamic motor resources.", "en"));
-
+        //wgs coordinates
+        adapterInstance.addProperty(adapterModel.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat"), "52.516377");
+        adapterInstance.addProperty(adapterModel.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long"), "13.323732");
+        
+        // Testbed name with omn:partOfGroup
+        adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology#partOfGroup"),adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
+        
+        // adding resource property to the description.
+/*        for(Property prob : motorControlProperties){
+        	adapterInstance.addProperty(RDFS.member, prob);
+        }*/
+        
     }
 
     @Override
