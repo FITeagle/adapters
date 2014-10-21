@@ -1,31 +1,34 @@
-@prefix :      <http://federation.av.tu-berlin.de/about#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix omn:   <http://fiteagle.org/ontology#> .
+@prefix omn:   <http://open-multinet.info/ontology#> .
 @prefix wgs:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
-@prefix omf: <http://fiteagle.org/ontology#> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix openstack: <http://fiteagle.org/ontology/adapter/openstack#> .
+@prefix omnr:  <http://open-multinet.info/ontology/resources#> .
 
-openstack:OpenstackAdapter
+omnr:OpenstackAdapter
         a                owl:Class ;
         rdfs:label       "OpenstackAdapterType "@en ;
         rdfs:subClassOf  omn:Adapter ;
-        omn:implements   openstack:OpenstackVM .
+        omn:implements   omnr:OpenstackVM .
 
-:OpenstackAdapter1  a  openstack:OpenstackAdapter ;
+av:OpenstackAdapter1
+        a  omnr:OpenstackAdapter ;
+        omn:partOfGroup av:AV_Smart_Communication_Testbed ;
         rdfs:comment  "An openstack adapter that can handle VMs."@en ;
         rdfs:label    "A deployed openstack adapter named: OpenstackAdapter1"@en .
+        
 
-openstack:id  a      owl:DatatypeProperty ;
-        rdfs:domain  openstack:OpenstackVM ;
+omnr:id
+        a      owl:DatatypeProperty ;
+        rdfs:domain  omnr:OpenstackVM ;
         rdfs:label   "The ID of the Openstack VM"@en ;
         rdfs:range   xsd:string .
 
-openstack:OpenstackVM
+omnr:OpenstackVM
         a                  owl:Class ;
         rdfs:label         "OpenstackVM"@en ;
         rdfs:subClassOf    omn:Resource ;
-        omn:implementedBy  openstack:OpenstackAdapter .
+        omn:implementedBy  omnr:OpenstackAdapter .

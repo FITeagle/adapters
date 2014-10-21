@@ -22,7 +22,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
-  private static final String[] ADAPTER_SPECIFIC_PREFIX = { "openstack", "http://fiteagle.org/ontology/adapter/openstack#" };
+  private static final String[] ADAPTER_SPECIFIC_PREFIX = { "omnr", "http://open-multinet.info/ontology/resources#" };
   
   private OpenstackClient openstackClient;
   
@@ -100,7 +100,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   public Model handleMonitorInstance(String instanceName, Model modelInstances) {
     Server currentServer = (Server) instanceList.get(instanceName);
 
-    Resource serverInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
+    Resource serverInstance = modelInstances.createResource("http://federation.av.tu-berlin.de/about#" + instanceName);
     addPropertiesToResource(serverInstance, currentServer, instanceName);
 
     return modelInstances;
@@ -112,7 +112,7 @@ public class OpenstackAdapter extends AbstractAdapter {
 
       Server server = (Server) instanceList.get(key);
 
-      Resource openstackInstance = modelInstances.createResource("http://fiteagleinternal#" + key);
+      Resource openstackInstance = modelInstances.createResource("http://federation.av.tu-berlin.de/about#" + key);
       addPropertiesToResource(openstackInstance, server, key);
     }
     return modelInstances;
