@@ -55,7 +55,7 @@ public class TestbedAdapterMDBListener implements MessageListener {
                           Model adapterModel = TestbedAdapter.getTestbedModel();
                           Resource adapterInstance = getAdapterInstance(modelMessage);
                           if (adapterInstance == null) {
-                              LOGGER.log(Level.INFO, "http://fiteagle.org/ontology#Adapter could not be detected");
+                              LOGGER.log(Level.INFO, "no adapter could be detected in the inform message");
                           } else {                            
                               LOGGER.log(Level.INFO, "Received an inform message");
                               Resource testbedResource = adapterModel.getResource(TestbedAdapter.getTestbed().getURI());

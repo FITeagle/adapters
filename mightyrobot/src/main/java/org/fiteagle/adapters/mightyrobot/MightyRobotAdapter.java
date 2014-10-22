@@ -19,7 +19,9 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 public class MightyRobotAdapter extends AbstractAdapter {
   
-  private String[] adapterSpecificPrefix = { "mightyrobot", "http://fiteagle.org/ontology/adapter/mightyrobot#" };
+  private static final String[] ADAPTER_SPECIFIC_PREFIX = {"mightyrobotfactory","http://open-multinet.info/ontology/resource/mightyrobotfactory#"};
+  private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = {"mightyrobot","http://open-multinet.info/ontology/resource/mightyrobot#"};
+  private final String[] ADAPTER_INSTANCE_PREFIX = {"av","http://federation.av.tu-berlin.de/about#"};
   
   private Model adapterModel;
   private Resource adapterInstance;
@@ -47,27 +49,25 @@ public class MightyRobotAdapter extends AbstractAdapter {
   
   public MightyRobotAdapter() {
     
-    adapterName = "ADeployedMightyRobotAdapter1";
+    adapterName = "MightyRobotFactory-1";
     
     // Provide model with needed prefixes
     adapterModel = ModelFactory.createDefaultModel();
-    adapterModel.setNsPrefix("", "http://fiteagleinternal#");
-    adapterModel.setNsPrefix(adapterSpecificPrefix[0], adapterSpecificPrefix[1]);
-    adapterModel.setNsPrefix("fiteagle", "http://fiteagle.org/ontology#");
+    adapterModel.setNsPrefix(ADAPTER_SPECIFIC_PREFIX[0], ADAPTER_SPECIFIC_PREFIX[1]);
     adapterModel.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
     adapterModel.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     adapterModel.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
     adapterModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
     
     // instantiate instance class resource
-    resource = adapterModel.createResource(adapterSpecificPrefix[1] + instanceClassResourceString);
+    resource = adapterModel.createResource(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + instanceClassResourceString);
     resource.addProperty(RDF.type, OWL.Class);
-    resource.addProperty(RDFS.subClassOf, adapterModel.createResource("http://fiteagle.org/ontology#Resource"));
+    resource.addProperty(RDFS.subClassOf, adapterModel.createResource(MessageBusOntologyModel.classResource));
     
     // instantiate adapter type resource
-    adapter = adapterModel.createResource(adapterSpecificPrefix[1] + adapterResourceString);
+    adapter = adapterModel.createResource(ADAPTER_SPECIFIC_PREFIX[1] + adapterResourceString);
     adapter.addProperty(RDF.type, OWL.Class);
-    adapter.addProperty(RDFS.subClassOf, adapterModel.createResource("http://fiteagle.org/ontology#Adapter"));
+    adapter.addProperty(RDFS.subClassOf, adapterModel.createResource(MessageBusOntologyModel.classAdapter));
     
     adapter.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resource);
     adapter.addProperty(RDFS.label, adapterModel.createLiteral(adapterResourceString + "Type ", "en"));
@@ -76,31 +76,31 @@ public class MightyRobotAdapter extends AbstractAdapter {
     resource.addProperty(RDFS.label, adapterModel.createLiteral(instanceClassResourceString + "Resource", "en"));
     
     // create properties
-    mightyRobotPropertyDancing = generateProperty(adapterModel.createProperty(adapterSpecificPrefix[1] + "dancing"),
+    mightyRobotPropertyDancing = generateProperty(adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "dancing"),
         XSD.xboolean);
     resourceControlProperties.add(mightyRobotPropertyDancing);
     
-    mightyRobotPropertyExploded = generateProperty(adapterModel.createProperty(adapterSpecificPrefix[1] + "exploded"),
+    mightyRobotPropertyExploded = generateProperty(adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "exploded"),
         XSD.xboolean);
     resourceControlProperties.add(mightyRobotPropertyExploded);
     
     mightyRobotPropertyHeadRotation = generateProperty(
-        adapterModel.createProperty(adapterSpecificPrefix[1] + "headRotation"), XSD.integer);
+        adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "headRotation"), XSD.integer);
     resourceControlProperties.add(mightyRobotPropertyHeadRotation);
     
-    mightyRobotPropertyNickname = generateProperty(adapterModel.createProperty(adapterSpecificPrefix[1] + "nickname"),
+    mightyRobotPropertyNickname = generateProperty(adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "nickname"),
         XSD.xstring);
     
     // instantiate adapter instance resource
-    adapterInstance = adapterModel.createResource("http://fiteagleinternal#" + adapterName);
+    adapterInstance = adapterModel.createResource(ADAPTER_INSTANCE_PREFIX[1] + adapterName);
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label,
         adapterModel.createLiteral("A deployed Mighty Robot Adapter named: " + adapterName, "en"));
     adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral(
         "A Mighty Robot Adapter that can handle multiple Robots and their shenanigans.", "en"));
     // Testbed Addendum
-    adapterInstance.addProperty(adapterModel.createProperty("http://fiteagleinternal#isAdapterIn"),
-        adapterModel.createResource("http://fiteagleinternal#AV_Smart_Communication_Testbed"));
+    adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology/omn#partOfGroup"),
+        adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
   }
   
   private Property generateProperty(Property template, Resource XSDType) {
@@ -124,7 +124,7 @@ public class MightyRobotAdapter extends AbstractAdapter {
   public Model handleMonitorInstance(String instanceName, Model modelInstances) {
     MightyRobot currentMightyRobot = (MightyRobot) instanceList.get(instanceName);
     
-    Resource mightyRobotInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
+    Resource mightyRobotInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + instanceName);
     addPropertiesToResource(mightyRobotInstance, currentMightyRobot, instanceName);
     
     return modelInstances;
@@ -137,7 +137,7 @@ public class MightyRobotAdapter extends AbstractAdapter {
       
       MightyRobot currentMightyRobot = (MightyRobot) instanceList.get(key);
       
-      Resource mightyRobotInstance = modelInstances.createResource("http://fiteagleinternal#" + key);
+      Resource mightyRobotInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + key);
       addPropertiesToResource(mightyRobotInstance, currentMightyRobot, key);
       
     }
@@ -195,7 +195,17 @@ public class MightyRobotAdapter extends AbstractAdapter {
   
   @Override
   public String[] getAdapterSpecificPrefix() {
-    return adapterSpecificPrefix.clone();
+      return ADAPTER_SPECIFIC_PREFIX.clone();
+  }
+  
+  @Override
+  public String[] getAdapterManagedResourcePrefix() {
+    return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
+  }
+
+  @Override
+  public String[] getAdapterInstancePrefix() {
+    return ADAPTER_INSTANCE_PREFIX.clone();
   }
   
   @Override

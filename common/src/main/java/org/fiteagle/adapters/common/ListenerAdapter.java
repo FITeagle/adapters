@@ -1,20 +1,20 @@
 package org.fiteagle.adapters.common;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.logging.Logger;
 
-import org.apache.jena.riot.RiotException;
+import javax.jms.JMSException;
+import javax.jms.Message;
 
+import org.apache.jena.riot.RiotException;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -22,8 +22,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public class ListenerAdapter {
 
-	private final static Logger LOGGER = Logger.getLogger(ListenerAdapter.class
-			.toString());
+	@SuppressWarnings("unused")
+  private final static Logger LOGGER = Logger.getLogger(ListenerAdapter.class.toString());
 
 	public ListenerAdapter() throws JMSException {
 	}
@@ -44,11 +44,8 @@ public class ListenerAdapter {
 	public String handleDiscoverAdapter(Model modelDiscover)
 			throws JMSException {
 
-		com.hp.hpl.jena.rdf.model.Resource message = modelDiscover
-				.createResource("http://fiteagleinternal#Message");
-		message.addProperty(RDF.type,
-				MessageBusOntologyModel.propertyFiteagleInform);
-		modelDiscover.setNsPrefix("", "http://fiteagleinternal#");
+		Resource message = MessageBusOntologyModel.internalMessage;
+		message.addProperty(RDF.type,	MessageBusOntologyModel.propertyFiteagleInform);
 
 		StringWriter writer = new StringWriter();
 		modelDiscover.write(writer, "TURTLE");
@@ -117,11 +114,8 @@ public class ListenerAdapter {
 	}
 
 	public String createResponse(Model model) {
-		com.hp.hpl.jena.rdf.model.Resource message = model
-				.createResource("http://fiteagleinternal#Message");
-		message.addProperty(RDF.type,
-				MessageBusOntologyModel.propertyFiteagleInform);
-		model.setNsPrefix("", "http://fiteagleinternal#");
+	  Resource message = MessageBusOntologyModel.internalMessage;
+		message.addProperty(RDF.type,	MessageBusOntologyModel.propertyFiteagleInform);
 
 		StringWriter writer = new StringWriter();
 		model.write(writer, "TURTLE");

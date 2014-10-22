@@ -19,7 +19,9 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 public final class MotorAdapter extends AbstractAdapter {
 
-    private String[] adapterSpecificPrefix = { "motor", "http://fiteagle.org/ontology/adapter/motor#" };
+    private static final String[] ADAPTER_SPECIFIC_PREFIX = {"motorgarage","http://open-multinet.info/ontology/resource/motorgarage#"};
+    private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = {"motor","http://open-multinet.info/ontology/resource/motor#"};
+    private final String[] ADAPTER_INSTANCE_PREFIX = {"av","http://federation.av.tu-berlin.de/about#"};
 
     private Model adapterModel;
     private Resource adapterInstance;
@@ -45,27 +47,25 @@ public final class MotorAdapter extends AbstractAdapter {
 
     private MotorAdapter() {
         
-        adapterName = "ADeployedMotorGarage1";
+        adapterName = "MotorGarage-1";
         
         adapterModel = ModelFactory.createDefaultModel();
 
-        adapterModel.setNsPrefix("", "http://fiteagleinternal#");
-        adapterModel.setNsPrefix("motor", "http://fiteagle.org/ontology/adapter/motor#");
-        adapterModel.setNsPrefix("omn","http://open-multinet.info/ontology#");
+        adapterModel.setNsPrefix("omn","http://open-multinet.info/ontology/omn#");
         adapterModel.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
         adapterModel.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         adapterModel.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
         adapterModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
         adapterModel.setNsPrefix("av","http://federation.av.tu-berlin.de/about#");
 
-        resource = adapterModel.createResource("http://fiteagle.org/ontology/adapter/motor#Motor");
+        resource = adapterModel.createResource(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"Motor");
         resource.addProperty(RDF.type, OWL.Class);
-        resource.addProperty(RDFS.subClassOf, adapterModel.createResource("http://open-multinet.info/ontology#Resource"));
+        resource.addProperty(RDFS.subClassOf, adapterModel.createResource(MessageBusOntologyModel.classResource));
 
 
-        adapter = adapterModel.createResource("http://open-multinet.info/ontology/resource#MotorGarage");
+        adapter = adapterModel.createResource(ADAPTER_SPECIFIC_PREFIX[1]+"MotorGarage");
         adapter.addProperty(RDF.type, OWL.Class);
-        adapter.addProperty(RDFS.subClassOf, adapterModel.createResource("http://open-multinet.info/ontology#Adapter"));
+        adapter.addProperty(RDFS.subClassOf, adapterModel.createResource(MessageBusOntologyModel.classAdapter));
 
         adapter.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resource);
         adapter.addProperty(RDFS.label, adapterModel.createLiteral("MotorGarageAdapterType ", "en"));
@@ -73,22 +73,22 @@ public final class MotorAdapter extends AbstractAdapter {
         resource.addProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapter);
         resource.addProperty(RDFS.label, adapterModel.createLiteral("MotorResource", "en"));
 
-        // create the property
-        motorPropertyRPM = adapterModel.createProperty("http://fiteagle.org/ontology/adapter/motor#rpm");
+        // create the properties
+        motorPropertyRPM = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"rpm");
         motorPropertyRPM.addProperty(RDF.type, OWL.DatatypeProperty);
         motorPropertyRPM.addProperty(RDFS.domain, resource);
         motorPropertyRPM.addProperty(RDFS.range, XSD.integer);
         motorPropertyRPM.addProperty(RDFS.label, "Motor Property: RPM", "en");
         motorControlProperties.add(motorPropertyRPM);
 
-        motorPropertyMaxRPM = adapterModel.createProperty("http://fiteagle.org/ontology/adapter/motor#maxRpm");
+        motorPropertyMaxRPM = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"maxRpm");
         motorPropertyMaxRPM.addProperty(RDF.type, OWL.DatatypeProperty);
         motorPropertyMaxRPM.addProperty(RDFS.domain, resource);
         motorPropertyMaxRPM.addProperty(RDFS.range, XSD.integer);
         motorPropertyRPM.addProperty(RDFS.label, "Motor Property: Max. RPM", "en");
         motorControlProperties.add(motorPropertyMaxRPM);
 
-        motorPropertyThrottle = adapterModel.createProperty("http://fiteagle.org/ontology/adapter/motor#throttle");
+        motorPropertyThrottle = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"throttle");
         motorPropertyThrottle.addProperty(RDF.type, OWL.DatatypeProperty);
         motorPropertyThrottle.addProperty(RDFS.domain, resource);
         motorPropertyThrottle.addProperty(RDFS.range, XSD.integer);
@@ -97,21 +97,21 @@ public final class MotorAdapter extends AbstractAdapter {
 
 
 
-        motorPropertyIsDynamic = adapterModel.createProperty("http://fiteagle.org/ontology/adapter/motor#isDynamic");
+        motorPropertyIsDynamic = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"isDynamic");
         motorPropertyIsDynamic.addProperty(RDF.type, OWL.DatatypeProperty);
         motorPropertyIsDynamic.addProperty(RDFS.domain, resource);
         motorPropertyIsDynamic.addProperty(RDFS.range, XSD.xboolean);
         motorPropertyRPM.addProperty(RDFS.label, "Motor Property: isDynamic", "en");
         motorControlProperties.add(motorPropertyIsDynamic);
 
-        motorPropertyManufacturer = adapterModel.createProperty("http://fiteagle.org/ontology/adapter/motor#manufacturer");
+        motorPropertyManufacturer = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"manufacturer");
         motorPropertyManufacturer.addProperty(RDF.type, OWL.DatatypeProperty);
         motorPropertyManufacturer.addProperty(RDFS.domain, resource);
         motorPropertyRPM.addProperty(RDFS.label, "Motor Property: Manufacturer", "en");
         motorPropertyManufacturer.addProperty(RDFS.range, XSD.xstring);
         motorControlProperties.add(motorPropertyManufacturer);
 
-        adapterInstance = adapterModel.createResource("http://federation.av.tu-berlin.de/about#" + adapterName);
+        adapterInstance = adapterModel.createResource(ADAPTER_INSTANCE_PREFIX[1] + adapterName);
         adapterInstance.addProperty(RDF.type, adapter);
         adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("A deployed motor garage adapter named: " + adapterName, "en"));
         adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("A motor garage adapter that can simulate different dynamic motor resources.", "en"));
@@ -120,7 +120,7 @@ public final class MotorAdapter extends AbstractAdapter {
         adapterInstance.addProperty(adapterModel.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long"), "13.323732");
         
         // Testbed name with omn:partOfGroup
-        adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology#partOfGroup"),adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
+        adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology/omn#partOfGroup"),adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
         
         // adding resource property to the description.
 /*        for(Property prob : motorControlProperties){
@@ -138,7 +138,7 @@ public final class MotorAdapter extends AbstractAdapter {
     public Model handleMonitorInstance(String instanceName, Model modelInstances) {
         Motor currentMotor = (Motor) instanceList.get(instanceName);
 
-        Resource motorInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
+        Resource motorInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + instanceName);
         addPropertiesToResource(motorInstance, currentMotor, instanceName);
 
         return modelInstances;
@@ -150,7 +150,7 @@ public final class MotorAdapter extends AbstractAdapter {
 
             Motor currentMotor = (Motor) instanceList.get(key);
 
-            Resource motorInstance = modelInstances.createResource("http://fiteagleinternal#" + key);
+            Resource motorInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + key);
             addPropertiesToResource(motorInstance, currentMotor, key);
         }
         return modelInstances;
@@ -202,7 +202,17 @@ public final class MotorAdapter extends AbstractAdapter {
 
     @Override
     public String[] getAdapterSpecificPrefix() {
-        return adapterSpecificPrefix.clone();
+        return ADAPTER_SPECIFIC_PREFIX.clone();
+    }
+    
+    @Override
+    public String[] getAdapterManagedResourcePrefix() {
+      return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
+    }
+
+    @Override
+    public String[] getAdapterInstancePrefix() {
+      return ADAPTER_INSTANCE_PREFIX.clone();
     }
 
     public Motor getInstance(String instanceName) {

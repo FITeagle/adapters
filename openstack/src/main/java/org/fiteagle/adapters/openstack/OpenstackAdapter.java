@@ -22,7 +22,10 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
-  private static final String[] ADAPTER_SPECIFIC_PREFIX = { "omnr", "http://open-multinet.info/ontology/resource#" };
+  private static final String[] ADAPTER_SPECIFIC_PREFIX = new String[2];
+  private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
+  private final String[] ADAPTER_INSTANCE_PREFIX = new String[2];
+  
   
   private OpenstackClient openstackClient;
   
@@ -46,11 +49,15 @@ public class OpenstackAdapter extends AbstractAdapter {
     StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
       adapter = adapterIterator.next().getSubject();
+      ADAPTER_SPECIFIC_PREFIX[1] = adapter.getNameSpace();
+      ADAPTER_SPECIFIC_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_SPECIFIC_PREFIX[1]);
     }
     
     StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
+      ADAPTER_MANAGED_RESOURCE_PREFIX[1] = resource.getNameSpace();
+      ADAPTER_MANAGED_RESOURCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_MANAGED_RESOURCE_PREFIX[1]);
     }
     
     StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
@@ -64,6 +71,9 @@ public class OpenstackAdapter extends AbstractAdapter {
       Resource adapterInstance = adapterInstanceIterator.next().getSubject();
       
       OpenstackAdapter openstackAdapter = new OpenstackAdapter(adapterInstance, adapterModel);
+      openstackAdapter.ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
+      openstackAdapter.ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(openstackAdapter.ADAPTER_INSTANCE_PREFIX[1]);
+      
       openstackAdapterInstances.put(adapterInstance.getURI(), openstackAdapter);
     }
   }
@@ -95,12 +105,22 @@ public class OpenstackAdapter extends AbstractAdapter {
   public String[] getAdapterSpecificPrefix() {
     return ADAPTER_SPECIFIC_PREFIX.clone();
   }
+  
+  @Override
+  public String[] getAdapterManagedResourcePrefix() {
+    return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
+  }
+  
+  @Override
+  public String[] getAdapterInstancePrefix() {
+    return ADAPTER_INSTANCE_PREFIX.clone();
+  }
 
   @Override
   public Model handleMonitorInstance(String instanceName, Model modelInstances) {
     Server currentServer = (Server) instanceList.get(instanceName);
 
-    Resource serverInstance = modelInstances.createResource("http://federation.av.tu-berlin.de/about#" + instanceName);
+    Resource serverInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + instanceName);
     addPropertiesToResource(serverInstance, currentServer, instanceName);
 
     return modelInstances;
@@ -112,7 +132,7 @@ public class OpenstackAdapter extends AbstractAdapter {
 
       Server server = (Server) instanceList.get(key);
 
-      Resource openstackInstance = modelInstances.createResource("http://federation.av.tu-berlin.de/about#" + key);
+      Resource openstackInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + key);
       addPropertiesToResource(openstackInstance, server, key);
     }
     return modelInstances;

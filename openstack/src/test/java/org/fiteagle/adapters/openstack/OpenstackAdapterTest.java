@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.openstack;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Iterator;
 
@@ -26,6 +26,16 @@ public class OpenstackAdapterTest {
   @Test
   public void testAdapterModel() {
     assertTrue(adapter.getAdapterDescriptionModel().contains(adapter.getAdapterType(), RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
+  }
+  
+  @Test
+  public void testAdaptePrefixes() {
+    assertNotNull(adapter.getAdapterSpecificPrefix()[0]);
+    assertNotNull(adapter.getAdapterManagedResourcePrefix()[0]);
+    assertNotNull(adapter.getAdapterInstancePrefix()[0]);
+    assertNotNull(adapter.getAdapterSpecificPrefix()[1]);
+    assertNotNull(adapter.getAdapterManagedResourcePrefix()[1]);
+    assertNotNull(adapter.getAdapterInstancePrefix()[1]);
   }
   
   @Test

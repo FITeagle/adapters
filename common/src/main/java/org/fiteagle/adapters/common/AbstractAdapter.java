@@ -46,10 +46,7 @@ public abstract class AbstractAdapter {
 	}
 
 	private void setModelPrefixes(Model model) {
-		model.setNsPrefix("", "http://fiteagleinternal#");
-		model.setNsPrefix(getAdapterSpecificPrefix()[0],
-				getAdapterSpecificPrefix()[1]);
-		model.setNsPrefix("fiteagle", "http://fiteagle.org/ontology#");
+		model.setNsPrefix(getAdapterSpecificPrefix()[0], getAdapterSpecificPrefix()[1]);
 		model.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
 		model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 		model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");

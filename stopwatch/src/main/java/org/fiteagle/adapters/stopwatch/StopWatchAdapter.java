@@ -25,7 +25,10 @@ public final class StopWatchAdapter extends AbstractAdapter {
   private Resource resource;
   private String adapterName;
   
-  private String[] adapterSpecificPrefix = { "stopwatch", "http://fiteagle.org/ontology/adapter/stopwatch#" };
+  private static final String[] ADAPTER_SPECIFIC_PREFIX = {"stopwatchfactory","http://open-multinet.info/ontology/resource/stopwatchfactory#"};
+  private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = {"stopwatch","http://open-multinet.info/ontology/resource/stopwatch#"};
+  private final String[] ADAPTER_INSTANCE_PREFIX = {"av","http://federation.av.tu-berlin.de/about#"};
+  
   private static StopWatchAdapter stopwatchAdapterSingleton;
   
   public static synchronized StopWatchAdapter getInstance() {
@@ -42,25 +45,23 @@ public final class StopWatchAdapter extends AbstractAdapter {
   
   private StopWatchAdapter() {
     
-    adapterName = "ADeployedStopwatchAdapter1";
+    adapterName = "StopwatchFactory-1";
     
     adapterModel = ModelFactory.createDefaultModel();
     
-    adapterModel.setNsPrefix("", "http://fiteagleinternal#");
-    adapterModel.setNsPrefix(adapterSpecificPrefix[0], adapterSpecificPrefix[1]);
-    adapterModel.setNsPrefix("fiteagle", "http://fiteagle.org/ontology#");
+    adapterModel.setNsPrefix(ADAPTER_SPECIFIC_PREFIX[0], ADAPTER_SPECIFIC_PREFIX[1]);
     adapterModel.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
     adapterModel.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
     adapterModel.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
     adapterModel.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
     
-    resource = adapterModel.createResource(adapterSpecificPrefix[1] + "Stopwatch");
+    resource = adapterModel.createResource(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "Stopwatch");
     resource.addProperty(RDF.type, OWL.Class);
-    resource.addProperty(RDFS.subClassOf, adapterModel.createResource("http://fiteagle.org/ontology#Resource"));
+    resource.addProperty(RDFS.subClassOf, adapterModel.createResource(MessageBusOntologyModel.classResource));
     
-    adapter = adapterModel.createResource(adapterSpecificPrefix[1] + "StopwatchAdapter");
+    adapter = adapterModel.createResource(ADAPTER_SPECIFIC_PREFIX[1] + "StopwatchAdapter");
     adapter.addProperty(RDF.type, OWL.Class);
-    adapter.addProperty(RDFS.subClassOf, adapterModel.createResource("http://fiteagle.org/ontology#Adapter"));
+    adapter.addProperty(RDFS.subClassOf, adapterModel.createResource(MessageBusOntologyModel.classAdapter));
     
     adapter.addProperty(MessageBusOntologyModel.propertyFiteagleImplements, resource);
     adapter.addProperty(RDFS.label, adapterModel.createLiteral("StopwatchAdapterType ", "en"));
@@ -69,25 +70,25 @@ public final class StopWatchAdapter extends AbstractAdapter {
     resource.addProperty(RDFS.label, adapterModel.createLiteral("Stopwatch Resource", "en"));
     
     // create the property
-    stopwatchPropertyRefreshInterval = adapterModel.createProperty(adapterSpecificPrefix[1] + "refreshInterval");
+    stopwatchPropertyRefreshInterval = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "refreshInterval");
     stopwatchPropertyRefreshInterval.addProperty(RDF.type, OWL.DatatypeProperty);
     stopwatchPropertyRefreshInterval.addProperty(RDFS.domain, resource);
     stopwatchPropertyRefreshInterval.addProperty(RDFS.range, XSD.integer);
     stopwatchontrolProperties.add(stopwatchPropertyRefreshInterval);
     
-    stopwatchPropertyCurrentTime = adapterModel.createProperty(adapterSpecificPrefix[1] + "currentTime");
+    stopwatchPropertyCurrentTime = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "currentTime");
     stopwatchPropertyCurrentTime.addProperty(RDF.type, OWL.DatatypeProperty);
     stopwatchPropertyCurrentTime.addProperty(RDFS.domain, resource);
     stopwatchPropertyCurrentTime.addProperty(RDFS.range, XSD.integer);
     stopwatchontrolProperties.add(stopwatchPropertyCurrentTime);
     
-    stopwatchPropertyIsRunning = adapterModel.createProperty(adapterSpecificPrefix[1] + "isRunning");
+    stopwatchPropertyIsRunning = adapterModel.createProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1] + "isRunning");
     stopwatchPropertyIsRunning.addProperty(RDF.type, OWL.DatatypeProperty);
     stopwatchPropertyIsRunning.addProperty(RDFS.domain, resource);
     stopwatchPropertyIsRunning.addProperty(RDFS.range, XSD.xboolean);
     stopwatchontrolProperties.add(stopwatchPropertyIsRunning);
     
-    adapterInstance = adapterModel.createResource("http://fiteagleinternal#" + adapterName);
+    adapterInstance = adapterModel.createResource(ADAPTER_INSTANCE_PREFIX[1] + adapterName);
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label,
         adapterModel.createLiteral("A deployed stopwatch adapter named: " + adapterName, "en"));
@@ -104,7 +105,7 @@ public final class StopWatchAdapter extends AbstractAdapter {
   public Model handleMonitorInstance(String instanceName, Model modelInstances) {
     Stopwatch currentResource = (Stopwatch) instanceList.get(instanceName);
     
-    Resource resourceInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
+    Resource resourceInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + instanceName);
     addPropertiesToResource(resourceInstance, currentResource, instanceName);
     
     return modelInstances;
@@ -116,7 +117,7 @@ public final class StopWatchAdapter extends AbstractAdapter {
       
       Stopwatch currentResource = (Stopwatch) instanceList.get(key);
       
-      Resource resourceInstance = modelInstances.createResource("http://fiteagleinternal#" + key);
+      Resource resourceInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1] + key);
       addPropertiesToResource(resourceInstance, currentResource, key);
     }
     return modelInstances;
@@ -168,7 +169,17 @@ public final class StopWatchAdapter extends AbstractAdapter {
   
   @Override
   public String[] getAdapterSpecificPrefix() {
-    return adapterSpecificPrefix.clone();
+      return ADAPTER_SPECIFIC_PREFIX.clone();
+  }
+  
+  @Override
+  public String[] getAdapterManagedResourcePrefix() {
+    return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
+  }
+
+  @Override
+  public String[] getAdapterInstancePrefix() {
+    return ADAPTER_INSTANCE_PREFIX.clone();
   }
   
   public Stopwatch getInstance(String instanceName) {

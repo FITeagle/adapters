@@ -162,7 +162,7 @@ public class AdapterRDFHandler {
     
     adapter.setModelPrefixes(modelInstances);
     
-    Resource releaseInstance = modelInstances.createResource("http://fiteagleinternal#" + instanceName);
+    Resource releaseInstance = modelInstances.createResource(adapter.getAdapterInstancePrefix()[1] + instanceName);
     modelInstances.add(adapter.getAdapterInstance(), MessageBusOntologyModel.methodReleases, releaseInstance);
     
     return modelInstances;

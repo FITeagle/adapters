@@ -93,16 +93,17 @@ To change the RPM of motor resource instance named "Motor1" to 500:
 
 
 ```
-@prefix fiteagle: <http://fiteagle.org/ontology#> .
-@prefix motor: <http://fiteagle.org/ontology/adapter/motor#> .
+
+@prefix motorgarage: <http://open-multinet.info/ontology/resource/motorgarage#> .
+@prefix motor: <http://open-multinet.info/ontology/resource/motor#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix : <http://fiteagleinternal#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
 
+av:ADeployedMotorAdapter1 a motorgarage:MotorGarageAdapter .
 
-:ADeployedMotorAdapter1 rdf:type motor:MotorGarageAdapter .
-
-:Motor1 rdf:type motor:Motor ;
+av:Motor1 a motor:Motor ;
                             motor:rpm 500 .
+                            
 ```
 
 

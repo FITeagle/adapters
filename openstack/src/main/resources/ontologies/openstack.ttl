@@ -1,36 +1,60 @@
-@prefix av:    <http://federation.av.tu-berlin.de/about#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix omn:   <http://open-multinet.info/ontology#> .
 @prefix wgs:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-@prefix omnr:  <http://open-multinet.info/ontology/resource#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+@prefix omn:   <http://open-multinet.info/ontology/omn#> .
+@prefix os:    <http://open-multinet.info/ontology/resource/openstack#> .
 @prefix osvm:  <http://open-multinet.info/ontology/resource/openstackvm#> .
 
-omnr:Openstack
+os:Openstack
         a                owl:Class ;
         rdfs:label       "Openstack VM Server Type "@en ;
         rdfs:subClassOf  omn:Adapter ;
-        omn:implements   omnr:OpenstackVM .
+        omn:implements   osvm:OpenstackVM .
 
-av:Openstack1
-        a  omnr:Openstack ;
+av:Openstack-1
+        a  os:Openstack ;
         omn:partOfGroup av:AV_Smart_Communication_Testbed ;
         rdfs:comment  "An openstack vm server that can handle different VMs."@en ;
         rdfs:label    "A deployed openstack vm server named: Openstack1"@en ;
         wgs:lat       "52.516377" ;
         wgs:long      "13.323732" .
 
-omnr:OpenstackVM
+osvm:OpenstackVM
         a                  owl:Class ;
         rdfs:label         "OpenstackVM"@en ;
         rdfs:subClassOf    omn:Resource ;
-        omn:implementedBy  omnr:Openstack .
+        omn:implementedBy  os:Openstack .
 
 osvm:id
         a      owl:DatatypeProperty ;
-        rdfs:domain  omnr:OpenstackVM ;
+        rdfs:domain  osvm:OpenstackVM ;
         rdfs:label   "The ID of the Openstack VM"@en ;
+        rdfs:range   xsd:string .
+
+osvm:status
+        a      owl:DatatypeProperty ;
+        rdfs:domain  osvm:OpenstackVM ;
+        rdfs:label   "The image id of the Openstack VM"@en ;
+        rdfs:range   xsd:string .
+        
+osvm:created
+        a      owl:DatatypeProperty ;
+        rdfs:domain  osvm:OpenstackVM ;
+        rdfs:label   "The image id of the Openstack VM"@en ;
+        rdfs:range   xsd:string .
+        
+osvm:image
+        a      owl:DatatypeProperty ;
+        rdfs:domain  osvm:OpenstackVM ;
+        rdfs:label   "The image id of the Openstack VM"@en ;
+        rdfs:range   xsd:string .
+        
+osvm:flavor
+        a      owl:DatatypeProperty ;
+        rdfs:domain  osvm:OpenstackVM ;
+        rdfs:label   "The image id of the Openstack VM"@en ;
         rdfs:range   xsd:string .

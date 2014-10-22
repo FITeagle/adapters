@@ -97,9 +97,10 @@ public abstract class AbstractAdapter {
     
 
     public void setModelPrefixes(Model model) {
-        model.setNsPrefix("", "http://fiteagleinternal#");
         model.setNsPrefix(getAdapterSpecificPrefix()[0], getAdapterSpecificPrefix()[1]);
-        model.setNsPrefix("fiteagle", "http://fiteagle.org/ontology#");
+        model.setNsPrefix(getAdapterManagedResourcePrefix()[0], getAdapterManagedResourcePrefix()[1]);
+        model.setNsPrefix(getAdapterInstancePrefix()[0], getAdapterInstancePrefix()[1]);
+        model.setNsPrefix("omn", "http://open-multinet.info/ontology/omn#");
         model.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
         model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
         model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
@@ -145,7 +146,7 @@ public abstract class AbstractAdapter {
         setModelPrefixes(modelPropertiesChanged);
         
         Model wholeInstance = getSingleInstanceModel(instanceName);
-        Resource currentInstance = wholeInstance.getResource("http://fiteagleinternal#" + instanceName);
+        Resource currentInstance = wholeInstance.getResource(getAdapterInstancePrefix()[1] + instanceName);
         
         for (String currentPropertyString : propertiesChanged) {             
             Property currentProperty = wholeInstance.getProperty(getAdapterSpecificPrefix()[1] + currentPropertyString);
@@ -164,6 +165,10 @@ public abstract class AbstractAdapter {
     public abstract void handleTerminateInstance(String instanceName);
 
     public abstract String[] getAdapterSpecificPrefix();
+    
+    public abstract String[] getAdapterManagedResourcePrefix();
+    
+    public abstract String[] getAdapterInstancePrefix();
 
     public abstract Model handleMonitorInstance(String instanceName, Model modelInstances);
 
