@@ -94,6 +94,8 @@ public final class StopWatchAdapter extends AbstractAdapter {
         adapterModel.createLiteral("A deployed stopwatch adapter named: " + adapterName, "en"));
     adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral(
         "A stopwatch adapter that can simulate different dynamic stopwatch resources.", "en"));
+    
+    adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology/omn#partOfGroup"),adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
   }
   
   @Override
