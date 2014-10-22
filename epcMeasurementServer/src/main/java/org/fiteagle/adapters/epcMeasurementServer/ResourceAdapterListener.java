@@ -1,9 +1,5 @@
 package org.fiteagle.adapters.epcMeasurementServer;
 
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -15,24 +11,19 @@ import javax.ejb.MessageDriven;
 import javax.jms.JMSContext;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.jms.TextMessage;
+
 import javax.jms.Topic;
 import javax.naming.NamingException;
 
-import org.apache.jena.riot.RiotException;
 import org.fiteagle.api.core.IMessageBus;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import org.fiteagle.adapters.common.AbstractAdapter;
 import org.fiteagle.adapters.common.MessageFilter;
 import org.fiteagle.adapters.common.ListenerAdapter;
-import org.fiteagle.api.core.MessageBusOntologyModel;
 
 @MessageDriven(name = "ResourceAdapterListener", activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
