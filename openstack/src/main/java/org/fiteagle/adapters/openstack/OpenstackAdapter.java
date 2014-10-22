@@ -22,7 +22,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
-  private static final String[] ADAPTER_SPECIFIC_PREFIX = { "omnr", "http://open-multinet.info/ontology/resources#" };
+  private static final String[] ADAPTER_SPECIFIC_PREFIX = { "omnr", "http://open-multinet.info/ontology/resource#" };
   
   private OpenstackClient openstackClient;
   
