@@ -7,6 +7,7 @@
 @prefix owl:   <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix omnr:  <http://open-multinet.info/ontology/resource#> .
+@prefix osvm:  <http://open-multinet.info/ontology/resource/openstackvm#> .
 
 omnr:Openstack
         a                owl:Class ;
@@ -28,7 +29,7 @@ omnr:OpenstackVM
         rdfs:subClassOf    omn:Resource ;
         omn:implementedBy  omnr:Openstack .
 
-omnr:id
+osvm:id
         a      owl:DatatypeProperty ;
         rdfs:domain  omnr:OpenstackVM ;
         rdfs:label   "The ID of the Openstack VM"@en ;
