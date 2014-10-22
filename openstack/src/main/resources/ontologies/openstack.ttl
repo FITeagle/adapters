@@ -18,7 +18,9 @@ av:Openstack1
         a  omnr:Openstack ;
         omn:partOfGroup av:AV_Smart_Communication_Testbed ;
         rdfs:comment  "An openstack vm server that can handle different VMs."@en ;
-        rdfs:label    "A deployed openstack vm server named: Openstack1"@en .
+        rdfs:label    "A deployed openstack vm server named: Openstack1"@en ;
+        wgs:lat       "52.516377" ;
+        wgs:long      "13.323732" .
 
 omnr:OpenstackVM
         a                  owl:Class ;
