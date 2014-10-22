@@ -8,17 +8,17 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix omnr:  <http://open-multinet.info/ontology/resources#> .
 
-omnr:OpenstackAdapter
+omnr:Openstack
         a                owl:Class ;
-        rdfs:label       "OpenstackAdapterType "@en ;
+        rdfs:label       "Openstack VM Server Type "@en ;
         rdfs:subClassOf  omn:Adapter ;
         omn:implements   omnr:OpenstackVM .
 
-av:OpenstackAdapter1
-        a  omnr:OpenstackAdapter ;
+av:Openstack1
+        a  omnr:Openstack ;
         omn:partOfGroup av:AV_Smart_Communication_Testbed ;
         rdfs:comment  "An openstack adapter that can handle VMs."@en ;
-        rdfs:label    "A deployed openstack adapter named: OpenstackAdapter1"@en .
+        rdfs:label    "A deployed openstack adapter named: Openstack1"@en .
         
 
 omnr:id
@@ -31,4 +31,4 @@ omnr:OpenstackVM
         a                  owl:Class ;
         rdfs:label         "OpenstackVM"@en ;
         rdfs:subClassOf    omn:Resource ;
-        omn:implementedBy  omnr:OpenstackAdapter .
+        omn:implementedBy  omnr:Openstack .

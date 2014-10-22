@@ -41,7 +41,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   static {
-    Model adapterModel = OntologyModels.loadModel("ontologies/openstackAdapter.ttl", IMessageBus.SERIALIZATION_TURTLE);
+    Model adapterModel = OntologyModels.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
     
     StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
