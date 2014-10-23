@@ -161,6 +161,15 @@ public class OpenstackAdapter extends AbstractAdapter {
         case "id": 
           openstackInstance.addLiteral(p, server.getId());
           break;
+        case "status": 
+          openstackInstance.addLiteral(p, server.getStatus());
+          break;
+        case "created": 
+          openstackInstance.addLiteral(p, server.getCreated());
+          break;
+        case "image": 
+          openstackInstance.addLiteral(p, server.getImage().getId());
+          break;
       }
     }
    
