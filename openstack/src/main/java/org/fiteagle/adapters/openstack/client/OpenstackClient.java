@@ -17,7 +17,6 @@ import com.woorea.openstack.base.client.Entity;
 import com.woorea.openstack.base.client.HttpMethod;
 import com.woorea.openstack.base.client.OpenStackRequest;
 import com.woorea.openstack.base.client.OpenStackSimpleTokenProvider;
-import com.woorea.openstack.connector.JerseyConnector;
 import com.woorea.openstack.keystone.Keystone;
 import com.woorea.openstack.keystone.api.TokensResource;
 import com.woorea.openstack.keystone.model.Access;
@@ -26,12 +25,10 @@ import com.woorea.openstack.keystone.model.Tenants;
 import com.woorea.openstack.keystone.model.authentication.TokenAuthentication;
 import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
 import com.woorea.openstack.nova.Nova;
-import com.woorea.openstack.nova.api.ServersResource.AssociateFloatingIp;
 import com.woorea.openstack.nova.model.Flavors;
 import com.woorea.openstack.nova.model.FloatingIp;
 import com.woorea.openstack.nova.model.FloatingIpPools;
 import com.woorea.openstack.nova.model.FloatingIpPools.FloatingIpPool;
-import com.woorea.openstack.nova.model.ServerAction;
 import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
@@ -129,7 +126,7 @@ public class OpenstackClient {
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
-		flavors = novaClient.flavors().list(true).execute();
+		flavors = novaClient.flavors().list(false).execute();
 
 		return flavors;
 	}
@@ -183,7 +180,8 @@ public class OpenstackClient {
 	    loadPreferences();
 	    PREFERENCES_INITIALIZED = true;
 	  }
-		Keystone keystone = new Keystone(KEYSTONE_AUTH_URL,	new JerseyConnector());
+	  
+		Keystone keystone = new Keystone(KEYSTONE_AUTH_URL);
 		TokensResource tokens = keystone.tokens();
 		UsernamePassword credentials = new UsernamePassword(KEYSTONE_USERNAME,  KEYSTONE_PASSWORD);
 		Access access = tokens.authenticate(credentials).withTenantName(TENANT_NAME).execute();
@@ -258,29 +256,6 @@ public class OpenstackClient {
 				Server.class);
 		Server serverDetail = novaClient.execute(request);
 		return serverDetail;
-	}
-
-	public void allocateFloatingIpForServer(String serverId, String floatingIp) {
-		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
-				TENANT_ID));
-		novaClient.token(access.getToken().getId());
-		
-		ServerAction.AssociateFloatingIp action = new ServerAction.AssociateFloatingIp(floatingIp);
-		AssociateFloatingIp associateFloatingIp = new AssociateFloatingIp(serverId, action);
-		
-		@SuppressWarnings("unchecked")
-    OpenStackRequest<ServerAction.AssociateFloatingIp> request = new OpenStackRequest<ServerAction.AssociateFloatingIp>(novaClient,
-				HttpMethod.POST,"/servers/"+serverId+"/action",
-				associateFloatingIp.json(action),
-				ServerAction.AssociateFloatingIp.class);
-		
-		try {
-			novaClient.execute(request);
-		} catch (Exception e) {
-			//TODO: this can throw harmless exceptions, but check the exception if it is not harmless
-			System.out.println(e);
-		}
 	}
 
 	public FloatingIpPools getFloatingIpPools(){

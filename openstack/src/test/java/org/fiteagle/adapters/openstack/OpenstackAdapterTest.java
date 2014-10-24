@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.openstack;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
