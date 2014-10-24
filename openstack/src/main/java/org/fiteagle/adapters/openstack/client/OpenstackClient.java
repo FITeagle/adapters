@@ -126,7 +126,7 @@ public class OpenstackClient {
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
-		flavors = novaClient.flavors().list(true).execute();
+		flavors = novaClient.flavors().list(false).execute();
 
 		return flavors;
 	}
