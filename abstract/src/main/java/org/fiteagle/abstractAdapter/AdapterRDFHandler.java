@@ -2,6 +2,7 @@ package org.fiteagle.abstractAdapter;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,10 +11,11 @@ import javax.ws.rs.core.Response;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -38,37 +40,39 @@ public class AdapterRDFHandler {
   }
   
   private StmtIterator getResourceInstanceIterator(Model model) {
-    return model.listStatements(new SimpleSelector(null, RDF.type, adapter.getAdapterManagedResource()));
+    return model.listStatements(null, RDF.type, adapter.getAdapterManagedResource());
   }
   
   public String parseCreateModel(Model modelCreate, String requestID) {
-    
     Model createdInstancesModel = ModelFactory.createDefaultModel();
     adapter.setModelPrefixes(createdInstancesModel);
     
     StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelCreate);
     
-    AdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to create...");
+    LOGGER.log(Level.INFO, "Searching for resources to create...");
+    System.out.println("model: "+modelCreate);
     
     Statement currentResourceInstanceStatement = null;
+    Boolean createdAtLeastOne = false;
     while (iteratorResourceInstance.hasNext()) {
       currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
       
       String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
-      
-      if (adapter.createInstance(instanceName)) {
-        LOGGER.log(Level.INFO, "Created instance: " + instanceName + " (" + currentResourceInstanceStatement.toString() + ")");
-        // Configure additional parameters directly after creation
-        adapter.configureInstance(currentResourceInstanceStatement);
+      if(adapter.createInstance(instanceName, modelCreate)) {
+        createdAtLeastOne = true;
+        LOGGER.log(Level.INFO, "Created instance: " + currentResourceInstanceStatement.getSubject().getLocalName());
         Model createdInstanceValues = createInformRDF(instanceName);
         createdInstancesModel.add(createdInstanceValues);
       }
-      else{
-        return Response.Status.CONFLICT.name();
-      }
+      
+    }
+    if(createdAtLeastOne == false){
+      LOGGER.log(Level.INFO, "Could not find any new instances to create");
+      return Response.Status.CONFLICT.name();
     }
 
     if (createdInstancesModel.isEmpty()) {
+      LOGGER.log(Level.INFO, "Could not find any instances to create");
       return Response.Status.BAD_REQUEST.name();
     }
     
@@ -77,17 +81,36 @@ public class AdapterRDFHandler {
     return Response.Status.OK.name();
   }
   
+  protected static Map<String, String> getPropertyMapForResource(String resourceURI, Model model){
+    Map<String, String> properties = new HashMap<>();
+    
+    Resource resource = model.getResource(resourceURI);
+    
+    System.out.println("PROPERTIES for "+resourceURI);
+    StmtIterator propertyIterator = model.listStatements(resource, (Property) null, (Literal) null);
+    while(propertyIterator.hasNext()){
+      Statement s = propertyIterator.next();
+      if(s.getObject().isLiteral()){
+        String key = s.getPredicate().getURI();
+        String value = s.getObject().asLiteral().getValue().toString();
+        properties.put(key, value);
+        System.out.println(key+": "+value);
+      }
+    }
+    return properties;
+  }
+  
   public String parseReleaseModel(Model modelRelease, String requestID) {
     StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelRelease);
     
-    AdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to release...");
+    LOGGER.log(Level.INFO, "Searching for resources to release...");
     
     Statement currentResourceInstanceStatement = null;
     while (iteratorResourceInstance.hasNext()) {
       currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
       
       String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
-      AdapterRDFHandler.LOGGER.log(Level.INFO, "Releasing instance: " + instanceName + " ("
+      LOGGER.log(Level.INFO, "Releasing instance: " + instanceName + " ("
           + currentResourceInstanceStatement.toString() + ")");
       
       if (adapter.terminateInstance(instanceName)) {
@@ -106,8 +129,7 @@ public class AdapterRDFHandler {
       currentInstanceStatement = iteratorResourceInstance.nextStatement();
       
       String instanceName = currentInstanceStatement.getSubject().getLocalName();
-      AdapterRDFHandler.LOGGER.log(Level.INFO, "Discovering instance: " + instanceName + " ("
-          + currentInstanceStatement.toString() + ")");
+      LOGGER.log(Level.INFO, "Discovering instance: " + instanceName + " (" + currentInstanceStatement.toString() + ")");
       
       String response = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
       if (response.isEmpty()) {
@@ -127,7 +149,7 @@ public class AdapterRDFHandler {
     
     StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelConfigure);
     
-    AdapterRDFHandler.LOGGER.log(Level.INFO, "Searching for resources to configure...");
+    LOGGER.log(Level.INFO, "Searching for resources to configure...");
     
     Statement currentConfigureStatement = null;
     while (iteratorResourceInstance.hasNext()) {
@@ -135,7 +157,7 @@ public class AdapterRDFHandler {
       
       String instanceName = currentConfigureStatement.getSubject().getLocalName();
       
-      AdapterRDFHandler.LOGGER.log(Level.INFO, "Configuring instance: "
+      LOGGER.log(Level.INFO, "Configuring instance: "
           + currentConfigureStatement.getSubject().getLocalName() + " (" + currentConfigureStatement.toString() + ")");
       
       List<String> updatedProperties = adapter.configureInstance(currentConfigureStatement);
@@ -162,7 +184,7 @@ public class AdapterRDFHandler {
     
     adapter.setModelPrefixes(modelInstances);
     
-    Resource releaseInstance = modelInstances.createResource(adapter.getAdapterInstancePrefix()[1] + instanceName);
+    Resource releaseInstance = modelInstances.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
     modelInstances.add(adapter.getAdapterInstance(), MessageBusOntologyModel.methodReleases, releaseInstance);
     
     return modelInstances;

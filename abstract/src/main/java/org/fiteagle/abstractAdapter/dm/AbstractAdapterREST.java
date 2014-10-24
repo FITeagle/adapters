@@ -1,5 +1,8 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -9,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.api.core.IMessageBus;
 
 //The adapter should:
 //* Be located at github.com/fiteagle/adapters
@@ -62,14 +66,14 @@ public abstract class AbstractAdapterREST {
     @Path("description.ttl")
     @Produces("text/turtle")
     public String getDescriptionTurtle() {
-        return abstractAdapter.getAdapterDescription(AbstractAdapter.PARAM_TURTLE);
+        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_TURTLE);
     }
 
     @GET
     @Path("description.rdf")
     @Produces("application/rdf+xml")
     public String getDescriptionRDF() {
-        return abstractAdapter.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
+        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_RDFXML);
     }
     
     /**
@@ -81,53 +85,54 @@ public abstract class AbstractAdapterREST {
     @Path("description.rdf-text")
     @Produces("text/html")
     public String getDescriptionRDFAsText() {
-        return abstractAdapter.getAdapterDescription(AbstractAdapter.PARAM_RDFXML);
+        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_RDFXML);
     }
 
     @GET
     @Path("description.ntriple")
     @Produces("application/n-triples")
     public String getDescriptionNTRIPLE() {
-        return abstractAdapter.getAdapterDescription(AbstractAdapter.PARAM_NTRIPLE);
+        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_NTRIPLE);
     }
 
     @GET
     @Path("instances.ttl")
     @Produces("text/turtle")
     public String getAllInstancesTurtle() {
-        return abstractAdapter.getAllInstances(AbstractAdapter.PARAM_TURTLE);
+        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_TURTLE);
     }
 
     @GET
     @Path("instances.rdf")
     @Produces("application/rdf+xml")
     public String getAllInstancesRDF() {
-        return abstractAdapter.getAllInstances(AbstractAdapter.PARAM_RDFXML);
+        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_RDFXML);
     }
     
     @GET
     @Path("instances.rdf-text")
     @Produces("text/html")
     public String getAllInstancesRDFAsText() {
-        return abstractAdapter.getAllInstances(AbstractAdapter.PARAM_RDFXML);
+        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_RDFXML);
     }
 
     @GET
     @Path("instances.ntriple")
     @Produces("application/n-triples")
     public String getAllInstancesNTRIPLE() {
-        return abstractAdapter.getAllInstances(AbstractAdapter.PARAM_NTRIPLE);
+        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_NTRIPLE);
     }
 
-    @POST
-    @Path("instance/{instanceName}")
-    @Produces("text/html")
-    public String createInstance(@PathParam("instanceName") String instanceName) {
-        if (abstractAdapter.createInstance(instanceName)) {
-            return "Created instance number : " + instanceName;
-        }
-        return "Invalid instance number";
+  @POST
+  @Path("instance/{instanceName}")
+  @Produces("text/html")
+  public String createInstance(@PathParam("instanceName") String instanceName) {
+    Map<String, String> properties = new HashMap<>();
+    if (abstractAdapter.createInstance(instanceName, properties)) {
+      return "Created instance number : " + instanceName;
     }
+    return "Invalid instance number";
+  }
 
     @DELETE
     @Path("instance/{instanceName}")
@@ -143,27 +148,27 @@ public abstract class AbstractAdapterREST {
     @Path("instance/{instanceName}/description.ttl")
     @Produces("text/turtle")
     public String monitorInstanceTurtle(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_TURTLE);
+        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_TURTLE);
     }
 
     @GET
     @Path("instance/{instanceName}/description.rdf")
     @Produces("application/rdf+xml")
     public String monitorInstanceRDF(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_RDFXML);
+        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_RDFXML);
     }
     
     @GET
     @Path("instance/{instanceName}/description.rdf-text")
     @Produces("text/html")
     public String monitorInstanceRDFAsText(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_RDFXML);
+        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_RDFXML);
     }
 
     @GET
     @Path("instance/{instanceName}/description.ntriple")
     @Produces("application/n-triples")
     public String monitorInstanceNTRIPLE(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, AbstractAdapter.PARAM_NTRIPLE);
+        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_NTRIPLE);
     }
 }

@@ -2,6 +2,7 @@ package org.fiteagle.adapters.mightyrobot;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -115,7 +116,7 @@ public class MightyRobotAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Object handleCreateInstance(String instanceName) {
+  public Object handleCreateInstance(String instanceName, Map<String, String> properties) {
     MightyRobot temp = new MightyRobot(this, instanceName);
     return temp;
   }

@@ -1,6 +1,8 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
@@ -19,7 +21,8 @@ public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
 
     @Override
     public boolean createInstance(String instanceName) {
-        return this.adapter.createInstance(instanceName);
+      Map<String, String> properties = new HashMap<>();
+        return this.adapter.createInstance(instanceName, properties);
     }
 
     @Override

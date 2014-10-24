@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.stopwatch;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,12 +33,14 @@ public class StopWatchAdapterTest {
     public void testCreateAndTerminate() {
         StopWatchAdapter adapter = StopWatchAdapter.getInstance();
 
+        Map<String, String> properties = new HashMap<>();
+        
         // Creating first instance works
-        Assert.assertTrue(adapter.createInstance("InstanceOne"));
+        Assert.assertTrue(adapter.createInstance("InstanceOne", properties));
         // Creating another instance with the same name FAILS
-        Assert.assertFalse(adapter.createInstance("InstanceOne"));
+        Assert.assertFalse(adapter.createInstance("InstanceOne", properties));
         // Creating another instance with another name works fine
-        Assert.assertTrue(adapter.createInstance("InstanceTwo"));
+        Assert.assertTrue(adapter.createInstance("InstanceTwo", properties));
         
         // Terminate existing instance
         Assert.assertTrue(adapter.terminateInstance("InstanceOne"));
@@ -52,12 +57,13 @@ public class StopWatchAdapterTest {
     public void testMonitor() {
         StopWatchAdapter adapter = StopWatchAdapter.getInstance();
         
-        String instanceName = "InstanceOne";
+        String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";
         
         // Monitor non-existing instance yields empty String
         Assert.assertEquals("", adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT));
         // create the instance
-        adapter.createInstance(instanceName);
+        Map<String, String> properties = new HashMap<>();
+        adapter.createInstance(instanceName, properties);
         
         // Monitoring existing instance yields a non-empty result
         String monitorData = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
@@ -65,18 +71,14 @@ public class StopWatchAdapterTest {
         
         // Monitoring data contains the instance name
         Assert.assertTrue(monitorData.contains(instanceName));
-        
+
         // Monitoring data contains the adapter specific prefix
-        Assert.assertTrue(monitorData.contains(adapter.getAdapterSpecificPrefix()[0]) && 
-        		monitorData.contains(adapter.getAdapterSpecificPrefix()[1]));
-        
+        Assert.assertTrue(monitorData.contains(adapter.getAdapterManagedResourcePrefix()[1]));
+  
         // release instances
-        adapter.terminateInstance("InstanceOne");
+        Assert.assertTrue(adapter.terminateInstance(instanceName));
     } 
     
-    /**
-     * Test getter methods, those must return actual data if everything was initialized properly
-     */
     @Test
     public void testGetters(){
     	StopWatchAdapter adapter = StopWatchAdapter.getInstance();
@@ -94,65 +96,5 @@ public class StopWatchAdapterTest {
     	Assert.assertNotNull(adapter.getAdapterDescriptionModel());
     	Assert.assertTrue(adapter.getAdapterDescriptionModel() instanceof Model); 
     }
-//    @Test
-//    public void testCreateAndTerminate() {
-//
-//        MotorAdapter motorAdapter = MotorAdapter.getInstance();
-//
-//        // create instance
-//        Assert.assertEquals(true, motorAdapter.createInstance("Motor1"));
-//
-//        // check instance shows up
-//        String returnStringTurtle = motorAdapter.getAllInstances("TURTLE");
-//        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":m1"));
-//
-//        // terminate instance
-//        Assert.assertEquals(true, motorAdapter.terminateInstance("Motor1"));
-//
-//        // terminate again
-//        Assert.assertEquals(false, motorAdapter.terminateInstance("Motor1"));
-//
-//        // check instance is gone
-//        returnStringTurtle = motorAdapter.getAllInstances("TURTLE");
-//        Assert.assertEquals(-1, returnStringTurtle.indexOf(":m1"));
-//    }
-//
-//    @Test
-//    public void testControl() {
-//
-//        MotorAdapter motorAdapter = MotorAdapter.getInstance();
-//
-//        Assert.assertEquals(true, motorAdapter.createInstance("Motor1"));
-//
-//        // Check initial rpm is 0
-//        String returnStringTurtle = motorAdapter.monitorInstance("Motor1", "TURTLE");
-//        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"0\""));
-//
-//        String controlString = "";
-//        BufferedReader reader;
-//        String line;
-//
-//        try {
-//            reader = new BufferedReader(new FileReader("target/test-classes/input.ttl"));
-//            line = reader.readLine();
-//            while (line != null) {
-//                controlString += line;
-//                line = reader.readLine();
-//            }
-//        } catch (IOException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//
-//        // Change rpm
-//        motorAdapter.controlInstance(controlString, "TURTLE");
-//
-//        // Check new rpm is 88 (as defined in input.ttl
-//        returnStringTurtle = motorAdapter.monitorInstance(1, "TURTLE");
-//        Assert.assertNotEquals(-1, returnStringTurtle.indexOf(":rpm           \"88\""));
-//
-//        // terminate instance
-//        Assert.assertEquals(true, motorAdapter.terminateInstance(1));
-//    }
 
 }

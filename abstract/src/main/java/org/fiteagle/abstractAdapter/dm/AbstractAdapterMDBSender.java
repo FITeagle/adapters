@@ -45,14 +45,6 @@ public abstract class AbstractAdapterMDBSender {
       LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterInstance().getURI());
       getAdapter().registerAdapter();
       
-      // TODO: necessary?
-      // Wait a short while, so the repository has time to process the registering before the restore request
-      try {
-          Thread.sleep(1000);
-      } catch(InterruptedException ex) {
-          Thread.currentThread().interrupt();
-      }
-      
       LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Restoring previous state of " + getAdapter().getAdapterInstance().getURI());
       try {
         restoreState();

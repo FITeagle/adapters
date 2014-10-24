@@ -38,17 +38,23 @@ openstackvm:id
 openstackvm:status
         a      owl:DatatypeProperty ;
         rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:label   "The image id of the Openstack VM"@en ;
+        rdfs:label   "The status of the Openstack VM"@en ;
         rdfs:range   xsd:string .
         
 openstackvm:created
         a      owl:DatatypeProperty ;
         rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:label   "The image id of the Openstack VM"@en ;
+        rdfs:label   "The date when the Openstack VM was created"@en ;
         rdfs:range   xsd:string .
         
-openstackvm:image
+openstackvm:imageid
         a      owl:DatatypeProperty ;
         rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The image id of the Openstack VM"@en ;
+        rdfs:range   xsd:string .
+        
+openstackvm:keypairname
+        a      owl:DatatypeProperty ;
+        rdfs:domain  openstackvm:OpenstackVM ;
+        rdfs:label   "The name of the keypair of the Openstack VM"@en ;
         rdfs:range   xsd:string .

@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.mightyrobot;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,9 +13,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class MightyRobotAdapterTest {
 
 
-    /**
-     * Test proper work of singleton.
-     */
     @Test
     public void testSingleton() {
         MightyRobotAdapter mightyRobotAdapterOne = MightyRobotAdapter.getInstance();
@@ -23,19 +23,18 @@ public class MightyRobotAdapterTest {
         Assert.assertEquals(mightyRobotAdapterOne, mightyRobotAdapterTwo);
     }
     
-    /**
-     * Test creation and termination of instances
-     */
     @Test
     public void testCreateAndTerminate() {
         MightyRobotAdapter adapter = MightyRobotAdapter.getInstance();
 
+        Map<String, String> properties = new HashMap<>();
+        
         // Creating first instance works
-        Assert.assertTrue(adapter.createInstance("InstanceOne"));
+        Assert.assertTrue(adapter.createInstance("InstanceOne", properties));
         // Creating another instance with the same name FAILS
-        Assert.assertFalse(adapter.createInstance("InstanceOne"));
+        Assert.assertFalse(adapter.createInstance("InstanceOne", properties));
         // Creating another instance with another name works fine
-        Assert.assertTrue(adapter.createInstance("InstanceTwo"));
+        Assert.assertTrue(adapter.createInstance("InstanceTwo", properties));
         
         // Terminate existing instance
         Assert.assertTrue(adapter.terminateInstance("InstanceOne"));
@@ -45,19 +44,17 @@ public class MightyRobotAdapterTest {
         Assert.assertTrue(adapter.terminateInstance("InstanceTwo"));
     }   
     
-    /**
-     * Test Monitoring of instances
-     */
     @Test
     public void testMonitor() {
         MightyRobotAdapter adapter = MightyRobotAdapter.getInstance();
         
-        String instanceName = "InstanceOne";
+        String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";
         
         // Monitor non-existing instance yields empty String
         Assert.assertEquals("", adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT));
         // create the instance
-        adapter.createInstance(instanceName);
+        Map<String, String> properties = new HashMap<>();
+        adapter.createInstance(instanceName, properties);
         
         // Monitoring existing instance yields a non-empty result
         String monitorData = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
@@ -65,18 +62,14 @@ public class MightyRobotAdapterTest {
         
         // Monitoring data contains the instance name
         Assert.assertTrue(monitorData.contains(instanceName));
-        
-        // Monitoring data contains the adapter specific prefix
-        Assert.assertTrue(monitorData.contains(adapter.getAdapterSpecificPrefix()[0]) && 
-        		monitorData.contains(adapter.getAdapterSpecificPrefix()[1]));
 
+        // Monitoring data contains the adapter specific prefix
+        Assert.assertTrue(monitorData.contains(adapter.getAdapterManagedResourcePrefix()[1]));
+  
         // release instances
-        adapter.terminateInstance("InstanceOne");
+        Assert.assertTrue(adapter.terminateInstance(instanceName));
     }      
     
-    /**
-     * Test getter methods, those must return actual data if everything was initialized properly
-     */
     @Test
     public void testGetters(){
     	MightyRobotAdapter adapter = MightyRobotAdapter.getInstance(); 

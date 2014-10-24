@@ -2,6 +2,7 @@ package org.fiteagle.adapters.motor;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -130,7 +131,7 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
-    public Object handleCreateInstance(String instanceName) {
+    public Object handleCreateInstance(String instanceName, Map<String, String> properties) {
         return new DynamicMotor(this, instanceName);
     }
 

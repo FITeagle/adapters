@@ -1,7 +1,10 @@
-@prefix os:    <http://open-multinet.info/ontology/resource/openstack#> .
-@prefix osvm:  <http://open-multinet.info/ontology/resource/openstackvm#> .
+@prefix openstack:    <http://open-multinet.info/ontology/resource/openstack#> .
+@prefix openstackvm:  <http://open-multinet.info/ontology/resource/openstackvm#> .
 @prefix av:    <http://federation.av.tu-berlin.de/about#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 
-av:Openstack-1 a os:Openstack .
+av:Openstack-1 a openstack:Openstack .
 
-av:OpenstackVM1 a osvm:OpenstackVM .
+av:OpenstackVM1 a openstackvm:OpenstackVM ;
+          openstackvm:keypairname "mitja_tub"^^xsd:string ;
+          openstackvm:imageid "7bef2175-b4cd-4302-be23-dbeb35b41702"^^xsd:string .
