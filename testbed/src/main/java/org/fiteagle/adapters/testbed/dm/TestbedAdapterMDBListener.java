@@ -37,7 +37,7 @@ public class TestbedAdapterMDBListener implements MessageListener {
     private Topic topic;
     
     @Inject
-    private ModelInformerBean mib;
+    private TestbedAdapterMDBSender mib;
 
     public void onMessage(final Message requestMessage) {
         try {
@@ -47,7 +47,7 @@ public class TestbedAdapterMDBListener implements MessageListener {
                 
                   if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
                           LOGGER.log(Level.INFO, "Received a discover message");
-                          mib.sendModel(requestMessage.getJMSCorrelationID());
+                          mib.sendInformMessage(TestbedAdapter.getTestbedModel(), requestMessage.getJMSCorrelationID());
                   }
                   
                   else if (isAdapterMessage(modelMessage)) {
@@ -58,7 +58,7 @@ public class TestbedAdapterMDBListener implements MessageListener {
                               LOGGER.log(Level.INFO, "no adapter could be detected in the inform message");
                           } else {                            
                               LOGGER.log(Level.INFO, "Received an inform message");
-                              Resource testbedResource = adapterModel.getResource(TestbedAdapter.getTestbed().getURI());
+                              Resource testbedResource = adapterModel.getResource(TestbedAdapter.getInstance().getAdapterInstance().getURI());
                               testbedResource.addProperty(MessageBusOntologyModel.propertyFiteagleContainsAdapter, adapterInstance);
                               sendUpdateModel(adapterModel);
                           }

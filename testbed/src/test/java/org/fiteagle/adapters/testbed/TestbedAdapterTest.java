@@ -13,7 +13,7 @@ public class TestbedAdapterTest {
   
   @Test
   public void testGetTestbed() {
-    assertNotNull(TestbedAdapter.getTestbed());
+    assertNotNull(TestbedAdapter.getInstance().getAdapterInstance());
   }
   
 }
