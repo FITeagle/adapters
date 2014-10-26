@@ -151,9 +151,9 @@ public abstract class AbstractAdapter {
   
   public void deregisterAdapter() {
     Model messageModel = ModelFactory.createDefaultModel();
-    messageModel.add(getAdapterInstance(), MessageBusOntologyModel.methodReleases, getAdapterInstance());
+    messageModel.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodReleases, getAdapterInstance());
     
-    notifyListeners(messageModel, "0");
+    notifyListeners(messageModel, null);
   }
   
   public Model createInformConfigureRDF(String instanceName, List<String> propertiesChanged) {

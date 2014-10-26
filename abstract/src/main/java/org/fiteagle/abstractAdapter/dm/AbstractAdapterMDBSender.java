@@ -56,8 +56,6 @@ public abstract class AbstractAdapterMDBSender {
     private void sendInformMessage(Model eventRDF, String requestID) {
         try {
             Model messageModel = MessageBusMsgFactory.createMsgInform(eventRDF);
-            messageModel.add(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
-
             String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
 
             String correlationID = "";

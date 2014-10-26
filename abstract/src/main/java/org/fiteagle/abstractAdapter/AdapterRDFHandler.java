@@ -185,7 +185,7 @@ public class AdapterRDFHandler {
     adapter.setModelPrefixes(modelInstances);
     
     Resource releaseInstance = modelInstances.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
-    modelInstances.add(adapter.getAdapterInstance(), MessageBusOntologyModel.methodReleases, releaseInstance);
+    modelInstances.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodReleases, releaseInstance);
     
     return modelInstances;
   }
