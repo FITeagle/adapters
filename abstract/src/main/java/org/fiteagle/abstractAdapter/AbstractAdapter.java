@@ -32,7 +32,7 @@ public abstract class AbstractAdapter {
   
   public abstract Model getAdapterDescriptionModel();
   
-  public abstract void updateInstanceList();
+  public abstract void updateAdapterDescription();
   
   public String getAdapterDescription(String serializationFormat) {
     return MessageBusMsgFactory.serializeModel(getAdapterDescriptionModel());
@@ -141,7 +141,7 @@ public abstract class AbstractAdapter {
   }
   
   public void registerAdapter() {
-    updateInstanceList();
+    updateAdapterDescription();
     notifyListeners(getAdapterDescriptionModel(), null);
   }
   

@@ -29,7 +29,7 @@ public class OpenstackAdapterTest {
   }
   
   @Test
-  public void testAdaptePrefixes() {
+  public void testAdapterPrefixes() {
     assertNotNull(adapter.getAdapterSpecificPrefix()[0]);
     assertNotNull(adapter.getAdapterManagedResourcePrefix()[0]);
     assertNotNull(adapter.getAdapterInstancePrefix()[0]);

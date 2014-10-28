@@ -210,7 +210,7 @@ public final class StopWatchAdapter extends AbstractAdapter {
   }
   
   @Override
-  public void updateInstanceList() {
+  public void updateAdapterDescription() {
     // TODO Auto-generated method stub
     
   }

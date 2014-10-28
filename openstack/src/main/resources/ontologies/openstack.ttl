@@ -14,6 +14,15 @@ openstack:Openstack
         rdfs:label       "Openstack VM Server Type "@en ;
         rdfs:subClassOf  omn:Adapter ;
         omn:implements   openstackvm:OpenstackVM .
+        
+openstack:images
+        a      owl:AsymmetricProperty ,
+               owl:IrreflexiveProperty ,
+               owl:ObjectProperty ;
+        rdfs:domain owl:Thing ;
+        rdfs:range owl:Thing ;
+        rdfs:label   "The images of the Openstack Instance"@en ;
+        rdfs:comment "Defines the images which are available at the Openstack Instance"@en .
 
 av:Openstack-1
         a  openstack:Openstack ;
@@ -32,8 +41,17 @@ openstackvm:OpenstackVM
 openstackvm:id
         a      owl:DatatypeProperty ;
         rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:label   "The ID of the Openstack VM"@en ;
+        rdfs:label   "An ID of an Openstack VM Instance or Image"@en ;
         rdfs:range   xsd:string .
+
+openstackvm:image
+        a      owl:AsymmetricProperty ,
+               owl:IrreflexiveProperty ,
+               owl:ObjectProperty ;
+        rdfs:domain openstackvm:OpenstackVM ;
+        rdfs:range owl:Thing ;
+        rdfs:label   "The image of the Openstack VM"@en ;
+        rdfs:comment "Defines the image used for the Openstack VM"@en .
 
 openstackvm:status
         a      owl:DatatypeProperty ;
@@ -45,12 +63,6 @@ openstackvm:created
         a      owl:DatatypeProperty ;
         rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The date when the Openstack VM was created"@en ;
-        rdfs:range   xsd:string .
-        
-openstackvm:imageid
-        a      owl:DatatypeProperty ;
-        rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:label   "The image id of the Openstack VM"@en ;
         rdfs:range   xsd:string .
         
 openstackvm:keypairname

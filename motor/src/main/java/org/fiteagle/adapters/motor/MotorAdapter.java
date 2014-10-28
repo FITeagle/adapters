@@ -241,7 +241,7 @@ public final class MotorAdapter extends AbstractAdapter {
     }
     
     @Override
-    public void updateInstanceList() {
+    public void updateAdapterDescription() {
       // TODO Auto-generated method stub
       
     }

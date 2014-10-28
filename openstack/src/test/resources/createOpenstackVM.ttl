@@ -7,4 +7,5 @@ av:Openstack-1 a openstack:Openstack .
 
 av:OpenstackVM1 a openstackvm:OpenstackVM ;
           openstackvm:keypairname "mitja_tub"^^xsd:string ;
-          openstackvm:imageid "7bef2175-b4cd-4302-be23-dbeb35b41702"^^xsd:string .
+          openstackvm:image av:ubuntu-14.04.1-server-amd64 .
+          

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
+import org.fiteagle.adapters.openstack.client.model.Image;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 import org.fiteagle.api.core.IMessageBus;
@@ -15,6 +16,7 @@ import org.fiteagle.api.core.OntologyModels;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -37,6 +39,10 @@ public class OpenstackAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   private List<Model> resourceInstances = new ArrayList<Model>();
+  private final Property PROPERTY_IMAGES;
+  private final Property PROPERTY_IMAGE;
+  private final Property PROPERTY_ID;
+  
   
   public static HashMap<String,OpenstackAdapter> openstackAdapterInstances = new HashMap<>();
   
@@ -72,8 +78,6 @@ public class OpenstackAdapter extends AbstractAdapter {
       Resource adapterInstance = adapterInstanceIterator.next().getSubject();
       
       OpenstackAdapter openstackAdapter = new OpenstackAdapter(adapterInstance, adapterModel);
-      openstackAdapter.ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
-      openstackAdapter.ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(openstackAdapter.ADAPTER_INSTANCE_PREFIX[1]);
       
       openstackAdapterInstances.put(adapterInstance.getURI(), openstackAdapter);
     }
@@ -85,11 +89,20 @@ public class OpenstackAdapter extends AbstractAdapter {
 	  
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
+    
+    ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
+    ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
+    
+    PROPERTY_IMAGES = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstack#images");
+    PROPERTY_IMAGE = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#image");
+    PROPERTY_ID = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#id");
   }
   
   @Override
   public Object handleCreateInstance(String instanceName, Map<String, String> properties) {
-    String imageID = getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"imageid", properties);
+    String imageResourceURI = getProperty(PROPERTY_IMAGE.getURI(), properties);
+    Statement imageIdStatement = adapterModel.getRequiredProperty(adapterModel.getResource(imageResourceURI), PROPERTY_ID);
+    String imageID = imageIdStatement.getObject().asLiteral().getValue().toString();
     String keypairName = getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"keypairname", properties);
     
     String flavorId_small = "2"; 
@@ -141,6 +154,23 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
+  public void updateAdapterDescription(){
+    Resource images = adapterModel.createResource(adapterInstance.getURI()+"_images");
+    int i = 1;
+    for(Image image : openstackClient.listImages()){
+      Resource imageResource = adapterModel.createResource(ADAPTER_INSTANCE_PREFIX[1]+image.getName().replace(" ", "_"));
+      imageResource.addProperty(RDF.type, adapterModel.createProperty("http://open-multinet.info/ontology/resource/openstackvm#Image"));
+      imageResource.addProperty(PROPERTY_ID, adapterModel.createLiteral(image.getId()));
+      imageResource.addProperty(RDFS.label, adapterModel.createLiteral(image.getName()));
+      images.addProperty(RDF.li(i), imageResource);
+      i++;
+    }
+    
+    adapterInstance.addProperty(PROPERTY_IMAGES, images);
+    
+    updateInstanceList();
+  }
+  
   public void updateInstanceList(){
     instanceList.clear();
     Servers servers = openstackClient.listServers();
@@ -175,9 +205,14 @@ public class OpenstackAdapter extends AbstractAdapter {
             openstackInstance.addLiteral(p, server.getCreated());
           }
           break;
-        case "imageid": 
+        case "image": 
           if(server.getImage() != null && server.getImage().getId() != null){
-            openstackInstance.addLiteral(p, server.getImage().getId());
+            ResIterator iter = adapterModel.listResourcesWithProperty(PROPERTY_ID, server.getImage().getId());
+            Resource image = null;
+            if(iter.hasNext()){
+              image = iter.next();
+            }
+            openstackInstance.addProperty(PROPERTY_IMAGE, image);
           }
           break;
         case "keypairname": 

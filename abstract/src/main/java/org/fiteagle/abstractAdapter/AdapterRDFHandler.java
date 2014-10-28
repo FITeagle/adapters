@@ -90,12 +90,16 @@ public class AdapterRDFHandler {
     StmtIterator propertyIterator = model.listStatements(resource, (Property) null, (Literal) null);
     while(propertyIterator.hasNext()){
       Statement s = propertyIterator.next();
+      String key = s.getPredicate().getURI();
+      String value = null;
       if(s.getObject().isLiteral()){
-        String key = s.getPredicate().getURI();
-        String value = s.getObject().asLiteral().getValue().toString();
-        properties.put(key, value);
-        System.out.println(key+": "+value);
+        value = s.getObject().asLiteral().getValue().toString();
       }
+      else if(s.getObject().isResource()){
+        value = s.getObject().asResource().getURI();
+      }
+      properties.put(key, value);
+      System.out.println(key+": "+value);
     }
     return properties;
   }
