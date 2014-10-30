@@ -1,0 +1,57 @@
+@prefix rdf:           <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix foaf:          <http://xmlns.com/foaf/0.1/> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+@prefix av:            <http://federation.av.tu-berlin.de/about#> .
+@prefix omn:           <http://open-multinet.info/ontology/omn#> .
+@prefix motorgarage:   <http://open-multinet.info/ontology/resource/motorgarage#> .
+@prefix motor:         <http://open-multinet.info/ontology/resource/motor#> .
+
+motorgarage:MotorGarage
+        a                owl:Class ;
+        rdfs:label       "MotorGarageAdapterType "@en ;
+        rdfs:subClassOf  omn:Adapter ;
+        omn:implements   motor:Motor .
+
+av:MotorGarage-1
+        a  motorgarage:MotorGarage ;
+        omn:partOfGroup av:AV_Smart_Communication_Testbed ;
+        rdfs:comment  "An openstack vm server that can handle different VMs."@en ;
+        rdfs:label    "A deployed openstack vm server named: Openstack1"@en ;
+        wgs:lat       "52.516377" ;
+        wgs:long      "13.323732" .
+          
+motor:Motor
+        a                  owl:Class ;
+        rdfs:label         "MotorResource"@en ;
+        rdfs:subClassOf    omn:Resource ;
+        omn:implementedBy  motorgarage:MotorGarage .
+          
+motor:manufacturer
+        a            owl:DatatypeProperty ;
+        rdfs:domain  motor:Motor ;
+        rdfs:range   xsd:string .
+
+motor:throttle
+        a            owl:DatatypeProperty ;
+        rdfs:domain  motor:Motor ;
+        rdfs:range   xsd:integer .
+
+motor:isDynamic
+        a            owl:DatatypeProperty ;
+        rdfs:domain  motor:Motor ;
+        rdfs:range   xsd:boolean .
+
+motor:rpm
+        a            owl:DatatypeProperty ;
+        rdfs:domain  motor:Motor ;
+        rdfs:label   "Motor Property: Max. RPM"@en , "Motor Property: Throttle"@en , "Motor Property: Manufacturer"@en , "Motor Property: isDynamic"@en , "Motor Property: RPM"@en ;
+        rdfs:range   xsd:integer .
+
+motor:maxRpm
+        a            owl:DatatypeProperty ;
+        rdfs:domain  motor:Motor ;
+        rdfs:range   xsd:integer .
+
