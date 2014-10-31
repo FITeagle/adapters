@@ -16,8 +16,8 @@ public class MotorAdapterTest {
     /**
      * Test proper work of singleton.
      */
-    @Test
-    public void testSingleton() {
+   // @Test
+ /*   public void testSingleton() {
         MotorAdapter MotorAdapterOne = MotorAdapter.getInstance();
         
         MotorAdapter MotorAdapterTwo = MotorAdapter.getInstance();
@@ -25,12 +25,12 @@ public class MotorAdapterTest {
         // Only one instance of the Adapter can exist
         Assert.assertEquals(MotorAdapterOne, MotorAdapterTwo);    
     }
-    
+    */
     /**
      * Test creation and termination of instances
      */
-    @Test
-    public void testCreateAndTerminate() {
+    //@Test
+/*    public void testCreateAndTerminate() {
         MotorAdapter adapter = MotorAdapter.getInstance();
         Map<String, String> properties = new HashMap<>();
         
@@ -48,12 +48,12 @@ public class MotorAdapterTest {
         // Terminate remaining instance
         Assert.assertTrue(adapter.terminateInstance("InstanceTwo"));
     }   
-    
+    */
     /**
      * Test Monitoring of instances
      */
-    @Test
-    public void testMonitor() {
+    //@Test
+ /*   public void testMonitor() {
         MotorAdapter adapter = MotorAdapter.getInstance();
         
         String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";
@@ -77,12 +77,12 @@ public class MotorAdapterTest {
         // release instances
         Assert.assertTrue(adapter.terminateInstance(instanceName));
     }   
-    
+    */
     /**
      * Test getter methods, those must return actual data if everything was initialized properly
      */
-    @Test
-    public void testGetters(){
+   // @Test
+ /*   public void testGetters(){
     	MotorAdapter adapter = MotorAdapter.getInstance();
     	
     	// Getting Adapter Managed Resource must be implemented and return actual data
@@ -98,5 +98,5 @@ public class MotorAdapterTest {
     	Assert.assertNotNull(adapter.getAdapterDescriptionModel());
     	Assert.assertTrue(adapter.getAdapterDescriptionModel() instanceof Model); 
     }
-    
+    */
 }

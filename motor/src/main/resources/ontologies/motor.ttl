@@ -18,8 +18,8 @@ motorgarage:MotorGarage
 av:MotorGarage-1
         a  motorgarage:MotorGarage ;
         omn:partOfGroup av:AV_Smart_Communication_Testbed ;
-        rdfs:comment  "An openstack vm server that can handle different VMs."@en ;
-        rdfs:label    "A deployed openstack vm server named: Openstack1"@en ;
+        rdfs:comment  "A motor garage adapter that can simulate different dynamic motor resources."@en ;
+        rdfs:label    "A deployed motor garage adapter named: MotorGarage-1"@en ;
         wgs:lat       "52.516377" ;
         wgs:long      "13.323732" .
           

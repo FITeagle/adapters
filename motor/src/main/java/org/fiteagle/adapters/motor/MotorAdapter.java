@@ -1,11 +1,14 @@
 package org.fiteagle.adapters.motor;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
+import org.fiteagle.api.core.OntologyModels;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -20,34 +23,84 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 public final class MotorAdapter extends AbstractAdapter {
 
-    private static final String[] ADAPTER_SPECIFIC_PREFIX = {"motorgarage","http://open-multinet.info/ontology/resource/motorgarage#"};
-    private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = {"motor","http://open-multinet.info/ontology/resource/motor#"};
-    private final String[] ADAPTER_INSTANCE_PREFIX = {"av","http://federation.av.tu-berlin.de/about#"};
+    //private static final String[] ADAPTER_SPECIFIC_PREFIX = {"motorgarage","http://open-multinet.info/ontology/resource/motorgarage#"};
+	private static final String[] ADAPTER_SPECIFIC_PREFIX = new String[2];
+	
+	//private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = {"motor","http://open-multinet.info/ontology/resource/motor#"};
+	private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
+	
+	//private final String[] ADAPTER_INSTANCE_PREFIX = {"av","http://federation.av.tu-berlin.de/about#"};
+	private final String[] ADAPTER_INSTANCE_PREFIX = new String[2];
 
     private Model adapterModel;
     private Resource adapterInstance;
-    private Resource adapter;
-    private Resource resource;
+    private static Resource adapter;
+    private static Resource resource;
     private String adapterName;
     
-    private static MotorAdapter motorAdapterSingleton;
+/*    private static MotorAdapter motorAdapterSingleton;
 
     public static synchronized MotorAdapter getInstance() {
         if (motorAdapterSingleton == null)
             motorAdapterSingleton = new MotorAdapter();
         return motorAdapterSingleton;
     }
-
+*/
+    public static HashMap<String,MotorAdapter> motorAdapterInstances = new HashMap<>();
+    
+    public static MotorAdapter getInstance(String URI){
+      return motorAdapterInstances.get(URI);
+    }
+    
     private Property motorPropertyRPM;
     private Property motorPropertyMaxRPM;
     private Property motorPropertyThrottle;
     private Property motorPropertyManufacturer;
     private Property motorPropertyIsDynamic;
 
-    private List<Property> motorControlProperties = new LinkedList<Property>();
-
-    private MotorAdapter() {
+    private static List<Property> motorControlProperties = new LinkedList<Property>();
+    
+    static {
+        Model adapterModel = OntologyModels.loadModel("ontologies/motor.ttl", IMessageBus.SERIALIZATION_TURTLE);
         
+        StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+        if (adapterIterator.hasNext()) {
+          adapter = adapterIterator.next().getSubject();
+          ADAPTER_SPECIFIC_PREFIX[1] = adapter.getNameSpace();
+          ADAPTER_SPECIFIC_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_SPECIFIC_PREFIX[1]);
+        }
+        
+        StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
+        if (resourceIterator.hasNext()) {
+          resource = resourceIterator.next().getObject().asResource();
+          ADAPTER_MANAGED_RESOURCE_PREFIX[1] = resource.getNameSpace();
+          ADAPTER_MANAGED_RESOURCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_MANAGED_RESOURCE_PREFIX[1]);
+        }
+        
+        StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
+        while (propertiesIterator.hasNext()) {
+          Property p = adapterModel.getProperty(propertiesIterator.next().getSubject().getURI());
+          motorControlProperties.add(p);
+        }
+        
+        StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
+        while (adapterInstanceIterator.hasNext()) {
+          Resource adapterInstance = adapterInstanceIterator.next().getSubject();
+          
+          MotorAdapter motorAdapter = new MotorAdapter(adapterInstance, adapterModel);
+          
+          motorAdapterInstances.put(adapterInstance.getURI(), motorAdapter);
+        }
+      }
+
+    private MotorAdapter(Resource adapterInstance, Model adapterModel) {
+        
+        this.adapterInstance = adapterInstance;
+        this.adapterModel = adapterModel;
+        
+        ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
+        ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
+/*        
         adapterName = "MotorGarage-1";
         
         adapterModel = ModelFactory.createDefaultModel();
@@ -119,9 +172,9 @@ public final class MotorAdapter extends AbstractAdapter {
         //wgs coordinates
         adapterInstance.addProperty(adapterModel.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat"), "52.516377");
         adapterInstance.addProperty(adapterModel.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long"), "13.323732");
-        
+ */       
         // Testbed name with omn:partOfGroup
-        adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology/omn#partOfGroup"),adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
+        //adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology/omn#partOfGroup"),adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
         
         // adding resource property to the description.
 /*        for(Property prob : motorControlProperties){
@@ -216,7 +269,7 @@ public final class MotorAdapter extends AbstractAdapter {
       return ADAPTER_INSTANCE_PREFIX.clone();
     }
 
-    public Motor getInstance(String instanceName) {
+    public Motor getInstanceName(String instanceName) {
         return (Motor) instanceList.get(instanceName);
     }
     

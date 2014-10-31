@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.motor.dm;
 
+import java.util.Iterator;
+
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
@@ -12,6 +14,12 @@ import org.fiteagle.adapters.motor.MotorAdapter;
 public class MotorAdapterEJB extends AbstractAdapterEJB {
 
     public MotorAdapterEJB() {
-        super.adapter = MotorAdapter.getInstance();
+    	if (adapter == null){
+  		  Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
+  		  if(iterator.hasNext()){
+  			  super.adapter = MotorAdapter.getInstance(iterator.next());
+  		  }
+  	  }
+        //super.adapter = MotorAdapter.getInstance();
     }
 }

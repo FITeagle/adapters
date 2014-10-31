@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.motor;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.annotation.PostConstruct;
@@ -27,7 +28,13 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
     @PostConstruct
     private void init(){
         instanceThreadList = new HashMap<String, Thread>(); 
-        this.adapter = MotorAdapter.getInstance();
+        if (adapter == null){
+  		  Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
+  		  if(iterator.hasNext()){
+  			  this.adapter = MotorAdapter.getInstance(iterator.next());
+  		  }
+  	  }
+        //this.adapter = MotorAdapter.getInstance();
     }
 
     public void startThread(String instanceName) {
@@ -64,9 +71,10 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
                 } catch (InterruptedException e) {
                     return;
                 }
-                Motor instance = adapter.getInstance(instanceName);
+                
+                Motor instance = adapter.getInstanceName(instanceName);
                 if(instance != null){
-                    adapter.getInstance(instanceName).setRpmWithNotify(randomRPMGenerator.nextInt(1000));
+                    adapter.getInstanceName(instanceName).setRpmWithNotify(randomRPMGenerator.nextInt(1000));
 
                 } else {
                     Thread.currentThread().interrupt();
