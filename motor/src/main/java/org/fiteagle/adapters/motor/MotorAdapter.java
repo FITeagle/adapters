@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.motor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,15 +12,12 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModels;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
 
 public final class MotorAdapter extends AbstractAdapter {
 
@@ -36,7 +34,6 @@ public final class MotorAdapter extends AbstractAdapter {
     private Resource adapterInstance;
     private static Resource adapter;
     private static Resource resource;
-    private String adapterName;
     
 /*    private static MotorAdapter motorAdapterSingleton;
 
@@ -55,10 +52,9 @@ public final class MotorAdapter extends AbstractAdapter {
     private Property motorPropertyRPM;
     private Property motorPropertyMaxRPM;
     private Property motorPropertyThrottle;
-    private Property motorPropertyManufacturer;
     private Property motorPropertyIsDynamic;
 
-    private static List<Property> motorControlProperties = new LinkedList<Property>();
+    private static List<Property> motorControlProperties = new ArrayList<Property>();
     
     static {
         Model adapterModel = OntologyModels.loadModel("ontologies/motor.ttl", IMessageBus.SERIALIZATION_TURTLE);
@@ -214,11 +210,27 @@ public final class MotorAdapter extends AbstractAdapter {
         motorInstance.addProperty(RDF.type, resource);
         motorInstance.addProperty(RDFS.label, "Motor: " + instanceName);
         motorInstance.addProperty(RDFS.comment, adapterModel.createLiteral("Motor in the garage " + instanceName, "en"));
-        motorInstance.addLiteral(motorPropertyRPM, currentMotor.getRpm());
-        motorInstance.addLiteral(motorPropertyMaxRPM, currentMotor.getMaxRpm());
-        motorInstance.addLiteral(motorPropertyThrottle, currentMotor.getThrottle());
-        motorInstance.addLiteral(motorPropertyManufacturer, "Fraunhofer FOKUS");
-        motorInstance.addLiteral(motorPropertyIsDynamic, ((DynamicMotor) currentMotor).isDynamic());
+        
+
+        for(Property p : motorControlProperties){
+          switch(p.getLocalName()){
+            case "rpm": 
+            	motorInstance.addLiteral(p, currentMotor.getRpm());
+            	break;
+            case "maxRpm": 
+            	motorInstance.addLiteral(p, currentMotor.getMaxRpm());
+            	break;
+            case "manufacturer": 
+            	motorInstance.addLiteral(p, currentMotor.getManufacturer());
+            	break;
+            case "throttle": 
+            	motorInstance.addLiteral(p, currentMotor.getThrottle());
+            	break;
+            case "isDynamic": 
+            	motorInstance.addLiteral(p, ((DynamicMotor) currentMotor).isDynamic());
+            	break;
+          }
+        }
     }
 
     @Override

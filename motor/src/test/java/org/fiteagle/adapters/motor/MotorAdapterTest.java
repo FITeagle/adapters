@@ -1,10 +1,12 @@
 package org.fiteagle.adapters.motor;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -13,25 +15,21 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class MotorAdapterTest {
 
 
-    /**
-     * Test proper work of singleton.
-     */
-   // @Test
- /*   public void testSingleton() {
-        MotorAdapter MotorAdapterOne = MotorAdapter.getInstance();
-        
-        MotorAdapter MotorAdapterTwo = MotorAdapter.getInstance();
-
-        // Only one instance of the Adapter can exist
-        Assert.assertEquals(MotorAdapterOne, MotorAdapterTwo);    
-    }
-    */
+	private static MotorAdapter adapter;
+	
+	@BeforeClass
+	public static void setup(){
+	    Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
+	    if(iterator.hasNext()){
+	    	adapter = MotorAdapter.getInstance(iterator.next());
+	    }
+	}
+	
     /**
      * Test creation and termination of instances
      */
-    //@Test
-/*    public void testCreateAndTerminate() {
-        MotorAdapter adapter = MotorAdapter.getInstance();
+    @Test
+    public void testCreateAndTerminate() {
         Map<String, String> properties = new HashMap<>();
         
         // Creating first instance works
@@ -48,13 +46,12 @@ public class MotorAdapterTest {
         // Terminate remaining instance
         Assert.assertTrue(adapter.terminateInstance("InstanceTwo"));
     }   
-    */
+  
     /**
      * Test Monitoring of instances
      */
-    //@Test
- /*   public void testMonitor() {
-        MotorAdapter adapter = MotorAdapter.getInstance();
+  @Test
+    public void testMonitor() {
         
         String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";
         
@@ -77,13 +74,12 @@ public class MotorAdapterTest {
         // release instances
         Assert.assertTrue(adapter.terminateInstance(instanceName));
     }   
-    */
+ 
     /**
      * Test getter methods, those must return actual data if everything was initialized properly
      */
-   // @Test
- /*   public void testGetters(){
-    	MotorAdapter adapter = MotorAdapter.getInstance();
+    @Test
+    public void testGetters(){
     	
     	// Getting Adapter Managed Resource must be implemented and return actual data
     	Assert.assertNotNull(adapter.getAdapterManagedResource());
@@ -98,5 +94,5 @@ public class MotorAdapterTest {
     	Assert.assertNotNull(adapter.getAdapterDescriptionModel());
     	Assert.assertTrue(adapter.getAdapterDescriptionModel() instanceof Model); 
     }
-    */
+    
 }
