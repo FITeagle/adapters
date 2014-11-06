@@ -1,17 +1,18 @@
 package org.fiteagle.adapters.openstack.client;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.prefs.Preferences;
 
-import org.fiteagle.adapters.openstack.client.model.Images;
+import org.fiteagle.adapters.openstack.Image;
+import org.fiteagle.adapters.openstack.OpenstackAdapter;
+import org.fiteagle.adapters.openstack.OpenstackVM;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate.SecurityGroup;
-import org.fiteagle.adapters.openstack.client.model.Servers;
 
 import com.woorea.openstack.base.client.Entity;
 import com.woorea.openstack.base.client.HttpMethod;
@@ -134,7 +135,7 @@ public class OpenstackClient {
 		return flavors;
 	}
 
-	public Images listImages() {
+	public Set<Image> listImages() {
 		Access access = getAccessWithTenantId();
 		
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -146,17 +147,11 @@ public class OpenstackClient {
 		
 		String responseImagesString = novaClient.execute(request);
 
-		Images images;
-		try {
-			images = OpenstackParser.parseToImages(responseImagesString);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
+		Set<Image> images = OpenstackParser.parseToImageSet(responseImagesString);
 		return images;
 	}
 	
-	public Servers listServers() {
+	public Set<OpenstackVM> listServers(OpenstackAdapter adapter) {
 	    Access access = getAccessWithTenantId();
 	    
 	    Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -167,14 +162,9 @@ public class OpenstackClient {
 	        String.class);
 	    
 	    String responseImagesString = novaClient.execute(request);
-	    Servers servers;
-	    try {
-	      servers = OpenstackParser.parseToServers(responseImagesString);
-	    } catch (IOException e) {
-	      throw new RuntimeException(e);
-	    }
+	    Set<OpenstackVM> openstackVMs = OpenstackParser.parseToOpenstackVMSet(responseImagesString, adapter);
     
-	    return servers;
+	    return openstackVMs;
 	}
 	
 	
@@ -211,7 +201,7 @@ public class OpenstackClient {
 		return access;
 	}
 
-	public Server createServer(String imageId, String flavorId, String serverName, String keyPairName) {
+	public OpenstackVM createServer(String imageId, String flavorId, String serverName, String keyPairName, OpenstackAdapter adapter) {
 
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -241,7 +231,7 @@ public class OpenstackClient {
 				org.fiteagle.adapters.openstack.client.model.Server.class);
 		
 		Server responseServer = novaClient.execute(createServerRequest);
-		return responseServer;
+		return OpenstackParser.parseToOpenstackVM(responseServer, adapter);
 	}
 
 	public Server getServerDetails(String id) {
@@ -345,10 +335,10 @@ public class OpenstackClient {
 		novaClient.keyPairs().delete(name).execute();
 	}
 	
-	public void deleteServer(String id){
+	public void deleteServer(OpenstackVM openstackVM){
+	  String id = (String) openstackVM.getProperty(OpenstackAdapter.PROPERTY_ID);
 		Access access = getAccessWithTenantId();
-		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
-				TENANT_ID));
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
 		OpenStackRequest<Server> request = new OpenStackRequest<Server>(
