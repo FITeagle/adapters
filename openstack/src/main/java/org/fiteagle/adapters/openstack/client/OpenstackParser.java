@@ -10,9 +10,9 @@ import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.fiteagle.abstractAdapter.AdapterResource;
 import org.fiteagle.adapters.openstack.Image;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
-import org.fiteagle.adapters.openstack.OpenstackVM;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.Servers;
@@ -49,7 +49,7 @@ public class OpenstackParser {
 		return mapper.readValue(flavorsString, Flavors.class);
 	}
 	
-	public static OpenstackVM parseToOpenstackVM(Server server, OpenstackAdapter adapter){
+	public static AdapterResource parseToOpenstackVM(Server server, OpenstackAdapter adapter){
 	  Map<Property, Object> properties = new HashMap<Property, Object>();
     
     for(Property p : OpenstackAdapter.resourceInstanceProperties){
@@ -82,10 +82,10 @@ public class OpenstackParser {
           break;
       }
     }
-    return new OpenstackVM(server.getName(), properties);
+    return new AdapterResource(server.getName(), properties);
 	}
 	
-	public static OpenstackVM parseToOpenstackVM(String serverString, OpenstackAdapter adapter){
+	public static AdapterResource parseToOpenstackVM(String serverString, OpenstackAdapter adapter){
 	  Server server = parseToServer(serverString);
 	  return parseToOpenstackVM(server, adapter);	
 	}
@@ -101,8 +101,8 @@ public class OpenstackParser {
 		return server;
 	}
 	
-	public static Set<OpenstackVM> parseToOpenstackVMSet(String serversString, OpenstackAdapter adapter){
-	  Set<OpenstackVM> openstackVMs = new HashSet<>();
+	public static Set<AdapterResource> parseToOpenstackVMSet(String serversString, OpenstackAdapter adapter){
+	  Set<AdapterResource> openstackVMs = new HashSet<>();
 	  Servers servers = parseToServers(serversString);
 	  for(Server server : servers.getList()){
 	    openstackVMs.add(parseToOpenstackVM(server, adapter));

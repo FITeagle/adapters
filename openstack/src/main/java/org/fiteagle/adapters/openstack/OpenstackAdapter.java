@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AdapterResource;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -37,7 +38,6 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   private Model adapterModel;
   private Resource adapterInstance;
-  private List<Model> resourceInstances = new ArrayList<Model>();
   
   public static HashMap<String,OpenstackAdapter> openstackAdapterInstances = new HashMap<>();
   
@@ -101,13 +101,13 @@ public class OpenstackAdapter extends AbstractAdapter {
     String keypairName = getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"keypairname", properties);
     
     String flavorId_small = "2"; 
-    OpenstackVM openstackVM = openstackClient.createServer(imageID, flavorId_small, instanceName, keypairName, this);
+    AdapterResource openstackVM = openstackClient.createServer(imageID, flavorId_small, instanceName, keypairName, this);
     return openstackVM;
   }
 
   @Override
   public void handleTerminateInstance(String instanceName) {
-    OpenstackVM openstackVMToDelete = (OpenstackVM) instanceList.get(instanceName);
+    AdapterResource openstackVMToDelete = (AdapterResource) instanceList.get(instanceName);
     openstackClient.deleteServer(openstackVMToDelete);
   }
   
@@ -128,7 +128,7 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   @Override
   public Model handleMonitorInstance(String instanceName, Model modelInstances) {
-    OpenstackVM openstackVM = (OpenstackVM) instanceList.get(instanceName);
+    AdapterResource openstackVM = (AdapterResource) instanceList.get(instanceName);
 
     Resource serverInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1]+instanceName);
     addPropertiesToResource(serverInstance, openstackVM, instanceName);
@@ -140,7 +140,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   public Model handleGetAllInstances(Model modelInstances) {
     for(String key : instanceList.keySet()) {
 
-      OpenstackVM server = (OpenstackVM) instanceList.get(key);
+      AdapterResource server = (AdapterResource) instanceList.get(key);
 
       Resource openstackInstance = modelInstances.createResource(key);
       addPropertiesToResource(openstackInstance, server, key);
@@ -168,17 +168,16 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   public void updateInstanceList(){
     instanceList.clear();
-    Set<OpenstackVM> openstackVMs = openstackClient.listServers(this);
-    for(OpenstackVM vm : openstackVMs){
+    Set<AdapterResource> openstackVMs = openstackClient.listServers(this);
+    for(AdapterResource vm : openstackVMs){
       String instanceName = vm.getName();
       instanceList.put(instanceName, vm);
       Model createdResourceInstanceModel = getSingleInstanceModel(instanceName);
-      resourceInstances.add(createdResourceInstanceModel);
       adapterModel.add(createdResourceInstanceModel);
     }
   }
   
-  private void addPropertiesToResource(Resource openstackInstance, OpenstackVM openstackVM, String instanceName) {
+  private void addPropertiesToResource(Resource openstackInstance, AdapterResource openstackVM, String instanceName) {
     openstackInstance.addProperty(RDF.type, resource);
     openstackInstance.addProperty(RDFS.label, instanceName);
     

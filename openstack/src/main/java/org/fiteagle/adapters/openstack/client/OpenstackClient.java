@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.prefs.Preferences;
 
+import org.fiteagle.abstractAdapter.AdapterResource;
 import org.fiteagle.adapters.openstack.Image;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
-import org.fiteagle.adapters.openstack.OpenstackVM;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate.SecurityGroup;
@@ -151,7 +151,7 @@ public class OpenstackClient {
 		return images;
 	}
 	
-	public Set<OpenstackVM> listServers(OpenstackAdapter adapter) {
+	public Set<AdapterResource> listServers(OpenstackAdapter adapter) {
 	    Access access = getAccessWithTenantId();
 	    
 	    Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -162,7 +162,7 @@ public class OpenstackClient {
 	        String.class);
 	    
 	    String responseImagesString = novaClient.execute(request);
-	    Set<OpenstackVM> openstackVMs = OpenstackParser.parseToOpenstackVMSet(responseImagesString, adapter);
+	    Set<AdapterResource> openstackVMs = OpenstackParser.parseToOpenstackVMSet(responseImagesString, adapter);
     
 	    return openstackVMs;
 	}
@@ -201,7 +201,7 @@ public class OpenstackClient {
 		return access;
 	}
 
-	public OpenstackVM createServer(String imageId, String flavorId, String serverName, String keyPairName, OpenstackAdapter adapter) {
+	public AdapterResource createServer(String imageId, String flavorId, String serverName, String keyPairName, OpenstackAdapter adapter) {
 
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -335,7 +335,7 @@ public class OpenstackClient {
 		novaClient.keyPairs().delete(name).execute();
 	}
 	
-	public void deleteServer(OpenstackVM openstackVM){
+	public void deleteServer(AdapterResource openstackVM){
 	  String id = (String) openstackVM.getProperty(OpenstackAdapter.PROPERTY_ID);
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));

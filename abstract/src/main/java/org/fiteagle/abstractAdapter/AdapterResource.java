@@ -1,15 +1,15 @@
-package org.fiteagle.adapters.openstack;
+package org.fiteagle.abstractAdapter;
 
 import java.util.Map;
 
 import com.hp.hpl.jena.rdf.model.Property;
 
-public class OpenstackVM {
+public class AdapterResource {
   
   private String name;
   private Map<Property, Object> properties;
   
-  public OpenstackVM(String name, Map<Property, Object> properties){
+  public AdapterResource(String name, Map<Property, Object> properties){
     this.name = name;
     this.properties = properties;
   }

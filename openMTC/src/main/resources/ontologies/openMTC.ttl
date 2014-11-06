@@ -1,0 +1,34 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix wgs:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+@prefix omn:   <http://open-multinet.info/ontology/omn#> .
+@prefix openmtc:    <http://open-multinet.info/ontology/resource/openmtc#> .
+
+openmtc:OpenMTC
+        a                owl:Class ;
+        rdfs:label       "OpenMTC Handler"@en ;
+        rdfs:subClassOf  omn:Adapter ;
+        omn:implements   openmtc:OpenMTCAsAService .
+        
+openmtc:OpenMTCAsAService
+        a                  owl:Class ;
+        rdfs:label         "OpenMTC as a Service"@en ;
+        rdfs:subClassOf    omn:Resource ;
+        omn:implementedBy  openmtc:OpenMTC .
+
+openmtc:url
+        a      owl:DatatypeProperty ;
+        rdfs:domain  openmtc:OpenMTCAsAService ;
+        rdfs:label   "The url of the OpenMTC as a Service instance"@en ;
+        rdfs:range   xsd:string .
+
+openmtc:status
+        a      owl:DatatypeProperty ;
+        rdfs:domain  openmtc:OpenMTCAsAService ;
+        rdfs:label   "The status of the OpenMTC as a Service instance"@en ;
+        rdfs:range   xsd:string .
+

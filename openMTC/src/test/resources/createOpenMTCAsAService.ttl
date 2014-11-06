@@ -1,0 +1,9 @@
+@prefix openmtc:    <http://open-multinet.info/ontology/resource/openmtc#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+av:OpenMTC-1 a openmtc:OpenMTC .
+
+av:OpenMTCAsAService-1 a openmtc:OpenMTCAsAService ;
+          openmtc:url "http://example.com"^^xsd:string ;
+          
