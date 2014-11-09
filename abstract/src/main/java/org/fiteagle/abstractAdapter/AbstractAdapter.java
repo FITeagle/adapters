@@ -62,7 +62,7 @@ public abstract class AbstractAdapter {
     return true;
   }
   
-  protected static String getProperty(String propertyKey, Map<String, String> properties){
+  public static String getProperty(String propertyKey, Map<String, String> properties){
     String value = properties.get(propertyKey);
     if(value == null || value.isEmpty()){
       throw new InsufficentPropertiesException(propertyKey);

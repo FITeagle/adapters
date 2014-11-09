@@ -4,19 +4,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import org.fiteagle.abstractAdapter.AdapterResource;
-import org.fiteagle.adapters.openstack.Image;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
+import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate.SecurityGroup;
+import org.fiteagle.adapters.openstack.client.model.Servers;
 
 import com.woorea.openstack.base.client.Entity;
 import com.woorea.openstack.base.client.HttpMethod;
 import com.woorea.openstack.base.client.OpenStackRequest;
+import com.woorea.openstack.base.client.OpenStackResponseException;
 import com.woorea.openstack.base.client.OpenStackSimpleTokenProvider;
 import com.woorea.openstack.connector.JerseyConnector;
 import com.woorea.openstack.keystone.Keystone;
@@ -39,32 +41,35 @@ import com.woorea.openstack.quantum.model.Networks;
 
 public class OpenstackClient {
 
-	private static String KEYSTONE_AUTH_URL;
-	private static String KEYSTONE_USERNAME;
-	private static String KEYSTONE_PASSWORD;
-	private static String KEYSTONE_ENDPOINT;
-	private static String TENANT_NAME;
-	private static String NOVA_ENDPOINT;
-	private static String GLANCE_ENDPOINT;
-	private static String NET_ENDPOINT;
-	private static String FLOATINGIP_POOL_NAME;
-	private static String NET_NAME;
-	private static String TENANT_ID = "";
+  private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
+  
+	private String KEYSTONE_AUTH_URL;
+	private String KEYSTONE_USERNAME;
+	private String KEYSTONE_PASSWORD;
+	private String KEYSTONE_ENDPOINT;
+	private String TENANT_NAME;
+	private String NOVA_ENDPOINT;
+	private String GLANCE_ENDPOINT;
+	private String NET_ENDPOINT;
+	private String FLOATINGIP_POOL_NAME;
+	private String NET_NAME;
+	private String TENANT_ID = "";
 	
 	private String networkId = "";
 
-	private static OpenstackClient instance;
-	public static OpenstackClient getInstance(){
-		if(instance == null){
-			instance = new OpenstackClient();
-		}
-		return instance;
-	}
+	private static HashMap<OpenstackAdapter, OpenstackClient> instances = new HashMap<OpenstackAdapter, OpenstackClient>();
+  
+  public static synchronized OpenstackClient getInstance(OpenstackAdapter adapter) {
+    if (instances.get(adapter) == null) {
+      instances.put(adapter, new OpenstackClient());
+    }
+    return instances.get(adapter);
+  }
 	
 	private OpenstackClient() {
 	}
 	
-	private static boolean PREFERENCES_INITIALIZED = false;
+	private boolean PREFERENCES_INITIALIZED = false;
 	
 	private void loadPreferences() {
 		Preferences preferences = Preferences.userNodeForPackage(getClass());
@@ -121,7 +126,6 @@ public class OpenstackClient {
 		  throw new InsufficientOpenstackPreferences("tenant_name");
 		}
 	}
-	
 
 	public Flavors listFlavors() {
 		Access access = getAccessWithTenantId();
@@ -135,7 +139,7 @@ public class OpenstackClient {
 		return flavors;
 	}
 
-	public Set<Image> listImages() {
+	public Images listImages() {
 		Access access = getAccessWithTenantId();
 		
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -145,13 +149,19 @@ public class OpenstackClient {
 				novaClient, HttpMethod.GET, "/images/detail", null,
 				String.class);
 		
-		String responseImagesString = novaClient.execute(request);
+		String response = null;
+		try{
+		  response = novaClient.execute(request);
+		} catch(OpenStackResponseException e){
+		  LOGGER.log(Level.SEVERE, e.getMessage());
+		  return null;
+		}
 
-		Set<Image> images = OpenstackParser.parseToImageSet(responseImagesString);
+		Images images = OpenstackParser.parseToImages(response);
 		return images;
 	}
 	
-	public Set<AdapterResource> listServers(OpenstackAdapter adapter) {
+	public Servers listServers() {
 	    Access access = getAccessWithTenantId();
 	    
 	    Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -161,10 +171,16 @@ public class OpenstackClient {
 	        novaClient, HttpMethod.GET, "/servers/detail", null,
 	        String.class);
 	    
-	    String responseImagesString = novaClient.execute(request);
-	    Set<AdapterResource> openstackVMs = OpenstackParser.parseToOpenstackVMSet(responseImagesString, adapter);
+	    String response = null;
+	    try{
+	      response = novaClient.execute(request);
+	    } catch(OpenStackResponseException e){
+	      LOGGER.log(Level.SEVERE, e.getMessage());
+	      return null;
+	    }
+	    Servers servers = OpenstackParser.parseToServers(response);
     
-	    return openstackVMs;
+	    return servers;
 	}
 	
 	
@@ -201,22 +217,15 @@ public class OpenstackClient {
 		return access;
 	}
 
-	public AdapterResource createServer(String imageId, String flavorId, String serverName, String keyPairName, OpenstackAdapter adapter) {
-
+	public Server createServer(ServerForCreate serverForCreate) {
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
 
-		ServerForCreate serverForCreate = new ServerForCreate();
-		serverForCreate.setName(serverName);
-		serverForCreate.setFlavorRef(flavorId);
-		serverForCreate.setImageRef(imageId);
-		serverForCreate.setKeyName(keyPairName);
 		SecurityGroup sGroup = new ServerForCreate.SecurityGroup("default");
 		serverForCreate.getSecurityGroups().add(sGroup);
 
-		List<ServerForCreate.Network> networkList = serverForCreate
-				.getNetworks();
+		List<ServerForCreate.Network> networkList = serverForCreate.getNetworks();
 		ServerForCreate.Network net_demo = new ServerForCreate.Network();
 		
 		net_demo.setUuid(this.getNetworkId());
@@ -231,7 +240,7 @@ public class OpenstackClient {
 				org.fiteagle.adapters.openstack.client.model.Server.class);
 		
 		Server responseServer = novaClient.execute(createServerRequest);
-		return OpenstackParser.parseToOpenstackVM(responseServer, adapter);
+		return responseServer;
 	}
 
 	public Server getServerDetails(String id) {
@@ -335,8 +344,7 @@ public class OpenstackClient {
 		novaClient.keyPairs().delete(name).execute();
 	}
 	
-	public void deleteServer(AdapterResource openstackVM){
-	  String id = (String) openstackVM.getProperty(OpenstackAdapter.PROPERTY_ID);
+	public void deleteServer(String id){
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
 		novaClient.token(access.getToken().getId());
@@ -375,11 +383,11 @@ public class OpenstackClient {
 		this.networkId = networkId;
 	}
 
-	public static String getKEYSTONE_ENDPOINT() {
+	public String getKEYSTONE_ENDPOINT() {
 		return KEYSTONE_ENDPOINT;
 	}
 
-	public static String getGLANCE_ENDPOINT() {
+	public String getGLANCE_ENDPOINT() {
 		return GLANCE_ENDPOINT;
 	}
 	
