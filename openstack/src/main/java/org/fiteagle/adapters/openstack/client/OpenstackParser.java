@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -31,28 +30,29 @@ import com.woorea.openstack.nova.model.FloatingIp;
 
 public class OpenstackParser {
 
-	private static JsonFactory factory = new JsonFactory();
-	private static ObjectMapper mapper = new ObjectMapper(factory);
+	private static ObjectMapper mapper = new ObjectMapper();
 
 	private final Property PROPERTY_ID;
   private final Property PROPERTY_IMAGES;
   private final Property PROPERTY_IMAGE;
+  private final Property PROPERTY_KEYPAIRNAME;
   
 	
 	private OpenstackAdapter adapter;
   
   private static HashMap<OpenstackAdapter, OpenstackParser> instances = new HashMap<OpenstackAdapter, OpenstackParser>();
   
-  public OpenstackParser(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE) {
+  public OpenstackParser(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
     this.adapter = adapter;
     this.PROPERTY_ID = PROPERTY_ID;
     this.PROPERTY_IMAGES = PROPERTY_IMAGES;
     this.PROPERTY_IMAGE = PROPERTY_IMAGE;    
+    this.PROPERTY_KEYPAIRNAME = PROPERTY_KEYPAIRNAME;
   }
 
-  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE) {
+  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
     if (instances.get(adapter) == null) {
-      instances.put(adapter, new OpenstackParser(adapter, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE));
+      instances.put(adapter, new OpenstackParser(adapter, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME));
     }
     return instances.get(adapter);
   }
@@ -226,5 +226,21 @@ public class OpenstackParser {
     serverForCreate.setKeyName(keypairName);
     
     return serverForCreate;
+  }
+
+  protected Property getPROPERTY_ID() {
+    return PROPERTY_ID;
+  }
+
+  protected Property getPROPERTY_IMAGES() {
+    return PROPERTY_IMAGES;
+  }
+
+  public Property getPROPERTY_IMAGE() {
+    return PROPERTY_IMAGE;
+  }
+  
+  public Property getPROPERTY_KEYPAIRNAME() {
+    return PROPERTY_KEYPAIRNAME;
   }
 }

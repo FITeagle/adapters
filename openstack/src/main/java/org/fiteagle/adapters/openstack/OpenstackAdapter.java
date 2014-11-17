@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterResource;
+import org.fiteagle.adapters.openstack.client.IOpenstackClient;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.OpenstackParser;
 import org.fiteagle.adapters.openstack.client.model.Images;
@@ -31,7 +32,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
   private final String[] ADAPTER_INSTANCE_PREFIX = new String[2];
   
-  private OpenstackClient openstackClient;
+  private IOpenstackClient openstackClient;
   private OpenstackParser openstackParser;
   
   private static Resource adapter;
@@ -45,6 +46,21 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   public static OpenstackAdapter getInstance(String URI){
     return openstackAdapterInstances.get(URI);
+  }
+  
+  private static OpenstackAdapter testInstance;
+  
+  public static OpenstackAdapter getInstance(IOpenstackClient openstackClient){
+    if(testInstance == null){
+      Model adapterModel = OntologyModels.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
+      StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
+      while (adapterInstanceIterator.hasNext()) {
+        Resource adapterInstance = adapterInstanceIterator.next().getSubject();
+        testInstance = new OpenstackAdapter(adapterInstance, adapterModel, openstackClient);
+        testInstance.updateAdapterDescription();
+      }
+    }
+    return testInstance;
   }
   
   static {
@@ -90,9 +106,26 @@ public class OpenstackAdapter extends AbstractAdapter {
     Property PROPERTY_IMAGES = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstack#images");
     Property PROPERTY_IMAGE = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#image");
     Property PROPERTY_ID = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#id");
+    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#keypairname");
     
     openstackClient = OpenstackClient.getInstance(this);
-    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE);
+    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME);
+  }
+  
+  private OpenstackAdapter(Resource adapterInstance, Model adapterModel, IOpenstackClient openstackClient){
+    this.adapterInstance = adapterInstance;
+    this.adapterModel = adapterModel;
+    
+    ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
+    ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
+    
+    Property PROPERTY_IMAGES = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstack#images");
+    Property PROPERTY_IMAGE = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#image");
+    Property PROPERTY_ID = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#id");
+    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#keypairname");
+    
+    this.openstackClient = openstackClient;
+    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME);
   }
   
   @Override
@@ -188,6 +221,10 @@ public class OpenstackAdapter extends AbstractAdapter {
   @Override
   public Model getAdapterDescriptionModel() {
     return adapterModel;
+  }
+  
+  public OpenstackParser getOpenstackParser(){
+    return openstackParser;
   }
 
 }

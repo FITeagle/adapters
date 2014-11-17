@@ -42,6 +42,11 @@ public class Image implements Serializable {
 	private Map<String, String> metadata;
 
 	private List<Link> links;
+	
+	public Image(String id, String name){
+	  this.id = id;
+	  this.name = name;
+	}
 
 	/**
 	 * @return the id

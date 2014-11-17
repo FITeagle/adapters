@@ -39,7 +39,7 @@ import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
 
-public class OpenstackClient {
+public class OpenstackClient implements IOpenstackClient{
 
   private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
   
@@ -127,6 +127,7 @@ public class OpenstackClient {
 		}
 	}
 
+	@Override
 	public Flavors listFlavors() {
 		Access access = getAccessWithTenantId();
 
@@ -139,6 +140,7 @@ public class OpenstackClient {
 		return flavors;
 	}
 
+	@Override
 	public Images listImages() {
 		Access access = getAccessWithTenantId();
 		
@@ -161,6 +163,7 @@ public class OpenstackClient {
 		return images;
 	}
 	
+	@Override
 	public Servers listServers() {
 	    Access access = getAccessWithTenantId();
 	    
@@ -182,7 +185,6 @@ public class OpenstackClient {
     
 	    return servers;
 	}
-	
 	
 	private Access getAccessWithTenantId() throws InsufficientOpenstackPreferences{
 	  if(PREFERENCES_INITIALIZED == false){
@@ -243,6 +245,7 @@ public class OpenstackClient {
 		return responseServer;
 	}
 
+	@Override
 	public Server getServerDetails(String id) {
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
@@ -259,6 +262,7 @@ public class OpenstackClient {
 		return serverDetail;
 	}
 
+	@Override
 	public void allocateFloatingIpForServer(String serverId, String floatingIp) {
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(
@@ -282,6 +286,7 @@ public class OpenstackClient {
 		}
 	}
 
+	@Override
 	public FloatingIpPools getFloatingIpPools(){
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
@@ -294,6 +299,7 @@ public class OpenstackClient {
 		return floatingIpPools;
 	}
 	
+	@Override
 	public FloatingIp addFloatingIp(){
 		
 		String poolName="";
@@ -324,6 +330,7 @@ public class OpenstackClient {
 		return floatingIp;
 	}
 	
+	@Override
 	public void addKeyPair(String name, String publicKey){
 		Access access = getAccessWithTenantId();
 
@@ -334,6 +341,7 @@ public class OpenstackClient {
 		novaClient.keyPairs().create(name, publicKey).execute();
 	}
 	
+	@Override
 	public void deleteKeyPair(String name){
 		Access access = getAccessWithTenantId();
 
@@ -344,6 +352,7 @@ public class OpenstackClient {
 		novaClient.keyPairs().delete(name).execute();
 	}
 	
+	@Override
 	public void deleteServer(String id){
 		Access access = getAccessWithTenantId();
 		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));

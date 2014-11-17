@@ -15,12 +15,14 @@ import org.codehaus.jackson.annotate.JsonProperty;
 public class Images implements Iterable<Image>, Serializable {
 
   private static final long serialVersionUID = -1945698118256231004L;
+  
+  public Images(List<Image> imageList){
+    this.list = imageList;
+  }
+  
   @JsonProperty("images")
 	private List<Image> list;
 
-	/**
-	 * @return the list
-	 */
 	public List<Image> getList() {
 		return list;
 	}
