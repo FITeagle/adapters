@@ -81,13 +81,10 @@ public class OpenstackParser {
 	
   public Resource getImage(String id) {
     Resource image;
-    StmtIterator imagesIterator = adapter.getAdapterDescriptionModel().listStatements(null, RDF.type,
-        adapter.getAdapterDescriptionModel().createProperty("http://open-multinet.info/ontology/resource/openstackvm#Image"));
+    StmtIterator imagesIterator = adapter.getAdapterDescriptionModel().listStatements(null, PROPERTY_ID, adapter.getAdapterDescriptionModel().createLiteral(id));
     if (imagesIterator.hasNext()) {
       image = imagesIterator.next().getSubject();
-      if (image.getPropertyResourceValue(PROPERTY_ID).asLiteral().getValue() == id) {
-        return image;
-      }
+      return image;
     }
     return null;
   }
@@ -158,13 +155,12 @@ public class OpenstackParser {
     int i = 1;
     for(Image image : images.getList()){
       Resource imageResource = adapterModel.createResource(adapter.getAdapterInstancePrefix()[1]+image.getName().replace(" ", "_"));
-      imageResource.addProperty(RDF.type, adapterModel.createProperty("http://open-multinet.info/ontology/resource/openstackvm#Image"));
+      imageResource.addProperty(RDF.type, adapterModel.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"Image"));
       imageResource.addProperty(PROPERTY_ID, adapterModel.createLiteral(image.getId()));
       imageResource.addProperty(RDFS.label, adapterModel.createLiteral(image.getName()));
       imagesResource.addProperty(RDF.li(i), imageResource);
       i++;
     }
-    
     return imagesResource;
   }
 	

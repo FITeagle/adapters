@@ -31,7 +31,7 @@ public class OpenstackTestClient implements IOpenstackClient {
   @Override
   public Images listImages() {
     ArrayList<Image> imageList = new ArrayList<>();
-    imageList.add(new Image("testImageID", "testImageName"));
+    imageList.add(new Image("12345", "testImageName"));
     Images images = new Images(imageList);
     return images;
   }
@@ -44,6 +44,9 @@ public class OpenstackTestClient implements IOpenstackClient {
   @Override
   public Server createServer(ServerForCreate serverForCreate) {
     Server server = new Server();
+    Image image = new Image("12345", serverForCreate.getImageRef());
+    server.setKeyName(serverForCreate.getKeyName());
+    server.setImage(image);
     return server;
   }
 
