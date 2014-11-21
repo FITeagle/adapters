@@ -26,7 +26,7 @@ public class OpenstackAdapterTest {
   
   @BeforeClass
   public static void loadModel(){
-    adapter = OpenstackAdapter.getInstance(OpenstackTestClient.getInstance());
+    adapter = OpenstackAdapter.getTestInstance(OpenstackTestClient.getInstance());
   }
   
   @Test

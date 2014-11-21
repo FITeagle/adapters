@@ -3,6 +3,8 @@ package org.fiteagle.adapters.openstack.client;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
@@ -28,6 +30,8 @@ import com.woorea.openstack.nova.model.FloatingIp;
 
 public class OpenstackParser {
 
+  private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
+  
 	private static ObjectMapper mapper = new ObjectMapper();
 
 	private final Property PROPERTY_ID;
@@ -62,8 +66,7 @@ public class OpenstackParser {
 		try {
       images = mapper.readValue(imagesString, Images.class);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.log(Level.SEVERE, e.getMessage());
     }
     return images;
 	}
@@ -136,8 +139,7 @@ public class OpenstackParser {
     try {
       server = mapper.readValue(serverString, Server.class);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.log(Level.SEVERE, e.getMessage());
     }
 		return server;
 	}
@@ -182,8 +184,7 @@ public class OpenstackParser {
 		try {
       servers = mapper.readValue(serversString, Servers.class);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.log(Level.SEVERE, e.getMessage());
     }
 		return servers;
 	}

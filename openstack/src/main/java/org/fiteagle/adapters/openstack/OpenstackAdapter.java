@@ -41,25 +41,20 @@ public class OpenstackAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   
-  private static Resource image;
-  
   public static HashMap<String,OpenstackAdapter> openstackAdapterInstances = new HashMap<>();
   
   public static OpenstackAdapter getInstance(String URI){
     return openstackAdapterInstances.get(URI);
   }
   
-  private static OpenstackAdapter testInstance;
-  
-  public static OpenstackAdapter getInstance(IOpenstackClient openstackClient){
-    if(testInstance == null){
-      Model adapterModel = OntologyModels.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
-      StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
-      while (adapterInstanceIterator.hasNext()) {
-        Resource adapterInstance = adapterInstanceIterator.next().getSubject();
-        testInstance = new OpenstackAdapter(adapterInstance, adapterModel, openstackClient);
-        testInstance.updateAdapterDescription();
-      }
+  public static OpenstackAdapter getTestInstance(IOpenstackClient openstackClient){
+    OpenstackAdapter testInstance = null;
+    Model adapterModel = OntologyModels.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
+    StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
+    while (adapterInstanceIterator.hasNext()) {
+      Resource adapterInstance = adapterInstanceIterator.next().getSubject();
+      testInstance = new OpenstackAdapter(adapterInstance, adapterModel, openstackClient);
+      testInstance.updateAdapterDescription();
     }
     return testInstance;
   }
@@ -112,7 +107,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     
     this.openstackClient = openstackClient;
     openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME);
-    image = adapterModel.getResource(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"OpenstackImage");
   }
   
   @Override
@@ -171,7 +165,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   public Resource getImageResource(){
-    return image;
+    return adapterModel.getResource(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"OpenstackImage");
   }
 
   @Override
