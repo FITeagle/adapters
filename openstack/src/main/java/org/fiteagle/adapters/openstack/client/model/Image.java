@@ -43,6 +43,9 @@ public class Image implements Serializable {
 
 	private List<Link> links;
 	
+	protected Image(){
+	}
+	
 	public Image(String id, String name){
 	  this.id = id;
 	  this.name = name;

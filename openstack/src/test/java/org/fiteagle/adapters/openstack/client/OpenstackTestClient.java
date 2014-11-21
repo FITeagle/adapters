@@ -47,6 +47,7 @@ public class OpenstackTestClient implements IOpenstackClient {
     Image image = new Image("12345", serverForCreate.getImageRef());
     server.setKeyName(serverForCreate.getKeyName());
     server.setImage(image);
+    server.setName(serverForCreate.getName());
     return server;
   }
 

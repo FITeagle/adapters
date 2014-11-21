@@ -2,14 +2,11 @@ package org.fiteagle.adapters.openstack.client;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.fiteagle.abstractAdapter.AdapterResource;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
 import org.fiteagle.adapters.openstack.client.model.Image;
 import org.fiteagle.adapters.openstack.client.model.Images;
@@ -17,6 +14,7 @@ import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -33,6 +31,7 @@ public class OpenstackParser {
 	private static ObjectMapper mapper = new ObjectMapper();
 
 	private final Property PROPERTY_ID;
+	private final Property PROPERTY_IMAGE_ID;
   private final Property PROPERTY_IMAGES;
   private final Property PROPERTY_IMAGE;
   private final Property PROPERTY_KEYPAIRNAME;
@@ -42,17 +41,18 @@ public class OpenstackParser {
   
   private static HashMap<OpenstackAdapter, OpenstackParser> instances = new HashMap<OpenstackAdapter, OpenstackParser>();
   
-  public OpenstackParser(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
+  public OpenstackParser(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
     this.adapter = adapter;
     this.PROPERTY_ID = PROPERTY_ID;
+    this.PROPERTY_IMAGE_ID = PROPERTY_IMAGE_ID;
     this.PROPERTY_IMAGES = PROPERTY_IMAGES;
     this.PROPERTY_IMAGE = PROPERTY_IMAGE;    
     this.PROPERTY_KEYPAIRNAME = PROPERTY_KEYPAIRNAME;
   }
 
-  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
+  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
     if (instances.get(adapter) == null) {
-      instances.put(adapter, new OpenstackParser(adapter, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME));
+      instances.put(adapter, new OpenstackParser(adapter, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME));
     }
     return instances.get(adapter);
   }
@@ -81,7 +81,7 @@ public class OpenstackParser {
 	
   public Resource getImage(String id) {
     Resource image;
-    StmtIterator imagesIterator = adapter.getAdapterDescriptionModel().listStatements(null, PROPERTY_ID, adapter.getAdapterDescriptionModel().createLiteral(id));
+    StmtIterator imagesIterator = adapter.getAdapterDescriptionModel().listStatements(null, PROPERTY_IMAGE_ID, adapter.getAdapterDescriptionModel().createLiteral(id));
     if (imagesIterator.hasNext()) {
       image = imagesIterator.next().getSubject();
       return image;
@@ -89,48 +89,49 @@ public class OpenstackParser {
     return null;
   }
 	
-	public AdapterResource parseToAdapterResource(Server server){
-	  Map<Property, Object> properties = new HashMap<Property, Object>();
-    
+	public Resource parseToResource(Server server){
+	  Resource resource = ModelFactory.createDefaultModel().createResource((adapter.getAdapterInstancePrefix()[1]+server.getName()));
+	  resource.addProperty(RDF.type, adapter.getAdapterManagedResource());
+	  resource.addProperty(RDFS.label, server.getName());
     for(Property p : OpenstackAdapter.resourceInstanceProperties){
       switch(p.getLocalName()){
         case "id": 
           if(server.getId() != null){
-            properties.put(p, server.getId());
+            resource.addLiteral(p, server.getId());
           }
           break;
         case "status": 
           if(server.getStatus() != null){
-            properties.put(p, server.getStatus());
+            resource.addLiteral(p, server.getStatus());
           }
           break;
         case "created": 
           if(server.getCreated() != null){
-            properties.put(p, server.getCreated());
+            resource.addLiteral(p, server.getCreated());
           }
           break;
         case "image": 
           if(server.getImage() != null && server.getImage().getId() != null){
               Resource image = getImage(server.getImage().getId());
-              properties.put(PROPERTY_IMAGE, image);
+              resource.addProperty(p, image);
           }
           break;
         case "keypairname": 
           if(server.getKeyName() != null){
-            properties.put(p, server.getKeyName());
+            resource.addLiteral(p, server.getKeyName());
           }
           break;
       }
     }
-    return new AdapterResource(server.getName(), properties);
+    return resource;
 	}
 	
-	public AdapterResource parseToAdapterResource(String serverString){
+	public Resource parseToResource(String serverString){
 	  Server server = parseToServer(serverString);
-	  return parseToAdapterResource(server);	
+	  return parseToResource(server);	
 	}
 	
-	private static Server parseToServer(String serverString) {
+	public static Server parseToServer(String serverString) {
 		Server server = null;
     try {
       server = mapper.readValue(serverString, Server.class);
@@ -141,60 +142,39 @@ public class OpenstackParser {
 		return server;
 	}
 	
-	public Set<AdapterResource> parseToAdapterResourceSet(Servers servers){
-	  Set<AdapterResource> openstackVMs = new HashSet<>();
-	  for(Server server : servers.getList()){
-	    openstackVMs.add(parseToAdapterResource(server));
-	  }
-	  return openstackVMs;
-	}
-	
 	private Resource parseToImagesResource(Images images){
 	  Model adapterModel = adapter.getAdapterDescriptionModel();
     Resource imagesResource = adapterModel.createResource(adapter.getAdapterInstance().getURI()+"_images");
     int i = 1;
     for(Image image : images.getList()){
       Resource imageResource = adapterModel.createResource(adapter.getAdapterInstancePrefix()[1]+image.getName().replace(" ", "_"));
-      imageResource.addProperty(RDF.type, adapterModel.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"Image"));
-      imageResource.addProperty(PROPERTY_ID, adapterModel.createLiteral(image.getId()));
+      imageResource.addProperty(RDF.type, adapter.getImageResource());
+      imageResource.addProperty(PROPERTY_IMAGE_ID, adapterModel.createLiteral(image.getId()));
       imageResource.addProperty(RDFS.label, adapterModel.createLiteral(image.getName()));
       imagesResource.addProperty(RDF.li(i), imageResource);
       i++;
     }
+    
     return imagesResource;
   }
 	
-	public void addPropertiesToResource(Resource openstackInstance, AdapterResource openstackVM, String instanceName) {
-    openstackInstance.addProperty(RDF.type, adapter.getAdapterManagedResource());
-    openstackInstance.addProperty(RDFS.label, instanceName);
-    
-    for(Property p : OpenstackAdapter.resourceInstanceProperties){
-      if(openstackVM.getProperty(p) != null){
-        openstackInstance.addLiteral(p, openstackVM.getProperty(p));
-      }
-    }
-  }
-	
 	public void addToAdapterInstanceDescription(Servers servers){
-	  Set<AdapterResource> openstackVMs = parseToAdapterResourceSet(servers);
-      for(AdapterResource vm : openstackVMs){
-        String instanceName = vm.getName();
-        
-        Model createdResourceInstanceModel = ModelFactory.createDefaultModel();
-        
-        Resource serverInstance = createdResourceInstanceModel.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
-        addPropertiesToResource(serverInstance, vm, instanceName);
-
-        adapter.createInstance(instanceName, createdResourceInstanceModel);
-      }
+    for(Server server : servers.getList()){
+      Resource resource = parseToResource(server);
+      adapter.getAdapterDescriptionModel().add(resource.getModel());
+    }
   }
 	
 	public void addToAdapterInstanceDescription(Images images){
 	  adapter.getAdapterInstance().addProperty(PROPERTY_IMAGES, parseToImagesResource(images));
 	}
 	
-	public String getAdapterResourceID(AdapterResource resource){
-	  return (String) resource.getProperty(PROPERTY_ID);
+	public String getAdapterResourceID(String instanceName){
+	  StmtIterator instancesIterator = adapter.getAdapterDescriptionModel().listStatements(adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+instanceName), PROPERTY_ID, (Literal) null);
+    if (instancesIterator.hasNext()) {
+      return instancesIterator.next().getLiteral().getValue().toString();
+    }
+	  return null;
 	}
 	
 	static Servers parseToServers(String serversString) {
@@ -210,7 +190,7 @@ public class OpenstackParser {
 
   public ServerForCreate parseToServerForCreate(String instanceName, Map<String, String> properties) {
     String imageResourceURI = OpenstackAdapter.getProperty(PROPERTY_IMAGE.getURI(), properties);
-    Statement imageIdStatement = adapter.getAdapterDescriptionModel().getRequiredProperty(adapter.getAdapterDescriptionModel().getResource(imageResourceURI), PROPERTY_ID);
+    Statement imageIdStatement = adapter.getAdapterDescriptionModel().getRequiredProperty(adapter.getAdapterDescriptionModel().getResource(imageResourceURI), PROPERTY_IMAGE_ID);
     String imageID = imageIdStatement.getObject().asLiteral().getValue().toString();
     String keypairName = OpenstackAdapter.getProperty(adapter.getAdapterManagedResourcePrefix()[1]+"keypairname", properties);
     String flavorId_small = "2"; 

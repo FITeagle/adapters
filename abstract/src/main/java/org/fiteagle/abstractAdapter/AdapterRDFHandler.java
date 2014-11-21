@@ -1,7 +1,6 @@
 package org.fiteagle.abstractAdapter;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,13 +49,11 @@ public class AdapterRDFHandler {
     StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelCreate);
     
     LOGGER.log(Level.INFO, "Searching for resources to create...");
-    System.out.println("model: "+modelCreate);
     
     Statement currentResourceInstanceStatement = null;
     Boolean createdAtLeastOne = false;
     while (iteratorResourceInstance.hasNext()) {
       currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
-      
       String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
       if(adapter.createInstance(instanceName, modelCreate)) {
         createdAtLeastOne = true;
@@ -159,13 +156,10 @@ public class AdapterRDFHandler {
     while (iteratorResourceInstance.hasNext()) {
       currentConfigureStatement = iteratorResourceInstance.nextStatement();
       
-      String instanceName = currentConfigureStatement.getSubject().getLocalName();
-      
       LOGGER.log(Level.INFO, "Configuring instance: "
           + currentConfigureStatement.getSubject().getLocalName() + " (" + currentConfigureStatement.toString() + ")");
       
-      List<String> updatedProperties = adapter.configureInstance(currentConfigureStatement);
-      Model changedInstanceValues = adapter.createInformConfigureRDF(instanceName, updatedProperties);
+      Model changedInstanceValues = adapter.configureInstance(currentConfigureStatement);
       changedInstancesModel.add(changedInstanceValues);
     }
     

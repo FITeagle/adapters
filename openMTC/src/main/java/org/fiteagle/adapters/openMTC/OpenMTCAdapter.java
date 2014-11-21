@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AdapterResource;
 import org.fiteagle.adapters.openmtc.client.OpenMTCClient;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -88,7 +87,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Object handleCreateInstance(String instanceName, Map<String, String> properties) {
+  public Resource handleCreateInstance(String instanceName, Map<String, String> properties) {
     openMTCClient.setUpConnection(properties);
     return null;
   }
@@ -114,45 +113,12 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Model handleMonitorInstance(String instanceName, Model modelInstances) {
-    AdapterResource openMTC = (AdapterResource) instanceList.get(instanceName);
-
-    Resource instance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1]+instanceName);
-    addPropertiesToResource(instance, openMTC, instanceName);
-
-    return modelInstances;
-  }
-
-  @Override
-  public Model handleGetAllInstances(Model modelInstances) {
-    for(String key : instanceList.keySet()) {
-
-      AdapterResource openMTC = (AdapterResource) instanceList.get(key);
-
-      Resource openMTCInstance = modelInstances.createResource(key);
-      addPropertiesToResource(openMTCInstance, openMTC, key);
-    }
-    return modelInstances;
-  }
-  
-  @Override
   public void updateAdapterDescription(){
     //TODO
   }
   
-  private void addPropertiesToResource(Resource openMTCInstance, AdapterResource openMTC, String instanceName) {
-    openMTCInstance.addProperty(RDF.type, resource);
-    openMTCInstance.addProperty(RDFS.label, instanceName);
-    
-    for(Property p : resourceInstanceProperties){
-      if(openMTC.getProperty(p) != null){
-        openMTCInstance.addLiteral(p, openMTC.getProperty(p));
-      }
-    }
-  }
-
   @Override
-  public List<String> configureInstance(Statement configureStatement) {
+  public Model configureInstance(Statement configureStatement) {
     // TODO Auto-generated method stub
     return null;
   }

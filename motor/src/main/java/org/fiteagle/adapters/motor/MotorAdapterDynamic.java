@@ -62,19 +62,18 @@ public class MotorAdapterDynamic implements IMotorAdapterDynamic{
                   
         }
 
-        @SuppressWarnings("static-access")
         public void run() {
 
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    Thread.currentThread().sleep(SLEEP);
+                    Thread.sleep(SLEEP);
                 } catch (InterruptedException e) {
                     return;
                 }
                 
-                Motor instance = adapter.getInstanceName(instanceName);
+                Motor instance = adapter.getInstanceByName(instanceName);
                 if(instance != null){
-                    adapter.getInstanceName(instanceName).setRpmWithNotify(randomRPMGenerator.nextInt(1000));
+                    adapter.getInstanceByName(instanceName).setRpmWithNotify(randomRPMGenerator.nextInt(1000));
 
                 } else {
                     Thread.currentThread().interrupt();

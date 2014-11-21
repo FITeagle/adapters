@@ -53,7 +53,7 @@ public class MotorAdapterTest {
   @Test
     public void testMonitor() {
         
-        String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";
+        String instanceName = "InstanceOne";
         
         // Monitor non-existing instance yields empty String
         Assert.assertEquals("", adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT));

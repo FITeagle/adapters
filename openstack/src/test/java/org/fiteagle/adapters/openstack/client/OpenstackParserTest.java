@@ -5,10 +5,12 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Iterator;
 
-import org.fiteagle.abstractAdapter.AdapterResource;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenstackParserTest {
   
@@ -32,9 +34,11 @@ public class OpenstackParserTest {
   @Test
   public void testParseToAdapterResource(){
     String serverString = "{\"id\": \"12345\",\"name\": \"server1\"}";
-    AdapterResource resource = openstackparser.parseToAdapterResource(serverString);
-    assertEquals("12345", resource.getProperty(openstackparser.getPROPERTY_ID()));
-    assertEquals("server1", resource.getName());
+    Resource resource = openstackparser.parseToResource(serverString);
+    assertEquals("server1", resource.getLocalName());
+    assertEquals("server1", resource.getProperty(RDFS.label).getLiteral().getValue());
+    assertEquals("12345", resource.getProperty(openstackparser.getPROPERTY_ID()).getLiteral().getValue());
+    
   }
   
 }

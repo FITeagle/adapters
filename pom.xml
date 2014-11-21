@@ -40,13 +40,11 @@
 	<modules>
 		<module>abstract</module>
 		<module>motor</module>
-		<module>mightyrobot</module>
 		<module>common</module>
 		<module>epcClient</module>
 		<module>epcMeasurementServer</module>
 		<module>testbed</module>
 		<module>openstack</module>
-		<module>stopwatch</module>
 		<module>openMTC</module>
 	</modules>
 </project>

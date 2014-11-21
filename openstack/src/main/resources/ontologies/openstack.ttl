@@ -37,11 +37,21 @@ openstackvm:OpenstackVM
         rdfs:label         "OpenstackVM"@en ;
         rdfs:subClassOf    omn:Resource ;
         omn:implementedBy  openstack:Openstack .
+        
+openstackvm:OpenstackImage
+        a                  owl:Class ;
+        rdfs:label         "Image"@en .
+        
+openstackvm:imageid
+        a      owl:DatatypeProperty ;
+        rdfs:domain  openstackvm:OpenstackImage ;
+        rdfs:label   "The ID of an Openstack Image"@en ;
+        rdfs:range   xsd:string .
 
 openstackvm:id
         a      owl:DatatypeProperty ;
         rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:label   "An ID of an Openstack VM Instance or Image"@en ;
+        rdfs:label   "The ID of an Openstack VM Instance"@en ;
         rdfs:range   xsd:string .
 
 openstackvm:image

@@ -229,9 +229,7 @@ public class OpenstackClient implements IOpenstackClient{
 
 		List<ServerForCreate.Network> networkList = serverForCreate.getNetworks();
 		ServerForCreate.Network net_demo = new ServerForCreate.Network();
-		
 		net_demo.setUuid(this.getNetworkId());
-		
 		networkList.add(net_demo);
 
 		OpenStackRequest<Server> createServerRequest = new OpenStackRequest<Server>(
@@ -239,10 +237,10 @@ public class OpenstackClient implements IOpenstackClient{
 				HttpMethod.POST,
 				"/servers",
 				Entity.json(serverForCreate),
-				org.fiteagle.adapters.openstack.client.model.Server.class);
+				Server.class);
 		
-		Server responseServer = novaClient.execute(createServerRequest);
-		return responseServer;
+		String serverID = novaClient.execute(createServerRequest).getId();
+		return getServerDetails(serverID);
 	}
 
 	@Override
@@ -282,7 +280,7 @@ public class OpenstackClient implements IOpenstackClient{
 			novaClient.execute(request);
 		} catch (Exception e) {
 			//TODO: this can throw harmless exceptions, but check the exception if it is not harmless
-			System.out.println(e);
+			LOGGER.log(Level.WARNING, e.getMessage());
 		}
 	}
 

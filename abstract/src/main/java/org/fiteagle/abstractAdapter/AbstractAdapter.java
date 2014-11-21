@@ -1,7 +1,6 @@
 package org.fiteagle.abstractAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,10 +9,10 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * Abstract class defining the basics all the current adapters are following Extend this class and implement the
@@ -22,7 +21,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 public abstract class AbstractAdapter {
   
   private List<AdapterEventListener> listener = new ArrayList<AdapterEventListener>();
-  protected HashMap<String, Object> instanceList = new HashMap<String, Object>();
   
   public abstract Resource getAdapterManagedResource();
   
@@ -39,26 +37,24 @@ public abstract class AbstractAdapter {
   }
   
   public boolean createInstance(String instanceName, Model model) {
-    if(instanceList.containsKey(instanceName)) {
+    if(containsResourceInstance(instanceName)) {
       return false;
     }
     
     Map<String, String> properties = AdapterRDFHandler.getPropertyMapForResource(getAdapterInstancePrefix()[1]+instanceName, model);
     
-    Object newInstance = handleCreateInstance(instanceName, properties);
-    
-    instanceList.put(instanceName, newInstance);
+    Resource createdInstanceModel = handleCreateInstance(instanceName, properties);
+    getAdapterDescriptionModel().add(createdInstanceModel.getModel());
     return true;
   }
   
   public boolean createInstance(String instanceName, Map<String, String> properties) {
-    if(instanceList.containsKey(instanceName)) {
+    if(containsResourceInstance(instanceName)) {
       return false;
     }
     
-    Object newInstance = handleCreateInstance(instanceName, properties);
-    
-    instanceList.put(instanceName, newInstance);
+    Resource createdInstanceModel = handleCreateInstance(instanceName, properties);
+    getAdapterDescriptionModel().add(createdInstanceModel.getModel());
     return true;
   }
   
@@ -71,9 +67,9 @@ public abstract class AbstractAdapter {
   }
   
   public boolean terminateInstance(String instanceName) {
-    if (instanceList.containsKey(instanceName)) {
+    if (containsResourceInstance(instanceName)) {
       handleTerminateInstance(instanceName);
-      instanceList.remove(instanceName);
+      getAdapterDescriptionModel().remove(getSingleInstanceModel(instanceName));
       return true;
     }
     
@@ -82,20 +78,31 @@ public abstract class AbstractAdapter {
   
   public String monitorInstance(String instanceName, String serializationFormat) {
     Model modelInstances = getSingleInstanceModel(instanceName);
-    if (modelInstances.isEmpty()) {
+    if (modelInstances == null || modelInstances.isEmpty()) {
       return "";
     }
     return MessageBusMsgFactory.serializeModel(modelInstances);
   }
   
   public Model getSingleInstanceModel(String instanceName) {
-    Model modelOfInstance = ModelFactory.createDefaultModel();
-    
-    if (instanceList.containsKey(instanceName)) {
-      modelOfInstance = handleMonitorInstance(instanceName, modelOfInstance);
+    if (containsResourceInstance(instanceName)) {
+      Model resourceModel = ModelFactory.createDefaultModel();
+      Resource resource = getAdapterDescriptionModel().getResource(getAdapterInstancePrefix()[1]+instanceName);
+      StmtIterator iter = resource.listProperties();
+      while(iter.hasNext()){
+        resourceModel.add(iter.next());
+      }
+      return resourceModel;
     }
-    
-    return modelOfInstance;
+    return null;
+  }
+  
+  public boolean containsResourceInstance(String instanceName){
+    Resource instance = getAdapterDescriptionModel().getResource(getAdapterInstancePrefix()[1]+instanceName);
+    if(instance != null && getAdapterDescriptionModel().contains(instance, RDF.type, getAdapterManagedResource())){
+      return true;
+    }
+    return false;
   }
   
   public String getAllInstances(String serializationFormat) {
@@ -106,8 +113,10 @@ public abstract class AbstractAdapter {
   public Model getAllInstancesModel() {
     Model modelInstances = ModelFactory.createDefaultModel();
     setModelPrefixes(modelInstances);
-    modelInstances = handleGetAllInstances(modelInstances);
-    
+    StmtIterator resourceIterator = getAdapterDescriptionModel().listStatements(null, RDF.type, getAdapterManagedResource());
+    while(resourceIterator.hasNext()){
+      modelInstances.add(getSingleInstanceModel(resourceIterator.next().getSubject().getLocalName()));      
+    }
     return modelInstances;
   }
   
@@ -123,10 +132,8 @@ public abstract class AbstractAdapter {
   }
   
   public String getDiscoverAll(String serializationFormat) {
-    Model modelDiscover = getAdapterDescriptionModel();
-    modelDiscover.add(getAllInstancesModel());
-    
-    return MessageBusMsgFactory.serializeModel(modelDiscover);
+    //TODO: serializationFormat
+    return MessageBusMsgFactory.serializeModel(getAdapterDescriptionModel());
   }
   
   public void notifyListeners(Model eventRDF, String requestID) {
@@ -156,26 +163,9 @@ public abstract class AbstractAdapter {
     notifyListeners(messageModel, null);
   }
   
-  public Model createInformConfigureRDF(String instanceName, List<String> propertiesChanged) {
-    Model modelPropertiesChanged = ModelFactory.createDefaultModel();
-    setModelPrefixes(modelPropertiesChanged);
-    
-    Model wholeInstance = getSingleInstanceModel(instanceName);
-    Resource currentInstance = wholeInstance.getResource(getAdapterInstancePrefix()[1]+instanceName);
-    
-    for (String currentPropertyString : propertiesChanged) {
-      Property currentProperty = wholeInstance.getProperty(getAdapterSpecificPrefix()[1] + currentPropertyString);
-      StmtIterator iter2 = currentInstance.listProperties(currentProperty);
-      Statement stmtToAdd = iter2.nextStatement();
-      modelPropertiesChanged.add(stmtToAdd);
-    }
-    
-    return modelPropertiesChanged;
-  }
+  public abstract Model configureInstance(Statement configureStatement);
   
-  public abstract List<String> configureInstance(Statement configureStatement);
-  
-  public abstract Object handleCreateInstance(String instanceName, Map<String, String> properties);
+  public abstract Resource handleCreateInstance(String instanceName, Map<String, String> properties);
   
   public abstract void handleTerminateInstance(String instanceName);
   
@@ -184,10 +174,6 @@ public abstract class AbstractAdapter {
   public abstract String[] getAdapterManagedResourcePrefix();
   
   public abstract String[] getAdapterInstancePrefix();
-  
-  public abstract Model handleMonitorInstance(String instanceName, Model modelInstances);
-  
-  public abstract Model handleGetAllInstances(Model modelInstances);
   
   public static class InsufficentPropertiesException extends RuntimeException {
     

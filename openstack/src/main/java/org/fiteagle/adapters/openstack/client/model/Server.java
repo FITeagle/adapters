@@ -248,6 +248,9 @@ public class Server implements Serializable {
 	
 	private String adminPass;
 
+	public Server(){
+	}
+	
 	/**
 	 * @return the id
 	 */
@@ -260,6 +263,10 @@ public class Server implements Serializable {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	public void setName(String name){
+	  this.name = name;
 	}
 
 	/**

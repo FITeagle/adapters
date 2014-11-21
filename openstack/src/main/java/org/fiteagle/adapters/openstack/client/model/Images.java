@@ -16,6 +16,9 @@ public class Images implements Iterable<Image>, Serializable {
 
   private static final long serialVersionUID = -1945698118256231004L;
   
+  protected Images(){
+  }
+  
   public Images(List<Image> imageList){
     this.list = imageList;
   }

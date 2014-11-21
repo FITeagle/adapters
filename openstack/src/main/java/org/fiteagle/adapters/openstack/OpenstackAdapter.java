@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AdapterResource;
 import org.fiteagle.adapters.openstack.client.IOpenstackClient;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.OpenstackParser;
@@ -41,6 +40,8 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   private Model adapterModel;
   private Resource adapterInstance;
+  
+  private static Resource image;
   
   public static HashMap<String,OpenstackAdapter> openstackAdapterInstances = new HashMap<>();
   
@@ -90,26 +91,10 @@ public class OpenstackAdapter extends AbstractAdapter {
     while (adapterInstanceIterator.hasNext()) {
       Resource adapterInstance = adapterInstanceIterator.next().getSubject();
       
-      OpenstackAdapter openstackAdapter = new OpenstackAdapter(adapterInstance, adapterModel);
-      
+      OpenstackAdapter openstackAdapter = new OpenstackAdapter(adapterInstance, adapterModel, null);
+      openstackAdapter.openstackClient = OpenstackClient.getInstance(openstackAdapter);
       openstackAdapterInstances.put(adapterInstance.getURI(), openstackAdapter);
     }
-  }
-  
-  private OpenstackAdapter(Resource adapterInstance, Model adapterModel){
-    this.adapterInstance = adapterInstance;
-    this.adapterModel = adapterModel;
-    
-    ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
-    ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
-    
-    Property PROPERTY_IMAGES = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstack#images");
-    Property PROPERTY_IMAGE = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#image");
-    Property PROPERTY_ID = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#id");
-    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#keypairname");
-    
-    openstackClient = OpenstackClient.getInstance(this);
-    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME);
   }
   
   private OpenstackAdapter(Resource adapterInstance, Model adapterModel, IOpenstackClient openstackClient){
@@ -119,28 +104,28 @@ public class OpenstackAdapter extends AbstractAdapter {
     ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
     ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
     
-    Property PROPERTY_IMAGES = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstack#images");
-    Property PROPERTY_IMAGE = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#image");
-    Property PROPERTY_ID = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#id");
-    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty("http://open-multinet.info/ontology/resource/openstackvm#keypairname");
+    Property PROPERTY_IMAGES = adapterModel.getProperty(ADAPTER_SPECIFIC_PREFIX[1]+"images");
+    Property PROPERTY_IMAGE = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"image");
+    Property PROPERTY_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"id");
+    Property PROPERTY_IMAGE_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"imageid");
+    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"keypairname");
     
     this.openstackClient = openstackClient;
-    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME);
+    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME);
+    image = adapterModel.getResource(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"OpenstackImage");
   }
   
   @Override
-  public Object handleCreateInstance(String instanceName, Map<String, String> properties) {
+  public Resource handleCreateInstance(String instanceName, Map<String, String> properties) {
     ServerForCreate serverForCreate = openstackParser.parseToServerForCreate(instanceName, properties);
-    
     Server server = openstackClient.createServer(serverForCreate);
-    AdapterResource openstackVM = openstackParser.parseToAdapterResource(server);
+    Resource openstackVM = openstackParser.parseToResource(server);
     return openstackVM;
   }
 
   @Override
   public void handleTerminateInstance(String instanceName) {
-    AdapterResource openstackVMToDelete = (AdapterResource) instanceList.get(instanceName);
-    openstackClient.deleteServer(openstackParser.getAdapterResourceID(openstackVMToDelete));
+    openstackClient.deleteServer(openstackParser.getAdapterResourceID(instanceName));
   }
   
   @Override
@@ -159,28 +144,6 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Model handleMonitorInstance(String instanceName, Model modelInstances) {
-    AdapterResource openstackVM = (AdapterResource) instanceList.get(instanceName);
-
-    Resource serverInstance = modelInstances.createResource(ADAPTER_INSTANCE_PREFIX[1]+instanceName);
-    openstackParser.addPropertiesToResource(serverInstance, openstackVM, instanceName);
-
-    return modelInstances;
-  }
-
-  @Override
-  public Model handleGetAllInstances(Model modelInstances) {
-    for(String key : instanceList.keySet()) {
-
-      AdapterResource server = (AdapterResource) instanceList.get(key);
-
-      Resource openstackInstance = modelInstances.createResource(key);
-      openstackParser.addPropertiesToResource(openstackInstance, server, key);
-    }
-    return modelInstances;
-  }
-  
-  @Override
   public void updateAdapterDescription(){
     Images images = openstackClient.listImages();
     if(images != null){
@@ -190,7 +153,6 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   private void updateInstanceList(){
-    instanceList.clear();
     Servers servers = openstackClient.listServers();
     if(servers != null){
       openstackParser.addToAdapterInstanceDescription(servers);
@@ -198,7 +160,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
-  public List<String> configureInstance(Statement configureStatement) {
+  public Model configureInstance(Statement configureStatement) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -206,6 +168,10 @@ public class OpenstackAdapter extends AbstractAdapter {
   @Override
   public Resource getAdapterManagedResource() {
     return resource;
+  }
+  
+  public Resource getImageResource(){
+    return image;
   }
 
   @Override

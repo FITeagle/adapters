@@ -1,12 +1,12 @@
 package org.fiteagle.abstractAdapter.dm;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Statement;
 
 public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
@@ -41,7 +41,7 @@ public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
     }
 
     @Override
-    public List<String> configureInstance(Statement configureStatement) {
+    public Model configureInstance(Statement configureStatement) {
         return this.adapter.configureInstance(configureStatement);
     }
 
