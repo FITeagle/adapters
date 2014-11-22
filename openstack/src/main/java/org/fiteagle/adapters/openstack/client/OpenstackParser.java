@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
 import org.fiteagle.adapters.openstack.client.model.Image;
@@ -16,7 +14,6 @@ import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -71,25 +68,53 @@ public class OpenstackParser {
     return images;
 	}
 
-	public static FloatingIp parseToFloatingIp(String floatingIpString) throws JsonParseException,
-			JsonMappingException, IOException {
-
-		return mapper.readValue(floatingIpString, FloatingIp.class);
+	public static FloatingIp parseToFloatingIp(String floatingIpString) {
+	  FloatingIp ip = null;
+		try {
+      ip = mapper.readValue(floatingIpString, FloatingIp.class);
+    } catch (IOException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+		return ip;
 	}
 
-	public static Flavors parseToFlavors(String flavorsString)
-			throws JsonParseException, JsonMappingException, IOException {
-		return mapper.readValue(flavorsString, Flavors.class);
+	public static Flavors parseToFlavors(String flavorsString) {
+	  Flavors flavors = null;
+		try {
+      flavors = mapper.readValue(flavorsString, Flavors.class);
+    } catch (IOException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+    return flavors;
 	}
 	
-  public Resource getImage(String id) {
-    Resource image;
-    StmtIterator imagesIterator = adapter.getAdapterDescriptionModel().listStatements(null, PROPERTY_IMAGE_ID, adapter.getAdapterDescriptionModel().createLiteral(id));
-    if (imagesIterator.hasNext()) {
-      image = imagesIterator.next().getSubject();
-      return image;
+	public static Server parseToServer(String serverString) {
+    Server server = null;
+    try {
+      server = mapper.readValue(serverString, Server.class);
+    } catch (IOException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
     }
-    return null;
+    return server;
+  }
+	
+	public static Servers parseToServers(String serversString) {
+    Servers servers = null;
+    try {
+      servers = mapper.readValue(serversString, Servers.class);
+    } catch (IOException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+    return servers;
+  }
+	
+  private Resource getImage(Image image) {
+    Resource imageResource = null;
+    StmtIterator imagesIterator = adapter.getAdapterDescriptionModel().listStatements(null, PROPERTY_IMAGE_ID, adapter.getAdapterDescriptionModel().createLiteral(image.getId()));
+    if (imagesIterator.hasNext()) {
+      imageResource = imagesIterator.next().getSubject();
+    }
+    return imageResource;
   }
 	
 	public Resource parseToResource(Server server){
@@ -115,7 +140,7 @@ public class OpenstackParser {
           break;
         case "image": 
           if(server.getImage() != null && server.getImage().getId() != null){
-              Resource image = getImage(server.getImage().getId());
+              Resource image = getImage(server.getImage());
               resource.addProperty(p, image);
           }
           break;
@@ -132,16 +157,6 @@ public class OpenstackParser {
 	public Resource parseToResource(String serverString){
 	  Server server = parseToServer(serverString);
 	  return parseToResource(server);	
-	}
-	
-	public static Server parseToServer(String serverString) {
-		Server server = null;
-    try {
-      server = mapper.readValue(serverString, Server.class);
-    } catch (IOException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
-    }
-		return server;
 	}
 	
 	private Resource parseToImagesResource(Images images){
@@ -172,21 +187,7 @@ public class OpenstackParser {
 	}
 	
 	public String getAdapterResourceID(String instanceName){
-	  StmtIterator instancesIterator = adapter.getAdapterDescriptionModel().listStatements(adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+instanceName), PROPERTY_ID, (Literal) null);
-    if (instancesIterator.hasNext()) {
-      return instancesIterator.next().getLiteral().getValue().toString();
-    }
-	  return null;
-	}
-	
-	static Servers parseToServers(String serversString) {
-	  Servers servers = null;
-		try {
-      servers = mapper.readValue(serversString, Servers.class);
-    } catch (IOException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
-    }
-		return servers;
+	  return adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+instanceName).getProperty(PROPERTY_ID).getLiteral().getValue().toString();
 	}
 
   public ServerForCreate parseToServerForCreate(String instanceName, Map<String, String> properties) {
@@ -207,6 +208,10 @@ public class OpenstackParser {
 
   protected Property getPROPERTY_ID() {
     return PROPERTY_ID;
+  }
+  
+  protected Property getPROPERTY_IMAGE_ID() {
+    return PROPERTY_IMAGE_ID;
   }
 
   protected Property getPROPERTY_IMAGES() {
