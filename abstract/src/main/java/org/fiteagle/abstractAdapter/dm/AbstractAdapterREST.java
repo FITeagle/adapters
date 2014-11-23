@@ -1,8 +1,5 @@
 package org.fiteagle.abstractAdapter.dm;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.PostConstruct;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -13,6 +10,9 @@ import javax.ws.rs.Produces;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 //The adapter should:
 //* Be located at github.com/fiteagle/adapters
@@ -127,8 +127,8 @@ public abstract class AbstractAdapterREST {
   @Path("instance/{instanceName}")
   @Produces("text/html")
   public String createInstance(@PathParam("instanceName") String instanceName) {
-    Map<String, String> properties = new HashMap<>();
-    if (abstractAdapter.createInstance(instanceName, properties)) {
+    Model modelCreate = ModelFactory.createDefaultModel();
+    if (abstractAdapter.createInstance(instanceName, modelCreate)) {
       return "Created instance number : " + instanceName;
     }
     return "Invalid instance number";

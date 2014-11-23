@@ -1,8 +1,6 @@
 package org.fiteagle.adapters.motor;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.fiteagle.api.core.IMessageBus;
 import org.junit.Assert;
@@ -10,6 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 public class MotorAdapterTest {
@@ -30,14 +29,14 @@ public class MotorAdapterTest {
      */
     @Test
     public void testCreateAndTerminate() {
-        Map<String, String> properties = new HashMap<>();
+      Model modelCreate = ModelFactory.createDefaultModel();
         
         // Creating first instance works
-        Assert.assertTrue(adapter.createInstance("InstanceOne", properties));
+        Assert.assertTrue(adapter.createInstance("InstanceOne", modelCreate));
         // Creating another instance with the same name FAILS
-        Assert.assertFalse(adapter.createInstance("InstanceOne", properties));
+        Assert.assertFalse(adapter.createInstance("InstanceOne", modelCreate));
         // Creating another instance with another name works fine
-        Assert.assertTrue(adapter.createInstance("InstanceTwo", properties));
+        Assert.assertTrue(adapter.createInstance("InstanceTwo", modelCreate));
         
         // Terminate existing instance
         Assert.assertTrue(adapter.terminateInstance("InstanceOne"));
@@ -58,8 +57,8 @@ public class MotorAdapterTest {
         // Monitor non-existing instance yields empty String
         Assert.assertEquals("", adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT));
         // create the instance
-        Map<String, String> properties = new HashMap<>();
-        adapter.createInstance(instanceName, properties);
+        Model modelCreate = ModelFactory.createDefaultModel();
+        adapter.createInstance(instanceName, modelCreate);
         
         // Monitoring existing instance yields a non-empty result
         String monitorData = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);

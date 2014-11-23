@@ -3,7 +3,6 @@ package org.fiteagle.adapters.openMTC;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openmtc.client.OpenMTCClient;
@@ -87,8 +86,8 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource handleCreateInstance(String instanceName, Map<String, String> properties) {
-    openMTCClient.setUpConnection(properties);
+  public Resource handleCreateInstance(String instanceName, Model createModel) {
+    openMTCClient.setUpConnection(createModel);
     return null;
   }
 

@@ -3,7 +3,6 @@ package org.fiteagle.adapters.openstack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openstack.client.IOpenstackClient;
@@ -110,8 +109,8 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource handleCreateInstance(String instanceName, Map<String, String> properties) {
-    ServerForCreate serverForCreate = openstackParser.parseToServerForCreate(instanceName, properties);
+  public Resource handleCreateInstance(String instanceName, Model newInstanceModel) {
+    ServerForCreate serverForCreate = openstackParser.parseToServerForCreate(instanceName, newInstanceModel);
     Server server = openstackClient.createServer(serverForCreate);
     Resource openstackVM = openstackParser.parseToResource(server);
     return openstackVM;
@@ -119,7 +118,7 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   @Override
   public void handleTerminateInstance(String instanceName) {
-    openstackClient.deleteServer(openstackParser.getAdapterResourceID(instanceName));
+    openstackClient.deleteServer(openstackParser.getResourcePropertyID(instanceName));
   }
   
   @Override

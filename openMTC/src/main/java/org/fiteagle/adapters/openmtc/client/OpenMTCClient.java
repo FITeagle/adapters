@@ -1,8 +1,9 @@
 package org.fiteagle.adapters.openmtc.client;
 
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.hp.hpl.jena.rdf.model.Model;
 
 public class OpenMTCClient {
 
@@ -17,7 +18,7 @@ public class OpenMTCClient {
     return instance;
   }
 
-  public void setUpConnection(Map<String, String> properties) {
+  public void setUpConnection(Model createModel) {
     LOGGER.log(Level.INFO, "Setting up connection..");
     
   }

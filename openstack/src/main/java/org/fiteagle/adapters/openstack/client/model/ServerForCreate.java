@@ -131,6 +131,16 @@ public class ServerForCreate implements Serializable {
 	@JsonProperty("config_drive")
 	private boolean configDrive;
 
+	public ServerForCreate(){
+	}
+
+	public ServerForCreate(String name, String flavorRef, String imageRef, String keyName){
+	  this.name = name;
+	  this.flavorRef = flavorRef;
+	  this.imageRef = imageRef;
+	  this.keyName = keyName;
+	}
+	
 	public String getName() {
 		return name;
 	}

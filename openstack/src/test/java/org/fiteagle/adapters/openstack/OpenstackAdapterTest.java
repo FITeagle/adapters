@@ -1,13 +1,10 @@
 package org.fiteagle.adapters.openstack;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-
-import java.util.HashMap;
-import java.util.Map;
+import static org.junit.Assert.assertTrue;
 
 import org.fiteagle.adapters.openstack.client.OpenstackTestClient;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -15,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -65,31 +63,33 @@ public class OpenstackAdapterTest {
   
   @Test
   public void testCreateInstance(){
-    Map<String, String> properties = new HashMap<>();
-    properties.put(adapter.getOpenstackParser().getPROPERTY_IMAGE().getURI(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
-    properties.put(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME().getURI(), adapter.getAdapterInstancePrefix()[1]+"testKeypairName");
+    Model modelCreate = ModelFactory.createDefaultModel();
+    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"server1");
+    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
+    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     
-    adapter.createInstance("server1", properties);
+    adapter.createInstance("server1", modelCreate);
     Model instanceModel = adapter.getSingleInstanceModel("server1");
     assertNotNull(instanceModel);
     StmtIterator iterator = instanceModel.listStatements(null, RDF.type, adapter.getAdapterManagedResource());
     assertTrue(iterator.hasNext());
     Resource server = iterator.next().getSubject();
     assertEquals(server.toString(), adapter.getAdapterInstancePrefix()[1]+"server1");
-    String imageURI = server.getProperty((adapter.getOpenstackParser().getPROPERTY_IMAGE())).getResource().getURI();
+    String imageURI = server.getProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE()).getResource().getURI();
     assertEquals(imageURI, adapter.getAdapterInstancePrefix()[1]+"testImageName");
-    String keyPairName = server.getProperty((adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME())).getString();
-    assertEquals(keyPairName, adapter.getAdapterInstancePrefix()[1]+"testKeypairName");
+    String keyPairName = server.getProperty(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME()).getString();
+    assertEquals(keyPairName, "testKeypairName");
     assertFalse(iterator.hasNext());
   }
   
   @Test
   public void testTerminateInstance(){
-    Map<String, String> properties = new HashMap<>();
-    properties.put(adapter.getOpenstackParser().getPROPERTY_IMAGE().getURI(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
-    properties.put(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME().getURI(), adapter.getAdapterInstancePrefix()[1]+"testKeypairName");
+    Model modelCreate = ModelFactory.createDefaultModel();
+    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"server1");
+    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
+    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     
-    adapter.createInstance("server1", properties);
+    adapter.createInstance("server1", modelCreate);
     adapter.terminateInstance("server1");
     Model instanceModel = adapter.getSingleInstanceModel("server1");
     assertNull(instanceModel);

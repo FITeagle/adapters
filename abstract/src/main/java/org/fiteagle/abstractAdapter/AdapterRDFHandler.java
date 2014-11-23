@@ -1,7 +1,6 @@
 package org.fiteagle.abstractAdapter;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,10 +9,8 @@ import javax.ws.rs.core.Response;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -76,29 +73,6 @@ public class AdapterRDFHandler {
     adapter.notifyListeners(createdInstancesModel, requestID);
     
     return Response.Status.OK.name();
-  }
-  
-  protected static Map<String, String> getPropertyMapForResource(String resourceURI, Model model){
-    Map<String, String> properties = new HashMap<>();
-    
-    Resource resource = model.getResource(resourceURI);
-    
-    System.out.println("PROPERTIES for "+resourceURI);
-    StmtIterator propertyIterator = model.listStatements(resource, (Property) null, (Literal) null);
-    while(propertyIterator.hasNext()){
-      Statement s = propertyIterator.next();
-      String key = s.getPredicate().getURI();
-      String value = null;
-      if(s.getObject().isLiteral()){
-        value = s.getObject().asLiteral().getValue().toString();
-      }
-      else if(s.getObject().isResource()){
-        value = s.getObject().asResource().getURI();
-      }
-      properties.put(key, value);
-      System.out.println(key+": "+value);
-    }
-    return properties;
   }
   
   public String parseReleaseModel(Model modelRelease, String requestID) {

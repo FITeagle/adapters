@@ -2,7 +2,6 @@ package org.fiteagle.adapters.openstack.client;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,8 +16,8 @@ import org.fiteagle.adapters.openstack.client.model.Servers;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -186,22 +185,27 @@ public class OpenstackParser {
 	  adapter.getAdapterInstance().addProperty(PROPERTY_IMAGES, parseToImagesResource(images));
 	}
 	
-	public String getAdapterResourceID(String instanceName){
+	public String getResourcePropertyID(String instanceName){
 	  return adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+instanceName).getProperty(PROPERTY_ID).getLiteral().getValue().toString();
 	}
 
-  public ServerForCreate parseToServerForCreate(String instanceName, Map<String, String> properties) {
-    String imageResourceURI = OpenstackAdapter.getProperty(PROPERTY_IMAGE.getURI(), properties);
-    Statement imageIdStatement = adapter.getAdapterDescriptionModel().getRequiredProperty(adapter.getAdapterDescriptionModel().getResource(imageResourceURI), PROPERTY_IMAGE_ID);
-    String imageID = imageIdStatement.getObject().asLiteral().getValue().toString();
-    String keypairName = OpenstackAdapter.getProperty(adapter.getAdapterManagedResourcePrefix()[1]+"keypairname", properties);
-    String flavorId_small = "2"; 
+	private String getStringPropertyValue(String instanceName, Model model, Property property){
+	  Resource imagesResource = model.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+	  return imagesResource.getProperty(property).getLiteral().getValue().toString();  
+	}
+	
+	private RDFNode getResourcePropertyValue(String instanceName, Model model, Property property){
+    Resource imagesResource = model.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    return imagesResource.getProperty(property).getObject();
+  }
+	
+  public ServerForCreate parseToServerForCreate(String instanceName, Model newInstanceModel) {
+    String imageResourceURI = getResourcePropertyValue(instanceName, newInstanceModel, PROPERTY_IMAGE).toString();
+    String imageRef = adapter.getAdapterDescriptionModel().getResource(imageResourceURI).getProperty(PROPERTY_IMAGE_ID).getLiteral().getValue().toString();
+    String keyName = getStringPropertyValue(instanceName, newInstanceModel, PROPERTY_KEYPAIRNAME);
+    String flavorRef_small = "2"; 
     
-    ServerForCreate serverForCreate = new ServerForCreate();
-    serverForCreate.setName(instanceName);
-    serverForCreate.setFlavorRef(flavorId_small);
-    serverForCreate.setImageRef(imageID);
-    serverForCreate.setKeyName(keypairName);
+    ServerForCreate serverForCreate = new ServerForCreate(instanceName, flavorRef_small, imageRef, keyName);
     
     return serverForCreate;
   }

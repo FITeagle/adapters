@@ -41,19 +41,7 @@ public abstract class AbstractAdapter {
       return false;
     }
     
-    Map<String, String> properties = AdapterRDFHandler.getPropertyMapForResource(getAdapterInstancePrefix()[1]+instanceName, model);
-    
-    Resource createdInstanceModel = handleCreateInstance(instanceName, properties);
-    getAdapterDescriptionModel().add(createdInstanceModel.getModel());
-    return true;
-  }
-  
-  public boolean createInstance(String instanceName, Map<String, String> properties) {
-    if(containsResourceInstance(instanceName)) {
-      return false;
-    }
-    
-    Resource createdInstanceModel = handleCreateInstance(instanceName, properties);
+    Resource createdInstanceModel = handleCreateInstance(instanceName, model);
     getAdapterDescriptionModel().add(createdInstanceModel.getModel());
     return true;
   }
@@ -165,7 +153,7 @@ public abstract class AbstractAdapter {
   
   public abstract Model configureInstance(Statement configureStatement);
   
-  public abstract Resource handleCreateInstance(String instanceName, Map<String, String> properties);
+  public abstract Resource handleCreateInstance(String instanceName, Model newInstanceModel);
   
   public abstract void handleTerminateInstance(String instanceName);
   

@@ -257,6 +257,10 @@ public class Server implements Serializable {
 	public String getId() {
 		return id;
 	}
+	
+	public void setId(String id){
+	  this.id = id;
+	}
 
 	/**
 	 * @return the name
