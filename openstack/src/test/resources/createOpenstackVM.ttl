@@ -7,5 +7,6 @@ av:Openstack-1 a openstack:Openstack .
 
 av:OpenstackVM9 a openstackvm:OpenstackVM ;
           openstackvm:keypairname "mitja_tub"^^xsd:string ;
+          openstackvm:flavor 2 ;
           openstackvm:image av:ubuntu-14.04.1-server-amd64 .
           

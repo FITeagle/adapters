@@ -80,3 +80,9 @@ openstackvm:keypairname
         rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The name of the keypair of the Openstack VM"@en ;
         rdfs:range   xsd:string .
+        
+openstackvm:flavor
+        a      owl:DatatypeProperty ;
+        rdfs:domain  openstackvm:OpenstackVM ;
+        rdfs:label   "The id of the flavor of the Openstack VM"@en ;
+        rdfs:range   xsd:integer .

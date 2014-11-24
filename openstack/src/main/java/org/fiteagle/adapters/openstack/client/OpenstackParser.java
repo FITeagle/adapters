@@ -35,24 +35,26 @@ public class OpenstackParser {
   private final Property PROPERTY_IMAGES;
   private final Property PROPERTY_IMAGE;
   private final Property PROPERTY_KEYPAIRNAME;
+  private final Property PROPERTY_FLAVOR;
   
 	
 	private OpenstackAdapter adapter;
   
   private static HashMap<OpenstackAdapter, OpenstackParser> instances = new HashMap<OpenstackAdapter, OpenstackParser>();
   
-  public OpenstackParser(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
+  public OpenstackParser(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME, Property PROPERTY_FLAVOR) {
     this.adapter = adapter;
     this.PROPERTY_ID = PROPERTY_ID;
     this.PROPERTY_IMAGE_ID = PROPERTY_IMAGE_ID;
     this.PROPERTY_IMAGES = PROPERTY_IMAGES;
     this.PROPERTY_IMAGE = PROPERTY_IMAGE;    
     this.PROPERTY_KEYPAIRNAME = PROPERTY_KEYPAIRNAME;
+    this.PROPERTY_FLAVOR = PROPERTY_FLAVOR;
   }
 
-  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME) {
+  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME, Property PROPERTY_FLAVOR) {
     if (instances.get(adapter) == null) {
-      instances.put(adapter, new OpenstackParser(adapter, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME));
+      instances.put(adapter, new OpenstackParser(adapter, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME, PROPERTY_FLAVOR));
     }
     return instances.get(adapter);
   }
@@ -203,9 +205,9 @@ public class OpenstackParser {
     String imageResourceURI = getResourcePropertyValue(instanceName, newInstanceModel, PROPERTY_IMAGE).toString();
     String imageRef = adapter.getAdapterDescriptionModel().getResource(imageResourceURI).getProperty(PROPERTY_IMAGE_ID).getLiteral().getValue().toString();
     String keyName = getStringPropertyValue(instanceName, newInstanceModel, PROPERTY_KEYPAIRNAME);
-    String flavorRef_small = "2"; 
+    String flavorRef = getStringPropertyValue(instanceName, newInstanceModel, PROPERTY_FLAVOR);
     
-    ServerForCreate serverForCreate = new ServerForCreate(instanceName, flavorRef_small, imageRef, keyName);
+    ServerForCreate serverForCreate = new ServerForCreate(instanceName, flavorRef, imageRef, keyName);
     
     return serverForCreate;
   }
@@ -228,5 +230,9 @@ public class OpenstackParser {
   
   public Property getPROPERTY_KEYPAIRNAME() {
     return PROPERTY_KEYPAIRNAME;
+  }
+  
+  public Property getPROPERTY_FLAVOR() {
+    return PROPERTY_FLAVOR;
   }
 }

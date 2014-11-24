@@ -103,9 +103,10 @@ public class OpenstackAdapter extends AbstractAdapter {
     Property PROPERTY_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"id");
     Property PROPERTY_IMAGE_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"imageid");
     Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"keypairname");
+    Property PROPERTY_FLAVOR = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"flavor");
     
     this.openstackClient = openstackClient;
-    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME);
+    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME, PROPERTY_FLAVOR);
   }
   
   @Override
