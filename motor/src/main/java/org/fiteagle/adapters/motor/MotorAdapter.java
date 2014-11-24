@@ -29,14 +29,6 @@ public final class MotorAdapter extends AbstractAdapter {
     private static Resource adapter;
     private static Resource resource;
     
-/*    private static MotorAdapter motorAdapterSingleton;
-
-    public static synchronized MotorAdapter getInstance() {
-        if (motorAdapterSingleton == null)
-            motorAdapterSingleton = new MotorAdapter();
-        return motorAdapterSingleton;
-    }
-*/
     public static HashMap<String,MotorAdapter> motorAdapterInstances = new HashMap<>();
     
     public static MotorAdapter getInstance(String URI){
