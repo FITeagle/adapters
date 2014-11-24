@@ -150,6 +150,11 @@ public class OpenstackParser {
             resource.addLiteral(p, server.getKeyName());
           }
           break;
+        case "flavor": 
+          if(server.getFlavor() != null && server.getFlavor().getId() != null){
+            resource.addLiteral(p, server.getFlavor().getId());
+          }
+          break;
       }
     }
     return resource;
