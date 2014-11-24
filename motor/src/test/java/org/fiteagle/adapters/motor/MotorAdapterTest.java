@@ -29,6 +29,10 @@ public class MotorAdapterTest {
   @Test
   public void testCreateAndTerminate() {
     Model modelCreate = ModelFactory.createDefaultModel();
+    Resource motor = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
+    motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
+    Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"rpm");
+    motor.addLiteral(propertyRPM, 42);
     
     // Creating first instance works
     Assert.assertTrue(adapter.createInstance("InstanceOne", modelCreate));
@@ -37,11 +41,13 @@ public class MotorAdapterTest {
     // Creating another instance with another name works fine
     Assert.assertTrue(adapter.createInstance("InstanceTwo", modelCreate));
     
-    // Terminate existing instance
+    Resource updatedResource = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
+    Assert.assertEquals(42, updatedResource.getProperty(propertyRPM).getInt());
+
+    Assert.assertEquals(2, adapter.getAmountOfInstances());
+    
     Assert.assertTrue(adapter.terminateInstance("InstanceOne"));
-    // Terminate non-existing instance
     Assert.assertFalse(adapter.terminateInstance("InstanceOne"));
-    // Terminate remaining instance
     Assert.assertTrue(adapter.terminateInstance("InstanceTwo"));
   }
   
@@ -62,7 +68,7 @@ public class MotorAdapterTest {
     
     // Monitoring data contains the instance name
     Assert.assertTrue(monitorData.contains(instanceName));
-    
+   
     // Monitoring data contains the adapter specific prefix
     Assert.assertTrue(monitorData.contains(adapter.getAdapterManagedResourcePrefix()[1]));
     

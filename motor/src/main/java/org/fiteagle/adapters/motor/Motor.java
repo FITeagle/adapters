@@ -7,7 +7,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 public class Motor {
     
-
     private String manufacturer;
     private int rpm;
     private int maxRpm;
@@ -19,23 +18,22 @@ public class Motor {
         super();
     }
     
-    public Motor(MotorAdapter owningAdapter, String instanceName) {
+    public Motor(MotorAdapter owningAdapter, String instanceName, Model createModel) {
         super();
         this.manufacturer = "Fraunhofer FOKUS";
         this.rpm = 0;
         this.maxRpm = 3000;
         this.throttle = 0;
         
+        StmtIterator iter = createModel.listStatements();
+        while(iter.hasNext()){
+          updateProperty(iter.next());
+        }
+        
         this.owningAdapter = owningAdapter;
         this.instanceName = instanceName;
     }
     
-    
-    public String toString() {
-        
-        return "Motor";
-    }
-
     public String getManufacturer() {
         return manufacturer;
     }
@@ -79,26 +77,20 @@ public class Motor {
         return instanceName;
     }
 
-  public void updateProperties(Statement configureStatement) {
-    StmtIterator iter = configureStatement.getSubject().listProperties();
-    
-    while (iter.hasNext()) {
-      Statement statement = iter.next();
-      System.out.println();
-      switch(statement.getPredicate().getLocalName()){
-        case "rpm":
-          this.setRpm(statement.getInt());
-          break;
-        case "maxRpm":
-          this.setMaxRpm(statement.getInt());
-          break;
-        case "throttle":
-          this.setRpm(statement.getInt());
-          break;
-        case "manufacturer":
-          this.setManufacturer(statement.getString());
-          break;
-      }
+  public void updateProperty(Statement configureStatement) {
+    switch (configureStatement.getPredicate().getLocalName()) {
+      case "rpm":
+        this.setRpm(configureStatement.getInt());
+        break;
+      case "maxRpm":
+        this.setMaxRpm(configureStatement.getInt());
+        break;
+      case "throttle":
+        this.setRpm(configureStatement.getInt());
+        break;
+      case "manufacturer":
+        this.setManufacturer(configureStatement.getString());
+        break;
     }
   }
 

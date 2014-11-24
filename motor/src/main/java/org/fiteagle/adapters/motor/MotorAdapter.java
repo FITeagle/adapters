@@ -73,7 +73,6 @@ public final class MotorAdapter extends AbstractAdapter {
       }
 
     private MotorAdapter(Resource adapterInstance, Model adapterModel) {
-        
         this.adapterInstance = adapterInstance;
         this.adapterModel = adapterModel;
         
@@ -83,7 +82,7 @@ public final class MotorAdapter extends AbstractAdapter {
 
     @Override
     public Resource handleCreateInstance(String instanceName, Model modelCreate) {
-      Motor motor = new DynamicMotor(this, instanceName);
+      Motor motor = new DynamicMotor(this, instanceName, modelCreate);
       instanceList.put(instanceName, motor);
       return parseToResource(motor); 
     }
@@ -114,39 +113,13 @@ public final class MotorAdapter extends AbstractAdapter {
       return resource;
     }
 
-    public void addPropertiesToResource(Resource motorInstance, Motor currentMotor, String instanceName) {
-        motorInstance.addProperty(RDF.type, resource);
-        motorInstance.addProperty(RDFS.label, "Motor: " + instanceName);
-        motorInstance.addProperty(RDFS.comment, adapterModel.createLiteral("Motor in the garage " + instanceName, "en"));
-
-        for(Property p : motorControlProperties){
-          switch(p.getLocalName()){
-            case "rpm": 
-            	motorInstance.addLiteral(p, currentMotor.getRpm());
-            	break;
-            case "maxRpm": 
-            	motorInstance.addLiteral(p, currentMotor.getMaxRpm());
-            	break;
-            case "manufacturer": 
-            	motorInstance.addLiteral(p, currentMotor.getManufacturer());
-            	break;
-            case "throttle": 
-            	motorInstance.addLiteral(p, currentMotor.getThrottle());
-            	break;
-            case "isDynamic": 
-            	motorInstance.addLiteral(p, ((DynamicMotor) currentMotor).isDynamic());
-            	break;
-          }
-        }
-    }
-
     @Override
     public void handleConfigureInstance(Statement configureStatement) {
       String instanceName = configureStatement.getSubject().getLocalName();
 
       if (instanceList.containsKey(instanceName)) {
           Motor currentMotor = (Motor) instanceList.get(instanceName);
-          currentMotor.updateProperties(configureStatement);
+          currentMotor.updateProperty(configureStatement);
       }
     }
 

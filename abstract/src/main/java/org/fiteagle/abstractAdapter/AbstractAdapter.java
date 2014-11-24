@@ -106,6 +106,16 @@ public abstract class AbstractAdapter {
     return MessageBusMsgFactory.serializeModel(getAllInstancesModel());
   }
   
+  public int getAmountOfInstances(){
+    StmtIterator iter = getAllInstancesModel().listStatements(null, RDF.type, getAdapterManagedResource());
+    int amountOfInstances = 0;
+    while(iter.hasNext()){
+      amountOfInstances++;
+      iter.next();
+    }
+    return amountOfInstances;
+  }
+  
   public Model getAllInstancesModel() {
     Model modelInstances = ModelFactory.createDefaultModel();
     setModelPrefixes(modelInstances);
