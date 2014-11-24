@@ -124,6 +124,11 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
+    public void handleTerminateInstance(String instanceName) {
+      instanceList.remove(instanceName);      
+    }
+    
+    @Override
     public String[] getAdapterSpecificPrefix() {
         return ADAPTER_SPECIFIC_PREFIX.clone();
     }
@@ -164,13 +169,6 @@ public final class MotorAdapter extends AbstractAdapter {
     
     @Override
     public void updateAdapterDescription() {
-      // TODO Auto-generated method stub
-      
     }
-
-    @Override
-    public void handleTerminateInstance(String instanceName) {
-      // TODO Auto-generated method stub
-      
-    }
+    
 }
