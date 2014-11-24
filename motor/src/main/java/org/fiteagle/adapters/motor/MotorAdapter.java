@@ -141,10 +141,13 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
-    public Model configureInstance(Statement configureStatement) {
-      adapterModel.removeAll(configureStatement.getSubject(), configureStatement.getPredicate(), null);
-      adapterModel.add(configureStatement);
-      return getSingleInstanceModel(configureStatement.getSubject().getLocalName());
+    public void handleConfigureInstance(Statement configureStatement) {
+      String instanceName = configureStatement.getSubject().getLocalName();
+
+      if (instanceList.containsKey(instanceName)) {
+          Motor currentMotor = (Motor) instanceList.get(instanceName);
+          currentMotor.updateProperties(configureStatement);
+      }
     }
 
     @Override

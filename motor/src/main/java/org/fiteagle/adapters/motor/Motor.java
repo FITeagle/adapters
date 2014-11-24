@@ -1,8 +1,8 @@
 package org.fiteagle.adapters.motor;
 
-import java.util.List;
-
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 
 public class Motor {
@@ -17,7 +17,6 @@ public class Motor {
     
     public Motor(){
         super();
-        
     }
     
     public Motor(MotorAdapter owningAdapter, String instanceName) {
@@ -49,9 +48,8 @@ public class Motor {
         return rpm;
     }
 
-    public void setRpm(int rpm, List<String> updatedProperties) {
+    public void setRpm(int rpm) {
         this.rpm = rpm;
-        updatedProperties.add("rpm");
     }
     
     public void setRpmWithNotify(int rpm) {
@@ -65,22 +63,43 @@ public class Motor {
         return maxRpm;
     }
 
-    public void setMaxRpm(int maxRpm, List<String> updatedProperties) {
+    public void setMaxRpm(int maxRpm) {
         this.maxRpm = maxRpm;
-        updatedProperties.add("maxRpm");
     }
 
     public int getThrottle() {
         return throttle;
     }
 
-    public void setThrottle(int throttle, List<String> updatedProperties) {
+    public void setThrottle(int throttle) {
         this.throttle = throttle;
-        updatedProperties.add("throttle");
     }
 
     public String getInstanceName() {
         return instanceName;
     }
+
+  public void updateProperties(Statement configureStatement) {
+    StmtIterator iter = configureStatement.getSubject().listProperties();
+    
+    while (iter.hasNext()) {
+      Statement statement = iter.next();
+      System.out.println();
+      switch(statement.getPredicate().getLocalName()){
+        case "rpm":
+          this.setRpm(statement.getInt());
+          break;
+        case "maxRpm":
+          this.setMaxRpm(statement.getInt());
+          break;
+        case "throttle":
+          this.setRpm(statement.getInt());
+          break;
+        case "manufacturer":
+          this.setManufacturer(statement.getString());
+          break;
+      }
+    }
+  }
 
 }

@@ -72,6 +72,14 @@ public abstract class AbstractAdapter {
     return MessageBusMsgFactory.serializeModel(modelInstances);
   }
   
+  public Model configureInstance(Statement configureStatement){
+    handleConfigureInstance(configureStatement);
+    
+    getAdapterDescriptionModel().removeAll(configureStatement.getSubject(), configureStatement.getPredicate(), null);
+    getAdapterDescriptionModel().add(configureStatement);
+    return getSingleInstanceModel(configureStatement.getSubject().getLocalName());
+  }
+  
   public Model getSingleInstanceModel(String instanceName) {
     if (containsResourceInstance(instanceName)) {
       Model resourceModel = ModelFactory.createDefaultModel();
@@ -151,7 +159,7 @@ public abstract class AbstractAdapter {
     notifyListeners(messageModel, null);
   }
   
-  public abstract Model configureInstance(Statement configureStatement);
+  public abstract void handleConfigureInstance(Statement configureStatement);
   
   public abstract Resource handleCreateInstance(String instanceName, Model newInstanceModel);
   
