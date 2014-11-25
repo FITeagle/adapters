@@ -1,0 +1,8 @@
+@prefix openstack:    <http://open-multinet.info/ontology/resource/openstack#> .
+@prefix openstackvm:  <http://open-multinet.info/ontology/resource/openstackvm#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+av:Openstack-1 a openstack:Openstack .
+
+av:OpenstackVM9 a openstackvm:OpenstackVM .
