@@ -1,0 +1,8 @@
+@prefix motorgarage: <http://open-multinet.info/ontology/resource/motorgarage#> .
+@prefix motor: <http://open-multinet.info/ontology/resource/motor#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+
+av:MotorGarage-1 a motorgarage:MotorGarage .
+
+av:Motor1 a motor:Motor .
