@@ -13,7 +13,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -48,14 +47,14 @@ public class AdapterRDFHandler {
     
     LOGGER.log(Level.INFO, "Searching for resources to create...");
     
-    Statement currentResourceInstanceStatement = null;
     Boolean createdAtLeastOne = false;
     while (iteratorResourceInstance.hasNext()) {
-      currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
-      String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
+      Resource resourceToCreate = iteratorResourceInstance.next().getSubject();
+      
+      String instanceName = resourceToCreate.getLocalName();
       if(adapter.createInstance(instanceName, modelCreate)) {
         createdAtLeastOne = true;
-        LOGGER.log(Level.INFO, "Created instance: " + currentResourceInstanceStatement.getSubject().getLocalName());
+        LOGGER.log(Level.INFO, "Created instance: " + resourceToCreate);
         Model createdInstanceValues = createInformRDF(instanceName);
         createdInstancesModel.add(createdInstanceValues);
       }
@@ -81,14 +80,11 @@ public class AdapterRDFHandler {
     
     LOGGER.log(Level.INFO, "Searching for resources to release...");
     
-    Statement currentResourceInstanceStatement = null;
     while (iteratorResourceInstance.hasNext()) {
-      currentResourceInstanceStatement = iteratorResourceInstance.nextStatement();
+      Resource resourceToRelease = iteratorResourceInstance.next().getSubject();
       
-      String instanceName = currentResourceInstanceStatement.getSubject().getLocalName();
-      LOGGER.log(Level.INFO, "Releasing instance: " + instanceName + " ("
-          + currentResourceInstanceStatement.toString() + ")");
-      
+      LOGGER.log(Level.INFO, "Releasing instance: " + resourceToRelease);
+      String instanceName = resourceToRelease.getLocalName();
       if (adapter.terminateInstance(instanceName)) {
         adapter.notifyListeners(createInformReleaseRDF(instanceName), requestID);
         return Response.Status.OK.name();
@@ -100,13 +96,11 @@ public class AdapterRDFHandler {
   public String parseDiscoverModel(Model modelDiscover) {
     StmtIterator iteratorResourceInstance = getResourceInstanceIterator(modelDiscover);
     
-    Statement currentInstanceStatement = null;
     while (iteratorResourceInstance.hasNext()) {
-      currentInstanceStatement = iteratorResourceInstance.nextStatement();
+      Resource resource = iteratorResourceInstance.next().getSubject();
       
-      String instanceName = currentInstanceStatement.getSubject().getLocalName();
-      LOGGER.log(Level.INFO, "Discovering instance: " + instanceName + " (" + currentInstanceStatement.toString() + ")");
-      
+      LOGGER.log(Level.INFO, "Discovering instance: " + resource);
+      String instanceName = resource.getLocalName();
       String response = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
       if (response.isEmpty()) {
         return Response.Status.NOT_FOUND.name();
@@ -129,7 +123,7 @@ public class AdapterRDFHandler {
     
     while (iteratorResourceInstance.hasNext()) {
       Resource resourceInstance = iteratorResourceInstance.next().getSubject();
-      LOGGER.log(Level.INFO, "Configuring instance: "+resourceInstance.getLocalName());
+      LOGGER.log(Level.INFO, "Configuring instance: "+resourceInstance);
       
       StmtIterator propertiesIterator = modelConfigure.listStatements(resourceInstance, null, (RDFNode) null);
       while(propertiesIterator.hasNext()){
