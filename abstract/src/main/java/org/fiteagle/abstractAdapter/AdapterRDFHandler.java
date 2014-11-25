@@ -11,6 +11,7 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -126,15 +127,15 @@ public class AdapterRDFHandler {
     
     LOGGER.log(Level.INFO, "Searching for resources to configure...");
     
-    Statement currentConfigureStatement = null;
     while (iteratorResourceInstance.hasNext()) {
-      currentConfigureStatement = iteratorResourceInstance.nextStatement();
+      Resource resourceInstance = iteratorResourceInstance.next().getSubject();
+      LOGGER.log(Level.INFO, "Configuring instance: "+resourceInstance.getLocalName());
       
-      LOGGER.log(Level.INFO, "Configuring instance: "
-          + currentConfigureStatement.getSubject().getLocalName() + " (" + currentConfigureStatement.toString() + ")");
-      
-      Model changedInstanceValues = adapter.configureInstance(currentConfigureStatement);
-      changedInstancesModel.add(changedInstanceValues);
+      StmtIterator propertiesIterator = modelConfigure.listStatements(resourceInstance, null, (RDFNode) null);
+      while(propertiesIterator.hasNext()){
+        Model changedInstanceValues = adapter.configureInstance(propertiesIterator.next());
+        changedInstancesModel.add(changedInstanceValues);
+      }
     }
     
     if (changedInstancesModel.isEmpty()) {
