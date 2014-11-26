@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.adapters.openmtc.client.OpenMTCClient;
+import org.fiteagle.adapters.openMTC.client.OpenMTCClient;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;

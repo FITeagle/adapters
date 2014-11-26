@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.openmtc.client;
+package org.fiteagle.adapters.openMTC.client;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
