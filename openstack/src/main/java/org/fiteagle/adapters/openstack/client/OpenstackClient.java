@@ -163,6 +163,28 @@ public class OpenstackClient implements IOpenstackClient{
 		return images;
 	}
 	
+  public int getMaxInstances() {
+      Access access = getAccessWithTenantId();
+      
+      Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
+      novaClient.token(access.getToken().getId());
+  
+      OpenStackRequest<String> request = new OpenStackRequest<String>(
+          novaClient, HttpMethod.GET, "/os-quota-sets/defaults", null,
+          String.class);
+      
+      int response = 0;
+      try{
+        response = Integer.valueOf(novaClient.execute(request));
+      } catch(OpenStackResponseException e){
+        LOGGER.log(Level.SEVERE, e.getMessage());
+        return 0;
+      }
+    
+      return response;
+  }
+	
+	
 	@Override
 	public Servers listServers() {
 	    Access access = getAccessWithTenantId();
