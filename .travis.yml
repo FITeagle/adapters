@@ -4,6 +4,7 @@ jdk:
 script:
   - mvn clean install site
 notifications:
+  slack: av-fitt:FmLx2wj2Td3cNfmrjaQXUXBO
   email:
     - alexander.willner@tu-berlin.de
     - fiteagle.dev@av.tu-berlin.de
