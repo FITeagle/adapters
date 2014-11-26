@@ -8,7 +8,7 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openmtc.client.OpenMTCClient;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
-import org.fiteagle.api.core.OntologyModels;
+import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -40,7 +40,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   static {
-    Model adapterModel = OntologyModels.loadModel("ontologies/openMTC.ttl", IMessageBus.SERIALIZATION_TURTLE);
+    Model adapterModel = OntologyModelUtil.loadModel("ontologies/openMTC.ttl", IMessageBus.SERIALIZATION_TURTLE);
     
     StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {

@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import org.fiteagle.adapters.testbed.dm.TestbedAdapterMDBSender;
 import org.fiteagle.api.core.MessageBusOntologyModel;
-import org.fiteagle.api.core.OntologyModels;
+import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -24,7 +24,7 @@ public class TestbedAdapter {
   private Resource adapterInstance;
   
   static {
-    testbedModel = OntologyModels.loadModel("ontologies/testbedAdapter.ttl", "TURTLE");
+    testbedModel = OntologyModelUtil.loadModel("ontologies/testbedAdapter.ttl", "TURTLE");
     
     StmtIterator testbedIterator = testbedModel.listStatements(null, RDF.type, MessageBusOntologyModel.classTestbed);
     if (testbedIterator.hasNext()) {

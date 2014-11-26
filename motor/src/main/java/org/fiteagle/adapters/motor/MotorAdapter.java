@@ -7,7 +7,7 @@ import java.util.List;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
-import org.fiteagle.api.core.OntologyModels;
+import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -40,7 +40,7 @@ public final class MotorAdapter extends AbstractAdapter {
     protected HashMap<String, Motor> instanceList = new HashMap<String, Motor>();
     
     static {
-        Model adapterModel = OntologyModels.loadModel("ontologies/motor.ttl", IMessageBus.SERIALIZATION_TURTLE);
+        Model adapterModel = OntologyModelUtil.loadModel("ontologies/motor.ttl", IMessageBus.SERIALIZATION_TURTLE);
         
         StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
         if (adapterIterator.hasNext()) {

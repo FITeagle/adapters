@@ -14,7 +14,7 @@ import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
-import org.fiteagle.api.core.OntologyModels;
+import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -48,7 +48,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   public static OpenstackAdapter getTestInstance(IOpenstackClient openstackClient){
     OpenstackAdapter testInstance = null;
-    Model adapterModel = OntologyModels.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
+    Model adapterModel = OntologyModelUtil.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
     StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
     while (adapterInstanceIterator.hasNext()) {
       Resource adapterInstance = adapterInstanceIterator.next().getSubject();
@@ -59,7 +59,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   static {
-    Model adapterModel = OntologyModels.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
+    Model adapterModel = OntologyModelUtil.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
     
     StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
