@@ -2,7 +2,7 @@ language: java
 jdk:
   - oraclejdk7
 script:
-  - mvn clean install site
+  - travis_retry mvn clean install site
 notifications:
   slack: av-fitt:FmLx2wj2Td3cNfmrjaQXUXBO
   email:
