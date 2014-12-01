@@ -41,26 +41,22 @@ Monitor, create, terminate and configure resource adapters.
 The example RDF files that are used in some calls can be found in the adapters/motor directory.
 
 * Create a single new motor instance using an attached, detailed RDF description:
-  * ```curl -i -X PUT -d @createMotor.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
+  * ```curl -k -v --request PUT --data @createMotor.ttl https://localhost:8443/native/api/resources/MotorGarage-1```
   * Response should be HTTP 201 + New motor instance RDF description
   
   
 * Create four new motor instances at once using an attached, detailed RDF description:
-  * ```curl -i -X PUT -d @createManyMotors.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
+  * ```curl -k -v --request PUT --data @createManyMotors.ttl https://localhost:8443/native/api/resources/MotorGarage-1```
   * Response should be HTTP 201 + New motor instance RDF description
    
-* Create a single new motor resource instance named "ARunningMotor01" with no attached RDF description and default parameters (just using the path):
-  * ```curl -i -X PUT http://localhost:8080/native/api/resources/ADeployedMotorAdapter1/ARunningMotor01```
-  * Response should be HTTP 201 + New motor instance RDF description
-
 * To get a description of all resources instances managed by the adapter:
-  * ```curl -i -X GET http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
+  * ```curl -i -X GET http://localhost:8080/native/api/resources/MotorGarage-1```
 
 * To get a description of the properties of a single resource instance managed by the adapter:
-  * ```curl -i -X GET http://localhost:8080/native/api/resources/ADeployedMotorAdapter1/ARunningMotor01```
+  * ```curl -i -X GET http://localhost:8080/native/api/resources/Motor1```
   
 * Release a single motor resource instance (just using the path):
-  * ```curl -i -X DELETE http://localhost:8080/native/api/resources/ADeployedMotorAdapter1/ARunningMotor01```
+  * ```curl -i -X DELETE http://localhost:8080/native/api/resources/MotorGarage-1/ARunningMotor01```
   * Response should be HTTP 200 + motor instance release RDF description
   
 * Configure a single motor resource instance using attached RDF description:
