@@ -18,11 +18,12 @@ motorgarage:MotorGarage
 av:MotorGarage-1
         a  motorgarage:MotorGarage ;
         omn:partOfGroup av:AV_Smart_Communication_Testbed ;
+        omn:maxInstances 10 ;
         rdfs:comment  "A motor garage adapter that can simulate different dynamic motor resources."@en ;
         rdfs:label    "A deployed motor garage adapter named: MotorGarage-1"@en ;
         wgs:lat       "52.516377" ;
         wgs:long      "13.323732" .
-          
+        
 motor:Motor
         a                  owl:Class ;
         rdfs:label         "MotorResource"@en ;
