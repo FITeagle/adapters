@@ -20,7 +20,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
  */
 public abstract class AbstractAdapter {
   
-  private List<AdapterEventListener> listener = new ArrayList<AdapterEventListener>();
+  private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
   
   public abstract Resource getAdapterManagedResource();
   
@@ -143,13 +143,13 @@ public abstract class AbstractAdapter {
   }
   
   public void notifyListeners(Model eventRDF, String requestID) {
-    for (AdapterEventListener name : listener) {
-      name.rdfChange(eventRDF, requestID);
+    for (AdapterEventListener listener : listeners) {
+      listener.publishModelUpdate(eventRDF, requestID);
     }
   }
   
   public boolean addChangeListener(AdapterEventListener newListener) {
-    listener.add(newListener);
+    listeners.add(newListener);
     return true;
   }
   
