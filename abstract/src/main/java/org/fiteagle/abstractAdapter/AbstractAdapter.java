@@ -14,10 +14,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-/**
- * Abstract class defining the basics all the current adapters are following Extend this class and implement the
- * abstract methods to get this to work
- */
 public abstract class AbstractAdapter {
   
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
