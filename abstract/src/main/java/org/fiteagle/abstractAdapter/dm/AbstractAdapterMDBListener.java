@@ -80,12 +80,10 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   
   public void handleCreateModel(Model modelCreate, String requestID) {
     Model createdInstancesModel = ModelFactory.createDefaultModel();
-    getAdapter().setModelPrefixes(createdInstancesModel);
     
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelCreate);
     
     LOGGER.log(Level.INFO, "Searching for resources to create...");
-    
     Boolean createdAtLeastOne = false;
     while (resourceInstanceIterator.hasNext()) {
       Resource resourceToCreate = resourceInstanceIterator.next().getSubject();
@@ -115,21 +113,55 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   }
   
   public void handleReleaseModel(Model modelRelease, String requestID) {
+    Model releasedInstancesModel = ModelFactory.createDefaultModel();
+    
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelRelease);
     
     LOGGER.log(Level.INFO, "Searching for resources to release...");
-    
     while (resourceInstanceIterator.hasNext()) {
       Resource resourceToRelease = resourceInstanceIterator.next().getSubject();
       
       LOGGER.log(Level.INFO, "Releasing instance: " + resourceToRelease);
       String instanceName = resourceToRelease.getLocalName();
       if (getAdapter().terminateInstance(instanceName)) {
-        getAdapter().notifyListeners(createInformReleaseModel(instanceName), requestID);
-        return;
+        releasedInstancesModel.add(createInformReleaseModel(instanceName));
       }
     }
-    sendErrorResponseMessage(Response.Status.NOT_FOUND.name(), requestID);
+    
+    if (releasedInstancesModel.isEmpty()) {
+      LOGGER.log(Level.INFO, "Could not find any instances to release");
+      sendErrorResponseMessage(Response.Status.NOT_FOUND.name(), requestID);
+      return;
+    }
+    
+    getAdapter().notifyListeners(releasedInstancesModel, requestID);
+  }
+  
+  public void handleConfigureModel(Model modelConfigure, String requestID) {
+    Model configuredInstancesModel = ModelFactory.createDefaultModel();
+    
+    StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelConfigure);
+    
+    LOGGER.log(Level.INFO, "Searching for resources to configure...");
+    
+    while (resourceInstanceIterator.hasNext()) {
+      Resource resourceInstance = resourceInstanceIterator.next().getSubject();
+      LOGGER.log(Level.INFO, "Configuring instance: " + resourceInstance);
+      
+      StmtIterator propertiesIterator = modelConfigure.listStatements(resourceInstance, null, (RDFNode) null);
+      while (propertiesIterator.hasNext()) {
+        Model changedInstanceValues = getAdapter().configureInstance(propertiesIterator.next());
+        configuredInstancesModel.add(changedInstanceValues);
+      }
+    }
+    
+    if (configuredInstancesModel.isEmpty()) {
+      LOGGER.log(Level.INFO, "Could not find any instances to configure");
+      sendErrorResponseMessage(Response.Status.NOT_FOUND.name(), requestID);
+      return;
+    }
+    
+    getAdapter().notifyListeners(configuredInstancesModel, requestID);
   }
   
   public void handleDiscoverModel(Model modelDiscover, String requestID) {
@@ -150,33 +182,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
     // No specific instance requested, show all
     getAdapter().notifyListeners(getAdapter().getAllInstancesModel(), requestID);
-  }
-  
-  public void handleConfigureModel(Model modelConfigure, String requestID) {
-    Model changedInstancesModel = ModelFactory.createDefaultModel();
-    getAdapter().setModelPrefixes(changedInstancesModel);
-    
-    StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelConfigure);
-    
-    LOGGER.log(Level.INFO, "Searching for resources to configure...");
-    
-    while (resourceInstanceIterator.hasNext()) {
-      Resource resourceInstance = resourceInstanceIterator.next().getSubject();
-      LOGGER.log(Level.INFO, "Configuring instance: " + resourceInstance);
-      
-      StmtIterator propertiesIterator = modelConfigure.listStatements(resourceInstance, null, (RDFNode) null);
-      while (propertiesIterator.hasNext()) {
-        Model changedInstanceValues = getAdapter().configureInstance(propertiesIterator.next());
-        changedInstancesModel.add(changedInstanceValues);
-      }
-    }
-    
-    if (changedInstancesModel.isEmpty()) {
-      sendErrorResponseMessage(Response.Status.NOT_FOUND.name(), requestID);
-      return;
-    }
-    
-    getAdapter().notifyListeners(changedInstancesModel, requestID);
   }
   
   private boolean adapterIsRecipient(Model messageModel) {
