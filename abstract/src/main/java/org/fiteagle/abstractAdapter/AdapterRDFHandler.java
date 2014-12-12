@@ -55,7 +55,7 @@ public class AdapterRDFHandler {
       if(adapter.createInstance(instanceName, modelCreate)) {
         createdAtLeastOne = true;
         LOGGER.log(Level.INFO, "Created instance: " + resourceToCreate);
-        Model createdInstanceValues = createInformRDF(instanceName);
+        Model createdInstanceValues = adapter.getSingleInstanceModel(instanceName);
         createdInstancesModel.add(createdInstanceValues);
       }
       
@@ -86,7 +86,7 @@ public class AdapterRDFHandler {
       LOGGER.log(Level.INFO, "Releasing instance: " + resourceToRelease);
       String instanceName = resourceToRelease.getLocalName();
       if (adapter.terminateInstance(instanceName)) {
-        adapter.notifyListeners(createInformReleaseRDF(instanceName), requestID);
+        adapter.notifyListeners(createInformReleaseModel(instanceName), requestID);
         return Response.Status.OK.name();
       }
     }
@@ -141,20 +141,16 @@ public class AdapterRDFHandler {
     return Response.Status.OK.name();
   }
   
-  public Model createInformRDF(String instanceName) {
-    return adapter.getSingleInstanceModel(instanceName);
-  }
-  
-  public Model createInformReleaseRDF(String instanceName) {
+  private Model createInformReleaseModel(String instanceName) {
     
-    Model modelInstances = ModelFactory.createDefaultModel();
+    Model model = ModelFactory.createDefaultModel();
     
-    adapter.setModelPrefixes(modelInstances);
+    adapter.setModelPrefixes(model);
     
-    Resource releaseInstance = modelInstances.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
-    modelInstances.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodReleases, releaseInstance);
+    Resource releasedInstance = model.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    model.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodReleases, releasedInstance);
     
-    return modelInstances;
+    return model;
   }
   
 }

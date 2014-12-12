@@ -37,7 +37,7 @@ public abstract class AbstractAdapterMDBSender {
       getAdapter().addChangeListener(new AdapterEventListener() {
 
         @Override
-        public void rdfChange(Model eventRDF, String requestID) {
+        public void publishModelUpdate(Model eventRDF, String requestID) {
             sendInformMessage(eventRDF, requestID);                
         }
       });
