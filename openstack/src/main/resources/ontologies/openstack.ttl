@@ -19,7 +19,7 @@ openstack:images
         a      owl:AsymmetricProperty ,
                owl:IrreflexiveProperty ,
                owl:ObjectProperty ;
-        rdfs:domain owl:Thing ;
+        rdfs:domain openstack:Openstack ;
         rdfs:range owl:Thing ;
         rdfs:label   "The images of the Openstack Instance"@en ;
         rdfs:comment "Defines the images which are available at the Openstack Instance"@en .
@@ -44,14 +44,14 @@ openstackvm:OpenstackImage
         
 openstackvm:imageid
         a      owl:DatatypeProperty ;
-        rdfs:domain  openstackvm:OpenstackImage ;
         rdfs:label   "The ID of an Openstack Image"@en ;
+        rdfs:domain  openstackvm:OpenstackImage ;
         rdfs:range   xsd:string .
 
 openstackvm:id
         a      owl:DatatypeProperty ;
-        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The ID of an Openstack VM Instance"@en ;
+        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:range   xsd:string .
 
 openstackvm:image
@@ -59,30 +59,30 @@ openstackvm:image
                owl:IrreflexiveProperty ,
                owl:ObjectProperty ;
         rdfs:domain openstackvm:OpenstackVM ;
-        rdfs:range owl:Thing ;
+        rdfs:range openstackvm:OpenstackImage ;
         rdfs:label   "The image of the Openstack VM"@en ;
         rdfs:comment "Defines the image used for the Openstack VM"@en .
 
 openstackvm:status
         a      owl:DatatypeProperty ;
-        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The status of the Openstack VM"@en ;
+        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:range   xsd:string .
         
 openstackvm:created
         a      owl:DatatypeProperty ;
-        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The date when the Openstack VM was created"@en ;
+        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:range   xsd:string .
         
 openstackvm:keypairname
         a      owl:DatatypeProperty ;
-        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The name of the keypair of the Openstack VM"@en ;
+        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:range   xsd:string .
         
 openstackvm:flavor
         a      owl:DatatypeProperty ;
-        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:label   "The id of the flavor of the Openstack VM"@en ;
+        rdfs:domain  openstackvm:OpenstackVM ;
         rdfs:range   xsd:integer .
