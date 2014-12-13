@@ -36,15 +36,13 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   
   public void onMessage(final Message requestMessage) {
     try {
+      String methodType = requestMessage.getStringProperty(IMessageBus.METHOD_TYPE);
+      Model messageModel = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
       
-      if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
+      if (methodType != null && messageModel != null) {
         
-        Model messageModel = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
-        
-        String methodType = requestMessage.getStringProperty(IMessageBus.METHOD_TYPE);
-        AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a "
-            + methodType + " message");
-        if (messageModel != null && adapterIsRecipient(messageModel)) {
+        AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
+        if (adapterIsRecipient(messageModel)) {
           if (methodType.equals(IMessageBus.TYPE_CREATE)
               && MessageBusMsgFactory.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleCreate)) {
             handleCreateModel(messageModel, requestMessage.getJMSCorrelationID());
@@ -63,11 +61,10 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
             // Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
             handleCreateModel(messageModel, requestMessage.getJMSCorrelationID());
           }
-          
         }
         
         // DISCOVER message needs not to check for adapterIsRecipient()
-        if (messageModel != null && methodType.equals(IMessageBus.TYPE_DISCOVER)
+        if (methodType.equals(IMessageBus.TYPE_DISCOVER)
             && MessageBusMsgFactory.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleDiscover)) {
             handleDiscoverModel(messageModel, requestMessage.getJMSCorrelationID());
         }
@@ -193,7 +190,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     
     try {
       responseMessage.setStringProperty(IMessageBus.TYPE_RESPONSE, IMessageBus.TYPE_INFORM);
-      responseMessage.setStringProperty(IMessageBus.RDF, result);
+      responseMessage.setStringProperty(IMessageBus.TYPE_ERROR, result);
       if (null != requestID) {
         responseMessage.setJMSCorrelationID(requestID);
       }
