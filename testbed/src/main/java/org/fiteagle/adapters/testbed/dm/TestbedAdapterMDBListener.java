@@ -14,7 +14,7 @@ import javax.jms.Topic;
 
 import org.fiteagle.adapters.testbed.TestbedAdapter;
 import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageBusMsgFactory;
+import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -42,7 +42,7 @@ public class TestbedAdapterMDBListener implements MessageListener {
     public void onMessage(final Message requestMessage) {
         try {
             if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
-                Model modelMessage = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
+                Model modelMessage = MessageUtil.getRDFResultModel(requestMessage);
                 if(modelMessage != null){
                 
                   if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
@@ -93,8 +93,8 @@ public class TestbedAdapterMDBListener implements MessageListener {
 
     private void sendUpdateModel(Model updateModel) {
         try {
-            Model messageModel = MessageBusMsgFactory.createMsgInform(updateModel);
-            String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
+            Model messageModel = MessageUtil.createMsgInform(updateModel);
+            String serializedRDF = MessageUtil.serializeModel(messageModel);
             final Message eventMessage = this.context.createMessage();
 
             eventMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_INFORM);

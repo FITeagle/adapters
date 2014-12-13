@@ -4,7 +4,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import org.fiteagle.adapters.testbed.TestbedAdapter;
 import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageBusMsgFactory;
+import org.fiteagle.api.core.MessageUtil;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -45,8 +45,8 @@ public class TestbedAdapterMDBSender {
   
   public void sendInformMessage(Model rdfModel, String requestID) {
     try {
-      Model messageModel = MessageBusMsgFactory.createMsgInform(rdfModel);
-      String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
+      Model messageModel = MessageUtil.createMsgInform(rdfModel);
+      String serializedRDF = MessageUtil.serializeModel(messageModel);
       
       String correlationID = "";
       if (requestID == null || requestID.isEmpty()) {

@@ -15,7 +15,7 @@ import javax.jms.Topic;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
 import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageBusMsgFactory;
+import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -55,8 +55,7 @@ public abstract class AbstractAdapterMDBSender {
     
     private void sendInformMessage(Model eventRDF, String requestID) {
         try {
-            Model messageModel = MessageBusMsgFactory.createMsgInform(eventRDF);
-            String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
+            Model messageModel = MessageUtil.createMsgInform(eventRDF);
 
             String correlationID = "";
             if(requestID == null || requestID.isEmpty()){
@@ -65,13 +64,10 @@ public abstract class AbstractAdapterMDBSender {
                 correlationID = requestID;
             }
             
-            final Message eventMessage = this.context.createMessage();
+            Message eventMessage = MessageUtil.createRDFMessage(messageModel, IMessageBus.TYPE_INFORM, IMessageBus.SERIALIZATION_DEFAULT, context);
             eventMessage.setJMSCorrelationID(correlationID);
-            eventMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_INFORM);
-            eventMessage.setStringProperty(IMessageBus.RDF, serializedRDF);
-            eventMessage.setStringProperty(IMessageBus.SERIALIZATION, IMessageBus.SERIALIZATION_DEFAULT);
             
-            this.context.createProducer().send(topic, eventMessage);
+            context.createProducer().send(topic, eventMessage);
         } catch (JMSException e) {
           LOGGER.log(Level.SEVERE, e.getMessage());
         }
@@ -86,21 +82,10 @@ public abstract class AbstractAdapterMDBSender {
     }
     
     private void sendRequestMessage(Model eventRDF) {
-      try {
-        
-        Model messageModel = MessageBusMsgFactory.createMsgRequest(eventRDF);
-        String serializedRDF = MessageBusMsgFactory.serializeModel(messageModel);
-        
-        final Message requestMessage = this.context.createMessage();
-        requestMessage.setJMSCorrelationID(UUID.randomUUID().toString());
-        requestMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_REQUEST);
-        requestMessage.setStringProperty(IMessageBus.RDF, serializedRDF);
-        requestMessage.setStringProperty(IMessageBus.SERIALIZATION, IMessageBus.SERIALIZATION_DEFAULT);
+        Model messageModel = MessageUtil.createMsgRequest(eventRDF);
+        final Message requestMessage = MessageUtil.createRDFMessage(messageModel, IMessageBus.TYPE_REQUEST, IMessageBus.SERIALIZATION_DEFAULT, context);
         
         this.context.createProducer().send(this.topic, requestMessage);
-      } catch (JMSException e) {
-        LOGGER.log(Level.SEVERE, e.getMessage());
-      }
     }
     
     @PreDestroy
@@ -109,9 +94,4 @@ public abstract class AbstractAdapterMDBSender {
     }
     
     protected abstract AbstractAdapter getAdapter();
-
 }
-
-
-
-

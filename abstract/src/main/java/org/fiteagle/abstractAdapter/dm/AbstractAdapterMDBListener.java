@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageBusMsgFactory;
+import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -37,26 +37,26 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   public void onMessage(final Message requestMessage) {
     try {
       String methodType = requestMessage.getStringProperty(IMessageBus.METHOD_TYPE);
-      Model messageModel = MessageBusMsgFactory.getMessageRDFModel(requestMessage);
+      Model messageModel = MessageUtil.getRDFResultModel(requestMessage);
       
       if (methodType != null && messageModel != null) {
         
         AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
         if (adapterIsRecipient(messageModel)) {
           if (methodType.equals(IMessageBus.TYPE_CREATE)
-              && MessageBusMsgFactory.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleCreate)) {
+              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleCreate)) {
             handleCreateModel(messageModel, requestMessage.getJMSCorrelationID());
             
           } else if (methodType.equals(IMessageBus.TYPE_CONFIGURE)
-              && MessageBusMsgFactory.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleConfigure)) {
+              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleConfigure)) {
             handleConfigureModel(messageModel, requestMessage.getJMSCorrelationID());
             
           } else if (methodType.equals(IMessageBus.TYPE_RELEASE)
-              && MessageBusMsgFactory.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleRelease)) {
+              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleRelease)) {
             handleReleaseModel(messageModel, requestMessage.getJMSCorrelationID());
             
           } else if (methodType.equals(IMessageBus.TYPE_INFORM)
-              && MessageBusMsgFactory.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleInform)
+              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleInform)
               && messageModel.contains(null, MessageBusOntologyModel.methodRestores, getAdapter().getAdapterInstance())) {
             // Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
             handleCreateModel(messageModel, requestMessage.getJMSCorrelationID());
@@ -65,7 +65,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         
         // DISCOVER message needs not to check for adapterIsRecipient()
         if (methodType.equals(IMessageBus.TYPE_DISCOVER)
-            && MessageBusMsgFactory.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleDiscover)) {
+            && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleDiscover)) {
             handleDiscoverModel(messageModel, requestMessage.getJMSCorrelationID());
         }
       }
