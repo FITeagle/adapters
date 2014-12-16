@@ -37,40 +37,31 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   public void onMessage(final Message requestMessage) {
     try {
       String methodType = requestMessage.getStringProperty(IMessageBus.METHOD_TYPE);
+      String serialization = requestMessage.getStringProperty(IMessageBus.SERIALIZATION);
       String rdfString = MessageUtil.getRDFResult(requestMessage);
-      if(rdfString == null ){
-        return;
-      }
-      Model messageModel = MessageUtil.parseSerializedModel(rdfString);
       
-      if (methodType != null && messageModel != null) {
+      if (methodType != null && rdfString != null) {
+        Model messageModel = MessageUtil.parseSerializedModel(rdfString, serialization);
         
-        AbstractAdapterMDBListener.LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
         if (adapterIsRecipient(messageModel)) {
-          if (methodType.equals(IMessageBus.TYPE_CREATE)
-              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleCreate)) {
+          if (methodType.equals(IMessageBus.TYPE_CREATE)) {
+            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
             handleCreateModel(messageModel, requestMessage.getJMSCorrelationID());
             
-          } else if (methodType.equals(IMessageBus.TYPE_CONFIGURE)
-              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleConfigure)) {
+          } else if (methodType.equals(IMessageBus.TYPE_CONFIGURE)) {
+            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
             handleConfigureModel(messageModel, requestMessage.getJMSCorrelationID());
             
-          } else if (methodType.equals(IMessageBus.TYPE_RELEASE)
-              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleRelease)) {
+          } else if (methodType.equals(IMessageBus.TYPE_RELEASE)) {
+            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
             handleReleaseModel(messageModel, requestMessage.getJMSCorrelationID());
-            
-          } else if (methodType.equals(IMessageBus.TYPE_INFORM)
-              && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleInform)
-              && messageModel.contains(null, MessageBusOntologyModel.methodRestores, getAdapter().getAdapterInstance())) {
-            // Does this inform message restore this adapter instance (this is the only kind of inform message the adapter is interested in)
-            handleCreateModel(messageModel, requestMessage.getJMSCorrelationID());
           }
         }
         
         // DISCOVER message needs not to check for adapterIsRecipient()
-        if (methodType.equals(IMessageBus.TYPE_DISCOVER)
-            && MessageUtil.isMessageType(messageModel, MessageBusOntologyModel.propertyFiteagleDiscover)) {
-            handleDiscoverModel(messageModel, requestMessage.getJMSCorrelationID());
+        if (methodType.equals(IMessageBus.TYPE_DISCOVER)) {
+          LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
+          handleDiscoverModel(messageModel, requestMessage.getJMSCorrelationID());
         }
       }
       
@@ -186,7 +177,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   }
   
   private boolean adapterIsRecipient(Model messageModel) {
-    return messageModel.contains(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
+    return messageModel.containsResource(getAdapter().getAdapterInstance());
   }
   
   private void sendErrorResponseMessage(String result, String requestID) {
@@ -202,7 +193,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }
     
-    this.context.createProducer().send(topic, responseMessage);
+    context.createProducer().send(topic, responseMessage);
   }
 
   private StmtIterator getResourceInstanceIterator(Model model) {

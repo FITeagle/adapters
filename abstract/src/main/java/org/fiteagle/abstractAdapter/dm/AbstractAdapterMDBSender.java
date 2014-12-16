@@ -16,11 +16,8 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
-import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBSender {
     
@@ -45,9 +42,9 @@ public abstract class AbstractAdapterMDBSender {
       LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterInstance().getURI());
       getAdapter().registerAdapter();
       
-      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Restoring previous state of " + getAdapter().getAdapterInstance().getURI());
+      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Sending restore request message for " + getAdapter().getAdapterInstance().getURI());
       try {
-        restoreState();
+        sendRestoreRequestMessage();
       } catch (JMSException e) {
         LOGGER.log(Level.SEVERE, e.getMessage());
       }
@@ -73,19 +70,13 @@ public abstract class AbstractAdapterMDBSender {
         }
     }
     
-    public void restoreState() throws JMSException {
-      Model messageModel = ModelFactory.createDefaultModel();
-      messageModel.add(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
-      messageModel.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodRestores, getAdapter().getAdapterInstance());
+    public void sendRestoreRequestMessage() throws JMSException {
+      String query = "DESCRIBE ?resource "
+          + "WHERE {?resource a <"+getAdapter().getAdapterManagedResource().getURI()+"> .  }";
       
-      sendRequestMessage(messageModel);
-    }
-    
-    private void sendRequestMessage(Model eventRDF) {
-        Model messageModel = MessageUtil.createMsgRequest(eventRDF);
-        final Message requestMessage = MessageUtil.createRDFMessage(messageModel, IMessageBus.TYPE_REQUEST, IMessageBus.SERIALIZATION_DEFAULT, context);
-        
-        this.context.createProducer().send(this.topic, requestMessage);
+      String requestModel = MessageUtil.createSerializedSPARQLQueryRestoresModel(query, getAdapter().getAdapterInstance());
+      final Message request = MessageUtil.createRDFMessage(requestModel, IMessageBus.TYPE_REQUEST, IMessageBus.SERIALIZATION_TURTLE, context);
+      context.createProducer().send(topic, request);
     }
     
     @PreDestroy
