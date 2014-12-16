@@ -184,7 +184,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     final Message responseMessage = context.createMessage();
     
     try {
-      responseMessage.setStringProperty(IMessageBus.TYPE_RESPONSE, IMessageBus.TYPE_INFORM);
+      responseMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_INFORM);
       responseMessage.setStringProperty(IMessageBus.TYPE_ERROR, result);
       if (null != requestID) {
         responseMessage.setJMSCorrelationID(requestID);
