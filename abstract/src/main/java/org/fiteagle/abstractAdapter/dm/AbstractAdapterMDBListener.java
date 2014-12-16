@@ -37,7 +37,11 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   public void onMessage(final Message requestMessage) {
     try {
       String methodType = requestMessage.getStringProperty(IMessageBus.METHOD_TYPE);
-      Model messageModel = MessageUtil.getRDFResultModel(requestMessage);
+      String rdfString = MessageUtil.getRDFResult(requestMessage);
+      if(rdfString == null ){
+        return;
+      }
+      Model messageModel = MessageUtil.parseSerializedModel(rdfString);
       
       if (methodType != null && messageModel != null) {
         
@@ -75,7 +79,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
   }
   
-  public void handleCreateModel(Model modelCreate, String requestID) {
+  private void handleCreateModel(Model modelCreate, String requestID) {
     Model createdInstancesModel = ModelFactory.createDefaultModel();
     
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelCreate);
@@ -109,7 +113,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     getAdapter().notifyListeners(createdInstancesModel, requestID);
   }
   
-  public void handleReleaseModel(Model modelRelease, String requestID) {
+  private void handleReleaseModel(Model modelRelease, String requestID) {
     Model releasedInstancesModel = ModelFactory.createDefaultModel();
     
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelRelease);
@@ -134,7 +138,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     getAdapter().notifyListeners(releasedInstancesModel, requestID);
   }
   
-  public void handleConfigureModel(Model modelConfigure, String requestID) {
+  private void handleConfigureModel(Model modelConfigure, String requestID) {
     Model configuredInstancesModel = ModelFactory.createDefaultModel();
     
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelConfigure);
@@ -161,7 +165,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     getAdapter().notifyListeners(configuredInstancesModel, requestID);
   }
   
-  public void handleDiscoverModel(Model modelDiscover, String requestID) {
+  private void handleDiscoverModel(Model modelDiscover, String requestID) {
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelDiscover);
     
     while (resourceInstanceIterator.hasNext()) {
@@ -186,7 +190,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   }
   
   private void sendErrorResponseMessage(String result, String requestID) {
-    final Message responseMessage = this.context.createMessage();
+    final Message responseMessage = context.createMessage();
     
     try {
       responseMessage.setStringProperty(IMessageBus.TYPE_RESPONSE, IMessageBus.TYPE_INFORM);

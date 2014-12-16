@@ -42,18 +42,22 @@ public class TestbedAdapterMDBListener implements MessageListener {
     public void onMessage(final Message requestMessage) {
         try {
             if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
-                Model modelMessage = MessageUtil.getRDFResultModel(requestMessage);
-                if(modelMessage != null){
+              String rdfString = MessageUtil.getRDFResult(requestMessage);
+              if(rdfString == null ){
+                return;
+              }
+              Model messageModel = MessageUtil.parseSerializedModel(rdfString);
+                if(messageModel != null){
                 
                   if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_DISCOVER)) {
                           LOGGER.log(Level.INFO, "Received a discover message");
                           mib.sendInformMessage(TestbedAdapter.getTestbedModel(), requestMessage.getJMSCorrelationID());
                   }
                   
-                  else if (isAdapterMessage(modelMessage)) {
+                  else if (isAdapterMessage(messageModel)) {
                       if (requestMessage.getStringProperty(IMessageBus.METHOD_TYPE).equals(IMessageBus.TYPE_INFORM)) {
                           Model adapterModel = TestbedAdapter.getTestbedModel();
-                          Resource adapterInstance = getAdapterInstance(modelMessage);
+                          Resource adapterInstance = getAdapterInstance(messageModel);
                           if (adapterInstance == null) {
                               LOGGER.log(Level.INFO, "no adapter could be detected in the inform message");
                           } else {                            
