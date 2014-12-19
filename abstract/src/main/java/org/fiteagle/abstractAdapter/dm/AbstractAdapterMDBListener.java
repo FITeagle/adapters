@@ -91,13 +91,15 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     }
     if (createdAtLeastOne == false) {
       LOGGER.log(Level.INFO, "Could not find any new instances to create");
-      sendErrorResponseMessage(Response.Status.CONFLICT.name(), requestID);
+      Message errorMessage = MessageUtil.createErrorMessage(Response.Status.CONFLICT.name(), requestID, context);
+      context.createProducer().send(topic, errorMessage);
       return;
     }
     
     if (createdInstancesModel.isEmpty()) {
       LOGGER.log(Level.INFO, "Could not find any instances to create");
-      sendErrorResponseMessage(Response.Status.BAD_REQUEST.name(), requestID);
+      Message errorMessage = MessageUtil.createErrorMessage(Response.Status.BAD_REQUEST.name(), requestID, context);
+      context.createProducer().send(topic, errorMessage);
       return;
     }
     
@@ -122,7 +124,8 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     
     if (releasedInstancesModel.isEmpty()) {
       LOGGER.log(Level.INFO, "Could not find any instances to release");
-      sendErrorResponseMessage(Response.Status.NOT_FOUND.name(), requestID);
+      Message errorMessage = MessageUtil.createErrorMessage(Response.Status.NOT_FOUND.name(), requestID, context);
+      context.createProducer().send(topic, errorMessage);
       return;
     }
     
@@ -149,7 +152,8 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     
     if (configuredInstancesModel.isEmpty()) {
       LOGGER.log(Level.INFO, "Could not find any instances to configure");
-      sendErrorResponseMessage(Response.Status.NOT_FOUND.name(), requestID);
+      Message errorMessage = MessageUtil.createErrorMessage(Response.Status.NOT_FOUND.name(), requestID, context);
+      context.createProducer().send(topic, errorMessage);
       return;
     }
     
@@ -165,7 +169,8 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
       LOGGER.log(Level.INFO, "Discovering instance: " + resource);
       Model instanceModel = getAdapter().getSingleInstanceModel(resource.getLocalName());
       if (instanceModel == null || instanceModel.isEmpty()) {
-        sendErrorResponseMessage(Response.Status.NOT_FOUND.name(), requestID);
+        Message errorMessage = MessageUtil.createErrorMessage(Response.Status.NOT_FOUND.name(), requestID, context);
+        context.createProducer().send(topic, errorMessage);
         return;
       } else {
         getAdapter().notifyListeners(instanceModel, requestID);
@@ -180,22 +185,6 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     return messageModel.containsResource(getAdapter().getAdapterInstance());
   }
   
-  private void sendErrorResponseMessage(String result, String requestID) {
-    final Message responseMessage = context.createMessage();
-    
-    try {
-      responseMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_INFORM);
-      responseMessage.setStringProperty(IMessageBus.TYPE_ERROR, result);
-      if (null != requestID) {
-        responseMessage.setJMSCorrelationID(requestID);
-      }
-    } catch (JMSException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
-    }
-    
-    context.createProducer().send(topic, responseMessage);
-  }
-
   private StmtIterator getResourceInstanceIterator(Model model) {
     return model.listStatements(null, RDF.type, getAdapter().getAdapterManagedResource());
   }

@@ -1,6 +1,5 @@
 package org.fiteagle.abstractAdapter.dm;
 
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,23 +50,10 @@ public abstract class AbstractAdapterMDBSender {
     }
     
     private void sendInformMessage(Model eventRDF, String requestID) {
-        try {
-            Model messageModel = MessageUtil.createMsgInform(eventRDF);
-
-            String correlationID = "";
-            if(requestID == null || requestID.isEmpty()){
-                correlationID = UUID.randomUUID().toString();
-            } else {
-                correlationID = requestID;
-            }
-            
-            Message eventMessage = MessageUtil.createRDFMessage(messageModel, IMessageBus.TYPE_INFORM, IMessageBus.SERIALIZATION_DEFAULT, context);
-            eventMessage.setJMSCorrelationID(correlationID);
-            
-            context.createProducer().send(topic, eventMessage);
-        } catch (JMSException e) {
-          LOGGER.log(Level.SEVERE, e.getMessage());
-        }
+      Model messageModel = MessageUtil.createMsgInform(eventRDF);
+      final Message message = MessageUtil.createRDFMessage(messageModel, IMessageBus.TYPE_INFORM, IMessageBus.SERIALIZATION_DEFAULT, requestID, context);
+      
+      context.createProducer().send(topic, message);
     }
     
     public void sendRestoreRequestMessage() throws JMSException {
@@ -75,7 +61,7 @@ public abstract class AbstractAdapterMDBSender {
           + "WHERE {?resource a <"+getAdapter().getAdapterManagedResource().getURI()+"> .  }";
       
       String requestModel = MessageUtil.createSerializedSPARQLQueryRestoresModel(query, getAdapter().getAdapterInstance());
-      final Message request = MessageUtil.createRDFMessage(requestModel, IMessageBus.TYPE_REQUEST, IMessageBus.SERIALIZATION_TURTLE, context);
+      final Message request = MessageUtil.createRDFMessage(requestModel, IMessageBus.TYPE_REQUEST, IMessageBus.SERIALIZATION_TURTLE, null, context);
       context.createProducer().send(topic, request);
     }
     
