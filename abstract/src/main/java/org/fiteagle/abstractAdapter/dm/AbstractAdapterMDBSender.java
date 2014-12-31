@@ -14,9 +14,11 @@ import javax.jms.Topic;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
 import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBSender {
     
@@ -49,9 +51,9 @@ public abstract class AbstractAdapterMDBSender {
       }
     }
     
-    private void sendInformMessage(Model eventRDF, String requestID) {
-      Model messageModel = MessageUtil.createMsgInform(eventRDF);
-      final Message message = MessageUtil.createRDFMessage(messageModel, IMessageBus.TYPE_INFORM, IMessageBus.SERIALIZATION_DEFAULT, requestID, context);
+    private void sendInformMessage(Model model, String requestID) {
+      model.add(MessageBusOntologyModel.internalMessage, RDF.type, MessageBusOntologyModel.propertyFiteagleInform);
+      final Message message = MessageUtil.createRDFMessage(model, IMessageBus.TYPE_INFORM, IMessageBus.SERIALIZATION_DEFAULT, requestID, context);
       
       context.createProducer().send(topic, message);
     }

@@ -1,9 +1,11 @@
 package org.fiteagle.adapters.testbed.dm;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 import org.fiteagle.adapters.testbed.TestbedAdapter;
 import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.MessageUtil;
 
 import javax.annotation.PostConstruct;
@@ -45,8 +47,8 @@ public class TestbedAdapterMDBSender {
   
   public void sendInformMessage(Model rdfModel, String requestID) {
     try {
-      Model messageModel = MessageUtil.createMsgInform(rdfModel);
-      String serializedRDF = MessageUtil.serializeModel(messageModel);
+      rdfModel.add(MessageBusOntologyModel.internalMessage, RDF.type, MessageBusOntologyModel.propertyFiteagleInform);
+      String serializedRDF = MessageUtil.serializeModel(rdfModel);
       
       String correlationID = "";
       if (requestID == null || requestID.isEmpty()) {

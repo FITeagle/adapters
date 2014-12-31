@@ -93,8 +93,8 @@ public class TestbedAdapterMDBListener implements MessageListener {
   
   private void sendUpdateModel(Model updateModel) {
     try {
-      Model messageModel = MessageUtil.createMsgInform(updateModel);
-      String serializedRDF = MessageUtil.serializeModel(messageModel);
+      updateModel.add(MessageBusOntologyModel.internalMessage, RDF.type, MessageBusOntologyModel.propertyFiteagleInform);
+      String serializedRDF = MessageUtil.serializeModel(updateModel);
       final Message eventMessage = this.context.createMessage();
       
       eventMessage.setStringProperty(IMessageBus.METHOD_TYPE, IMessageBus.TYPE_INFORM);
