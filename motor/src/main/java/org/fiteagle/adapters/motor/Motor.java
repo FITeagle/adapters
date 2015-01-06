@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.motor;
 
+import org.fiteagle.api.core.IMessageBus;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -54,7 +56,7 @@ public class Motor {
         this.rpm = rpm;
         Model changedInstanceValues = owningAdapter.getSingleInstanceModel(instanceName); 
         owningAdapter.setModelPrefixes(changedInstanceValues);   
-        owningAdapter.notifyListeners(changedInstanceValues, "");
+        owningAdapter.notifyListeners(changedInstanceValues, "", IMessageBus.TYPE_INFORM, null);
     }
 
     public int getMaxRpm() {

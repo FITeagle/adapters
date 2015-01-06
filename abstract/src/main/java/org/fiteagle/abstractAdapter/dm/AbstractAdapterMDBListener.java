@@ -14,7 +14,6 @@ import javax.ws.rs.core.Response;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
-import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -52,16 +51,10 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
             LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
             handleConfigureModel(messageModel, requestMessage.getJMSCorrelationID());
             
-          } else if (methodType.equals(IMessageBus.TYPE_RELEASE)) {
+          } else if (methodType.equals(IMessageBus.TYPE_DELETE)) {
             LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
-            handleReleaseModel(messageModel, requestMessage.getJMSCorrelationID());
+            handleDeleteModel(messageModel, requestMessage.getJMSCorrelationID());
           }
-        }
-        
-        // DISCOVER message needs not to check for adapterIsRecipient()
-        if (methodType.equals(IMessageBus.TYPE_DISCOVER)) {
-          LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
-          handleDiscoverModel(messageModel, requestMessage.getJMSCorrelationID());
         }
       }
       
@@ -103,10 +96,10 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
       return;
     }
     
-    getAdapter().notifyListeners(createdInstancesModel, requestID);
+    getAdapter().notifyListeners(createdInstancesModel, requestID, IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
   }
   
-  private void handleReleaseModel(Model modelRelease, String requestID) {
+  private void handleDeleteModel(Model modelRelease, String requestID) {
     Model releasedInstancesModel = ModelFactory.createDefaultModel();
     
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelRelease);
@@ -129,7 +122,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
       return;
     }
     
-    getAdapter().notifyListeners(releasedInstancesModel, requestID);
+    getAdapter().notifyListeners(releasedInstancesModel, requestID, IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
   }
   
   private void handleConfigureModel(Model modelConfigure, String requestID) {
@@ -157,28 +150,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
       return;
     }
     
-    getAdapter().notifyListeners(configuredInstancesModel, requestID);
-  }
-  
-  private void handleDiscoverModel(Model modelDiscover, String requestID) {
-    StmtIterator resourceInstanceIterator = getResourceInstanceIterator(modelDiscover);
-    
-    while (resourceInstanceIterator.hasNext()) {
-      Resource resource = resourceInstanceIterator.next().getSubject();
-      
-      LOGGER.log(Level.INFO, "Discovering instance: " + resource);
-      Model instanceModel = getAdapter().getSingleInstanceModel(resource.getLocalName());
-      if (instanceModel == null || instanceModel.isEmpty()) {
-        Message errorMessage = MessageUtil.createErrorMessage(Response.Status.NOT_FOUND.name(), requestID, context);
-        context.createProducer().send(topic, errorMessage);
-        return;
-      } else {
-        getAdapter().notifyListeners(instanceModel, requestID);
-        return;
-      }
-    }
-    // No specific instance requested, show all
-    getAdapter().notifyListeners(getAdapter().getAllInstancesModel(), requestID);
+    getAdapter().notifyListeners(configuredInstancesModel, requestID, IMessageBus.TYPE_INFORM,  IMessageBus.TARGET_ORCHESTRATOR);
   }
   
   private boolean adapterIsRecipient(Model messageModel) {
@@ -192,9 +164,8 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   private Model createInformReleaseModel(String instanceName) {
     Model model = ModelFactory.createDefaultModel();
     getAdapter().setModelPrefixes(model);
-    Resource releasedInstance = model.createResource(getAdapter().getAdapterInstancePrefix()[1] + instanceName);
-    model.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodReleases, releasedInstance);
-    
+    Resource resource = getAdapter().getAdapterManagedResource();
+    model.add(resource, RDF.type, getAdapter().getAdapterManagedResource());
     return model;
   }
   

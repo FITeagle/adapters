@@ -58,11 +58,7 @@ public class ResourceAdapterListener implements MessageListener {
 			if (rcvMessage.getStringProperty(IMessageBus.METHOD_TYPE) != null) {
 				String response = null;
 
-				if (rcvMessage.getStringProperty(IMessageBus.METHOD_TYPE)
-						.equals(IMessageBus.TYPE_DISCOVER.toString())) {
-					LOGGER.info(" epc-client-adapter received a message from type DISCOVER");
-					response = handleDiscover(rcvMessage);
-				} else if (ignoreMessage(rcvMessage)) {
+				if (ignoreMessage(rcvMessage)) {
 					return;
 				}
 				;
@@ -72,7 +68,7 @@ public class ResourceAdapterListener implements MessageListener {
 					response = handleCreate(rcvMessage);
 				} else if (rcvMessage
 						.getStringProperty(IMessageBus.METHOD_TYPE).equals(
-								IMessageBus.TYPE_RELEASE.toString())) {
+								IMessageBus.TYPE_DELETE.toString())) {
 					LOGGER.info("epc-client-adapter received a message from type RELEASE");
 					response = handleRelease(rcvMessage);
 				}
@@ -134,7 +130,7 @@ public class ResourceAdapterListener implements MessageListener {
 	public void sendResponseMessage(Message rcvMessage, String result)
 			throws JMSException {
 
-		final Message responseMessage = this.context.createMessage();
+		final Message responseMessage = this.context.createTextMessage(result);
 
 		responseMessage.setJMSCorrelationID(rcvMessage.getJMSCorrelationID());
 		responseMessage.setStringProperty(IMessageBus.SERIALIZATION, "TURTLE");
@@ -142,7 +138,6 @@ public class ResourceAdapterListener implements MessageListener {
 		responseMessage.setStringProperty(IMessageBus.METHOD_TYPE,
 				IMessageBus.TYPE_INFORM);
 
-		responseMessage.setStringProperty(IMessageBus.RDF, result);
 		this.context.createProducer().send(topic, responseMessage);
 	}
 

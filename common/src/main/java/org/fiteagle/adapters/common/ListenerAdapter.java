@@ -32,7 +32,7 @@ public class ListenerAdapter {
 
 		Model model = ModelFactory.createDefaultModel();
 		try {
-			String rdf = rcvMessage.getStringProperty(IMessageBus.RDF);
+			String rdf = rcvMessage.getBody(String.class);
 			InputStream inputStream = new ByteArrayInputStream(rdf.getBytes());
 			model.read(inputStream, null,
 					rcvMessage.getStringProperty(IMessageBus.SERIALIZATION));
@@ -44,9 +44,6 @@ public class ListenerAdapter {
 	public String handleDiscoverAdapter(Model modelDiscover)
 			throws JMSException {
 
-		Resource message = MessageBusOntologyModel.internalMessage;
-		message.addProperty(RDF.type,	MessageBusOntologyModel.propertyFiteagleInform);
-
 		StringWriter writer = new StringWriter();
 		modelDiscover.write(writer, "TURTLE");
 		System.out.println("finishing handleDiscoveryAdapter");
@@ -56,11 +53,9 @@ public class ListenerAdapter {
 	public Model handleCreateAdapter(Message rcvMessage) throws JMSException {
 
 		Model model = createModel(rcvMessage);
-		if (rcvMessage.getStringProperty(IMessageBus.RDF) != null) {
+		if (rcvMessage.getBody(String.class) != null) {
 			try {
-				StmtIterator stmtiterator = model
-						.listStatements(new SimpleSelector(null, RDF.type,
-								MessageBusOntologyModel.propertyFiteagleCreate));
+				StmtIterator stmtiterator = model.listStatements();
 
 				return handleStatement(model, stmtiterator);
 			} catch (RiotException e) {
@@ -73,11 +68,9 @@ public class ListenerAdapter {
 	public Model handleReleaseAdapter(Message rcvMessage) throws JMSException {
 
 		Model model = createModel(rcvMessage);
-		if (rcvMessage.getStringProperty(IMessageBus.RDF) != null) {
+		if (rcvMessage.getBody(String.class) != null) {
 			try {
-				StmtIterator stmtiterator = model
-						.listStatements(new SimpleSelector(null, RDF.type,
-								MessageBusOntologyModel.propertyFiteagleRelease));
+				StmtIterator stmtiterator = model.listStatements();
 
 				return handleStatement(model, stmtiterator);
 			} catch (RiotException e) {
@@ -103,7 +96,7 @@ public class ListenerAdapter {
 
 		Model model = ModelFactory.createDefaultModel();
 		try {
-			String rdf = rcvMessage.getStringProperty(IMessageBus.RDF);
+			String rdf = rcvMessage.getBody(String.class);
 			InputStream inputstream = new ByteArrayInputStream(rdf.getBytes());
 			model.read(inputstream, null,
 					rcvMessage.getStringProperty(IMessageBus.SERIALIZATION));
@@ -114,9 +107,6 @@ public class ListenerAdapter {
 	}
 
 	public String createResponse(Model model) {
-	  Resource message = MessageBusOntologyModel.internalMessage;
-		message.addProperty(RDF.type,	MessageBusOntologyModel.propertyFiteagleInform);
-
 		StringWriter writer = new StringWriter();
 		model.write(writer, "TURTLE");
 		return writer.toString();

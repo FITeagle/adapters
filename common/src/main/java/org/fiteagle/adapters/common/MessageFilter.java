@@ -4,16 +4,9 @@ import org.fiteagle.api.core.IMessageBus;
 
 public class MessageFilter {
 
-	public static final String MESSAGE_FILTER = IMessageBus.METHOD_TYPE
-			+ " = '" + IMessageBus.TYPE_DISCOVER + /*
-													 * "' OR " +
-													 * IMessageBus.METHOD_TYPE +
-													 * " = '" +
-													 * IMessageBus.TYPE_INFORM +
-													 */"' OR "
-			+ IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_CREATE
+	public static final String MESSAGE_FILTER = IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_CREATE
 			+ "' OR " + IMessageBus.METHOD_TYPE + " = '"
 			+ IMessageBus.TYPE_CONFIGURE + "' OR " + IMessageBus.METHOD_TYPE
-			+ " = '" + IMessageBus.TYPE_RELEASE + "'";
+			+ " = '" + IMessageBus.TYPE_DELETE + "'";
 
 }

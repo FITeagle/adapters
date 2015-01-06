@@ -35,37 +35,36 @@ public abstract class AbstractAdapterMDBSender {
       getAdapter().addChangeListener(new AdapterEventListener() {
 
         @Override
-        public void publishModelUpdate(Model eventRDF, String requestID) {
-            sendInformMessage(eventRDF, requestID);                
+        public void publishModelUpdate(Model eventRDF, String requestID, String methodTarget) {
+            sendInformMessage(eventRDF, requestID, methodTarget);                
         }
       });
       
       LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterInstance().getURI());
       getAdapter().registerAdapter();
       
-      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Sending restore request message for " + getAdapter().getAdapterInstance().getURI());
-      try {
-        sendRestoreRequestMessage();
-      } catch (JMSException e) {
-        LOGGER.log(Level.SEVERE, e.getMessage());
-      }
+//      LOGGER.log(Level.INFO, this.getClass().getSimpleName() + ": Sending restore request message for " + getAdapter().getAdapterInstance().getURI());
+//      try {
+//        sendRestoreRequestMessage();
+//      } catch (JMSException e) {
+//        LOGGER.log(Level.SEVERE, e.getMessage());
+//      }
     }
     
-    private void sendInformMessage(Model model, String requestID) {
-      model.add(MessageBusOntologyModel.internalMessage, RDF.type, MessageBusOntologyModel.propertyFiteagleInform);
-      final Message message = MessageUtil.createRDFMessage(model, IMessageBus.TYPE_INFORM, IMessageBus.SERIALIZATION_DEFAULT, requestID, context);
+    private void sendInformMessage(Model model, String requestID, String methodTarget) {
+      final Message message = MessageUtil.createRDFMessage(model, IMessageBus.TYPE_INFORM, methodTarget, IMessageBus.SERIALIZATION_DEFAULT, requestID, context);
       
       context.createProducer().send(topic, message);
     }
     
-    public void sendRestoreRequestMessage() throws JMSException {
-      String query = "DESCRIBE ?resource "
-          + "WHERE {?resource a <"+getAdapter().getAdapterManagedResource().getURI()+"> .  }";
-      
-      String requestModel = MessageUtil.createSerializedSPARQLQueryRestoresModel(query, getAdapter().getAdapterInstance());
-      final Message request = MessageUtil.createRDFMessage(requestModel, IMessageBus.TYPE_REQUEST, IMessageBus.SERIALIZATION_TURTLE, null, context);
-      context.createProducer().send(topic, request);
-    }
+//    public void sendRestoreRequestMessage() throws JMSException {
+//      String query = "DESCRIBE ?resource "
+//          + "WHERE {?resource a <"+getAdapter().getAdapterManagedResource().getURI()+"> .  }";
+//      
+//      String requestModel = MessageUtil.createSerializedSPARQLQueryRestoresModel(query, getAdapter().getAdapterInstance());
+//      final Message request = MessageUtil.createRDFMessage(requestModel, IMessageBus.TYPE_GET, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER, IMessageBus.SERIALIZATION_TURTLE, null, context);
+//      context.createProducer().send(topic, request);
+//    }
     
     @PreDestroy
     public void contextDestroyed() {

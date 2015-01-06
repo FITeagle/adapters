@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
@@ -138,9 +139,9 @@ public abstract class AbstractAdapter {
     return MessageUtil.serializeModel(getAdapterDescriptionModel());
   }
   
-  public void notifyListeners(Model eventRDF, String requestID) {
+  public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
     for (AdapterEventListener listener : listeners) {
-      listener.publishModelUpdate(eventRDF, requestID);
+      listener.publishModelUpdate(eventRDF, requestID, methodTarget);
     }
   }
   
@@ -151,18 +152,17 @@ public abstract class AbstractAdapter {
   
   public void registerAdapter() {
     updateAdapterDescription();
-    notifyListeners(getAdapterDescriptionModel(), null);
+    notifyListeners(getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
   }
   
-  public void restoreResourceInstances() {
-    notifyListeners(getAdapterDescriptionModel(), null);
-  }
+//  public void restoreResourceInstances() {
+//    notifyListeners(getAdapterDescriptionModel(), null, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
+//  }
   
   public void deregisterAdapter() {
     Model messageModel = ModelFactory.createDefaultModel();
-    messageModel.add(MessageBusOntologyModel.internalMessage, MessageBusOntologyModel.methodReleases, getAdapterInstance());
-    
-    notifyListeners(messageModel, null);
+
+    notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
   }
   
   public abstract void handleConfigureInstance(Statement configureStatement);

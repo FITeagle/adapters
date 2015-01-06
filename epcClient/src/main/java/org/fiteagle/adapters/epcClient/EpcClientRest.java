@@ -16,12 +16,16 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.Consumes;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 //import org.fiteagle.north.proprietary.rest.NorthboundAPI;
+
+
+import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -37,33 +41,6 @@ public class EpcClientRest {
 
 	public EpcClientRest() {
 		// TODO Auto-generated constructor stub
-	}
-
-	/**
-	 * sending discovery message and ask for resource description 
-	 * curl -v http://localhost:8080/epcClient/testEpcClient/resource_discovery_epcClient
-	 */
-	@GET
-	@Path("resource_discovery_epcClient")
-	public void resourceDiscovery() {
-		String serialization = "TURTLE";
-
-		Model model = putNsPrefix(discoverModel(createModel()));
-
-		try {
-			Message message = this.createRequest(
-					modelToString(model, serialization), serialization,
-					IMessageBus.TYPE_DISCOVER);
-			this.context.createProducer().send(this.topic, message);
-			System.out.println("sending discovery message");
-
-			Message rcvResponse = waitForResponse(message.getJMSCorrelationID());
-			System.out.println("Resource description is received "
-					+ getResponse(rcvResponse));
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	/**
@@ -92,7 +69,7 @@ public class EpcClientRest {
 			System.out.println("sending creation message ");
 
 			Message rcvMessage = waitForResponse(message.getJMSCorrelationID());
-			response = getResponse(rcvMessage);
+			response = MessageUtil.getRDFResult(rcvMessage);
 			System.out.println("a new user added " + response);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
@@ -122,27 +99,17 @@ public class EpcClientRest {
 		try {
 			Message message = this.createRequest(
 					modelToString(releaseModel, serialization), serialization,
-					IMessageBus.TYPE_RELEASE);
+					IMessageBus.TYPE_DELETE);
 			this.context.createProducer().send(this.topic, message);
 			System.out.println("sending delete message ");
 
 			Message rcvMessage = waitForResponse(message.getJMSCorrelationID());
-			response = getResponse(rcvMessage);
+			response = MessageUtil.getRDFResult(rcvMessage);
 			System.out.println("user deleted " + response);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-
-	private Model discoverModel(Model rdfModel) {
-
-		com.hp.hpl.jena.rdf.model.Resource message = rdfModel
-				.createResource("http://fiteagleinternal#Message");
-		message.addProperty(RDF.type,
-				MessageBusOntologyModel.propertyFiteagleDiscover);
-
-		return rdfModel;
 	}
 
 	private Model createModel() {
@@ -165,11 +132,6 @@ public class EpcClientRest {
 				.createResource("http://fiteagleinternal#");
 		fuseco.addProperty(RDF.type, ResourceType);
 
-		com.hp.hpl.jena.rdf.model.Resource message = rdfModel
-				.createResource("http://fiteagleinternal#Message");
-		message.addProperty(RDF.type,
-				MessageBusOntologyModel.propertyFiteagleCreate);
-
 		return rdfModel;
 	}
 
@@ -180,11 +142,6 @@ public class EpcClientRest {
 		com.hp.hpl.jena.rdf.model.Resource fuseco = rdfModel
 				.createResource("http://fiteagleinternal#");
 		fuseco.addProperty(RDF.type, ResourceType);
-
-		com.hp.hpl.jena.rdf.model.Resource message = rdfModel
-				.createResource("http://fiteagleinternal#Message");
-		message.addProperty(RDF.type,
-				MessageBusOntologyModel.propertyFiteagleRelease);
 
 		return rdfModel;
 	}
@@ -197,11 +154,10 @@ public class EpcClientRest {
 
 	private Message createRequest(final String rdfInput,
 			final String serialization, String methodType) throws JMSException {
-		final Message message = this.context.createTextMessage();
+		final Message message = this.context.createTextMessage(rdfInput);
 
 		message.setStringProperty(IMessageBus.METHOD_TYPE, methodType);
 		message.setStringProperty(IMessageBus.SERIALIZATION, serialization);
-		message.setStringProperty(IMessageBus.RDF, rdfInput);
 		message.setJMSCorrelationID(UUID.randomUUID().toString());
 
 		return message;
@@ -220,17 +176,6 @@ public class EpcClientRest {
 		final Message response = this.context
 				.createConsumer(this.topic, filter).receive(5000);
 		return response;
-	}
-
-	private String getResponse(final Message rcvResponse) throws JMSException {
-		String resourceDescription = "timeout";
-
-		if (rcvResponse != null) {
-			resourceDescription = rcvResponse
-					.getStringProperty(IMessageBus.RDF);
-		}
-
-		return resourceDescription;
 	}
 
 }
