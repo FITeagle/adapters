@@ -141,7 +141,7 @@ public abstract class AbstractAdapter {
   
   public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
     for (AdapterEventListener listener : listeners) {
-      listener.publishModelUpdate(eventRDF, requestID, methodTarget);
+      listener.publishModelUpdate(eventRDF, requestID, methodType, methodTarget);
     }
   }
   

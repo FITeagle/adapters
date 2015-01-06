@@ -77,7 +77,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
     }
 
     @Override
-    public void publishModelUpdate(Model eventRDF, String requestID, String methodTarget) {
+    public void publishModelUpdate(Model eventRDF, String requestID, String methodType, String methodTarget) {
         if (wsSession != null && wsSession.isOpen()) {
             Set<Session> sessions = wsSession.getOpenSessions();
             

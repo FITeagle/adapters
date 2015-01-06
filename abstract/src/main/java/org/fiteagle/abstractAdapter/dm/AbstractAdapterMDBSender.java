@@ -35,8 +35,8 @@ public abstract class AbstractAdapterMDBSender {
       getAdapter().addChangeListener(new AdapterEventListener() {
 
         @Override
-        public void publishModelUpdate(Model eventRDF, String requestID, String methodTarget) {
-            sendInformMessage(eventRDF, requestID, methodTarget);                
+        public void publishModelUpdate(Model eventRDF, String requestID, String methodType, String methodTarget) {
+            sendInformMessage(eventRDF, requestID, methodType, methodTarget);                
         }
       });
       
@@ -51,8 +51,8 @@ public abstract class AbstractAdapterMDBSender {
 //      }
     }
     
-    private void sendInformMessage(Model model, String requestID, String methodTarget) {
-      final Message message = MessageUtil.createRDFMessage(model, IMessageBus.TYPE_INFORM, methodTarget, IMessageBus.SERIALIZATION_DEFAULT, requestID, context);
+    private void sendInformMessage(Model model, String requestID, String methodType, String methodTarget) {
+      final Message message = MessageUtil.createRDFMessage(model, methodType, methodTarget, IMessageBus.SERIALIZATION_DEFAULT, requestID, context);
       
       context.createProducer().send(topic, message);
     }
