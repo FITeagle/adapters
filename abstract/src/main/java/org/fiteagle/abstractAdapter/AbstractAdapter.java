@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
-import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -30,7 +29,7 @@ public abstract class AbstractAdapter {
   public abstract void updateAdapterDescription();
   
   public String getAdapterDescription(String serializationFormat) {
-    return MessageUtil.serializeModel(getAdapterDescriptionModel());
+    return MessageUtil.serializeModel(getAdapterDescriptionModel(), serializationFormat);
   }
   
   public boolean createInstance(String instanceName, Model model) {
@@ -66,7 +65,7 @@ public abstract class AbstractAdapter {
     if (modelInstances == null || modelInstances.isEmpty()) {
       return "";
     }
-    return MessageUtil.serializeModel(modelInstances);
+    return MessageUtil.serializeModel(modelInstances, serializationFormat);
   }
   
   public Model configureInstance(Statement configureStatement){
@@ -100,7 +99,7 @@ public abstract class AbstractAdapter {
   
   public String getAllInstances(String serializationFormat) {
     // TODO: serializationFormat
-    return MessageUtil.serializeModel(getAllInstancesModel());
+    return MessageUtil.serializeModel(getAllInstancesModel(), serializationFormat);
   }
   
   public int getAmountOfInstances(){
@@ -135,8 +134,7 @@ public abstract class AbstractAdapter {
   }
   
   public String getDiscoverAll(String serializationFormat) {
-    //TODO: serializationFormat
-    return MessageUtil.serializeModel(getAdapterDescriptionModel());
+    return MessageUtil.serializeModel(getAdapterDescriptionModel(), serializationFormat);
   }
   
   public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {

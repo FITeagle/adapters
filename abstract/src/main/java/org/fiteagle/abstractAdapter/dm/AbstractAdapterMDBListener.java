@@ -37,7 +37,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     try {
       String methodType = requestMessage.getStringProperty(IMessageBus.METHOD_TYPE);
       String serialization = requestMessage.getStringProperty(IMessageBus.SERIALIZATION);
-      String rdfString = MessageUtil.getRDFResult(requestMessage);
+      String rdfString = MessageUtil.getStringBody(requestMessage);
       
       if (methodType != null && rdfString != null) {
         Model messageModel = MessageUtil.parseSerializedModel(rdfString, serialization);

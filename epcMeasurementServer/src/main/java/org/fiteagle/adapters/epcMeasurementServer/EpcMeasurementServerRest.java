@@ -68,7 +68,7 @@ public class EpcMeasurementServerRest {
 			System.out.println("sending creation message ");
 
 			Message rcvMessage = waitForResponse(message.getJMSCorrelationID());
-			response = MessageUtil.getRDFResult(rcvMessage);
+			response = MessageUtil.getStringBody(rcvMessage);
 			System.out.println("a new user added " + response);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
@@ -103,7 +103,7 @@ public class EpcMeasurementServerRest {
 			System.out.println("sending delete message ");
 
 			Message rcvMessage = waitForResponse(message.getJMSCorrelationID());
-			response = MessageUtil.getRDFResult(rcvMessage);
+			response = MessageUtil.getStringBody(rcvMessage);
 			System.out.println("user deleted " + response);
 		} catch (JMSException e) {
 			// TODO Auto-generated catch block
