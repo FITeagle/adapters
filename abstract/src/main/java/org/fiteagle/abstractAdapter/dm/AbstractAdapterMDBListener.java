@@ -33,27 +33,26 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   
   protected abstract AbstractAdapter getAdapter();
   
-  public void onMessage(final Message requestMessage) {
+  public void onMessage(final Message message) {
     try {
-      String methodType = requestMessage.getStringProperty(IMessageBus.METHOD_TYPE);
-      String serialization = requestMessage.getStringProperty(IMessageBus.SERIALIZATION);
-      String rdfString = MessageUtil.getStringBody(requestMessage);
+      String messageType = MessageUtil.getMessageType(message);
+      String serialization = MessageUtil.getMessageSerialization(message);
+      String rdfString = MessageUtil.getStringBody(message);
       
-      if (methodType != null && rdfString != null) {
+      if (messageType != null && rdfString != null) {
         Model messageModel = MessageUtil.parseSerializedModel(rdfString, serialization);
         
         if (adapterIsRecipient(messageModel)) {
-          if (methodType.equals(IMessageBus.TYPE_CREATE)) {
-            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
-            handleCreateModel(messageModel, requestMessage.getJMSCorrelationID());
+          LOGGER.log(Level.INFO, "Received a " + messageType + " message");
+          
+          if (messageType.equals(IMessageBus.TYPE_CREATE)) {
+            handleCreateModel(messageModel, message.getJMSCorrelationID());
             
-          } else if (methodType.equals(IMessageBus.TYPE_CONFIGURE)) {
-            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
-            handleConfigureModel(messageModel, requestMessage.getJMSCorrelationID());
+          } else if (messageType.equals(IMessageBus.TYPE_CONFIGURE)) {
+            handleConfigureModel(messageModel, message.getJMSCorrelationID());
             
-          } else if (methodType.equals(IMessageBus.TYPE_DELETE)) {
-            LOGGER.log(Level.INFO, this.getClass().getSimpleName() + " : Received a " + methodType + " message");
-            handleDeleteModel(messageModel, requestMessage.getJMSCorrelationID());
+          } else if (messageType.equals(IMessageBus.TYPE_DELETE)) {
+            handleDeleteModel(messageModel, message.getJMSCorrelationID());
           }
         }
       }
