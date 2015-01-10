@@ -3,12 +3,17 @@ package org.fiteagle.abstractAdapter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.Response;
 
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -28,8 +33,81 @@ public abstract class AbstractAdapter {
   
   public abstract void updateAdapterDescription();
   
+  private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
+  
   public String getAdapterDescription(String serializationFormat) {
     return MessageUtil.serializeModel(getAdapterDescriptionModel(), serializationFormat);
+  }
+  
+  public Model handleCreateModel(Model model, String requestID) throws AdapterException {
+    Model createdInstancesModel = ModelFactory.createDefaultModel();    
+    StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
+    LOGGER.log(Level.INFO, "Searching for resources to create...");
+
+    if(!resourceInstanceIterator.hasNext()){
+      LOGGER.log(Level.INFO, "Could not find any instances to create");
+      throw new AdapterException(Response.Status.BAD_REQUEST.name());
+    }
+    
+    Boolean createdAtLeastOne = false;
+    while (resourceInstanceIterator.hasNext()) {
+      Resource resourceToCreate = resourceInstanceIterator.next().getSubject();
+      
+      String instanceName = resourceToCreate.getLocalName();
+      if (createInstance(instanceName, model)) {
+        createdAtLeastOne = true;
+        LOGGER.log(Level.INFO, "Created instance: " + resourceToCreate);
+        Model createdInstanceValues = getSingleInstanceModel(instanceName);
+        createdInstancesModel.add(createdInstanceValues);
+      }
+    }
+    if (createdAtLeastOne == false) {
+      LOGGER.log(Level.INFO, "Could not find any new instances to create");
+      throw new AdapterException(Response.Status.CONFLICT.name());
+    }
+    notifyListeners(createdInstancesModel, requestID, IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
+    return createdInstancesModel;
+  }
+  
+  public void handleDeleteModel(Model model) {
+    StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
+    LOGGER.log(Level.INFO, "Searching for resources to delete...");
+    
+    while (resourceInstanceIterator.hasNext()) {
+      Resource resourceToRelease = resourceInstanceIterator.next().getSubject();      
+      LOGGER.log(Level.INFO, "Releasing instance: " + resourceToRelease);
+      terminateInstance(resourceToRelease.getLocalName());
+    }
+  }
+  
+  public Model handleConfigureModel(Model model, String requestID) throws AdapterException {
+    Model configuredInstancesModel = ModelFactory.createDefaultModel();    
+    StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
+    LOGGER.log(Level.INFO, "Searching for resources to configure...");
+    
+    while (resourceInstanceIterator.hasNext()) {
+      Resource resourceInstance = resourceInstanceIterator.next().getSubject();
+      LOGGER.log(Level.INFO, "Configuring instance: " + resourceInstance);
+      
+      StmtIterator propertiesIterator = model.listStatements(resourceInstance, null, (RDFNode) null);
+      Model configureModel = ModelFactory.createDefaultModel();
+      while (propertiesIterator.hasNext()) {
+        configureModel.add(propertiesIterator.next());
+      }
+      Model changedInstanceValues = configureInstance(resourceInstance.getLocalName(), configureModel);
+      configuredInstancesModel.add(changedInstanceValues);
+    }
+    
+    if (configuredInstancesModel.isEmpty()) {
+      LOGGER.log(Level.INFO, "Could not find any instances to configure");
+      throw new AdapterException(Response.Status.NOT_FOUND.name());
+    }
+    notifyListeners(configuredInstancesModel, requestID, IMessageBus.TYPE_INFORM,  IMessageBus.TARGET_ORCHESTRATOR);
+    return configuredInstancesModel;
+  }
+  
+  private StmtIterator getResourceInstanceIterator(Model model) {
+    return model.listStatements(null, RDF.type, getAdapterManagedResource());
   }
   
   public boolean createInstance(String instanceName, Model model) {
@@ -37,8 +115,8 @@ public abstract class AbstractAdapter {
       return false;
     }
     
-    Resource createdInstanceModel = handleCreateInstance(instanceName, model);
-    getAdapterDescriptionModel().add(createdInstanceModel.getModel());
+    Resource createdInstance = handleCreateInstance(instanceName, model);
+    getAdapterDescriptionModel().add(createdInstance.getModel());
     return true;
   }
   
@@ -68,12 +146,17 @@ public abstract class AbstractAdapter {
     return MessageUtil.serializeModel(modelInstances, serializationFormat);
   }
   
-  public Model configureInstance(Statement configureStatement){
-    handleConfigureInstance(configureStatement);
+  public Model configureInstance(String instanceName, Model configureModel){
+    handleConfigureInstance(instanceName, configureModel);
     
-    getAdapterDescriptionModel().removeAll(configureStatement.getSubject(), configureStatement.getPredicate(), null);
-    getAdapterDescriptionModel().add(configureStatement);
-    return getSingleInstanceModel(configureStatement.getSubject().getLocalName());
+    StmtIterator iter = configureModel.listStatements();
+    while(iter.hasNext()){
+      Statement configureStatement = iter.next();
+      getAdapterDescriptionModel().removeAll(configureStatement.getSubject(), configureStatement.getPredicate(), null);
+      getAdapterDescriptionModel().add(configureStatement);
+    }
+    
+    return getSingleInstanceModel(instanceName);
   }
   
   public Model getSingleInstanceModel(String instanceName) {
@@ -98,18 +181,7 @@ public abstract class AbstractAdapter {
   }
   
   public String getAllInstances(String serializationFormat) {
-    // TODO: serializationFormat
     return MessageUtil.serializeModel(getAllInstancesModel(), serializationFormat);
-  }
-  
-  public int getAmountOfInstances(){
-    StmtIterator iter = getAllInstancesModel().listStatements(null, RDF.type, getAdapterManagedResource());
-    int amountOfInstances = 0;
-    while(iter.hasNext()){
-      amountOfInstances++;
-      iter.next();
-    }
-    return amountOfInstances;
   }
   
   public Model getAllInstancesModel() {
@@ -132,20 +204,15 @@ public abstract class AbstractAdapter {
     model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
     model.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
   }
-  
-  public String getDiscoverAll(String serializationFormat) {
-    return MessageUtil.serializeModel(getAdapterDescriptionModel(), serializationFormat);
-  }
-  
+
   public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
     for (AdapterEventListener listener : listeners) {
       listener.publishModelUpdate(eventRDF, requestID, methodType, methodTarget);
     }
   }
   
-  public boolean addChangeListener(AdapterEventListener newListener) {
+  public void addListener(AdapterEventListener newListener) {
     listeners.add(newListener);
-    return true;
   }
   
   public void registerAdapter() {
@@ -153,17 +220,13 @@ public abstract class AbstractAdapter {
     notifyListeners(getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
   }
   
-//  public void restoreResourceInstances() {
-//    notifyListeners(getAdapterDescriptionModel(), null, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
-//  }
-  
   public void deregisterAdapter() {
     Model messageModel = ModelFactory.createDefaultModel();
-
+    messageModel.add(getAdapterInstance(), RDF.type, getAdapterType());
     notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
   }
   
-  public abstract void handleConfigureInstance(Statement configureStatement);
+  public abstract void handleConfigureInstance(String instanceName, Model configureModel);
   
   public abstract Resource handleCreateInstance(String instanceName, Model newInstanceModel);
   
@@ -174,6 +237,15 @@ public abstract class AbstractAdapter {
   public abstract String[] getAdapterManagedResourcePrefix();
   
   public abstract String[] getAdapterInstancePrefix();
+  
+  public static class AdapterException extends Exception {
+    
+    private static final long serialVersionUID = -1664977530188161479L;
+    
+    public AdapterException(String message) {
+      super(message);
+    }
+  }
   
   public static class InsufficentPropertiesException extends RuntimeException {
     

@@ -13,14 +13,14 @@ public class MotorAdapterWebsocket extends AbstractAdapterWebsocket {
 
 private static MotorAdapter adapter;
 	
-    @Override
-    public AbstractAdapter handleSetup() {
-    	if(adapter == null){
-    		Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
-    		if(iterator.hasNext()){
-    			adapter = MotorAdapter.getInstance(iterator.next());
-    		}
-    	}
-    	return adapter;
+  @Override
+  protected AbstractAdapter getAdapter() {
+    if (adapter == null) {
+      Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
+      if (iterator.hasNext()) {
+        adapter = MotorAdapter.getInstance(iterator.next());
+      }
     }
+    return adapter;
+  }
 }

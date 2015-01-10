@@ -6,7 +6,7 @@
 	<groupId>org.fiteagle.adapters</groupId>
 	<artifactId>motor</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<parent>
 		<groupId>org.fiteagle</groupId>
 		<artifactId>adapters</artifactId>
@@ -22,7 +22,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>AdapterMotor</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.wildfly.plugins</groupId>

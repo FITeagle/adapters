@@ -19,7 +19,6 @@ import org.fiteagle.api.core.OntologyModelUtil;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -154,7 +153,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
-  public void handleConfigureInstance(Statement configureStatement) {
+  public void handleConfigureInstance(String instanceName, Model configureModel) {
     // TODO Auto-generated method stub
   }
 

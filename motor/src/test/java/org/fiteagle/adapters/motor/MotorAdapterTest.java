@@ -11,7 +11,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 public class MotorAdapterTest {
@@ -44,8 +43,6 @@ public class MotorAdapterTest {
     Resource updatedResource = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
     Assert.assertEquals(42, updatedResource.getProperty(propertyRPM).getInt());
 
-    Assert.assertEquals(2, adapter.getAmountOfInstances());
-    
     Assert.assertTrue(adapter.terminateInstance("InstanceOne"));
     Assert.assertFalse(adapter.terminateInstance("InstanceOne"));
     Assert.assertTrue(adapter.terminateInstance("InstanceTwo"));
@@ -53,7 +50,6 @@ public class MotorAdapterTest {
   
   @Test
   public void testMonitor() {
-    
     String instanceName = "InstanceOne";
     
     // Monitor non-existing instance yields empty String
@@ -107,11 +103,8 @@ public class MotorAdapterTest {
     Property propertyManufacturer = modelConfigure.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"manufacturer");
     motor.addLiteral(propertyManufacturer, "TU Berlin");
     
-    Model updatedResourceModel = null;
-    StmtIterator iter = modelConfigure.listStatements();
-    while(iter.hasNext()){
-      updatedResourceModel = adapter.configureInstance(iter.next());
-    }
+    Model updatedResourceModel = adapter.configureInstance(instanceName, modelConfigure);
+    
     Resource updatedResource = updatedResourceModel.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
     Assert.assertEquals(23, updatedResource.getProperty(propertyRPM).getInt());
     Assert.assertEquals("TU Berlin", updatedResource.getProperty(propertyManufacturer).getString());

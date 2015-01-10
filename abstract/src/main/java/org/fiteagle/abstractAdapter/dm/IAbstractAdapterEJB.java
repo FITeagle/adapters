@@ -3,9 +3,9 @@ package org.fiteagle.abstractAdapter.dm;
 import org.fiteagle.abstractAdapter.AdapterEventListener;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Statement;
 
 public interface IAbstractAdapterEJB {
+  
      String getAdapterDescription(String serializationFormat);
 
      boolean createInstance(String instanceName);
@@ -16,7 +16,7 @@ public interface IAbstractAdapterEJB {
 
      String getAllInstances(String serializationFormat);
 
-     Model configureInstance(Statement configureStatement);
+     Model configureInstance(String instanceName, Model configureModel);
 
-     boolean addChangeListener(AdapterEventListener newListener);
+     void addChangeListener(AdapterEventListener newListener);
 }

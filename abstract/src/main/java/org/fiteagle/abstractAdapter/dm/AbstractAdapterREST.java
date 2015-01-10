@@ -1,39 +1,22 @@
 package org.fiteagle.abstractAdapter.dm;
 
-import javax.annotation.PostConstruct;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-
-//The adapter should:
-//* Be located at github.com/fiteagle/adapters
-//* Has the namespace: org.fiteagle.adapters.ADAPTERNAME.*
-//* Has the delivery mechanism namespace: org.fiteagle.adapters.ADAPTERNAME.*.dm
-//* Be deployable with: "cd adapters/ADAPTERNAME; mvn wildfly:deploy;"
-//* Should provide a REST interface
-// * Describe: HTTP GET localhost:8080/ADAPTERNAME/description.ttl
-// * Provision: HTTP GET localhost:8080/ADAPTERNAME/instances.ttl
-// * Provision: HTTP POST localhost:8080/ADAPTERNAME/instance/1
-// * Monitor: HTTP GET localhost:8080/ADAPTERNAME/instance/1/descripti...
-// * Control: HTTP PUT localhost:8080/ADAPTERNAME/instance/1/descripti...
-// * Terminate: HTTP DELETE localhost:8080/ADAPTERNAME/instance/1
-
-//Themes  
-//Qualities .
-//Test  cd adapters/ADAPTERNAME
-//mvn test
-//mvn wildfly:deploy;
-//mvn site && open target/site/index.html
-//curl localhost:8080/ADAPTERNAME/description.ttl
 
 /**
  * subclasses must be annotated as
@@ -41,134 +24,103 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
  * @Path("/") for this to work!
  */
 public abstract class AbstractAdapterREST {
-    private AbstractAdapter abstractAdapter;
-
-    @PostConstruct
-    public void setup() {
-        // this.abstractAdapterEJB = (IAbstractAdapter) new InitialContext().lookup("java:module/AbstractAdapter");
-        this.abstractAdapter = handleSetup();
+  
+  protected abstract AbstractAdapter getAdapter();
+  
+  @GET
+  @Path("")
+  @Produces("text/turtle")
+  public String getDescriptionTurtle() {
+    return getAdapter().getAdapterDescription(IMessageBus.SERIALIZATION_TURTLE);
+  }
+  
+  @GET
+  @Path("")
+  @Produces("application/rdf+xml")
+  public String getDescriptionRDF() {
+    return getAdapter().getAdapterDescription(IMessageBus.SERIALIZATION_RDFXML);
+  }
+  
+  @GET
+  @Path("")
+  @Produces("application/n-triples")
+  public String getDescriptionNTRIPLE() {
+    return getAdapter().getAdapterDescription(IMessageBus.SERIALIZATION_NTRIPLE);
+  }
+  
+  @GET
+  @Path("instance")
+  @Produces("text/turtle")
+  public String getAllInstancesTurtle() {
+    return getAdapter().getAllInstances(IMessageBus.SERIALIZATION_TURTLE);
+  }
+  
+  @GET
+  @Path("instance")
+  @Produces("application/rdf+xml")
+  public String getAllInstancesRDF() {
+    return getAdapter().getAllInstances(IMessageBus.SERIALIZATION_RDFXML);
+  }
+  
+  @GET
+  @Path("instance")
+  @Produces("application/n-triples")
+  public String getAllInstancesNTRIPLE() {
+    return getAdapter().getAllInstances(IMessageBus.SERIALIZATION_NTRIPLE);
+  }
+  
+  @PUT
+  @Path("instance")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces("text/html")
+  public String createInstances(String rdfInput) {
+    try {
+      Model resultModel = getAdapter().handleCreateModel(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
+      return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
+    } catch (AdapterException e) {
+      return e.getMessage();
     }
-
-    /**
-     * Subclasses must return the desired adapter singleton for use in this context
-     */
-    public abstract AbstractAdapter handleSetup();
-
-    public static final String UPLOADED_FILE_PARAMETER_NAME = "file";
-
-    // The language in which to write the model is specified by the lang argument. Predefined values are
-    // "RDF/XML", "RDF/XML-ABBREV", "N-TRIPLE", "TURTLE", (and "TTL") and "N3". The default value, represented by null, is "RDF/XML".
-
-    // TODO!!!!!
-    // replace form upload
-
-    @GET
-    @Path("description.ttl")
-    @Produces("text/turtle")
-    public String getDescriptionTurtle() {
-        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_TURTLE);
-    }
-
-    @GET
-    @Path("description.rdf")
-    @Produces("application/rdf+xml")
-    public String getDescriptionRDF() {
-        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_RDFXML);
-    }
-    
-    /**
-     * Only for JavaScript Weblclient
-     * 
-     * @return
-     */
-    @GET
-    @Path("description.rdf-text")
-    @Produces("text/html")
-    public String getDescriptionRDFAsText() {
-        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_RDFXML);
-    }
-
-    @GET
-    @Path("description.ntriple")
-    @Produces("application/n-triples")
-    public String getDescriptionNTRIPLE() {
-        return abstractAdapter.getAdapterDescription(IMessageBus.SERIALIZATION_NTRIPLE);
-    }
-
-    @GET
-    @Path("instances.ttl")
-    @Produces("text/turtle")
-    public String getAllInstancesTurtle() {
-        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_TURTLE);
-    }
-
-    @GET
-    @Path("instances.rdf")
-    @Produces("application/rdf+xml")
-    public String getAllInstancesRDF() {
-        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_RDFXML);
-    }
-    
-    @GET
-    @Path("instances.rdf-text")
-    @Produces("text/html")
-    public String getAllInstancesRDFAsText() {
-        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_RDFXML);
-    }
-
-    @GET
-    @Path("instances.ntriple")
-    @Produces("application/n-triples")
-    public String getAllInstancesNTRIPLE() {
-        return abstractAdapter.getAllInstances(IMessageBus.SERIALIZATION_NTRIPLE);
-    }
-
+  }
+  
   @POST
+  @Path("instance")
+  @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+  @Produces("text/html")
+  public String configureInstances(String rdfInput) {
+    try {
+      Model resultModel = getAdapter().handleConfigureModel(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
+      return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
+    } catch (AdapterException e) {
+      return e.getMessage();
+    }
+  }
+    
+  @DELETE
   @Path("instance/{instanceName}")
   @Produces("text/html")
-  public String createInstance(@PathParam("instanceName") String instanceName) {
-    Model modelCreate = ModelFactory.createDefaultModel();
-    if (abstractAdapter.createInstance(instanceName, modelCreate)) {
-      return "Created instance number : " + instanceName;
-    }
-    return "Invalid instance number";
+  public Response terminateInstance(@PathParam("instanceName") String instanceName) {
+    getAdapter().terminateInstance(instanceName);
+    return Response.status(Response.Status.OK.getStatusCode()).build();
   }
-
-    @DELETE
-    @Path("instance/{instanceName}")
-    @Produces("text/html")
-    public String terminateInstance(@PathParam("instanceName") String instanceName) {
-        if (abstractAdapter.terminateInstance(instanceName)) {
-            return "Terminated instance number : " + instanceName;
-        }
-        return "Invalid instance number";
-    }
-
-    @GET
-    @Path("instance/{instanceName}/description.ttl")
-    @Produces("text/turtle")
-    public String monitorInstanceTurtle(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_TURTLE);
-    }
-
-    @GET
-    @Path("instance/{instanceName}/description.rdf")
-    @Produces("application/rdf+xml")
-    public String monitorInstanceRDF(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_RDFXML);
-    }
-    
-    @GET
-    @Path("instance/{instanceName}/description.rdf-text")
-    @Produces("text/html")
-    public String monitorInstanceRDFAsText(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_RDFXML);
-    }
-
-    @GET
-    @Path("instance/{instanceName}/description.ntriple")
-    @Produces("application/n-triples")
-    public String monitorInstanceNTRIPLE(@PathParam("instanceName") String instanceName) {
-        return abstractAdapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_NTRIPLE);
-    }
+  
+  @GET
+  @Path("instance/{instanceName}")
+  @Produces("text/turtle")
+  public String monitorInstanceTurtle(@PathParam("instanceName") String instanceName) {
+    return getAdapter().monitorInstance(instanceName, IMessageBus.SERIALIZATION_TURTLE);
+  }
+  
+  @GET
+  @Path("instance/{instanceName}")
+  @Produces("application/rdf+xml")
+  public String monitorInstanceRDF(@PathParam("instanceName") String instanceName) {
+    return getAdapter().monitorInstance(instanceName, IMessageBus.SERIALIZATION_RDFXML);
+  }
+  
+  @GET
+  @Path("instance/{instanceName}")
+  @Produces("application/n-triples")
+  public String monitorInstanceNTRIPLE(@PathParam("instanceName") String instanceName) {
+    return getAdapter().monitorInstance(instanceName, IMessageBus.SERIALIZATION_NTRIPLE);
+  }
 }

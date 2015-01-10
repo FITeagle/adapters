@@ -5,46 +5,44 @@ import org.fiteagle.abstractAdapter.AdapterEventListener;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
 
 public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
 
-	// Subclasses need to set this to the appropriate Adapter to work!
-    protected AbstractAdapter adapter = null;
+    protected abstract AbstractAdapter getAdapter();
 
     @Override
     public String getAdapterDescription(String serializationFormat) {
-        return this.adapter.getAdapterDescription(serializationFormat);
+        return getAdapter().getAdapterDescription(serializationFormat);
     }
 
     @Override
     public boolean createInstance(String instanceName) {
       Model modelCreate = ModelFactory.createDefaultModel();
-      return this.adapter.createInstance(instanceName, modelCreate);
+      return getAdapter().createInstance(instanceName, modelCreate);
     }
 
     @Override
     public boolean terminateInstance(String instanceName) {
-        return this.adapter.terminateInstance(instanceName);
+        return getAdapter().terminateInstance(instanceName);
     }
 
     @Override
     public String monitorInstance(String instanceName, String serializationFormat) {
-        return this.adapter.monitorInstance(instanceName, serializationFormat);
+        return getAdapter().monitorInstance(instanceName, serializationFormat);
     }
 
     @Override
     public String getAllInstances(String serializationFormat) {
-        return this.adapter.getAllInstances(serializationFormat);
+        return getAdapter().getAllInstances(serializationFormat);
     }
 
     @Override
-    public Model configureInstance(Statement configureStatement) {
-        return this.adapter.configureInstance(configureStatement);
+    public Model configureInstance(String instanceName, Model configureModel) {
+        return getAdapter().configureInstance(instanceName, configureModel);
     }
 
     @Override
-    public boolean addChangeListener(AdapterEventListener newListener) {
-        return this.adapter.addChangeListener(newListener);
+    public void addChangeListener(AdapterEventListener newListener) {
+        getAdapter().addListener(newListener);
     }
 }
