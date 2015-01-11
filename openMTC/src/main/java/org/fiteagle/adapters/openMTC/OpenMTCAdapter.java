@@ -85,13 +85,13 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource handleCreateInstance(String instanceName, Model createModel) {
+  protected Model handleCreateInstance(String instanceName, Model createModel) {
     openMTCClient.setUpConnection(createModel);
     return null;
   }
 
   @Override
-  public void handleTerminateInstance(String instanceName) {
+  protected void handleDeleteInstance(String instanceName) {
     //TODO
   }
   
@@ -116,7 +116,8 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  public void handleConfigureInstance(String instanceName, Model configureModel) {
+  protected Model handleConfigureInstance(String instanceName, Model configureModel) {
+    return null;
     // TODO Auto-generated method stub
   }
 

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.adapters.openstack.client.OpenstackTestClient;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.junit.BeforeClass;
@@ -62,15 +63,16 @@ public class OpenstackAdapterTest {
   }
   
   @Test
-  public void testCreateInstance(){
+  public void testCreateInstance() throws AdapterException{
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"server1");
+    instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
     instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
-    adapter.createInstance("server1", modelCreate);
-    Model instanceModel = adapter.getSingleInstanceModel("server1");
+    adapter.createInstances(modelCreate, null);
+    Model instanceModel = adapter.getInstanceModel("server1");
     assertNotNull(instanceModel);
     StmtIterator iterator = instanceModel.listStatements(null, RDF.type, adapter.getAdapterManagedResource());
     assertTrue(iterator.hasNext());
@@ -84,18 +86,18 @@ public class OpenstackAdapterTest {
   }
   
   @Test
-  public void testTerminateInstance(){
+  public void testTerminateInstance() throws AdapterException{
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"server1");
+    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"server2");
+    instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
     instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
+    instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
-    adapter.createInstance("server1", modelCreate);
-    adapter.terminateInstance("server1");
-    Model instanceModel = adapter.getSingleInstanceModel("server1");
+    adapter.createInstances(modelCreate, null);
+    adapter.deleteInstance("server2");
+    Model instanceModel = adapter.getInstanceModel("server2");
     assertNull(instanceModel);
-    StmtIterator iterator = adapter.getAllInstancesModel().listStatements();
-    assertFalse(iterator.hasNext());
   }
   
 }

@@ -118,7 +118,7 @@ public class OpenstackParser {
     return imageResource;
   }
 	
-	public Resource parseToResource(Server server){
+	public Model parseToModel(Server server){
 	  Resource resource = ModelFactory.createDefaultModel().createResource((adapter.getAdapterInstancePrefix()[1]+server.getName()));
 	  resource.addProperty(RDF.type, adapter.getAdapterManagedResource());
 	  resource.addProperty(RDFS.label, server.getName());
@@ -157,12 +157,12 @@ public class OpenstackParser {
           break;
       }
     }
-    return resource;
+    return resource.getModel();
 	}
 	
-	public Resource parseToResource(String serverString){
+	public Model parseToModel(String serverString){
 	  Server server = parseToServer(serverString);
-	  return parseToResource(server);	
+	  return parseToModel(server);	
 	}
 	
 	private Resource parseToImagesResource(Images images){
@@ -183,8 +183,8 @@ public class OpenstackParser {
 	
 	public void addToAdapterInstanceDescription(Servers servers){
     for(Server server : servers.getList()){
-      Resource resource = parseToResource(server);
-      adapter.getAdapterDescriptionModel().add(resource.getModel());
+      Model resourceModel = parseToModel(server);
+      adapter.getAdapterDescriptionModel().add(resourceModel);
     }
   }
 	

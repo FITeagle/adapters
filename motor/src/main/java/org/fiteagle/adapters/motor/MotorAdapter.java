@@ -82,14 +82,14 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource handleCreateInstance(String instanceName, Model modelCreate) {
+  protected Model handleCreateInstance(String instanceName, Model modelCreate) {
     Motor motor = new Motor(this, instanceName);
     instanceList.put(instanceName, motor);
     handleConfigureInstance(instanceName, modelCreate);
-    return parseToResource(motor);
+    return parseToModel(motor);
   }
   
-  protected Resource parseToResource(Motor motor) {
+  protected Model parseToModel(Motor motor) {
     Resource resource = ModelFactory.createDefaultModel().createResource((ADAPTER_INSTANCE_PREFIX[1] + motor.getInstanceName()));
     resource.addProperty(RDF.type, MotorAdapter.resource);
     resource.addProperty(RDFS.label, motor.getInstanceName());
@@ -112,22 +112,24 @@ public final class MotorAdapter extends AbstractAdapter {
           break;
       }
     }
-    return resource;
+    return resource.getModel();
   }
   
   @Override
-  public void handleConfigureInstance(String instanceName, Model configureModel) {
+  protected Model handleConfigureInstance(String instanceName, Model configureModel) {
     if (instanceList.containsKey(instanceName)) {
       Motor currentMotor = (Motor) instanceList.get(instanceName);
       StmtIterator iter = configureModel.listStatements();
       while(iter.hasNext()){
         currentMotor.updateProperty(iter.next());
       }
+      return parseToModel(currentMotor);
     }
+    return ModelFactory.createDefaultModel();
   }
   
   @Override
-  public void handleTerminateInstance(String instanceName) {
+  protected void handleDeleteInstance(String instanceName) {
     Motor motor = getInstanceByName(instanceName);
     motor.terminate();
     instanceList.remove(instanceName);

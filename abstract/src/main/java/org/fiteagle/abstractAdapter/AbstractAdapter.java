@@ -2,14 +2,13 @@ package org.fiteagle.abstractAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 
+import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
 import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -23,67 +22,53 @@ public abstract class AbstractAdapter {
   
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
   
-  public abstract Resource getAdapterManagedResource();
-  
-  public abstract Resource getAdapterInstance();
-  
-  public abstract Resource getAdapterType();
-  
-  public abstract Model getAdapterDescriptionModel();
-  
-  public abstract void updateAdapterDescription();
-  
   private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
   
-  public String getAdapterDescription(String serializationFormat) {
-    return MessageUtil.serializeModel(getAdapterDescriptionModel(), serializationFormat);
-  }
-  
-  public Model handleCreateModel(Model model, String requestID) throws AdapterException {
-    Model createdInstancesModel = ModelFactory.createDefaultModel();    
+  public Model createInstances(Model model, String requestID) throws AdapterException {
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
-    LOGGER.log(Level.INFO, "Searching for resources to create...");
-
     if(!resourceInstanceIterator.hasNext()){
       LOGGER.log(Level.INFO, "Could not find any instances to create");
       throw new AdapterException(Response.Status.BAD_REQUEST.name());
     }
     
-    Boolean createdAtLeastOne = false;
+    Model createdInstancesModel = ModelFactory.createDefaultModel();    
     while (resourceInstanceIterator.hasNext()) {
-      Resource resourceToCreate = resourceInstanceIterator.next().getSubject();
-      
-      String instanceName = resourceToCreate.getLocalName();
-      if (createInstance(instanceName, model)) {
-        createdAtLeastOne = true;
-        LOGGER.log(Level.INFO, "Created instance: " + resourceToCreate);
-        Model createdInstanceValues = getSingleInstanceModel(instanceName);
-        createdInstancesModel.add(createdInstanceValues);
+      String instanceName = resourceInstanceIterator.next().getSubject().getLocalName();
+      if(!containsInstance(instanceName)) {
+        Model createdInstance = handleCreateInstance(instanceName, model);
+        LOGGER.log(Level.INFO, "Created instance: " + instanceName);
+        createdInstancesModel.add(createdInstance);
+      }
+      else{
+        LOGGER.log(Level.INFO, "Instance: " + instanceName+" already exists");
       }
     }
-    if (createdAtLeastOne == false) {
+    if (createdInstancesModel.isEmpty()) {
       LOGGER.log(Level.INFO, "Could not find any new instances to create");
       throw new AdapterException(Response.Status.CONFLICT.name());
     }
+    updateAdapterModel(createdInstancesModel);
     notifyListeners(createdInstancesModel, requestID, IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
     return createdInstancesModel;
   }
   
-  public void handleDeleteModel(Model model) {
+  public void deleteInstances(Model model) {
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
-    LOGGER.log(Level.INFO, "Searching for resources to delete...");
-    
     while (resourceInstanceIterator.hasNext()) {
-      Resource resourceToRelease = resourceInstanceIterator.next().getSubject();      
-      LOGGER.log(Level.INFO, "Releasing instance: " + resourceToRelease);
-      terminateInstance(resourceToRelease.getLocalName());
+      String instanceName = resourceInstanceIterator.next().getSubject().getLocalName();
+      deleteInstance(instanceName);     
     }
   }
   
-  public Model handleConfigureModel(Model model, String requestID) throws AdapterException {
+  public void deleteInstance(String instanceName){
+    LOGGER.log(Level.INFO, "Deleting instance: " + instanceName);
+    handleDeleteInstance(instanceName);
+    getAdapterDescriptionModel().remove(getInstanceModel(instanceName));
+  }
+  
+  public Model configureInstances(Model model, String requestID) throws AdapterException {
     Model configuredInstancesModel = ModelFactory.createDefaultModel();    
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
-    LOGGER.log(Level.INFO, "Searching for resources to configure...");
     
     while (resourceInstanceIterator.hasNext()) {
       Resource resourceInstance = resourceInstanceIterator.next().getSubject();
@@ -94,73 +79,33 @@ public abstract class AbstractAdapter {
       while (propertiesIterator.hasNext()) {
         configureModel.add(propertiesIterator.next());
       }
-      Model changedInstanceValues = configureInstance(resourceInstance.getLocalName(), configureModel);
-      configuredInstancesModel.add(changedInstanceValues);
+      Model updatedModel = handleConfigureInstance(resourceInstance.getLocalName(), configureModel);
+      configuredInstancesModel.add(updatedModel);
     }
-    
     if (configuredInstancesModel.isEmpty()) {
       LOGGER.log(Level.INFO, "Could not find any instances to configure");
       throw new AdapterException(Response.Status.NOT_FOUND.name());
     }
+    updateAdapterModel(configuredInstancesModel);
     notifyListeners(configuredInstancesModel, requestID, IMessageBus.TYPE_INFORM,  IMessageBus.TARGET_ORCHESTRATOR);
     return configuredInstancesModel;
+  }
+  
+  private void updateAdapterModel(Model updatedModel){
+    StmtIterator iter = updatedModel.listStatements();
+    while(iter.hasNext()){
+      Statement configureStatement = iter.next();
+      getAdapterDescriptionModel().removeAll(configureStatement.getSubject(), configureStatement.getPredicate(), null);
+      getAdapterDescriptionModel().add(configureStatement);
+    }
   }
   
   private StmtIterator getResourceInstanceIterator(Model model) {
     return model.listStatements(null, RDF.type, getAdapterManagedResource());
   }
   
-  public boolean createInstance(String instanceName, Model model) {
-    if(containsResourceInstance(instanceName)) {
-      return false;
-    }
-    
-    Resource createdInstance = handleCreateInstance(instanceName, model);
-    getAdapterDescriptionModel().add(createdInstance.getModel());
-    return true;
-  }
-  
-  public static String getProperty(String propertyKey, Map<String, String> properties){
-    String value = properties.get(propertyKey);
-    if(value == null || value.isEmpty()){
-      throw new InsufficentPropertiesException(propertyKey);
-    }
-    return properties.get(propertyKey);
-  }
-  
-  public boolean terminateInstance(String instanceName) {
-    if (containsResourceInstance(instanceName)) {
-      handleTerminateInstance(instanceName);
-      getAdapterDescriptionModel().remove(getSingleInstanceModel(instanceName));
-      return true;
-    }
-    
-    return false;
-  }
-  
-  public String monitorInstance(String instanceName, String serializationFormat) {
-    Model modelInstances = getSingleInstanceModel(instanceName);
-    if (modelInstances == null || modelInstances.isEmpty()) {
-      return "";
-    }
-    return MessageUtil.serializeModel(modelInstances, serializationFormat);
-  }
-  
-  public Model configureInstance(String instanceName, Model configureModel){
-    handleConfigureInstance(instanceName, configureModel);
-    
-    StmtIterator iter = configureModel.listStatements();
-    while(iter.hasNext()){
-      Statement configureStatement = iter.next();
-      getAdapterDescriptionModel().removeAll(configureStatement.getSubject(), configureStatement.getPredicate(), null);
-      getAdapterDescriptionModel().add(configureStatement);
-    }
-    
-    return getSingleInstanceModel(instanceName);
-  }
-  
-  public Model getSingleInstanceModel(String instanceName) {
-    if (containsResourceInstance(instanceName)) {
+  public Model getInstanceModel(String instanceName) {
+    if (containsInstance(instanceName)) {
       Model resourceModel = ModelFactory.createDefaultModel();
       Resource resource = getAdapterDescriptionModel().getResource(getAdapterInstancePrefix()[1]+instanceName);
       StmtIterator iter = resource.listProperties();
@@ -172,7 +117,7 @@ public abstract class AbstractAdapter {
     return null;
   }
   
-  public boolean containsResourceInstance(String instanceName){
+  private boolean containsInstance(String instanceName){
     Resource instance = getAdapterDescriptionModel().getResource(getAdapterInstancePrefix()[1]+instanceName);
     if(instance != null && getAdapterDescriptionModel().contains(instance, RDF.type, getAdapterManagedResource())){
       return true;
@@ -180,21 +125,17 @@ public abstract class AbstractAdapter {
     return false;
   }
   
-  public String getAllInstances(String serializationFormat) {
-    return MessageUtil.serializeModel(getAllInstancesModel(), serializationFormat);
-  }
-  
   public Model getAllInstancesModel() {
     Model modelInstances = ModelFactory.createDefaultModel();
     setModelPrefixes(modelInstances);
     StmtIterator resourceIterator = getAdapterDescriptionModel().listStatements(null, RDF.type, getAdapterManagedResource());
     while(resourceIterator.hasNext()){
-      modelInstances.add(getSingleInstanceModel(resourceIterator.next().getSubject().getLocalName()));      
+      modelInstances.add(getInstanceModel(resourceIterator.next().getSubject().getLocalName()));      
     }
     return modelInstances;
   }
   
-  public void setModelPrefixes(Model model) {
+  protected void setModelPrefixes(Model model) {
     model.setNsPrefix(getAdapterSpecificPrefix()[0], getAdapterSpecificPrefix()[1]);
     model.setNsPrefix(getAdapterManagedResourcePrefix()[0], getAdapterManagedResourcePrefix()[1]);
     model.setNsPrefix(getAdapterInstancePrefix()[0], getAdapterInstancePrefix()[1]);
@@ -215,22 +156,21 @@ public abstract class AbstractAdapter {
     listeners.add(newListener);
   }
   
-  public void registerAdapter() {
-    updateAdapterDescription();
-    notifyListeners(getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
-  }
+  public abstract Resource getAdapterManagedResource();
   
-  public void deregisterAdapter() {
-    Model messageModel = ModelFactory.createDefaultModel();
-    messageModel.add(getAdapterInstance(), RDF.type, getAdapterType());
-    notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
-  }
+  public abstract Resource getAdapterInstance();
   
-  public abstract void handleConfigureInstance(String instanceName, Model configureModel);
+  public abstract Resource getAdapterType();
   
-  public abstract Resource handleCreateInstance(String instanceName, Model newInstanceModel);
+  public abstract Model getAdapterDescriptionModel();
   
-  public abstract void handleTerminateInstance(String instanceName);
+  public abstract void updateAdapterDescription();
+  
+  protected abstract Model handleConfigureInstance(String instanceName, Model configureModel);
+  
+  protected abstract Model handleCreateInstance(String instanceName, Model newInstanceModel);
+  
+  protected abstract void handleDeleteInstance(String instanceName);
   
   public abstract String[] getAdapterSpecificPrefix();
   
@@ -244,15 +184,6 @@ public abstract class AbstractAdapter {
     
     public AdapterException(String message) {
       super(message);
-    }
-  }
-  
-  public static class InsufficentPropertiesException extends RuntimeException {
-    
-    private static final long serialVersionUID = 2485932734534584797L;
-
-    public InsufficentPropertiesException(String missingPropertyName) {
-      super("no property called "+missingPropertyName+" could be found or it was empty");
     }
   }
   

@@ -13,6 +13,7 @@ import org.fiteagle.adapters.openstack.client.model.Images;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -48,7 +49,8 @@ public class OpenstackParserTest {
   @Test
   public void testParseToResource(){
     String serverString = "{\"id\": \"12345\",\"name\": \"server1\"}";
-    Resource resource = openstackparser.parseToResource(serverString);
+    Model resourceModel = openstackparser.parseToModel(serverString);
+    Resource resource = resourceModel.getResource(adapter.getAdapterInstancePrefix()[1]+"server1");
     assertEquals("server1", resource.getLocalName());
     assertEquals("server1", resource.getProperty(RDFS.label).getLiteral().getValue());
     assertEquals("12345", resource.getProperty(openstackparser.getPROPERTY_ID()).getLiteral().getValue());

@@ -1,4 +1,4 @@
-package org.fiteagle.abstractAdapter;
+package org.fiteagle.abstractAdapter.dm;
 
 import com.hp.hpl.jena.rdf.model.Model;
 

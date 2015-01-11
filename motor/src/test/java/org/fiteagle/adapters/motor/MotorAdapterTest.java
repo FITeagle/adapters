@@ -2,7 +2,7 @@ package org.fiteagle.adapters.motor;
 
 import java.util.Iterator;
 
-import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,6 +11,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 public class MotorAdapterTest {
@@ -26,50 +27,38 @@ public class MotorAdapterTest {
   }
   
   @Test
-  public void testCreateAndTerminate() {
+  public void testCreateAndTerminate() throws AdapterException {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource motor = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
     motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
     Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"rpm");
     motor.addLiteral(propertyRPM, 42);
     
-    // Creating first instance works
-    Assert.assertTrue(adapter.createInstance("InstanceOne", modelCreate));
-    // Creating another instance with the same name FAILS
-    Assert.assertFalse(adapter.createInstance("InstanceOne", modelCreate));
-    // Creating another instance with another name works fine
-    Assert.assertTrue(adapter.createInstance("InstanceTwo", modelCreate));
+    adapter.createInstances(modelCreate, null);
     
     Resource updatedResource = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
     Assert.assertEquals(42, updatedResource.getProperty(propertyRPM).getInt());
 
-    Assert.assertTrue(adapter.terminateInstance("InstanceOne"));
-    Assert.assertFalse(adapter.terminateInstance("InstanceOne"));
-    Assert.assertTrue(adapter.terminateInstance("InstanceTwo"));
+    adapter.deleteInstances(modelCreate);
+    StmtIterator iter = adapter.getAllInstancesModel().listStatements();
+    Assert.assertFalse(iter.hasNext());
   }
   
   @Test
-  public void testMonitor() {
-    String instanceName = "InstanceOne";
+  public void testMonitor() throws AdapterException {
+    String instanceName = "InstanceOne";    
+    Assert.assertTrue(adapter.getInstanceModel(instanceName) == null);
     
-    // Monitor non-existing instance yields empty String
-    Assert.assertEquals("", adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT));
-    // create the instance
     Model modelCreate = ModelFactory.createDefaultModel();
-    adapter.createInstance(instanceName, modelCreate);
+    Resource motorResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
+    adapter.createInstances(modelCreate, null);
     
-    // Monitoring existing instance yields a non-empty result
-    String monitorData = adapter.monitorInstance(instanceName, IMessageBus.SERIALIZATION_DEFAULT);
-    Assert.assertNotEquals("", monitorData);
+    Model monitorData = adapter.getInstanceModel(instanceName);
+    Assert.assertFalse(monitorData.isEmpty());
+    Assert.assertTrue(monitorData.containsAll(modelCreate));
     
-    // Monitoring data contains the instance name
-    Assert.assertTrue(monitorData.contains(instanceName));
-   
-    // Monitoring data contains the adapter specific prefix
-    Assert.assertTrue(monitorData.contains(adapter.getAdapterManagedResourcePrefix()[1]));
-    
-    // release instances
-    Assert.assertTrue(adapter.terminateInstance(instanceName));
+    adapter.deleteInstance(instanceName);
   }
   
   @Test
@@ -89,11 +78,13 @@ public class MotorAdapterTest {
   }
   
   @Test
-  public void testConfigure() {
+  public void testConfigure() throws AdapterException {
     String instanceName = "InstanceOne";
     
     Model modelCreate = ModelFactory.createDefaultModel();
-    adapter.createInstance(instanceName, modelCreate);
+    Resource motorResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
+    adapter.createInstances(modelCreate, null);
 
     Model modelConfigure = ModelFactory.createDefaultModel();
     Resource motor = modelConfigure.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
@@ -103,13 +94,13 @@ public class MotorAdapterTest {
     Property propertyManufacturer = modelConfigure.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"manufacturer");
     motor.addLiteral(propertyManufacturer, "TU Berlin");
     
-    Model updatedResourceModel = adapter.configureInstance(instanceName, modelConfigure);
+    Model updatedResourceModel = adapter.configureInstances(modelConfigure, null);
     
     Resource updatedResource = updatedResourceModel.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
     Assert.assertEquals(23, updatedResource.getProperty(propertyRPM).getInt());
     Assert.assertEquals("TU Berlin", updatedResource.getProperty(propertyManufacturer).getString());
     
-    Assert.assertTrue(adapter.terminateInstance(instanceName));
+    adapter.deleteInstance(instanceName);
   }
   
 }

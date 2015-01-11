@@ -1,44 +1,45 @@
 package org.fiteagle.abstractAdapter.dm;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AdapterEventListener;
+import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-public abstract class AbstractAdapterEJB implements IAbstractAdapterEJB {
+public abstract class AbstractAdapterEJB implements AdapterEJB {
 
     protected abstract AbstractAdapter getAdapter();
 
     @Override
     public String getAdapterDescription(String serializationFormat) {
-        return getAdapter().getAdapterDescription(serializationFormat);
+        return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), serializationFormat);
     }
 
     @Override
-    public boolean createInstance(String instanceName) {
+    public Model createInstance(String instanceName) throws AdapterException {
       Model modelCreate = ModelFactory.createDefaultModel();
-      return getAdapter().createInstance(instanceName, modelCreate);
+      return getAdapter().createInstances(modelCreate, null);
     }
 
     @Override
-    public boolean terminateInstance(String instanceName) {
-        return getAdapter().terminateInstance(instanceName);
+    public void terminateInstance(String instanceName) {
+        getAdapter().deleteInstance(instanceName);
     }
 
     @Override
-    public String monitorInstance(String instanceName, String serializationFormat) {
-        return getAdapter().monitorInstance(instanceName, serializationFormat);
+    public Model monitorInstance(String instanceName) {
+        return getAdapter().getInstanceModel(instanceName);
     }
 
     @Override
-    public String getAllInstances(String serializationFormat) {
-        return getAdapter().getAllInstances(serializationFormat);
+    public String getAllInstances(String serialization) {
+        return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), serialization);
     }
 
     @Override
-    public Model configureInstance(String instanceName, Model configureModel) {
-        return getAdapter().configureInstance(instanceName, configureModel);
+    public Model configureInstances(Model configureModel) throws AdapterException {
+        return getAdapter().configureInstances(configureModel, null);
     }
 
     @Override

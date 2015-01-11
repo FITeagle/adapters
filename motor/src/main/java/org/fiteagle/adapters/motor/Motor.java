@@ -11,7 +11,7 @@ import javax.naming.NamingException;
 
 import org.fiteagle.api.core.IMessageBus;
 
-import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Statement;
 
 public class Motor {
@@ -49,8 +49,8 @@ public class Motor {
   
   public void setRpmWithNotify(int rpm) {
     this.rpm = rpm;
-    Resource resource = owningAdapter.parseToResource(this);
-    owningAdapter.notifyListeners(resource.getModel(), null, IMessageBus.TYPE_INFORM, null);
+    Model resourceModel = owningAdapter.parseToModel(this);
+    owningAdapter.notifyListeners(resourceModel, null, IMessageBus.TYPE_INFORM, null);
   }
   
   public String getManufacturer() {

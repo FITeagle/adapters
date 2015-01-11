@@ -11,11 +11,12 @@ import javax.jms.Message;
 import javax.jms.Topic;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AdapterEventListener;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   
@@ -32,7 +33,8 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
     getAdapter().addListener(this);
     
     LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterInstance().getURI());
-    getAdapter().registerAdapter();
+    getAdapter().updateAdapterDescription();
+    getAdapter().notifyListeners(getAdapter().getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
   }
   
   @Override
@@ -43,7 +45,10 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   
   @PreDestroy
   public void contextDestroyed() {
-    getAdapter().deregisterAdapter();
+    LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + getAdapter().getAdapterInstance().getURI());
+    Model messageModel = ModelFactory.createDefaultModel();
+    messageModel.add(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
+    getAdapter().notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
   }
   
   protected abstract AbstractAdapter getAdapter();

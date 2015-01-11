@@ -31,42 +31,42 @@ public abstract class AbstractAdapterREST {
   @Path("")
   @Produces("text/turtle")
   public String getDescriptionTurtle() {
-    return getAdapter().getAdapterDescription(IMessageBus.SERIALIZATION_TURTLE);
+    return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
   }
   
   @GET
   @Path("")
   @Produces("application/rdf+xml")
   public String getDescriptionRDF() {
-    return getAdapter().getAdapterDescription(IMessageBus.SERIALIZATION_RDFXML);
+    return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_RDFJSON);
   }
   
   @GET
   @Path("")
   @Produces("application/n-triples")
   public String getDescriptionNTRIPLE() {
-    return getAdapter().getAdapterDescription(IMessageBus.SERIALIZATION_NTRIPLE);
+    return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_NTRIPLE);
   }
   
   @GET
   @Path("instance")
   @Produces("text/turtle")
   public String getAllInstancesTurtle() {
-    return getAdapter().getAllInstances(IMessageBus.SERIALIZATION_TURTLE);
+    return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_TURTLE);
   }
   
   @GET
   @Path("instance")
   @Produces("application/rdf+xml")
   public String getAllInstancesRDF() {
-    return getAdapter().getAllInstances(IMessageBus.SERIALIZATION_RDFXML);
+    return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_RDFXML);
   }
   
   @GET
   @Path("instance")
   @Produces("application/n-triples")
   public String getAllInstancesNTRIPLE() {
-    return getAdapter().getAllInstances(IMessageBus.SERIALIZATION_NTRIPLE);
+    return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_NTRIPLE);
   }
   
   @PUT
@@ -75,7 +75,7 @@ public abstract class AbstractAdapterREST {
   @Produces("text/html")
   public String createInstances(String rdfInput) {
     try {
-      Model resultModel = getAdapter().handleCreateModel(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
+      Model resultModel = getAdapter().createInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       return e.getMessage();
@@ -88,7 +88,7 @@ public abstract class AbstractAdapterREST {
   @Produces("text/html")
   public String configureInstances(String rdfInput) {
     try {
-      Model resultModel = getAdapter().handleConfigureModel(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
+      Model resultModel = getAdapter().configureInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       return e.getMessage();
@@ -99,7 +99,7 @@ public abstract class AbstractAdapterREST {
   @Path("instance/{instanceName}")
   @Produces("text/html")
   public Response terminateInstance(@PathParam("instanceName") String instanceName) {
-    getAdapter().terminateInstance(instanceName);
+    getAdapter().deleteInstance(instanceName);
     return Response.status(Response.Status.OK.getStatusCode()).build();
   }
   
@@ -107,20 +107,23 @@ public abstract class AbstractAdapterREST {
   @Path("instance/{instanceName}")
   @Produces("text/turtle")
   public String monitorInstanceTurtle(@PathParam("instanceName") String instanceName) {
-    return getAdapter().monitorInstance(instanceName, IMessageBus.SERIALIZATION_TURTLE);
+    Model model = getAdapter().getInstanceModel(instanceName);
+    return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_TURTLE);
   }
   
   @GET
   @Path("instance/{instanceName}")
   @Produces("application/rdf+xml")
   public String monitorInstanceRDF(@PathParam("instanceName") String instanceName) {
-    return getAdapter().monitorInstance(instanceName, IMessageBus.SERIALIZATION_RDFXML);
+    Model model = getAdapter().getInstanceModel(instanceName);
+    return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_RDFXML);
   }
   
   @GET
   @Path("instance/{instanceName}")
   @Produces("application/n-triples")
   public String monitorInstanceNTRIPLE(@PathParam("instanceName") String instanceName) {
-    return getAdapter().monitorInstance(instanceName, IMessageBus.SERIALIZATION_NTRIPLE);
+    Model model = getAdapter().getInstanceModel(instanceName);
+    return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_NTRIPLE);
   }
 }

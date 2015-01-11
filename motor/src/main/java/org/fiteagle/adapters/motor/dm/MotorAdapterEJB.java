@@ -7,11 +7,11 @@ import javax.ejb.Singleton;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterEJB;
-import org.fiteagle.abstractAdapter.dm.IAbstractAdapterEJB;
+import org.fiteagle.abstractAdapter.dm.AdapterEJB;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
 @Singleton
-@Remote(IAbstractAdapterEJB.class)
+@Remote(AdapterEJB.class)
 public class MotorAdapterEJB extends AbstractAdapterEJB {
   
   private static MotorAdapter adapter;
