@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.openSDNCore.dm;
 
-import java.util.Iterator;
+import java.util.Map;
 
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -13,16 +13,8 @@ import org.fiteagle.adapters.openSDNCore.OpenSDNCoreAdapter;
 @Startup
 public class OpenSDNCoreMDBSender extends AbstractAdapterMDBSender {
   
-  private static OpenSDNCoreAdapter adapter;
-  
   @Override
-  protected AbstractAdapter getAdapter() {
-    if (adapter == null) {
-      Iterator<String> iterator = OpenSDNCoreAdapter.adapterInstances.keySet().iterator();
-      if (iterator.hasNext()) {
-        adapter = OpenSDNCoreAdapter.getInstance(iterator.next());
-      }
-    }
-    return adapter;
+  protected Map<String, AbstractAdapter> getAdapterInstances() {
+    return OpenSDNCoreAdapter.adapterInstances;
   }
 }

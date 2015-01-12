@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.openMTC.dm;
 
-import java.util.Iterator;
+import java.util.Map;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
@@ -15,17 +15,9 @@ import org.fiteagle.api.core.IMessageBus;
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class OpenMTCAdapterMDBListener extends AbstractAdapterMDBListener {
   
-  private static OpenMTCAdapter adapter;
-  
   @Override
-  protected AbstractAdapter getAdapter() {
-    if(adapter == null){
-      Iterator<String> iter = OpenMTCAdapter.adapterInstances.keySet().iterator();
-      if(iter.hasNext()){
-          adapter = OpenMTCAdapter.getInstance(iter.next());
-      }
-    }
-    return adapter;
+  protected Map<String, AbstractAdapter> getAdapterInstances() {
+    return OpenMTCAdapter.adapterInstances;
   }
 
 }

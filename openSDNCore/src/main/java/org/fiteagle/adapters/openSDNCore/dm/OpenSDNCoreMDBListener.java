@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.openSDNCore.dm;
 
-import java.util.Iterator;
+import java.util.Map;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
@@ -18,17 +18,9 @@ import org.fiteagle.api.core.MessageFilters;
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class OpenSDNCoreMDBListener extends AbstractAdapterMDBListener {
   
-  private static OpenSDNCoreAdapter adapter;
-  
   @Override
-  protected AbstractAdapter getAdapter() {
-    if (adapter == null) {
-      Iterator<String> iterator = OpenSDNCoreAdapter.adapterInstances.keySet().iterator();
-      if (iterator.hasNext()) {
-        adapter = OpenSDNCoreAdapter.getInstance(iterator.next());
-      }
-    }
-    return adapter;
+  protected Map<String, AbstractAdapter> getAdapterInstances() {
+    return OpenSDNCoreAdapter.adapterInstances;
   }
   
 }

@@ -25,11 +25,11 @@ public class OpenstackParserTest {
   
   @BeforeClass
   public static void setup(){
-    Iterator<String> iter = OpenstackAdapter.openstackAdapterInstances.keySet().iterator();
+    Iterator<String> iter = OpenstackAdapter.adapterInstances.keySet().iterator();
     if(iter.hasNext()){
-        adapter = OpenstackAdapter.getInstance(iter.next());
+        adapter = (OpenstackAdapter) OpenstackAdapter.adapterInstances.get(iter.next());
     }
-    openstackparser = adapter.getOpenstackParser();
+    openstackparser =  adapter.getOpenstackParser();
   }
   
   @Test

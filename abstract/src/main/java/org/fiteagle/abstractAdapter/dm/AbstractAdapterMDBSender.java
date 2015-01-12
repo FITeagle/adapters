@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,13 +30,15 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   
   @PostConstruct
   public void initializeAdapter() {
-    LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Adding MDB-Sender for " + getAdapter().getAdapterInstance().getURI());
-    getAdapter().addListener(this);
-    
-    LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Registering " + getAdapter().getAdapterInstance().getURI());
-    getAdapter().updateAdapterDescription();
-    getAdapter().notifyListeners(getAdapter().getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
-  }
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Adding MDB-Sender for " + adapter.getAdapterInstance().getURI());
+      adapter.addListener(this);
+      
+      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Registering " + adapter.getAdapterInstance().getURI());
+      adapter.updateAdapterDescription();
+      adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
+    }
+   }
   
   @Override
   public void publishModelUpdate(Model eventRDF, String requestID, String methodType, String methodTarget) {
@@ -45,11 +48,14 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   
   @PreDestroy
   public void contextDestroyed() {
-    LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + getAdapter().getAdapterInstance().getURI());
-    Model messageModel = ModelFactory.createDefaultModel();
-    messageModel.add(getAdapter().getAdapterInstance(), RDF.type, getAdapter().getAdapterType());
-    getAdapter().notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + adapter.getAdapterInstance().getURI());
+      Model messageModel = ModelFactory.createDefaultModel();
+      messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
+      adapter.notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
+    }
   }
   
-  protected abstract AbstractAdapter getAdapter();
+  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  
 }

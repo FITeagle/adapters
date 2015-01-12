@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +26,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
   
   private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBListener.class.toString());
   
-  protected abstract AbstractAdapter getAdapter();
+  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
   
   public void onMessage(final Message message) {
     String messageType = MessageUtil.getMessageType(message);
@@ -35,30 +36,28 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     if (messageType != null && rdfString != null) {
       Model messageModel = MessageUtil.parseSerializedModel(rdfString, serialization);
       
-      if (adapterIsRecipient(messageModel)) {
-        LOGGER.log(Level.INFO, "Received a " + messageType + " message");
-        try{
-          if (messageType.equals(IMessageBus.TYPE_CREATE)) {
-            Model resultModel = getAdapter().createInstances(messageModel);
-            getAdapter().notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, null);
-            
-          } else if (messageType.equals(IMessageBus.TYPE_CONFIGURE)) {
-            Model resultModel = getAdapter().configureInstances(messageModel);
-            getAdapter().notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, null);
-            
-          } else if (messageType.equals(IMessageBus.TYPE_DELETE)) {
-            getAdapter().deleteInstances(messageModel);
+      for(AbstractAdapter adapter : getAdapterInstances().values()){
+        if (adapter.isRecipient(messageModel)) {
+          LOGGER.log(Level.INFO, "Received a " + messageType + " message");
+          try{
+            if (messageType.equals(IMessageBus.TYPE_CREATE)) {
+              Model resultModel = adapter.createInstances(messageModel);
+              adapter.notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, null);
+              
+            } else if (messageType.equals(IMessageBus.TYPE_CONFIGURE)) {
+              Model resultModel = adapter.configureInstances(messageModel);
+              adapter.notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, null);
+              
+            } else if (messageType.equals(IMessageBus.TYPE_DELETE)) {
+              adapter.deleteInstances(messageModel);
+            }
+          } catch(AdapterException e){
+            Message errorMessage = MessageUtil.createErrorMessage(e.getMessage(), MessageUtil.getJMSCorrelationID(message), context);
+            context.createProducer().send(topic, errorMessage);
           }
-        } catch(AdapterException e){
-          Message errorMessage = MessageUtil.createErrorMessage(e.getMessage(), MessageUtil.getJMSCorrelationID(message), context);
-          context.createProducer().send(topic, errorMessage);
         }
       }
     }
-  }
-  
-  private boolean adapterIsRecipient(Model messageModel) {
-    return messageModel.containsResource(getAdapter().getAdapterInstance());
   }
   
 }

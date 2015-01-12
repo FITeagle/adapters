@@ -20,9 +20,13 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public abstract class AbstractAdapter {
   
+  private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
+  
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
   
-  private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
+  public boolean isRecipient(Model messageModel) {
+    return messageModel.containsResource(getAdapterInstance());
+  }
   
   public Model createInstances(Model model) throws AdapterException {
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    

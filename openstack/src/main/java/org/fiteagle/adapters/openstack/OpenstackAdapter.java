@@ -3,6 +3,7 @@ package org.fiteagle.adapters.openstack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openstack.client.IOpenstackClient;
@@ -35,11 +36,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   
-  public static HashMap<String,OpenstackAdapter> openstackAdapterInstances = new HashMap<>();
-  
-  public static OpenstackAdapter getInstance(String URI){
-    return openstackAdapterInstances.get(URI);
-  }
+  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
   public static OpenstackAdapter getTestInstance(IOpenstackClient openstackClient){
     OpenstackAdapter testInstance = null;
@@ -78,7 +75,7 @@ public class OpenstackAdapter extends AbstractAdapter {
       
       OpenstackAdapter openstackAdapter = new OpenstackAdapter(adapterInstance, adapterModel, null);
       openstackAdapter.openstackClient = OpenstackClient.getInstance(openstackAdapter);
-      openstackAdapterInstances.put(adapterInstance.getURI(), openstackAdapter);
+      adapterInstances.put(adapterInstance.getURI(), openstackAdapter);
     }
   }
   

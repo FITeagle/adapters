@@ -3,6 +3,7 @@ package org.fiteagle.adapters.motor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
@@ -24,11 +25,7 @@ public final class MotorAdapter extends AbstractAdapter {
   private static Resource adapter;
   private static Resource resource;
   
-  public static HashMap<String, MotorAdapter> motorAdapterInstances = new HashMap<>();
-  
-  public static MotorAdapter getInstance(String URI) {
-    return motorAdapterInstances.get(URI);
-  }
+  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
   private static List<Property> motorControlProperties = new ArrayList<Property>();
   
@@ -61,7 +58,7 @@ public final class MotorAdapter extends AbstractAdapter {
       
       MotorAdapter motorAdapter = new MotorAdapter(adapterInstance, adapterModel);
       
-      motorAdapterInstances.put(adapterInstance.getURI(), motorAdapter);
+      adapterInstances.put(adapterInstance.getURI(), motorAdapter);
     }
   }
   

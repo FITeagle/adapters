@@ -3,6 +3,7 @@ package org.fiteagle.adapters.openSDNCore;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
@@ -23,13 +24,9 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   private static Resource adapter;
   private static Resource resource;
   
-  public static HashMap<String, OpenSDNCoreAdapter> adapterInstances = new HashMap<>();
-  
-  public static OpenSDNCoreAdapter getInstance(String URI) {
-    return adapterInstances.get(URI);
-  }
-  
   private static List<Property> properties = new ArrayList<Property>();
+  
+  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
   static {
     Model adapterModel = OntologyModelUtil.loadModel("ontologies/openSDNCore.ttl", IMessageBus.SERIALIZATION_TURTLE);

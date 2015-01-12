@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.motor.dm;
 
-import java.util.Iterator;
+import java.util.Map;
 
 import javax.websocket.server.ServerEndpoint;
 
@@ -10,17 +10,9 @@ import org.fiteagle.adapters.motor.MotorAdapter;
 
 @ServerEndpoint("/websocket")
 public class MotorAdapterWebsocket extends AbstractAdapterWebsocket {
-
-private static MotorAdapter adapter;
-	
+  
   @Override
-  protected AbstractAdapter getAdapter() {
-    if (adapter == null) {
-      Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
-      if (iterator.hasNext()) {
-        adapter = MotorAdapter.getInstance(iterator.next());
-      }
-    }
-    return adapter;
+  protected Map<String, AbstractAdapter> getAdapterInstances() {
+    return MotorAdapter.adapterInstances;
   }
 }

@@ -1,9 +1,9 @@
 package org.fiteagle.adapters.motor.dm;
 
+import java.util.Map;
+
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
-
-import java.util.Iterator;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
@@ -18,17 +18,9 @@ import org.fiteagle.api.core.MessageFilters;
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class MotorAdapterMDBListener extends AbstractAdapterMDBListener {
   
-  private static MotorAdapter adapter;
-  
   @Override
-  protected AbstractAdapter getAdapter() {
-    if (adapter == null) {
-      Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
-      if (iterator.hasNext()) {
-        adapter = MotorAdapter.getInstance(iterator.next());
-      }
-    }
-    return adapter;
+  protected Map<String, AbstractAdapter> getAdapterInstances() {
+    return MotorAdapter.adapterInstances;
   }
   
 }

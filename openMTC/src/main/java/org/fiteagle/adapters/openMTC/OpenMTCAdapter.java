@@ -3,6 +3,7 @@ package org.fiteagle.adapters.openMTC;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openMTC.client.OpenMTCClient;
@@ -28,11 +29,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   
-  public static HashMap<String,OpenMTCAdapter> adapterInstances = new HashMap<>();
-  
-  public static OpenMTCAdapter getInstance(String URI){
-    return adapterInstances.get(URI);
-  }
+  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
   static {
     Model adapterModel = OntologyModelUtil.loadModel("ontologies/openMTC.ttl", IMessageBus.SERIALIZATION_TURTLE);

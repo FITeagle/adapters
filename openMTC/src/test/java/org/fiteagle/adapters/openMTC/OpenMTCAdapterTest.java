@@ -1,9 +1,11 @@
 package org.fiteagle.adapters.openMTC;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,13 +15,13 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenMTCAdapterTest {
   
-  private static OpenMTCAdapter adapter;
+  private static AbstractAdapter adapter;
   
   @BeforeClass
   public static void loadModel(){
     Iterator<String> iter = OpenMTCAdapter.adapterInstances.keySet().iterator();
     if(iter.hasNext()){
-        adapter = OpenMTCAdapter.getInstance(iter.next());
+        adapter = OpenMTCAdapter.adapterInstances.get(iter.next());
     }
   }
   

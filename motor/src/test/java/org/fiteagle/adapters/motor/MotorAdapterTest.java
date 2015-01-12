@@ -1,7 +1,6 @@
 package org.fiteagle.adapters.motor;
 
-import java.util.Iterator;
-
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -16,14 +15,11 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public class MotorAdapterTest {
   
-  private static MotorAdapter adapter;
+  private static AbstractAdapter adapter;
   
   @BeforeClass
   public static void setup() {
-    Iterator<String> iterator = MotorAdapter.motorAdapterInstances.keySet().iterator();
-    if (iterator.hasNext()) {
-      adapter = MotorAdapter.getInstance(iterator.next());
-    }
+    adapter = MotorAdapter.adapterInstances.values().iterator().next();
   }
   
   @Test

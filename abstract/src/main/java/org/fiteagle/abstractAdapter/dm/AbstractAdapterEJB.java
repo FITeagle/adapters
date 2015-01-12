@@ -1,49 +1,46 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.Map;
+
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
-import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public abstract class AbstractAdapterEJB implements AdapterEJB {
-
-    protected abstract AbstractAdapter getAdapter();
-
-    @Override
-    public String getAdapterDescription(String serializationFormat) {
-        return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), serializationFormat);
+  
+  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  
+  @Override
+  public Model createInstance(Model createModel) throws AdapterException {
+    Model resultModel = ModelFactory.createDefaultModel();
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      if(adapter.isRecipient(createModel)){
+        resultModel.add(adapter.createInstances(createModel));
+      }
     }
-
-    @Override
-    public Model createInstance(String instanceURI) throws AdapterException {
-      Model modelCreate = ModelFactory.createDefaultModel();
-      return getAdapter().createInstances(modelCreate);
+    return resultModel;
+  }
+  
+  @Override
+  public void deleteInstances(Model deleteModel) {
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      if(adapter.isRecipient(deleteModel)){
+        adapter.deleteInstances(deleteModel);
+      }
     }
-
-    @Override
-    public void terminateInstance(String instanceURI) {
-        getAdapter().deleteInstance(instanceURI);
+  }
+  
+  @Override
+  public Model configureInstances(Model configureModel) throws AdapterException {
+    Model resultModel = ModelFactory.createDefaultModel();
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      if(adapter.isRecipient(configureModel)){
+        resultModel.add(adapter.configureInstances(configureModel));
+      }
     }
-
-    @Override
-    public Model monitorInstance(String instanceURI) {
-        return getAdapter().getInstanceModel(instanceURI);
-    }
-
-    @Override
-    public String getAllInstances(String serialization) {
-        return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), serialization);
-    }
-
-    @Override
-    public Model configureInstances(Model configureModel) throws AdapterException {
-        return getAdapter().configureInstances(configureModel);
-    }
-
-    @Override
-    public void addChangeListener(AdapterEventListener newListener) {
-        getAdapter().addListener(newListener);
-    }
+    return resultModel;
+  }
+  
 }

@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.openstack.dm;
 
-import java.util.Iterator;
+import java.util.Map;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
@@ -17,17 +17,9 @@ import org.fiteagle.api.core.MessageFilters;
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 public class OpenstackAdapterMDBListener extends AbstractAdapterMDBListener {
   
-  private static OpenstackAdapter adapter;
-  
   @Override
-  protected AbstractAdapter getAdapter() {
-    if(adapter == null){
-      Iterator<String> iter = OpenstackAdapter.openstackAdapterInstances.keySet().iterator();
-      if(iter.hasNext()){
-          adapter = OpenstackAdapter.getInstance(iter.next());
-      }
-    }
-    return adapter;
+  protected Map<String, AbstractAdapter> getAdapterInstances() {
+    return OpenstackAdapter.adapterInstances;
   }
 
 }

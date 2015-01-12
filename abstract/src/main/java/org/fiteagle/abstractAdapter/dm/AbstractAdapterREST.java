@@ -1,5 +1,7 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -25,57 +27,42 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public abstract class AbstractAdapterREST {
   
-  protected abstract AbstractAdapter getAdapter();
+  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  
+  private final static String adapterInstancesPrefix = "http://federation.av.tu-berlin.de/about#";
   
   @GET
-  @Path("")
+  @Path("/{adapterName}/instance")
   @Produces("text/turtle")
-  public String getDescriptionTurtle() {
-    return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
+  public String getAllInstancesTurtle(@PathParam("adapterName") String adapterName) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_TURTLE);
   }
   
   @GET
-  @Path("")
+  @Path("/{adapterName}/instance")
   @Produces("application/rdf+xml")
-  public String getDescriptionRDF() {
-    return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_RDFJSON);
+  public String getAllInstancesRDF(@PathParam("adapterName") String adapterName) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_RDFXML);
   }
   
   @GET
-  @Path("")
+  @Path("/{adapterName}/instance")
   @Produces("application/n-triples")
-  public String getDescriptionNTRIPLE() {
-    return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_NTRIPLE);
-  }
-  
-  @GET
-  @Path("instance")
-  @Produces("text/turtle")
-  public String getAllInstancesTurtle() {
-    return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_TURTLE);
-  }
-  
-  @GET
-  @Path("instance")
-  @Produces("application/rdf+xml")
-  public String getAllInstancesRDF() {
-    return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_RDFXML);
-  }
-  
-  @GET
-  @Path("instance")
-  @Produces("application/n-triples")
-  public String getAllInstancesNTRIPLE() {
-    return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_NTRIPLE);
+  public String getAllInstancesNTRIPLE(@PathParam("adapterName") String adapterName) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_NTRIPLE);
   }
   
   @PUT
-  @Path("instance")
+  @Path("/{adapterName}/instance")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/html")
-  public String createInstances(String rdfInput) {
+  public String createInstances(@PathParam("adapterName") String adapterName, String rdfInput) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
     try {
-      Model resultModel = getAdapter().createInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
+      Model resultModel = adapter.createInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       return e.getMessage();
@@ -83,12 +70,13 @@ public abstract class AbstractAdapterREST {
   }
   
   @POST
-  @Path("instance")
+  @Path("/{adapterName}/instance")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/html")
-  public String configureInstances(String rdfInput) {
+  public String configureInstances(@PathParam("adapterName") String adapterName, String rdfInput) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
     try {
-      Model resultModel = getAdapter().configureInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
+      Model resultModel = adapter.configureInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       return e.getMessage();
@@ -96,34 +84,38 @@ public abstract class AbstractAdapterREST {
   }
     
   @DELETE
-  @Path("instance/{instanceURI}")
+  @Path("/{adapterName}/instance/{instanceURI}")
   @Produces("text/html")
-  public Response terminateInstance(@PathParam("instanceURI") String instanceURI) {
-    getAdapter().deleteInstance(instanceURI);
+  public Response terminateInstance(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    adapter.deleteInstance(instanceURI);
     return Response.status(Response.Status.OK.getStatusCode()).build();
   }
   
   @GET
-  @Path("instance/{instanceURI}")
+  @Path("/{adapterName}/instance/{instanceURI}")
   @Produces("text/turtle")
-  public String monitorInstanceTurtle(@PathParam("instanceURI") String instanceURI) {
-    Model model = getAdapter().getInstanceModel(instanceURI);
+  public String monitorInstanceTurtle(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    Model model = adapter.getInstanceModel(instanceURI);
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_TURTLE);
   }
   
   @GET
-  @Path("instance/{instanceURI}")
+  @Path("/{adapterName}/instance/{instanceURI}")
   @Produces("application/rdf+xml")
-  public String monitorInstanceRDF(@PathParam("instanceURI") String instanceURI) {
-    Model model = getAdapter().getInstanceModel(instanceURI);
+  public String monitorInstanceRDF(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    Model model = adapter.getInstanceModel(instanceURI);
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_RDFXML);
   }
   
   @GET
-  @Path("instance/{instanceURI}")
+  @Path("/{adapterName}/instance/{instanceURI}")
   @Produces("application/n-triples")
-  public String monitorInstanceNTRIPLE(@PathParam("instanceURI") String instanceURI) {
-    Model model = getAdapter().getInstanceModel(instanceURI);
+  public String monitorInstanceNTRIPLE(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    Model model = adapter.getInstanceModel(instanceURI);
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_NTRIPLE);
   }
 }

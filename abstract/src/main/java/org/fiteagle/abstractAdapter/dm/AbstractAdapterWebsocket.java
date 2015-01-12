@@ -1,6 +1,7 @@
 package org.fiteagle.abstractAdapter.dm;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -22,37 +23,37 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   
-  private AbstractAdapter adapter = getAdapter();
-  
   private Session wsSession;
   
-  protected abstract AbstractAdapter getAdapter();
+  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
   
   @PostConstruct
   public void setup() {
-    adapter.addListener(this);
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      adapter.addListener(this);
+    }
   }
   
   @OnMessage
   public String onMessage(final String message) {
-    if (message.equals("description.ttl")) {
-      
-      return MessageUtil.serializeModel(getAdapter().getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
-      
-    } else if (message.equals("instances.ttl")) {
-      
-      return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_TURTLE);
-      
-    } else if (message.equals("instances.rdf")) {
-      
-      return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_RDFXML);
-      
-    } else if (message.equals("instances.ntriple")) {
-      
-      return MessageUtil.serializeModel(getAdapter().getAllInstancesModel(), IMessageBus.SERIALIZATION_NTRIPLE);
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      if (message.equals(adapter.getAdapterInstance().getURI())) {
+        return MessageUtil.serializeModel(adapter.getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
+        
+      } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/ttl")) {
+        
+        return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_TURTLE);
+        
+      } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/rdfxml")) {
+        
+        return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_RDFXML);
+        
+      } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/ntriple")) {
+        
+        return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_NTRIPLE);
+      }
     }
-    
-    return message;
+    return null;
   }
   
   @OnOpen
