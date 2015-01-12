@@ -25,7 +25,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
-  private static final String[] ADAPTER_SPECIFIC_PREFIX = new String[2];
   private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
   
   private IOpenstackClient openstackClient;
@@ -62,8 +61,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
       adapter = adapterIterator.next().getSubject();
-      ADAPTER_SPECIFIC_PREFIX[1] = adapter.getNameSpace();
-      ADAPTER_SPECIFIC_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_SPECIFIC_PREFIX[1]);
     }
     
     StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
@@ -93,7 +90,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
     
-    Property PROPERTY_IMAGES = adapterModel.getProperty(ADAPTER_SPECIFIC_PREFIX[1]+"images");
+    Property PROPERTY_IMAGES = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"images");
     Property PROPERTY_IMAGE = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"image");
     Property PROPERTY_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"id");
     Property PROPERTY_IMAGE_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"imageid");
@@ -115,11 +112,6 @@ public class OpenstackAdapter extends AbstractAdapter {
   @Override
   protected void handleDeleteInstance(String instanceURI) {
     openstackClient.deleteServer(openstackParser.getResourcePropertyID(instanceURI));
-  }
-  
-  @Override
-  public String[] getAdapterSpecificPrefix() {
-    return ADAPTER_SPECIFIC_PREFIX.clone();
   }
   
   @Override

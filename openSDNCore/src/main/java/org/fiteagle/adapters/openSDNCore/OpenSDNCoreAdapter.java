@@ -94,11 +94,6 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   }
   
   @Override
-  public String[] getAdapterSpecificPrefix() {
-    return ADAPTER_SPECIFIC_PREFIX.clone();
-  }
-  
-  @Override
   public String[] getAdapterManagedResourcePrefix() {
     return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
   }

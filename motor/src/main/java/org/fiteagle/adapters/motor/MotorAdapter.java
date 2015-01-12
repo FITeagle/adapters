@@ -19,7 +19,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public final class MotorAdapter extends AbstractAdapter {
   
-  private static final String[] ADAPTER_SPECIFIC_PREFIX = new String[2];
   private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
   
   private Model adapterModel;
@@ -44,8 +43,6 @@ public final class MotorAdapter extends AbstractAdapter {
         MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
       adapter = adapterIterator.next().getSubject();
-      ADAPTER_SPECIFIC_PREFIX[1] = adapter.getNameSpace();
-      ADAPTER_SPECIFIC_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_SPECIFIC_PREFIX[1]);
     }
     
     StmtIterator resourceIterator = adapterModel.listStatements(adapter,
@@ -129,11 +126,6 @@ public final class MotorAdapter extends AbstractAdapter {
     Motor motor = getInstanceByName(instanceURI);
     motor.terminate();
     instanceList.remove(instanceURI);
-  }
-  
-  @Override
-  public String[] getAdapterSpecificPrefix() {
-    return ADAPTER_SPECIFIC_PREFIX.clone();
   }
   
   @Override

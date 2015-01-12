@@ -133,7 +133,6 @@ public abstract class AbstractAdapter {
   }
   
   protected void setModelPrefixes(Model model) {
-    model.setNsPrefix(getAdapterSpecificPrefix()[0], getAdapterSpecificPrefix()[1]);
     model.setNsPrefix(getAdapterManagedResourcePrefix()[0], getAdapterManagedResourcePrefix()[1]);
     model.setNsPrefix("omn", "http://open-multinet.info/ontology/omn#");
     model.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
@@ -167,8 +166,6 @@ public abstract class AbstractAdapter {
   protected abstract Model handleCreateInstance(String instanceURI, Model newInstanceModel);
   
   protected abstract void handleDeleteInstance(String instanceURI);
-  
-  public abstract String[] getAdapterSpecificPrefix();
   
   public abstract String[] getAdapterManagedResourcePrefix();
 
