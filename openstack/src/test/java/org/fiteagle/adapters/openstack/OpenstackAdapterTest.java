@@ -71,7 +71,7 @@ public class OpenstackAdapterTest {
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
-    adapter.createInstances(modelCreate, null);
+    adapter.createInstances(modelCreate);
     Model instanceModel = adapter.getInstanceModel("server1");
     assertNotNull(instanceModel);
     StmtIterator iterator = instanceModel.listStatements(null, RDF.type, adapter.getAdapterManagedResource());
@@ -94,7 +94,7 @@ public class OpenstackAdapterTest {
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
-    adapter.createInstances(modelCreate, null);
+    adapter.createInstances(modelCreate);
     adapter.deleteInstance("server2");
     Model instanceModel = adapter.getInstanceModel("server2");
     assertNull(instanceModel);

@@ -19,7 +19,7 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
     @Override
     public Model createInstance(String instanceName) throws AdapterException {
       Model modelCreate = ModelFactory.createDefaultModel();
-      return getAdapter().createInstances(modelCreate, null);
+      return getAdapter().createInstances(modelCreate);
     }
 
     @Override
@@ -39,7 +39,7 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
 
     @Override
     public Model configureInstances(Model configureModel) throws AdapterException {
-        return getAdapter().configureInstances(configureModel, null);
+        return getAdapter().configureInstances(configureModel);
     }
 
     @Override

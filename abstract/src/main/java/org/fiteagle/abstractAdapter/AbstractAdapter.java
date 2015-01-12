@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
-import org.fiteagle.api.core.IMessageBus;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -24,7 +23,7 @@ public abstract class AbstractAdapter {
   
   private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
   
-  public Model createInstances(Model model, String requestID) throws AdapterException {
+  public Model createInstances(Model model) throws AdapterException {
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
     if(!resourceInstanceIterator.hasNext()){
       LOGGER.log(Level.INFO, "Could not find any instances to create");
@@ -48,7 +47,6 @@ public abstract class AbstractAdapter {
       throw new AdapterException(Response.Status.CONFLICT.name());
     }
     updateAdapterModel(createdInstancesModel);
-    notifyListeners(createdInstancesModel, requestID, IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
     return createdInstancesModel;
   }
   
@@ -66,7 +64,7 @@ public abstract class AbstractAdapter {
     getAdapterDescriptionModel().remove(getInstanceModel(instanceName));
   }
   
-  public Model configureInstances(Model model, String requestID) throws AdapterException {
+  public Model configureInstances(Model model) throws AdapterException {
     Model configuredInstancesModel = ModelFactory.createDefaultModel();    
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
     
@@ -87,7 +85,6 @@ public abstract class AbstractAdapter {
       throw new AdapterException(Response.Status.NOT_FOUND.name());
     }
     updateAdapterModel(configuredInstancesModel);
-    notifyListeners(configuredInstancesModel, requestID, IMessageBus.TYPE_INFORM,  IMessageBus.TARGET_ORCHESTRATOR);
     return configuredInstancesModel;
   }
   

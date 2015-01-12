@@ -75,7 +75,7 @@ public abstract class AbstractAdapterREST {
   @Produces("text/html")
   public String createInstances(String rdfInput) {
     try {
-      Model resultModel = getAdapter().createInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
+      Model resultModel = getAdapter().createInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       return e.getMessage();
@@ -88,7 +88,7 @@ public abstract class AbstractAdapterREST {
   @Produces("text/html")
   public String configureInstances(String rdfInput) {
     try {
-      Model resultModel = getAdapter().configureInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE), null);
+      Model resultModel = getAdapter().configureInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       return e.getMessage();

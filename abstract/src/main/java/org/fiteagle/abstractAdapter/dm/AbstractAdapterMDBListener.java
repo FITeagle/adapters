@@ -39,10 +39,12 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
         LOGGER.log(Level.INFO, "Received a " + messageType + " message");
         try{
           if (messageType.equals(IMessageBus.TYPE_CREATE)) {
-            getAdapter().createInstances(messageModel, MessageUtil.getJMSCorrelationID(message));
+            Model resultModel = getAdapter().createInstances(messageModel);
+            getAdapter().notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM,  IMessageBus.TARGET_ORCHESTRATOR);
             
           } else if (messageType.equals(IMessageBus.TYPE_CONFIGURE)) {
-            getAdapter().configureInstances(messageModel, MessageUtil.getJMSCorrelationID(message));
+            Model resultModel = getAdapter().configureInstances(messageModel);
+            getAdapter().notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
             
           } else if (messageType.equals(IMessageBus.TYPE_DELETE)) {
             getAdapter().deleteInstances(messageModel);

@@ -34,7 +34,7 @@ public class MotorAdapterTest {
     Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"rpm");
     motor.addLiteral(propertyRPM, 42);
     
-    adapter.createInstances(modelCreate, null);
+    adapter.createInstances(modelCreate);
     
     Resource updatedResource = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
     Assert.assertEquals(42, updatedResource.getProperty(propertyRPM).getInt());
@@ -52,7 +52,7 @@ public class MotorAdapterTest {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource motorResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
-    adapter.createInstances(modelCreate, null);
+    adapter.createInstances(modelCreate);
     
     Model monitorData = adapter.getInstanceModel(instanceName);
     Assert.assertFalse(monitorData.isEmpty());
@@ -84,7 +84,7 @@ public class MotorAdapterTest {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource motorResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
-    adapter.createInstances(modelCreate, null);
+    adapter.createInstances(modelCreate);
 
     Model modelConfigure = ModelFactory.createDefaultModel();
     Resource motor = modelConfigure.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
@@ -94,7 +94,7 @@ public class MotorAdapterTest {
     Property propertyManufacturer = modelConfigure.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"manufacturer");
     motor.addLiteral(propertyManufacturer, "TU Berlin");
     
-    Model updatedResourceModel = adapter.configureInstances(modelConfigure, null);
+    Model updatedResourceModel = adapter.configureInstances(modelConfigure);
     
     Resource updatedResource = updatedResourceModel.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
     Assert.assertEquals(23, updatedResource.getProperty(propertyRPM).getInt());
