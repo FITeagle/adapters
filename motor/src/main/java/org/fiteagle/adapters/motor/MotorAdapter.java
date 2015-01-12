@@ -82,10 +82,10 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleCreateInstance(String instanceName, Model modelCreate) {
-    Motor motor = new Motor(this, instanceName);
-    instanceList.put(instanceName, motor);
-    handleConfigureInstance(instanceName, modelCreate);
+  protected Model handleCreateInstance(String instanceURI, Model modelCreate) {
+    Motor motor = new Motor(this, instanceURI);
+    instanceList.put(instanceURI, motor);
+    handleConfigureInstance(instanceURI, modelCreate);
     return parseToModel(motor);
   }
   
@@ -116,9 +116,9 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleConfigureInstance(String instanceName, Model configureModel) {
-    if (instanceList.containsKey(instanceName)) {
-      Motor currentMotor = (Motor) instanceList.get(instanceName);
+  protected Model handleConfigureInstance(String instanceURI, Model configureModel) {
+    if (instanceList.containsKey(instanceURI)) {
+      Motor currentMotor = (Motor) instanceList.get(instanceURI);
       StmtIterator iter = configureModel.listStatements();
       while(iter.hasNext()){
         currentMotor.updateProperty(iter.next());
@@ -129,10 +129,10 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected void handleDeleteInstance(String instanceName) {
-    Motor motor = getInstanceByName(instanceName);
+  protected void handleDeleteInstance(String instanceURI) {
+    Motor motor = getInstanceByName(instanceURI);
     motor.terminate();
-    instanceList.remove(instanceName);
+    instanceList.remove(instanceURI);
   }
   
   @Override
@@ -150,8 +150,8 @@ public final class MotorAdapter extends AbstractAdapter {
     return ADAPTER_INSTANCE_PREFIX.clone();
   }
   
-  public Motor getInstanceByName(String instanceName) {
-    return (Motor) instanceList.get(instanceName);
+  public Motor getInstanceByName(String instanceURI) {
+    return (Motor) instanceList.get(instanceURI);
   }
   
   @Override

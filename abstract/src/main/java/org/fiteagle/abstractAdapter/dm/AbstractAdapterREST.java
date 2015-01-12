@@ -96,34 +96,34 @@ public abstract class AbstractAdapterREST {
   }
     
   @DELETE
-  @Path("instance/{instanceName}")
+  @Path("instance/{instanceURI}")
   @Produces("text/html")
-  public Response terminateInstance(@PathParam("instanceName") String instanceName) {
-    getAdapter().deleteInstance(instanceName);
+  public Response terminateInstance(@PathParam("instanceURI") String instanceURI) {
+    getAdapter().deleteInstance(instanceURI);
     return Response.status(Response.Status.OK.getStatusCode()).build();
   }
   
   @GET
-  @Path("instance/{instanceName}")
+  @Path("instance/{instanceURI}")
   @Produces("text/turtle")
-  public String monitorInstanceTurtle(@PathParam("instanceName") String instanceName) {
-    Model model = getAdapter().getInstanceModel(instanceName);
+  public String monitorInstanceTurtle(@PathParam("instanceURI") String instanceURI) {
+    Model model = getAdapter().getInstanceModel(instanceURI);
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_TURTLE);
   }
   
   @GET
-  @Path("instance/{instanceName}")
+  @Path("instance/{instanceURI}")
   @Produces("application/rdf+xml")
-  public String monitorInstanceRDF(@PathParam("instanceName") String instanceName) {
-    Model model = getAdapter().getInstanceModel(instanceName);
+  public String monitorInstanceRDF(@PathParam("instanceURI") String instanceURI) {
+    Model model = getAdapter().getInstanceModel(instanceURI);
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_RDFXML);
   }
   
   @GET
-  @Path("instance/{instanceName}")
+  @Path("instance/{instanceURI}")
   @Produces("application/n-triples")
-  public String monitorInstanceNTRIPLE(@PathParam("instanceName") String instanceName) {
-    Model model = getAdapter().getInstanceModel(instanceName);
+  public String monitorInstanceNTRIPLE(@PathParam("instanceURI") String instanceURI) {
+    Model model = getAdapter().getInstanceModel(instanceURI);
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_NTRIPLE);
   }
 }

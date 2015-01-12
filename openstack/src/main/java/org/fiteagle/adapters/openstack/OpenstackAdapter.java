@@ -109,16 +109,16 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleCreateInstance(String instanceName, Model newInstanceModel) {
-    ServerForCreate serverForCreate = openstackParser.parseToServerForCreate(instanceName, newInstanceModel);
+  protected Model handleCreateInstance(String instanceURI, Model newInstanceModel) {
+    ServerForCreate serverForCreate = openstackParser.parseToServerForCreate(instanceURI, newInstanceModel);
     Server server = openstackClient.createServer(serverForCreate);
     Model openstackVM = openstackParser.parseToModel(server);
     return openstackVM;
   }
 
   @Override
-  protected void handleDeleteInstance(String instanceName) {
-    openstackClient.deleteServer(openstackParser.getResourcePropertyID(instanceName));
+  protected void handleDeleteInstance(String instanceURI) {
+    openstackClient.deleteServer(openstackParser.getResourcePropertyID(instanceURI));
   }
   
   @Override
@@ -153,7 +153,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleConfigureInstance(String instanceName, Model configureModel) {
+  protected Model handleConfigureInstance(String instanceURI, Model configureModel) {
     // TODO Auto-generated method stub
     return null;
   }

@@ -32,14 +32,14 @@ public abstract class AbstractAdapter {
     
     Model createdInstancesModel = ModelFactory.createDefaultModel();    
     while (resourceInstanceIterator.hasNext()) {
-      String instanceName = resourceInstanceIterator.next().getSubject().getURI();
-      if(!containsInstance(instanceName)) {
-        Model createdInstance = handleCreateInstance(instanceName, model);
-        LOGGER.log(Level.INFO, "Created instance: " + instanceName);
+      String instanceURI = resourceInstanceIterator.next().getSubject().getURI();
+      if(!containsInstance(instanceURI)) {
+        Model createdInstance = handleCreateInstance(instanceURI, model);
+        LOGGER.log(Level.INFO, "Created instance: " + instanceURI);
         createdInstancesModel.add(createdInstance);
       }
       else{
-        LOGGER.log(Level.INFO, "Instance: " + instanceName+" already exists");
+        LOGGER.log(Level.INFO, "Instance: " + instanceURI+" already exists");
       }
     }
     if (createdInstancesModel.isEmpty()) {
@@ -53,15 +53,15 @@ public abstract class AbstractAdapter {
   public void deleteInstances(Model model) {
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
     while (resourceInstanceIterator.hasNext()) {
-      String instanceName = resourceInstanceIterator.next().getSubject().getURI();
-      deleteInstance(instanceName);     
+      String instanceURI = resourceInstanceIterator.next().getSubject().getURI();
+      deleteInstance(instanceURI);     
     }
   }
   
-  public void deleteInstance(String instanceName){
-    LOGGER.log(Level.INFO, "Deleting instance: " + instanceName);
-    handleDeleteInstance(instanceName);
-    getAdapterDescriptionModel().remove(getInstanceModel(instanceName));
+  public void deleteInstance(String instanceURI){
+    LOGGER.log(Level.INFO, "Deleting instance: " + instanceURI);
+    handleDeleteInstance(instanceURI);
+    getAdapterDescriptionModel().remove(getInstanceModel(instanceURI));
   }
   
   public Model configureInstances(Model model) throws AdapterException {
@@ -101,10 +101,10 @@ public abstract class AbstractAdapter {
     return model.listStatements(null, RDF.type, getAdapterManagedResource());
   }
   
-  public Model getInstanceModel(String instanceName) {
-    if (containsInstance(instanceName)) {
+  public Model getInstanceModel(String instanceURI) {
+    if (containsInstance(instanceURI)) {
       Model resourceModel = ModelFactory.createDefaultModel();
-      Resource resource = getAdapterDescriptionModel().getResource(instanceName);
+      Resource resource = getAdapterDescriptionModel().getResource(instanceURI);
       StmtIterator iter = resource.listProperties();
       while(iter.hasNext()){
         resourceModel.add(iter.next());
@@ -114,8 +114,8 @@ public abstract class AbstractAdapter {
     return null;
   }
   
-  private boolean containsInstance(String instanceName){
-    Resource instance = getAdapterDescriptionModel().getResource(instanceName);
+  private boolean containsInstance(String instanceURI){
+    Resource instance = getAdapterDescriptionModel().getResource(instanceURI);
     if(instance != null && getAdapterDescriptionModel().contains(instance, RDF.type, getAdapterManagedResource())){
       return true;
     }
@@ -163,11 +163,11 @@ public abstract class AbstractAdapter {
   
   public abstract void updateAdapterDescription();
   
-  protected abstract Model handleConfigureInstance(String instanceName, Model configureModel);
+  protected abstract Model handleConfigureInstance(String instanceURI, Model configureModel);
   
-  protected abstract Model handleCreateInstance(String instanceName, Model newInstanceModel);
+  protected abstract Model handleCreateInstance(String instanceURI, Model newInstanceModel);
   
-  protected abstract void handleDeleteInstance(String instanceName);
+  protected abstract void handleDeleteInstance(String instanceURI);
   
   public abstract String[] getAdapterSpecificPrefix();
   

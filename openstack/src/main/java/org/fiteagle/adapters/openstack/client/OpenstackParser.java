@@ -192,27 +192,27 @@ public class OpenstackParser {
 	  adapter.getAdapterInstance().addProperty(PROPERTY_IMAGES, parseToImagesResource(images));
 	}
 	
-	public String getResourcePropertyID(String instanceName){
-	  return adapter.getAdapterDescriptionModel().getResource(instanceName).getProperty(PROPERTY_ID).getLiteral().getValue().toString();
+	public String getResourcePropertyID(String instanceURI){
+	  return adapter.getAdapterDescriptionModel().getResource(instanceURI).getProperty(PROPERTY_ID).getLiteral().getValue().toString();
 	}
 
-	private String getStringPropertyValue(String instanceName, Model model, Property property){
-	  Resource imagesResource = model.getResource(instanceName);
+	private String getStringPropertyValue(String instanceURI, Model model, Property property){
+	  Resource imagesResource = model.getResource(instanceURI);
 	  return imagesResource.getProperty(property).getLiteral().getValue().toString();  
 	}
 	
-	private RDFNode getResourcePropertyValue(String instanceName, Model model, Property property){
-    Resource imagesResource = model.getResource(instanceName);
+	private RDFNode getResourcePropertyValue(String instanceURI, Model model, Property property){
+    Resource imagesResource = model.getResource(instanceURI);
     return imagesResource.getProperty(property).getObject();
   }
 	
-  public ServerForCreate parseToServerForCreate(String instanceName, Model newInstanceModel) {
-    String imageResourceURI = getResourcePropertyValue(instanceName, newInstanceModel, PROPERTY_IMAGE).toString();
+  public ServerForCreate parseToServerForCreate(String instanceURI, Model newInstanceModel) {
+    String imageResourceURI = getResourcePropertyValue(instanceURI, newInstanceModel, PROPERTY_IMAGE).toString();
     String imageRef = adapter.getAdapterDescriptionModel().getResource(imageResourceURI).getProperty(PROPERTY_IMAGE_ID).getLiteral().getValue().toString();
-    String keyName = getStringPropertyValue(instanceName, newInstanceModel, PROPERTY_KEYPAIRNAME);
-    String flavorRef = getStringPropertyValue(instanceName, newInstanceModel, PROPERTY_FLAVOR);
+    String keyName = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_KEYPAIRNAME);
+    String flavorRef = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_FLAVOR);
     
-    ServerForCreate serverForCreate = new ServerForCreate(instanceName, flavorRef, imageRef, keyName);
+    ServerForCreate serverForCreate = new ServerForCreate(instanceURI, flavorRef, imageRef, keyName);
     
     return serverForCreate;
   }

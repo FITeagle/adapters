@@ -79,17 +79,17 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleCreateInstance(String instanceName, Model modelCreate) {
+  protected Model handleCreateInstance(String instanceURI, Model modelCreate) {
     return null;
   }
   
   @Override
-  protected Model handleConfigureInstance(String instanceName, Model configureModel) {
+  protected Model handleConfigureInstance(String instanceURI, Model configureModel) {
     return null;
   }
   
   @Override
-  protected void handleDeleteInstance(String instanceName) {
+  protected void handleDeleteInstance(String instanceURI) {
     return;
   }
   

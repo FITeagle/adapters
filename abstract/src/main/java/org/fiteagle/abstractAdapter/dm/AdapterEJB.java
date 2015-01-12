@@ -8,11 +8,11 @@ public interface AdapterEJB {
   
      String getAdapterDescription(String serializationFormat);
 
-     Model createInstance(String instanceName) throws AdapterException;
+     Model createInstance(String instanceURI) throws AdapterException;
 
-     void terminateInstance(String instanceName);
+     void terminateInstance(String instanceURI);
 
-     Model monitorInstance(String instanceName);
+     Model monitorInstance(String instanceURI);
 
      String getAllInstances(String serializationFormat);
 

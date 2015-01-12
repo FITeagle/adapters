@@ -17,19 +17,19 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
     }
 
     @Override
-    public Model createInstance(String instanceName) throws AdapterException {
+    public Model createInstance(String instanceURI) throws AdapterException {
       Model modelCreate = ModelFactory.createDefaultModel();
       return getAdapter().createInstances(modelCreate);
     }
 
     @Override
-    public void terminateInstance(String instanceName) {
-        getAdapter().deleteInstance(instanceName);
+    public void terminateInstance(String instanceURI) {
+        getAdapter().deleteInstance(instanceURI);
     }
 
     @Override
-    public Model monitorInstance(String instanceName) {
-        return getAdapter().getInstanceModel(instanceName);
+    public Model monitorInstance(String instanceURI) {
+        return getAdapter().getInstanceModel(instanceURI);
     }
 
     @Override
