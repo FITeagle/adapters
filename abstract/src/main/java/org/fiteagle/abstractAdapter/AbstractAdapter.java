@@ -135,7 +135,6 @@ public abstract class AbstractAdapter {
   protected void setModelPrefixes(Model model) {
     model.setNsPrefix(getAdapterSpecificPrefix()[0], getAdapterSpecificPrefix()[1]);
     model.setNsPrefix(getAdapterManagedResourcePrefix()[0], getAdapterManagedResourcePrefix()[1]);
-    model.setNsPrefix(getAdapterInstancePrefix()[0], getAdapterInstancePrefix()[1]);
     model.setNsPrefix("omn", "http://open-multinet.info/ontology/omn#");
     model.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
     model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
@@ -172,9 +171,7 @@ public abstract class AbstractAdapter {
   public abstract String[] getAdapterSpecificPrefix();
   
   public abstract String[] getAdapterManagedResourcePrefix();
-  
-  public abstract String[] getAdapterInstancePrefix();
-  
+
   public static class AdapterException extends Exception {
     
     private static final long serialVersionUID = -1664977530188161479L;

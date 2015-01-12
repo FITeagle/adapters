@@ -37,10 +37,10 @@ public class OpenstackAdapterTest {
   public void testAdapterPrefixes() {
     assertNotNull(adapter.getAdapterSpecificPrefix()[0]);
     assertNotNull(adapter.getAdapterManagedResourcePrefix()[0]);
-    assertNotNull(adapter.getAdapterInstancePrefix()[0]);
+    assertNotNull(adapter.getAdapterInstance().getNameSpace());
     assertNotNull(adapter.getAdapterSpecificPrefix()[1]);
     assertNotNull(adapter.getAdapterManagedResourcePrefix()[1]);
-    assertNotNull(adapter.getAdapterInstancePrefix()[1]);
+    assertNotNull(adapter.getAdapterInstance().getNameSpace());
   }
   
   @Test
@@ -65,21 +65,21 @@ public class OpenstackAdapterTest {
   @Test
   public void testCreateInstance() throws AdapterException{
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"server1");
+    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"server1");
     instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
-    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
+    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstance().getNameSpace()+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
     adapter.createInstances(modelCreate);
-    Model instanceModel = adapter.getInstanceModel(adapter.getAdapterInstancePrefix()[1]+"server1");
+    Model instanceModel = adapter.getInstanceModel(adapter.getAdapterInstance().getNameSpace()+"server1");
     assertNotNull(instanceModel);
     StmtIterator iterator = instanceModel.listStatements(null, RDF.type, adapter.getAdapterManagedResource());
     assertTrue(iterator.hasNext());
     Resource server = iterator.next().getSubject();
-    assertEquals(server.toString(), adapter.getAdapterInstancePrefix()[1]+"server1");
+    assertEquals(server.toString(), adapter.getAdapterInstance().getNameSpace()+"server1");
     String imageURI = server.getProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE()).getResource().getURI();
-    assertEquals(imageURI, adapter.getAdapterInstancePrefix()[1]+"testImageName");
+    assertEquals(imageURI, adapter.getAdapterInstance().getNameSpace()+"testImageName");
     String keyPairName = server.getProperty(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME()).getString();
     assertEquals(keyPairName, "testKeypairName");
     assertFalse(iterator.hasNext());
@@ -88,15 +88,15 @@ public class OpenstackAdapterTest {
   @Test
   public void testTerminateInstance() throws AdapterException{
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"server2");
+    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"server2");
     instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
-    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstancePrefix()[1]+"testImageName");
+    instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstance().getNameSpace()+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
     adapter.createInstances(modelCreate);
-    adapter.deleteInstance(adapter.getAdapterInstancePrefix()[1]+"server2");
-    Model instanceModel = adapter.getInstanceModel(adapter.getAdapterInstancePrefix()[1]+"server2");
+    adapter.deleteInstance(adapter.getAdapterInstance().getNameSpace()+"server2");
+    Model instanceModel = adapter.getInstanceModel(adapter.getAdapterInstance().getNameSpace()+"server2");
     assertNull(instanceModel);
   }
   

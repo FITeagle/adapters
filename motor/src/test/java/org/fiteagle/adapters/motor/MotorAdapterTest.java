@@ -29,14 +29,14 @@ public class MotorAdapterTest {
   @Test
   public void testCreateAndTerminate() throws AdapterException {
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource motor = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
+    Resource motor = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"InstanceOne");
     motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
     Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"rpm");
     motor.addLiteral(propertyRPM, 42);
     
     adapter.createInstances(modelCreate);
     
-    Resource updatedResource = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+"InstanceOne");
+    Resource updatedResource = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstance().getNameSpace()+"InstanceOne");
     Assert.assertEquals(42, updatedResource.getProperty(propertyRPM).getInt());
 
     adapter.deleteInstances(modelCreate);
@@ -46,7 +46,7 @@ public class MotorAdapterTest {
   
   @Test
   public void testMonitor() throws AdapterException {
-    String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";  
+    String instanceName = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
     Assert.assertTrue(adapter.getInstanceModel(instanceName) == null);
     
     Model modelCreate = ModelFactory.createDefaultModel();
@@ -63,23 +63,19 @@ public class MotorAdapterTest {
   
   @Test
   public void testGetters() {
-    // Getting Adapter Managed Resource must be implemented and return actual data
     Assert.assertNotNull(adapter.getAdapterManagedResource());
     Assert.assertTrue(adapter.getAdapterManagedResource() instanceof Resource);
-    // Same for Getting Adapter Instance
     Assert.assertNotNull(adapter.getAdapterInstance());
     Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);
-    // And Adapter Type
     Assert.assertNotNull(adapter.getAdapterType());
     Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);
-    // And Adapter DescriptionModel
     Assert.assertNotNull(adapter.getAdapterDescriptionModel());
     Assert.assertTrue(adapter.getAdapterDescriptionModel() instanceof Model);
   }
   
   @Test
   public void testConfigure() throws AdapterException {
-    String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";
+    String instanceName = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";
     
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource motorResource = modelCreate.createResource(instanceName);

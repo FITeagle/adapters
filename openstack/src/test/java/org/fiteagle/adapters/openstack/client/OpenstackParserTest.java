@@ -48,11 +48,11 @@ public class OpenstackParserTest {
   
   @Test
   public void testParseToResource(){
-    String serverString = "{\"id\": \"12345\",\"name\": \""+adapter.getAdapterInstancePrefix()[1]+"server1\"}";
+    String serverString = "{\"id\": \"12345\",\"name\": \""+adapter.getAdapterInstance().getNameSpace()+"server1\"}";
     Model resourceModel = openstackparser.parseToModel(serverString);
-    Resource resource = resourceModel.getResource(adapter.getAdapterInstancePrefix()[1]+"server1");
+    Resource resource = resourceModel.getResource(adapter.getAdapterInstance().getNameSpace()+"server1");
     assertEquals("server1", resource.getLocalName());
-    assertEquals(adapter.getAdapterInstancePrefix()[1]+"server1", resource.getProperty(RDFS.label).getLiteral().getValue());
+    assertEquals(adapter.getAdapterInstance().getNameSpace()+"server1", resource.getProperty(RDFS.label).getLiteral().getValue());
     assertEquals("12345", resource.getProperty(openstackparser.getPROPERTY_ID()).getLiteral().getValue());
   }
   
@@ -63,7 +63,7 @@ public class OpenstackParserTest {
     Images images = new Images(imageList);
     openstackparser.addToAdapterInstanceDescription(images);
     
-    Resource image = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+"image1");
+    Resource image = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstance().getNameSpace()+"image1");
     assertEquals("123", image.getProperty(openstackparser.getPROPERTY_IMAGE_ID()).getLiteral().getValue());
     assertEquals("image1", image.getProperty(RDFS.label).getLiteral().getValue());
     assertEquals(adapter.getImageResource(), image.getProperty(RDF.type).getObject());

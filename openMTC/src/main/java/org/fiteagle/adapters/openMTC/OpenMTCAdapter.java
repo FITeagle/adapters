@@ -106,11 +106,6 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  public String[] getAdapterInstancePrefix() {
-    return ADAPTER_INSTANCE_PREFIX.clone();
-  }
-
-  @Override
   public void updateAdapterDescription(){
     //TODO
   }

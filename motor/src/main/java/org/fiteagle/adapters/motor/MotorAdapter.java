@@ -21,7 +21,6 @@ public final class MotorAdapter extends AbstractAdapter {
   
   private static final String[] ADAPTER_SPECIFIC_PREFIX = new String[2];
   private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
-  private final String[] ADAPTER_INSTANCE_PREFIX = new String[2];
   
   private Model adapterModel;
   private Resource adapterInstance;
@@ -76,9 +75,6 @@ public final class MotorAdapter extends AbstractAdapter {
   private MotorAdapter(Resource adapterInstance, Model adapterModel) {
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
-    
-    ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
-    ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
   }
   
   @Override
@@ -143,11 +139,6 @@ public final class MotorAdapter extends AbstractAdapter {
   @Override
   public String[] getAdapterManagedResourcePrefix() {
     return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
-  }
-  
-  @Override
-  public String[] getAdapterInstancePrefix() {
-    return ADAPTER_INSTANCE_PREFIX.clone();
   }
   
   public Motor getInstanceByName(String instanceURI) {
