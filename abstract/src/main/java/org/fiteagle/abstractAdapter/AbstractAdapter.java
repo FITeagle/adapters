@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
+import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -124,7 +125,7 @@ public abstract class AbstractAdapter {
   
   public Model getAllInstancesModel() {
     Model modelInstances = ModelFactory.createDefaultModel();
-    setModelPrefixes(modelInstances);
+    MessageUtil.setCommonPrefixes(modelInstances);
     StmtIterator resourceIterator = getAdapterDescriptionModel().listStatements(null, RDF.type, getAdapterManagedResource());
     while(resourceIterator.hasNext()){
       modelInstances.add(getInstanceModel(resourceIterator.next().getSubject().getLocalName()));      
@@ -132,15 +133,6 @@ public abstract class AbstractAdapter {
     return modelInstances;
   }
   
-  protected void setModelPrefixes(Model model) {
-    model.setNsPrefix(getAdapterManagedResourcePrefix()[0], getAdapterManagedResourcePrefix()[1]);
-    model.setNsPrefix("omn", "http://open-multinet.info/ontology/omn#");
-    model.setNsPrefix("owl", "http://www.w3.org/2002/07/owl#");
-    model.setNsPrefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-    model.setNsPrefix("xsd", "http://www.w3.org/2001/XMLSchema#");
-    model.setNsPrefix("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-  }
-
   public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
     for (AdapterEventListener listener : listeners) {
       listener.publishModelUpdate(eventRDF, requestID, methodType, methodTarget);
@@ -167,8 +159,6 @@ public abstract class AbstractAdapter {
   
   protected abstract void handleDeleteInstance(String instanceURI);
   
-  public abstract String[] getAdapterManagedResourcePrefix();
-
   public static class AdapterException extends Exception {
     
     private static final long serialVersionUID = -1664977530188161479L;

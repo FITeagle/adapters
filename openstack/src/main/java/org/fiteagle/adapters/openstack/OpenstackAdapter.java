@@ -25,8 +25,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenstackAdapter extends AbstractAdapter {
 
-  private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
-  
   private IOpenstackClient openstackClient;
   private OpenstackParser openstackParser;
   
@@ -66,8 +64,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
-      ADAPTER_MANAGED_RESOURCE_PREFIX[1] = resource.getNameSpace();
-      ADAPTER_MANAGED_RESOURCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_MANAGED_RESOURCE_PREFIX[1]);
     }
     
     StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
@@ -91,11 +87,11 @@ public class OpenstackAdapter extends AbstractAdapter {
     this.adapterModel = adapterModel;
     
     Property PROPERTY_IMAGES = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"images");
-    Property PROPERTY_IMAGE = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"image");
-    Property PROPERTY_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"id");
-    Property PROPERTY_IMAGE_ID = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"imageid");
-    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"keypairname");
-    Property PROPERTY_FLAVOR = adapterModel.getProperty(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"flavor");
+    Property PROPERTY_IMAGE = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"image");
+    Property PROPERTY_ID = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"id");
+    Property PROPERTY_IMAGE_ID = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"imageid");
+    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"keypairname");
+    Property PROPERTY_FLAVOR = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"flavor");
     
     this.openstackClient = openstackClient;
     openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME, PROPERTY_FLAVOR);
@@ -112,11 +108,6 @@ public class OpenstackAdapter extends AbstractAdapter {
   @Override
   protected void handleDeleteInstance(String instanceURI) {
     openstackClient.deleteServer(openstackParser.getResourcePropertyID(instanceURI));
-  }
-  
-  @Override
-  public String[] getAdapterManagedResourcePrefix() {
-    return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
   }
   
   @Override
@@ -147,7 +138,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   public Resource getImageResource(){
-    return adapterModel.getResource(ADAPTER_MANAGED_RESOURCE_PREFIX[1]+"OpenstackImage");
+    return adapterModel.getResource(getAdapterManagedResource().getNameSpace()+"OpenstackImage");
   }
 
   @Override

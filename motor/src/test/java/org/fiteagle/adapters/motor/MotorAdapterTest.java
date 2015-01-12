@@ -31,7 +31,7 @@ public class MotorAdapterTest {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource motor = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"InstanceOne");
     motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
-    Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"rpm");
+    Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResource().getNameSpace()+"rpm");
     motor.addLiteral(propertyRPM, 42);
     
     adapter.createInstances(modelCreate);
@@ -85,9 +85,9 @@ public class MotorAdapterTest {
     Model modelConfigure = ModelFactory.createDefaultModel();
     Resource motor = modelConfigure.createResource(instanceName);
     motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
-    Property propertyRPM = modelConfigure.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"rpm");
+    Property propertyRPM = modelConfigure.createProperty(adapter.getAdapterManagedResource().getNameSpace()+"rpm");
     motor.addLiteral(propertyRPM, 23);
-    Property propertyManufacturer = modelConfigure.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"manufacturer");
+    Property propertyManufacturer = modelConfigure.createProperty(adapter.getAdapterManagedResource().getNameSpace()+"manufacturer");
     motor.addLiteral(propertyManufacturer, "TU Berlin");
     
     Model updatedResourceModel = adapter.configureInstances(modelConfigure);

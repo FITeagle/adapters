@@ -18,10 +18,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public final class OpenSDNCoreAdapter extends AbstractAdapter {
   
-  private static final String[] ADAPTER_SPECIFIC_PREFIX = new String[2];
-  private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
-  private final String[] ADAPTER_INSTANCE_PREFIX = new String[2];
-  
   private Model adapterModel;
   private Resource adapterInstance;
   private static Resource adapter;
@@ -42,16 +38,12 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
         MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
       adapter = adapterIterator.next().getSubject();
-      ADAPTER_SPECIFIC_PREFIX[1] = adapter.getNameSpace();
-      ADAPTER_SPECIFIC_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_SPECIFIC_PREFIX[1]);
     }
     
     StmtIterator resourceIterator = adapterModel.listStatements(adapter,
         MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
-      ADAPTER_MANAGED_RESOURCE_PREFIX[1] = resource.getNameSpace();
-      ADAPTER_MANAGED_RESOURCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_MANAGED_RESOURCE_PREFIX[1]);
     }
     
     StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
@@ -73,9 +65,6 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   private OpenSDNCoreAdapter(Resource adapterInstance, Model adapterModel) {
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
-    
-    ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
-    ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
   }
   
   @Override
@@ -91,11 +80,6 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   @Override
   protected void handleDeleteInstance(String instanceURI) {
     return;
-  }
-  
-  @Override
-  public String[] getAdapterManagedResourcePrefix() {
-    return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
   }
   
   @Override

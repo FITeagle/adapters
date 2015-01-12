@@ -19,9 +19,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class OpenMTCAdapter extends AbstractAdapter {
 
-  private static final String[] ADAPTER_MANAGED_RESOURCE_PREFIX = new String[2];
-  private final String[] ADAPTER_INSTANCE_PREFIX = new String[2];
-  
   private OpenMTCClient openMTCClient;
   
   private static Resource adapter;
@@ -48,8 +45,6 @@ public class OpenMTCAdapter extends AbstractAdapter {
     StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
-      ADAPTER_MANAGED_RESOURCE_PREFIX[1] = resource.getNameSpace();
-      ADAPTER_MANAGED_RESOURCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_MANAGED_RESOURCE_PREFIX[1]);
     }
     
     StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
@@ -76,9 +71,6 @@ public class OpenMTCAdapter extends AbstractAdapter {
     
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
-    
-    ADAPTER_INSTANCE_PREFIX[1] = adapterInstance.getNameSpace();
-    ADAPTER_INSTANCE_PREFIX[0] = adapterModel.getNsURIPrefix(ADAPTER_INSTANCE_PREFIX[1]);
   }
   
   @Override
@@ -90,11 +82,6 @@ public class OpenMTCAdapter extends AbstractAdapter {
   @Override
   protected void handleDeleteInstance(String instanceName) {
     //TODO
-  }
-  
-  @Override
-  public String[] getAdapterManagedResourcePrefix() {
-    return ADAPTER_MANAGED_RESOURCE_PREFIX.clone();
   }
   
   @Override

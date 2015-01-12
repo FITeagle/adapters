@@ -30,8 +30,7 @@ public class OpenMTCAdapterTest {
   
   @Test
   public void testAdapterPrefixes() {
-    assertNotNull(adapter.getAdapterManagedResourcePrefix()[0]);
-    assertNotNull(adapter.getAdapterManagedResourcePrefix()[1]);
+    assertNotNull(adapter.getAdapterManagedResource().getNameSpace());
     assertNotNull(adapter.getAdapterInstance().getNameSpace());
   }
   
