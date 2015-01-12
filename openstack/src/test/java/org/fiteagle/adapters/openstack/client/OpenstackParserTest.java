@@ -48,11 +48,11 @@ public class OpenstackParserTest {
   
   @Test
   public void testParseToResource(){
-    String serverString = "{\"id\": \"12345\",\"name\": \"server1\"}";
+    String serverString = "{\"id\": \"12345\",\"name\": \""+adapter.getAdapterInstancePrefix()[1]+"server1\"}";
     Model resourceModel = openstackparser.parseToModel(serverString);
     Resource resource = resourceModel.getResource(adapter.getAdapterInstancePrefix()[1]+"server1");
     assertEquals("server1", resource.getLocalName());
-    assertEquals("server1", resource.getProperty(RDFS.label).getLiteral().getValue());
+    assertEquals(adapter.getAdapterInstancePrefix()[1]+"server1", resource.getProperty(RDFS.label).getLiteral().getValue());
     assertEquals("12345", resource.getProperty(openstackparser.getPROPERTY_ID()).getLiteral().getValue());
   }
   

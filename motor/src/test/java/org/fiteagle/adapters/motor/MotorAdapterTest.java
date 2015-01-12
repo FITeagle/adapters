@@ -46,11 +46,11 @@ public class MotorAdapterTest {
   
   @Test
   public void testMonitor() throws AdapterException {
-    String instanceName = "InstanceOne";    
+    String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";  
     Assert.assertTrue(adapter.getInstanceModel(instanceName) == null);
     
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource motorResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    Resource motorResource = modelCreate.createResource(instanceName);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
     adapter.createInstances(modelCreate);
     
@@ -79,15 +79,15 @@ public class MotorAdapterTest {
   
   @Test
   public void testConfigure() throws AdapterException {
-    String instanceName = "InstanceOne";
+    String instanceName = adapter.getAdapterInstancePrefix()[1]+"InstanceOne";
     
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource motorResource = modelCreate.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    Resource motorResource = modelCreate.createResource(instanceName);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
     adapter.createInstances(modelCreate);
 
     Model modelConfigure = ModelFactory.createDefaultModel();
-    Resource motor = modelConfigure.createResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    Resource motor = modelConfigure.createResource(instanceName);
     motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
     Property propertyRPM = modelConfigure.createProperty(adapter.getAdapterManagedResourcePrefix()[1]+"rpm");
     motor.addLiteral(propertyRPM, 23);
@@ -96,7 +96,7 @@ public class MotorAdapterTest {
     
     Model updatedResourceModel = adapter.configureInstances(modelConfigure);
     
-    Resource updatedResource = updatedResourceModel.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    Resource updatedResource = updatedResourceModel.getResource(instanceName);
     Assert.assertEquals(23, updatedResource.getProperty(propertyRPM).getInt());
     Assert.assertEquals("TU Berlin", updatedResource.getProperty(propertyManufacturer).getString());
     

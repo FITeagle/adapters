@@ -32,7 +32,7 @@ public abstract class AbstractAdapter {
     
     Model createdInstancesModel = ModelFactory.createDefaultModel();    
     while (resourceInstanceIterator.hasNext()) {
-      String instanceName = resourceInstanceIterator.next().getSubject().getLocalName();
+      String instanceName = resourceInstanceIterator.next().getSubject().getURI();
       if(!containsInstance(instanceName)) {
         Model createdInstance = handleCreateInstance(instanceName, model);
         LOGGER.log(Level.INFO, "Created instance: " + instanceName);
@@ -53,7 +53,7 @@ public abstract class AbstractAdapter {
   public void deleteInstances(Model model) {
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
     while (resourceInstanceIterator.hasNext()) {
-      String instanceName = resourceInstanceIterator.next().getSubject().getLocalName();
+      String instanceName = resourceInstanceIterator.next().getSubject().getURI();
       deleteInstance(instanceName);     
     }
   }
@@ -77,7 +77,7 @@ public abstract class AbstractAdapter {
       while (propertiesIterator.hasNext()) {
         configureModel.add(propertiesIterator.next());
       }
-      Model updatedModel = handleConfigureInstance(resourceInstance.getLocalName(), configureModel);
+      Model updatedModel = handleConfigureInstance(resourceInstance.getURI(), configureModel);
       configuredInstancesModel.add(updatedModel);
     }
     if (configuredInstancesModel.isEmpty()) {
@@ -104,7 +104,7 @@ public abstract class AbstractAdapter {
   public Model getInstanceModel(String instanceName) {
     if (containsInstance(instanceName)) {
       Model resourceModel = ModelFactory.createDefaultModel();
-      Resource resource = getAdapterDescriptionModel().getResource(getAdapterInstancePrefix()[1]+instanceName);
+      Resource resource = getAdapterDescriptionModel().getResource(instanceName);
       StmtIterator iter = resource.listProperties();
       while(iter.hasNext()){
         resourceModel.add(iter.next());
@@ -115,7 +115,7 @@ public abstract class AbstractAdapter {
   }
   
   private boolean containsInstance(String instanceName){
-    Resource instance = getAdapterDescriptionModel().getResource(getAdapterInstancePrefix()[1]+instanceName);
+    Resource instance = getAdapterDescriptionModel().getResource(instanceName);
     if(instance != null && getAdapterDescriptionModel().contains(instance, RDF.type, getAdapterManagedResource())){
       return true;
     }

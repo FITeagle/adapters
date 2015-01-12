@@ -119,7 +119,7 @@ public class OpenstackParser {
   }
 	
 	public Model parseToModel(Server server){
-	  Resource resource = ModelFactory.createDefaultModel().createResource((adapter.getAdapterInstancePrefix()[1]+server.getName()));
+	  Resource resource = ModelFactory.createDefaultModel().createResource(server.getName());
 	  resource.addProperty(RDF.type, adapter.getAdapterManagedResource());
 	  resource.addProperty(RDFS.label, server.getName());
     for(Property p : OpenstackAdapter.resourceInstanceProperties){
@@ -193,16 +193,16 @@ public class OpenstackParser {
 	}
 	
 	public String getResourcePropertyID(String instanceName){
-	  return adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstancePrefix()[1]+instanceName).getProperty(PROPERTY_ID).getLiteral().getValue().toString();
+	  return adapter.getAdapterDescriptionModel().getResource(instanceName).getProperty(PROPERTY_ID).getLiteral().getValue().toString();
 	}
 
 	private String getStringPropertyValue(String instanceName, Model model, Property property){
-	  Resource imagesResource = model.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+	  Resource imagesResource = model.getResource(instanceName);
 	  return imagesResource.getProperty(property).getLiteral().getValue().toString();  
 	}
 	
 	private RDFNode getResourcePropertyValue(String instanceName, Model model, Property property){
-    Resource imagesResource = model.getResource(adapter.getAdapterInstancePrefix()[1]+instanceName);
+    Resource imagesResource = model.getResource(instanceName);
     return imagesResource.getProperty(property).getObject();
   }
 	

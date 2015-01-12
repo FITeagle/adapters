@@ -94,7 +94,7 @@ public class Motor {
   }
   
   public void updateProperty(Statement configureStatement) {
-    if(configureStatement.getSubject().getLocalName().equals(instanceName)){
+    if(configureStatement.getSubject().getURI().equals(instanceName)){
       switch (configureStatement.getPredicate().getLocalName()) {
         case "rpm":
           this.setRpm(configureStatement.getInt());

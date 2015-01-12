@@ -90,7 +90,7 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   protected Model parseToModel(Motor motor) {
-    Resource resource = ModelFactory.createDefaultModel().createResource((ADAPTER_INSTANCE_PREFIX[1] + motor.getInstanceName()));
+    Resource resource = ModelFactory.createDefaultModel().createResource(motor.getInstanceName());
     resource.addProperty(RDF.type, MotorAdapter.resource);
     resource.addProperty(RDFS.label, motor.getInstanceName());
     for (Property p : motorControlProperties) {
