@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import org.fiteagle.adapters.openstack.OpenstackAdapter;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
@@ -57,16 +56,7 @@ public class OpenstackClient implements IOpenstackClient{
 	
 	private String networkId = "";
 
-	private static HashMap<OpenstackAdapter, OpenstackClient> instances = new HashMap<OpenstackAdapter, OpenstackClient>();
-  
-  public static synchronized OpenstackClient getInstance(OpenstackAdapter adapter) {
-    if (instances.get(adapter) == null) {
-      instances.put(adapter, new OpenstackClient());
-    }
-    return instances.get(adapter);
-  }
-	
-	private OpenstackClient() {
+	public OpenstackClient() {
 	}
 	
 	private boolean PREFERENCES_INITIALIZED = false;

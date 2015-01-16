@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
@@ -25,10 +24,7 @@ public class OpenstackParserTest {
   
   @BeforeClass
   public static void setup(){
-    Iterator<String> iter = OpenstackAdapter.adapterInstances.keySet().iterator();
-    if(iter.hasNext()){
-        adapter = (OpenstackAdapter) OpenstackAdapter.adapterInstances.get(iter.next());
-    }
+    adapter = (OpenstackAdapter) OpenstackAdapter.adapterInstances.values().iterator().next();
     openstackparser =  adapter.getOpenstackParser();
   }
   
@@ -52,8 +48,8 @@ public class OpenstackParserTest {
     Model resourceModel = openstackparser.parseToModel(serverString);
     Resource resource = resourceModel.getResource(adapter.getAdapterInstance().getNameSpace()+"server1");
     assertEquals("server1", resource.getLocalName());
-    assertEquals(adapter.getAdapterInstance().getNameSpace()+"server1", resource.getProperty(RDFS.label).getLiteral().getValue());
-    assertEquals("12345", resource.getProperty(openstackparser.getPROPERTY_ID()).getLiteral().getValue());
+    assertEquals("server1", resource.getProperty(RDFS.label).getLiteral().getString());
+    assertEquals("12345", resource.getProperty(openstackparser.getPROPERTY_ID()).getLiteral().getString());
   }
   
   @Test
@@ -65,8 +61,8 @@ public class OpenstackParserTest {
     
     Resource image = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstance().getNameSpace()+"image1");
     assertEquals("123", image.getProperty(openstackparser.getPROPERTY_IMAGE_ID()).getLiteral().getValue());
-    assertEquals("image1", image.getProperty(RDFS.label).getLiteral().getValue());
-    assertEquals(adapter.getImageResource(), image.getProperty(RDF.type).getObject());
+    assertEquals("image1", image.getProperty(RDFS.label).getLiteral().getString());
+    assertEquals(adapter.getImageResource(), image.getProperty(RDF.type).getResource());
   }
   
 }

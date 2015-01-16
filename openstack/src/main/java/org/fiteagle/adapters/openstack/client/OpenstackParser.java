@@ -42,19 +42,19 @@ public class OpenstackParser {
   
   private static HashMap<OpenstackAdapter, OpenstackParser> instances = new HashMap<OpenstackAdapter, OpenstackParser>();
   
-  public OpenstackParser(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME, Property PROPERTY_FLAVOR) {
+  public OpenstackParser(OpenstackAdapter adapter) {
     this.adapter = adapter;
-    this.PROPERTY_ID = PROPERTY_ID;
-    this.PROPERTY_IMAGE_ID = PROPERTY_IMAGE_ID;
-    this.PROPERTY_IMAGES = PROPERTY_IMAGES;
-    this.PROPERTY_IMAGE = PROPERTY_IMAGE;    
-    this.PROPERTY_KEYPAIRNAME = PROPERTY_KEYPAIRNAME;
-    this.PROPERTY_FLAVOR = PROPERTY_FLAVOR;
+    PROPERTY_IMAGES = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"images");
+    PROPERTY_IMAGE = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"image");
+    PROPERTY_ID = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"id");
+    PROPERTY_IMAGE_ID = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"imageid");
+    PROPERTY_KEYPAIRNAME = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"keypairname");
+    PROPERTY_FLAVOR = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"flavor");
   }
 
-  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter, Property PROPERTY_ID, Property PROPERTY_IMAGE_ID, Property PROPERTY_IMAGES, Property PROPERTY_IMAGE, Property PROPERTY_KEYPAIRNAME, Property PROPERTY_FLAVOR) {
+  public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter) {
     if (instances.get(adapter) == null) {
-      instances.put(adapter, new OpenstackParser(adapter, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME, PROPERTY_FLAVOR));
+      instances.put(adapter, new OpenstackParser(adapter));
     }
     return instances.get(adapter);
   }
@@ -121,7 +121,7 @@ public class OpenstackParser {
 	public Model parseToModel(Server server){
 	  Resource resource = ModelFactory.createDefaultModel().createResource(server.getName());
 	  resource.addProperty(RDF.type, adapter.getAdapterManagedResource());
-	  resource.addProperty(RDFS.label, server.getName());
+	  resource.addProperty(RDFS.label, resource.getLocalName());
     for(Property p : OpenstackAdapter.resourceInstanceProperties){
       switch(p.getLocalName()){
         case "id": 

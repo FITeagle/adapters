@@ -39,14 +39,9 @@ public class OpenstackAdapter extends AbstractAdapter {
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
   public static OpenstackAdapter getTestInstance(IOpenstackClient openstackClient){
-    OpenstackAdapter testInstance = null;
-    Model adapterModel = OntologyModelUtil.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
-    StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
-    while (adapterInstanceIterator.hasNext()) {
-      Resource adapterInstance = adapterInstanceIterator.next().getSubject();
-      testInstance = new OpenstackAdapter(adapterInstance, adapterModel, openstackClient);
-      testInstance.updateAdapterDescription();
-    }
+    OpenstackAdapter instance = (OpenstackAdapter) adapterInstances.values().iterator().next();
+    OpenstackAdapter testInstance = new OpenstackAdapter(instance.getAdapterInstance(), instance.getAdapterDescriptionModel(), openstackClient);
+    testInstance.updateAdapterDescription();
     return testInstance;
   }
   
@@ -72,10 +67,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
     while (adapterInstanceIterator.hasNext()) {
       Resource adapterInstance = adapterInstanceIterator.next().getSubject();
-      
-      OpenstackAdapter openstackAdapter = new OpenstackAdapter(adapterInstance, adapterModel, null);
-      openstackAdapter.openstackClient = OpenstackClient.getInstance(openstackAdapter);
-      adapterInstances.put(adapterInstance.getURI(), openstackAdapter);
+      new OpenstackAdapter(adapterInstance, adapterModel, new OpenstackClient());
     }
   }
   
@@ -83,15 +75,10 @@ public class OpenstackAdapter extends AbstractAdapter {
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
     
-    Property PROPERTY_IMAGES = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"images");
-    Property PROPERTY_IMAGE = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"image");
-    Property PROPERTY_ID = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"id");
-    Property PROPERTY_IMAGE_ID = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"imageid");
-    Property PROPERTY_KEYPAIRNAME = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"keypairname");
-    Property PROPERTY_FLAVOR = adapterModel.getProperty(getAdapterManagedResource().getNameSpace()+"flavor");
-    
     this.openstackClient = openstackClient;
-    openstackParser = OpenstackParser.getInstance(this, PROPERTY_ID, PROPERTY_IMAGE_ID, PROPERTY_IMAGES, PROPERTY_IMAGE, PROPERTY_KEYPAIRNAME, PROPERTY_FLAVOR);
+    this.openstackParser = OpenstackParser.getInstance(this);
+    
+    adapterInstances.put(adapterInstance.getURI(), this);
   }
   
   @Override
