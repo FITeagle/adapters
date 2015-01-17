@@ -174,7 +174,7 @@ public class OpenstackParser {
     Resource imagesResource = adapterModel.createResource(adapter.getAdapterInstance().getURI()+"_images");
     int i = 1;
     for(Image image : images.getList()){
-      Resource imageResource = adapterModel.createResource(adapter.getAdapterInstance().getNameSpace()+image.getName().replace(" ", "_"));
+      Resource imageResource = adapterModel.createResource(adapter.getAdapterInstance().getNameSpace()+image.getName().replace(" ", "_").replace(".","-"));
       imageResource.addProperty(RDF.type, adapter.getImageResource());
       imageResource.addProperty(PROPERTY_IMAGE_ID, adapterModel.createLiteral(image.getId()));
       imageResource.addProperty(RDFS.label, adapterModel.createLiteral(image.getName()));
