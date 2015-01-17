@@ -64,11 +64,15 @@ public class OpenstackAdapter extends AbstractAdapter {
       resourceInstanceProperties.add(p);
     }
     
-    StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
-    while (adapterInstanceIterator.hasNext()) {
-      Resource adapterInstance = adapterInstanceIterator.next().getSubject();
-      new OpenstackAdapter(adapterInstance, adapterModel, new OpenstackClient());
-    }
+    createDefaultAdapterInstance(adapterModel);
+  }
+  
+  private static void createDefaultAdapterInstance(Model model){
+    Resource adapterInstance = model.createResource("http://federation.av.tu-berlin.de/about#Openstack-1");
+    adapterInstance.addProperty(RDF.type, adapter);
+    adapterInstance.addProperty(RDFS.label, "Openstack-1");
+    adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");
+    new OpenstackAdapter(adapterInstance, model, new OpenstackClient());
   }
   
   private OpenstackAdapter(Resource adapterInstance, Model adapterModel, IOpenstackClient openstackClient){
