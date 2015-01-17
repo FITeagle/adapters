@@ -1,5 +1,7 @@
+@prefix rdf:           <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix foaf:          <http://xmlns.com/foaf/0.1/> .
 @prefix owl:           <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
 @prefix av:            <http://federation.av.tu-berlin.de/about#> .
@@ -15,7 +17,7 @@ motorgarage:MotorGarage
 
 av:MotorGarage-1
         a  motorgarage:MotorGarage ;
-        omn:partOf av:AV_Smart_Communication_Testbed ;
+        omn:partOfGroup av:AV_Smart_Communication_Testbed ;
         omn:maxInstances 10 ;
         rdfs:comment  "A deployed motor garage adapter that can simulate different dynamic motor resources."@en ;
         rdfs:label    "MotorGarage-1"@en ;
