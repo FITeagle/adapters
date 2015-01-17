@@ -52,19 +52,29 @@ public final class MotorAdapter extends AbstractAdapter {
       motorControlProperties.add(p);
     }
     
-    StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
-    while (adapterInstanceIterator.hasNext()) {
-      Resource adapterInstance = adapterInstanceIterator.next().getSubject();
-      
-      MotorAdapter motorAdapter = new MotorAdapter(adapterInstance, adapterModel);
-      
-      adapterInstances.put(adapterInstance.getURI(), motorAdapter);
-    }
+    createDefaultAdapterInstance(adapterModel);
+  }
+  
+  private static void createDefaultAdapterInstance(Model model){
+    Resource adapterInstance = model.createResource("http://federation.av.tu-berlin.de/about#MotorGarage-1");
+    adapterInstance.addProperty(RDF.type, adapter);
+    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
+    adapterInstance.addProperty(RDFS.comment, "A motor garage adapter that can simulate different dynamic motor resources.");
+    adapterInstance.addLiteral(MessageBusOntologyModel.maxInstances, 10);
+    Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+    adapterInstance.addProperty(MessageBusOntologyModel.partOfFederation, testbed);
+    Property longitude = model.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long");
+    Property latitude = model.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
+    adapterInstance.addProperty(latitude, "52.516377");
+    adapterInstance.addProperty(longitude, "13.323732");
+    
+    new MotorAdapter(adapterInstance, model);
   }
   
   private MotorAdapter(Resource adapterInstance, Model adapterModel) {
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
+    adapterInstances.put(adapterInstance.getURI(), this);
   }
   
   @Override
