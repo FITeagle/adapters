@@ -1,38 +1,45 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <name>FITeagle :: Adapters :: OpenSDNCore</name>
-  <groupId>org.fiteagle.adapters</groupId>
-  <artifactId>openSDNCore</artifactId>
-  <packaging>war</packaging>
-  <version>0.1-SNAPSHOT</version>
-  <parent>
-    <groupId>org.fiteagle</groupId>
-    <artifactId>adapters</artifactId>
-    <version>0.1-SNAPSHOT</version>
-  </parent>
+	<name>FITeagle :: Adapters :: OpenSDNCore</name>
+	<groupId>org.fiteagle.adapters</groupId>
+	<artifactId>openSDNCore</artifactId>
+	<packaging>war</packaging>
+	<version>0.1-SNAPSHOT</version>
+	<parent>
+		<groupId>org.fiteagle</groupId>
+		<artifactId>adapters</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.fiteagle.adapters</groupId>
-      <artifactId>abstract</artifactId>
-      <version>0.1-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>org.fiteagle.adapters</groupId>
+			<artifactId>abstract</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-client</artifactId>
+			<version>3.0.10.Final</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
-  <build>
-    <finalName>${project.artifactId}</finalName>
-    <plugins>
-      <plugin>
-        <groupId>org.wildfly.plugins</groupId>
-        <artifactId>wildfly-maven-plugin</artifactId>
-        <version>${wildfly.version}</version>
-        <configuration>
-          <skip>false</skip>
-          <filename>${project.build.finalName}.war</filename>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${wildfly.version}</version>
+				<configuration>
+					<skip>false</skip>
+					<filename>${project.build.finalName}.war</filename>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
