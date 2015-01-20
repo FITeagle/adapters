@@ -10,11 +10,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
@@ -34,25 +36,25 @@ public abstract class AbstractAdapterREST {
   @GET
   @Path("/{adapterName}/instance")
   @Produces("text/turtle")
-  public String getAllInstancesTurtle(@PathParam("adapterName") String adapterName) {
+  public String getAllInstancesTurtle(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
-    return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_TURTLE);
+    return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
   }
   
   @GET
   @Path("/{adapterName}/instance")
   @Produces("application/rdf+xml")
-  public String getAllInstancesRDF(@PathParam("adapterName") String adapterName) {
+  public String getAllInstancesRDF(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
-    return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_RDFXML);
+    return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_RDFXML);
   }
   
   @GET
   @Path("/{adapterName}/instance")
   @Produces("application/n-triples")
-  public String getAllInstancesNTRIPLE(@PathParam("adapterName") String adapterName) {
+  public String getAllInstancesNTRIPLE(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
-    return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_NTRIPLE);
+    return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_NTRIPLE);
   }
   
   @PUT
@@ -88,7 +90,11 @@ public abstract class AbstractAdapterREST {
   @Produces("text/html")
   public Response terminateInstance(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
-    adapter.deleteInstance(instanceURI);
+    try {
+      adapter.deleteInstance(instanceURI);
+    } catch (InstanceNotFoundException e) {
+      return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
+    }
     return Response.status(Response.Status.OK.getStatusCode()).build();
   }
   
@@ -97,7 +103,12 @@ public abstract class AbstractAdapterREST {
   @Produces("text/turtle")
   public String monitorInstanceTurtle(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
-    Model model = adapter.getInstanceModel(instanceURI);
+    Model model;
+    try {
+      model = adapter.getInstance(instanceURI);
+    } catch (InstanceNotFoundException e) {
+      throw new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
+    }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_TURTLE);
   }
   
@@ -106,7 +117,12 @@ public abstract class AbstractAdapterREST {
   @Produces("application/rdf+xml")
   public String monitorInstanceRDF(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
-    Model model = adapter.getInstanceModel(instanceURI);
+    Model model;
+    try {
+      model = adapter.getInstance(instanceURI);
+    } catch (InstanceNotFoundException e) {
+      throw new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
+    }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_RDFXML);
   }
   
@@ -115,7 +131,12 @@ public abstract class AbstractAdapterREST {
   @Produces("application/n-triples")
   public String monitorInstanceNTRIPLE(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
-    Model model = adapter.getInstanceModel(instanceURI);
+    Model model;
+    try {
+      model = adapter.getInstance(instanceURI);
+    } catch (InstanceNotFoundException e) {
+      throw new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
+    }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_NTRIPLE);
   }
 }

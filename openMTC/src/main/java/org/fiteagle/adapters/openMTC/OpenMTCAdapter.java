@@ -71,13 +71,13 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleCreateInstance(String instanceName, Model createModel) {
+  public Model createInstance(String instanceName, Model createModel) {
     openMTCClient.setUpConnection(createModel);
     return null;
   }
 
   @Override
-  protected void handleDeleteInstance(String instanceName) {
+  public void deleteInstance(String instanceName) {
     //TODO
   }
   
@@ -87,7 +87,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleConfigureInstance(String instanceName, Model configureModel) {
+  public Model configureInstance(String instanceName, Model configureModel) {
     return null;
     // TODO Auto-generated method stub
   }
@@ -110,6 +110,18 @@ public class OpenMTCAdapter extends AbstractAdapter {
   @Override
   public Model getAdapterDescriptionModel() {
     return adapterModel;
+  }
+
+  @Override
+  public Model getInstance(String instanceURI) throws InstanceNotFoundException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Model getAllInstances() throws InstanceNotFoundException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

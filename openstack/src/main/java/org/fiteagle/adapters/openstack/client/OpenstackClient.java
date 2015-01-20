@@ -177,25 +177,25 @@ public class OpenstackClient implements IOpenstackClient{
 	
 	@Override
 	public Servers listServers() {
-	    Access access = getAccessWithTenantId();
-	    
-	    Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
-	    novaClient.token(access.getToken().getId());
-	
-	    OpenStackRequest<String> request = new OpenStackRequest<String>(
-	        novaClient, HttpMethod.GET, "/servers/detail", null,
-	        String.class);
-	    
-	    String response = null;
-	    try{
-	      response = novaClient.execute(request);
-	    } catch(OpenStackResponseException e){
-	      LOGGER.log(Level.SEVERE, e.getMessage());
-	      return null;
-	    }
-	    Servers servers = OpenstackParser.parseToServers(response);
+    Access access = getAccessWithTenantId();
     
-	    return servers;
+    Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
+    novaClient.token(access.getToken().getId());
+
+    OpenStackRequest<String> request = new OpenStackRequest<String>(
+        novaClient, HttpMethod.GET, "/servers/detail", null,
+        String.class);
+    
+    String response = null;
+    try{
+      response = novaClient.execute(request);
+    } catch(OpenStackResponseException e){
+      LOGGER.log(Level.SEVERE, e.getMessage());
+      return null;
+    }
+    Servers servers = OpenstackParser.parseToServers(response);
+  
+    return servers;
 	}
 	
 	private Access getAccessWithTenantId() throws InsufficientOpenstackPreferences{

@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.openstack.client;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import org.fiteagle.adapters.openstack.client.model.Image;
 import org.fiteagle.adapters.openstack.client.model.Images;
@@ -23,6 +24,8 @@ public class OpenstackTestClient implements IOpenstackClient {
     return instance;
   }
   
+  private Servers servers = new Servers();
+  
   @Override
   public Flavors listFlavors() {
     return null;
@@ -38,7 +41,7 @@ public class OpenstackTestClient implements IOpenstackClient {
   
   @Override
   public Servers listServers() {
-    return null;
+    return servers;
   }
   
   @Override
@@ -48,18 +51,25 @@ public class OpenstackTestClient implements IOpenstackClient {
     server.setKeyName(serverForCreate.getKeyName());
     server.setImage(image);
     server.setName(serverForCreate.getName());
-    server.setId("123");
+    Random random = new Random();
+    server.setId(String.valueOf(random.nextLong()));
+    
+    servers.getList().add(server);
     return server;
   }
 
   @Override
   public Server getServerDetails(String id) {
+    for(Server server : servers.getList()){
+      if(server.getId().equals(id)){
+        return server;
+      }
+    }
     return null;
   }
 
   @Override
   public void allocateFloatingIpForServer(String serverId, String floatingIp) {
-   
   }
 
   @Override
@@ -74,17 +84,21 @@ public class OpenstackTestClient implements IOpenstackClient {
   
   @Override
   public void addKeyPair(String name, String publicKey){
-    
   }
 
   @Override
   public void deleteKeyPair(String name){
-    
   }
   
   @Override
   public void deleteServer(String id){
-    
+    Server serverToDelete = null;
+    for(Server server : servers.getList()){
+      if(server.getId().equals(id)){
+        serverToDelete = server;
+      }
+    }
+    servers.getList().remove(serverToDelete);
   }
 
 }

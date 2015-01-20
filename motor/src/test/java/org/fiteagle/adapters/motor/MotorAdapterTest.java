@@ -2,6 +2,7 @@ package org.fiteagle.adapters.motor;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,38 +24,46 @@ public class MotorAdapterTest {
   }
   
   @Test
-  public void testCreateAndTerminate() throws AdapterException {
+  public void testCreateAndTerminate() throws AdapterException, InstanceNotFoundException {
+    String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
+    
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource motor = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"InstanceOne");
+    Resource motor = modelCreate.createResource(instanceURI);
     motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
     Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResource().getNameSpace()+"rpm");
     motor.addLiteral(propertyRPM, 42);
     
     adapter.createInstances(modelCreate);
     
-    Resource updatedResource = adapter.getAdapterDescriptionModel().getResource(adapter.getAdapterInstance().getNameSpace()+"InstanceOne");
-    Assert.assertEquals(42, updatedResource.getProperty(propertyRPM).getInt());
+    Model createdResourceModel = adapter.getInstance(instanceURI);
+    Resource resource = createdResourceModel.getResource(instanceURI);
+    Assert.assertEquals(42, resource.getProperty(propertyRPM).getInt());
 
     adapter.deleteInstances(modelCreate);
-    StmtIterator iter = adapter.getAllInstancesModel().listStatements();
+    StmtIterator iter = adapter.getAllInstances().listStatements();
     Assert.assertFalse(iter.hasNext());
   }
   
+  @Test(expected=InstanceNotFoundException.class)
+  public void testGetNonExistingInstance() throws InstanceNotFoundException{
+    String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
+    adapter.getInstance(instanceURI);
+  }
+  
   @Test
-  public void testMonitor() throws AdapterException {
-    String instanceName = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
-    Assert.assertTrue(adapter.getInstanceModel(instanceName) == null);
+  public void testMonitor() throws AdapterException, InstanceNotFoundException {
+    String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
     
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource motorResource = modelCreate.createResource(instanceName);
+    Resource motorResource = modelCreate.createResource(instanceURI);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
     adapter.createInstances(modelCreate);
     
-    Model monitorData = adapter.getInstanceModel(instanceName);
+    Model monitorData = adapter.getInstance(instanceURI);
     Assert.assertFalse(monitorData.isEmpty());
     Assert.assertTrue(monitorData.containsAll(modelCreate));
     
-    adapter.deleteInstance(instanceName);
+    adapter.deleteInstance(instanceURI);
   }
   
   @Test
@@ -70,16 +79,16 @@ public class MotorAdapterTest {
   }
   
   @Test
-  public void testConfigure() throws AdapterException {
-    String instanceName = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";
+  public void testConfigure() throws AdapterException, InstanceNotFoundException {
+    String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";
     
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource motorResource = modelCreate.createResource(instanceName);
+    Resource motorResource = modelCreate.createResource(instanceURI);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
     adapter.createInstances(modelCreate);
 
     Model modelConfigure = ModelFactory.createDefaultModel();
-    Resource motor = modelConfigure.createResource(instanceName);
+    Resource motor = modelConfigure.createResource(instanceURI);
     motor.addProperty(RDF.type, adapter.getAdapterManagedResource());
     Property propertyRPM = modelConfigure.createProperty(adapter.getAdapterManagedResource().getNameSpace()+"rpm");
     motor.addLiteral(propertyRPM, 23);
@@ -88,11 +97,11 @@ public class MotorAdapterTest {
     
     Model updatedResourceModel = adapter.configureInstances(modelConfigure);
     
-    Resource updatedResource = updatedResourceModel.getResource(instanceName);
+    Resource updatedResource = updatedResourceModel.getResource(instanceURI);
     Assert.assertEquals(23, updatedResource.getProperty(propertyRPM).getInt());
     Assert.assertEquals("TU Berlin", updatedResource.getProperty(propertyManufacturer).getString());
     
-    adapter.deleteInstance(instanceName);
+    adapter.deleteInstance(instanceURI);
   }
   
 }

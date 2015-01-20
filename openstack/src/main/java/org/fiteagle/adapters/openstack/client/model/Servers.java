@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.openstack.client.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class Servers implements Iterable<Server>, Serializable {
 
   private static final long serialVersionUID = -5868007654154799223L;
   @JsonProperty("servers")
-  private List<Server> list;
+  private List<Server> list = new ArrayList<>();
 
   public List<Server> getList() {
     return list;

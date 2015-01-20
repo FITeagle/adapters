@@ -78,17 +78,17 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleCreateInstance(String instanceURI, Model modelCreate) {
+  public Model createInstance(String instanceURI, Model modelCreate) {
     Motor motor = new Motor(this, instanceURI);
     instanceList.put(instanceURI, motor);
-    handleConfigureInstance(instanceURI, modelCreate);
+    configureInstance(instanceURI, modelCreate);
     return parseToModel(motor);
   }
   
   protected Model parseToModel(Motor motor) {
     Resource resource = ModelFactory.createDefaultModel().createResource(motor.getInstanceName());
     resource.addProperty(RDF.type, MotorAdapter.resource);
-    resource.addProperty(RDFS.label, motor.getInstanceName());
+    resource.addProperty(RDFS.label, resource.getLocalName());
     for (Property p : motorControlProperties) {
       switch (p.getLocalName()) {
         case "rpm":
@@ -112,7 +112,7 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleConfigureInstance(String instanceURI, Model configureModel) {
+  public Model configureInstance(String instanceURI, Model configureModel) {
     if (instanceList.containsKey(instanceURI)) {
       Motor currentMotor = (Motor) instanceList.get(instanceURI);
       StmtIterator iter = configureModel.listStatements();
@@ -125,7 +125,7 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected void handleDeleteInstance(String instanceURI) {
+  public void deleteInstance(String instanceURI) {
     Motor motor = getInstanceByName(instanceURI);
     motor.terminate();
     instanceList.remove(instanceURI);
@@ -157,6 +157,24 @@ public final class MotorAdapter extends AbstractAdapter {
   
   @Override
   public void updateAdapterDescription() {
+  }
+
+  @Override
+  public Model getInstance(String instanceURI) throws InstanceNotFoundException {
+    Motor motor = instanceList.get(instanceURI);
+    if(motor == null){
+      throw new InstanceNotFoundException();
+    }
+    return parseToModel(motor);
+  }
+
+  @Override
+  public Model getAllInstances() throws InstanceNotFoundException {
+    Model model = ModelFactory.createDefaultModel();
+    for(String uri : instanceList.keySet()){
+      model.add(getInstance(uri));
+    }
+    return model;
   }
   
 }

@@ -3,10 +3,10 @@ package org.fiteagle.adapters.openstack;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.adapters.openstack.client.OpenstackTestClient;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.junit.BeforeClass;
@@ -59,7 +59,7 @@ public class OpenstackAdapterTest {
   }
   
   @Test
-  public void testCreateInstance() throws AdapterException{
+  public void testCreateInstance() throws AdapterException, InstanceNotFoundException{
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"server1");
     instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
@@ -68,7 +68,7 @@ public class OpenstackAdapterTest {
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
     adapter.createInstances(modelCreate);
-    Model instanceModel = adapter.getInstanceModel(adapter.getAdapterInstance().getNameSpace()+"server1");
+    Model instanceModel = adapter.getInstance(adapter.getAdapterInstance().getNameSpace()+"server1");
     assertNotNull(instanceModel);
     StmtIterator iterator = instanceModel.listStatements(null, RDF.type, adapter.getAdapterManagedResource());
     assertTrue(iterator.hasNext());
@@ -81,19 +81,25 @@ public class OpenstackAdapterTest {
     assertFalse(iterator.hasNext());
   }
   
-  @Test
-  public void testTerminateInstance() throws AdapterException{
+  @Test(expected = InstanceNotFoundException.class)
+  public void testTerminateInstance() throws AdapterException, InstanceNotFoundException{
+    String instanceURI = adapter.getAdapterInstance().getNameSpace()+"server2";
     Model modelCreate = ModelFactory.createDefaultModel();
-    Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"server2");
+    Resource instanceResource = modelCreate.createResource(instanceURI);
     instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
     instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstance().getNameSpace()+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
     
     adapter.createInstances(modelCreate);
-    adapter.deleteInstance(adapter.getAdapterInstance().getNameSpace()+"server2");
-    Model instanceModel = adapter.getInstanceModel(adapter.getAdapterInstance().getNameSpace()+"server2");
-    assertNull(instanceModel);
+    adapter.deleteInstance(instanceURI);
+    adapter.getInstance(instanceURI);
+  }
+  
+  @Test(expected = InstanceNotFoundException.class)
+  public void testTerminateNonExistingInstance() throws AdapterException, InstanceNotFoundException{
+    String instanceURI = adapter.getAdapterInstance().getNameSpace()+"server2";
+    adapter.deleteInstance(instanceURI);
   }
   
 }

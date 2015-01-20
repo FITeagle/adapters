@@ -65,17 +65,17 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleCreateInstance(String instanceURI, Model modelCreate) {
+  public Model createInstance(String instanceURI, Model modelCreate) {
     return null;
   }
   
   @Override
-  protected Model handleConfigureInstance(String instanceURI, Model configureModel) {
+  public Model configureInstance(String instanceURI, Model configureModel) {
     return null;
   }
   
   @Override
-  protected void handleDeleteInstance(String instanceURI) {
+  public void deleteInstance(String instanceURI) {
     return;
   }
   
@@ -101,6 +101,18 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   
   @Override
   public void updateAdapterDescription() {
+  }
+
+  @Override
+  public Model getInstance(String instanceURI) throws InstanceNotFoundException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Model getAllInstances() throws InstanceNotFoundException {
+    // TODO Auto-generated method stub
+    return null;
   }
   
 }

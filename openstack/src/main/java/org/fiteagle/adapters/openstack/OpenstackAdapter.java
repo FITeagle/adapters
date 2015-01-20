@@ -18,6 +18,7 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -88,16 +89,24 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
-  protected Model handleCreateInstance(String instanceURI, Model newInstanceModel) {
+  public Model createInstance(String instanceURI, Model newInstanceModel) {
     ServerForCreate serverForCreate = openstackParser.parseToServerForCreate(instanceURI, newInstanceModel);
     Server server = openstackClient.createServer(serverForCreate);
-    Model openstackVM = openstackParser.parseToModel(server);
-    return openstackVM;
+    Model model = openstackParser.parseToModel(server);
+    return model;
   }
 
   @Override
-  protected void handleDeleteInstance(String instanceURI) {
-    openstackClient.deleteServer(openstackParser.getResourcePropertyID(instanceURI));
+  public void deleteInstance(String instanceURI) throws InstanceNotFoundException {
+    Model model = getInstance(instanceURI);
+    StmtIterator iter = getResourceInstanceIterator(model);
+    if (iter.hasNext()) {
+      Resource instance = iter.next().getSubject();
+      String id = instance.getRequiredProperty(openstackParser.getPROPERTY_ID()).getLiteral().getString();
+      openstackClient.deleteServer(id);
+      return;
+    }
+    throw new InstanceNotFoundException();
   }
   
   @Override
@@ -106,18 +115,10 @@ public class OpenstackAdapter extends AbstractAdapter {
     if(images != null){
       openstackParser.addToAdapterInstanceDescription(images);
     }
-    updateInstanceList();
-  }
-  
-  private void updateInstanceList(){
-    Servers servers = openstackClient.listServers();
-    if(servers != null){
-      openstackParser.addToAdapterInstanceDescription(servers);
-    }
   }
   
   @Override
-  protected Model handleConfigureInstance(String instanceURI, Model configureModel) {
+  public Model configureInstance(String instanceURI, Model configureModel) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -148,6 +149,27 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   public OpenstackParser getOpenstackParser(){
     return openstackParser;
+  }
+
+  @Override
+  public Model getInstance(String instanceURI) throws InstanceNotFoundException {
+    Servers servers = openstackClient.listServers();
+    for(Server server : servers.getList()){
+      if(server.getName().equals(instanceURI)){
+        return openstackParser.parseToModel(server);
+      }
+    }
+    throw new InstanceNotFoundException();
+  }
+
+  @Override
+  public Model getAllInstances() throws InstanceNotFoundException {
+    Model model = ModelFactory.createDefaultModel();
+    Servers servers = openstackClient.listServers();
+    for(Server server : servers.getList()){
+      model.add(getInstance(server.getName()));
+    }
+    return model;
   }
 
 }

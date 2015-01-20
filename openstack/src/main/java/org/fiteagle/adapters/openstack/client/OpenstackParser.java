@@ -185,21 +185,10 @@ public class OpenstackParser {
     return imagesResource;
   }
 	
-	public void addToAdapterInstanceDescription(Servers servers){
-    for(Server server : servers.getList()){
-      Model resourceModel = parseToModel(server);
-      adapter.getAdapterDescriptionModel().add(resourceModel);
-    }
-  }
-	
 	public void addToAdapterInstanceDescription(Images images){
 	  adapter.getAdapterInstance().addProperty(PROPERTY_IMAGES, parseToImagesResource(images));
 	}
 	
-	public String getResourcePropertyID(String instanceURI){
-	  return adapter.getAdapterDescriptionModel().getResource(instanceURI).getProperty(PROPERTY_ID).getLiteral().getValue().toString();
-	}
-
 	private String getStringPropertyValue(String instanceURI, Model model, Property property){
 	  Resource imagesResource = model.getResource(instanceURI);
 	  return imagesResource.getProperty(property).getLiteral().getValue().toString();  
@@ -212,7 +201,7 @@ public class OpenstackParser {
 	
   public ServerForCreate parseToServerForCreate(String instanceURI, Model newInstanceModel) {
     String imageResourceURI = getResourcePropertyValue(instanceURI, newInstanceModel, PROPERTY_IMAGE).toString();
-    String imageRef = adapter.getAdapterDescriptionModel().getResource(imageResourceURI).getProperty(PROPERTY_IMAGE_ID).getLiteral().getValue().toString();
+    String imageRef = adapter.getAdapterDescriptionModel().getResource(imageResourceURI).getProperty(PROPERTY_IMAGE_ID).getLiteral().getString();
     String keyName = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_KEYPAIRNAME);
     String flavorRef = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_FLAVOR);
     
@@ -221,15 +210,15 @@ public class OpenstackParser {
     return serverForCreate;
   }
 
-  protected Property getPROPERTY_ID() {
+  public Property getPROPERTY_ID() {
     return PROPERTY_ID;
   }
   
-  protected Property getPROPERTY_IMAGE_ID() {
+  public Property getPROPERTY_IMAGE_ID() {
     return PROPERTY_IMAGE_ID;
   }
 
-  protected Property getPROPERTY_IMAGES() {
+  public Property getPROPERTY_IMAGES() {
     return PROPERTY_IMAGES;
   }
 

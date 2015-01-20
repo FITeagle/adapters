@@ -11,6 +11,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
@@ -35,22 +36,22 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   }
   
   @OnMessage
-  public String onMessage(final String message) {
+  public String onMessage(final String message) throws InstanceNotFoundException {
     for(AbstractAdapter adapter : getAdapterInstances().values()){
       if (message.equals(adapter.getAdapterInstance().getURI())) {
         return MessageUtil.serializeModel(adapter.getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
         
       } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/ttl")) {
         
-        return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_TURTLE);
+        return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
         
       } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/rdfxml")) {
         
-        return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_RDFXML);
+        return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_RDFXML);
         
       } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/ntriple")) {
         
-        return MessageUtil.serializeModel(adapter.getAllInstancesModel(), IMessageBus.SERIALIZATION_NTRIPLE);
+        return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_NTRIPLE);
       }
     }
     return null;
