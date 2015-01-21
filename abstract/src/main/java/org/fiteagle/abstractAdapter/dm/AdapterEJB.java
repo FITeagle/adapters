@@ -8,7 +8,7 @@ public interface AdapterEJB {
   
   Model createInstance(Model createModel) throws AdapterException;
   
-  void deleteInstances(Model deleteModel);
+  Model deleteInstances(Model deleteModel) throws AdapterException;
   
   Model configureInstances(Model configureModel) throws AdapterException;
   

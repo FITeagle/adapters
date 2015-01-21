@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
+import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -47,7 +48,8 @@ public abstract class AbstractAdapter {
     return createdInstancesModel;
   }
   
-  public void deleteInstances(Model model) {
+  public Model deleteInstances(Model model) throws AdapterException {
+	Model deletedInstancesModel = ModelFactory.createDefaultModel();    
     StmtIterator resourceInstanceIterator = getResourceInstanceIterator(model);    
     while (resourceInstanceIterator.hasNext()) {
       String instanceURI = resourceInstanceIterator.next().getSubject().getURI();
@@ -56,8 +58,12 @@ public abstract class AbstractAdapter {
         deleteInstance(instanceURI);
       } catch (InstanceNotFoundException e) {
         LOGGER.log(Level.INFO, "Instance: " + instanceURI + " not found");
-      }     
+        throw new AdapterException(Response.Status.NOT_FOUND.name());
+      }    
+      Resource deletedInstance = deletedInstancesModel.createResource(instanceURI);
+      deletedInstance.addProperty(MessageBusOntologyModel.hasState, "deleted");
     }
+    return deletedInstancesModel;
   }
   
   public Model configureInstances(Model model) throws AdapterException {

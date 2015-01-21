@@ -24,12 +24,14 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
   }
   
   @Override
-  public void deleteInstances(Model deleteModel) {
+  public Model deleteInstances(Model deleteModel) throws AdapterException {
+	  Model resultModel = ModelFactory.createDefaultModel();
     for(AbstractAdapter adapter : getAdapterInstances().values()){
       if(adapter.isRecipient(deleteModel)){
-        adapter.deleteInstances(deleteModel);
+        resultModel.add(adapter.deleteInstances(deleteModel));
       }
     }
+    return resultModel;
   }
   
   @Override
