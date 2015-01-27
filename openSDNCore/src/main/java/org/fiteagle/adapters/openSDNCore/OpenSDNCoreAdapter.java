@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.openSDNCore;
 
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +40,7 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
     }
     
     StmtIterator resourceIterator = adapterModel.listStatements(adapter,
-        MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
+        Omn_lifecycle.implements_, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
     }

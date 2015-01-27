@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.motor;
 
+import info.openmultinet.ontology.vocabulary.Omn_federation;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +44,7 @@ public final class MotorAdapter extends AbstractAdapter {
     }
     
     StmtIterator resourceIterator = adapterModel.listStatements(adapter,
-        MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
+        Omn_lifecycle.implements_, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
     }
@@ -62,7 +65,7 @@ public final class MotorAdapter extends AbstractAdapter {
     adapterInstance.addProperty(RDFS.comment, "A motor garage adapter that can simulate different dynamic motor resources.");
     adapterInstance.addLiteral(MessageBusOntologyModel.maxInstances, 10);
     Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-    adapterInstance.addProperty(MessageBusOntologyModel.partOfFederation, testbed);
+    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
     Property longitude = model.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long");
     Property latitude = model.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
     adapterInstance.addProperty(latitude, "52.516377");

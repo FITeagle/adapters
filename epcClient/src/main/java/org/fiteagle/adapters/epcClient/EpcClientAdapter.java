@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.epcClient;
 
+import info.openmultinet.ontology.vocabulary.Omn;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,10 +108,10 @@ public class EpcClientAdapter extends AbstractAdapter implements SSHAccessable {
 				.createResource("http://fiteagle.org/ontology#Adapter"));
 
 		epcClientAdapter.addProperty(
-				MessageBusOntologyModel.propertyFiteagleImplements,
+		    Omn_lifecycle.implements_,
 				epcClientResource);
 		epcClientResource.addProperty(
-				MessageBusOntologyModel.propertyFiteagleImplementedBy,
+				Omn_lifecycle.implementedBy,
 				epcClientAdapter);
 
 		// creating properties

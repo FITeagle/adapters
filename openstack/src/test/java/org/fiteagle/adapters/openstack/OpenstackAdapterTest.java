@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import info.openmultinet.ontology.vocabulary.Omn;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
@@ -41,14 +43,14 @@ public class OpenstackAdapterTest {
   
   @Test
   public void testAdapterResource() {
-    assertTrue(adapter.getAdapterManagedResource().hasProperty(MessageBusOntologyModel.propertyFiteagleImplementedBy, adapter.getAdapterType()));
-    assertTrue(adapter.getAdapterManagedResource().hasProperty(RDFS.subClassOf, MessageBusOntologyModel.classResource));
+    assertTrue(adapter.getAdapterManagedResource().hasProperty(Omn_lifecycle.implementedBy, adapter.getAdapterType()));
+    assertTrue(adapter.getAdapterManagedResource().hasProperty(RDFS.subClassOf, Omn.Resource));
   }
 
   @Test
   public void testAdapterType() {
       assertTrue(adapter.getAdapterType().hasProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
-      assertTrue(adapter.getAdapterType().hasProperty(MessageBusOntologyModel.propertyFiteagleImplements, adapter.getAdapterManagedResource()));
+      assertTrue(adapter.getAdapterType().hasProperty(Omn_lifecycle.implements_, adapter.getAdapterManagedResource()));
   }
   
   @Test

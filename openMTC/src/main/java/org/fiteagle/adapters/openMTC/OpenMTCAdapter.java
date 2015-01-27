@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.openMTC;
 
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +41,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
       adapter = adapterIterator.next().getSubject();
     }
     
-    StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
+    StmtIterator resourceIterator = adapterModel.listStatements(adapter, Omn_lifecycle.implements_, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
     }

@@ -1,5 +1,7 @@
 package org.fiteagle.abstractAdapter;
 
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -61,7 +63,7 @@ public abstract class AbstractAdapter {
         throw new AdapterException(Response.Status.NOT_FOUND.name());
       }    
       Resource deletedInstance = deletedInstancesModel.createResource(instanceURI);
-      deletedInstance.addProperty(MessageBusOntologyModel.hasState, "deleted");
+      deletedInstance.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Removing);
     }
     return deletedInstancesModel;
   }

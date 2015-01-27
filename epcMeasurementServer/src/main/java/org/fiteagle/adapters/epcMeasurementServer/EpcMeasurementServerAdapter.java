@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.epcMeasurementServer;
 
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.logging.Logger;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,10 +107,10 @@ public class EpcMeasurementServerAdapter extends AbstractAdapter implements
 				.createResource("http://fiteagle.org/ontology#Adapter"));
 
 		epcMeasurementServerAdapter.addProperty(
-				MessageBusOntologyModel.propertyFiteagleImplements,
+		    Omn_lifecycle.implements_,
 				epcMeasurementServerResource);
 		epcMeasurementServerResource.addProperty(
-				MessageBusOntologyModel.propertyFiteagleImplementedBy,
+		    Omn_lifecycle.implementedBy,
 				epcMeasurementServerAdapter);
 
 		// creating properties

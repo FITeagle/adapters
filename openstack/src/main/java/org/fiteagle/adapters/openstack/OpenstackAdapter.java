@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.openstack;
 
+import info.openmultinet.ontology.vocabulary.Omn_federation;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +57,7 @@ public class OpenstackAdapter extends AbstractAdapter {
       adapter = adapterIterator.next().getSubject();
     }
     
-    StmtIterator resourceIterator = adapterModel.listStatements(adapter, MessageBusOntologyModel.propertyFiteagleImplements, (Resource) null);
+    StmtIterator resourceIterator = adapterModel.listStatements(adapter, Omn_lifecycle.implements_, (Resource) null);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
     }
@@ -74,7 +77,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
     adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");
     Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-    adapterInstance.addProperty(MessageBusOntologyModel.partOfFederation, testbed);
+    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
     new OpenstackAdapter(adapterInstance, model, new OpenstackClient());
   }
   

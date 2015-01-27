@@ -4,18 +4,19 @@
 @prefix omn:           <http://open-multinet.info/ontology/omn#> .
 @prefix motorgarage:   <http://open-multinet.info/ontology/resource/motorgarage#> .
 @prefix motor:         <http://open-multinet.info/ontology/resource/motor#> .
+@prefix omnLifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
 
 motorgarage:MotorGarage
-        a                owl:Class ;
-        rdfs:label       "MotorGarage"@en ;
-        rdfs:subClassOf  omn:Adapter ;
-        omn:implements   motor:Motor .
+        a                          owl:Class ;
+        rdfs:label                 "MotorGarage"@en ;
+        rdfs:subClassOf            omn:Adapter ;
+        omnLifecycle:implements   motor:Motor .
         
 motor:Motor
-        a                  owl:Class ;
-        rdfs:label         "Motor"@en ;
-        rdfs:subClassOf    omn:Resource ;
-        omn:implementedBy  motorgarage:MotorGarage .
+        a                            owl:Class ;
+        rdfs:label                   "Motor"@en ;
+        rdfs:subClassOf              omn:Resource ;
+        omnLifecycle:implementedBy  motorgarage:MotorGarage .
           
 motor:manufacturer
         a            owl:DatatypeProperty ;

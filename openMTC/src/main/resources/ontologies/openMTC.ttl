@@ -7,18 +7,19 @@
 @prefix av:    <http://federation.av.tu-berlin.de/about#> .
 @prefix omn:   <http://open-multinet.info/ontology/omn#> .
 @prefix openmtc:    <http://open-multinet.info/ontology/resource/openmtc#> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
 
 openmtc:OpenMTC
-        a                owl:Class ;
-        rdfs:label       "OpenMTC Handler"@en ;
-        rdfs:subClassOf  omn:Adapter ;
-        omn:implements   openmtc:OpenMTCAsAService .
+        a                          owl:Class ;
+        rdfs:label                 "OpenMTC Handler"@en ;
+        rdfs:subClassOf            omn:Adapter ;
+        omn-lifecycle:implements   openmtc:OpenMTCAsAService .
         
 openmtc:OpenMTCAsAService
-        a                  owl:Class ;
-        rdfs:label         "OpenMTC as a Service"@en ;
-        rdfs:subClassOf    omn:Resource ;
-        omn:implementedBy  openmtc:OpenMTC .
+        a                            owl:Class ;
+        rdfs:label                   "OpenMTC as a Service"@en ;
+        rdfs:subClassOf              omn:Resource ;
+        omn-lifecycle:implementedBy  openmtc:OpenMTC .
 
 openmtc:url
         a      owl:DatatypeProperty ;
