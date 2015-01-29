@@ -1,5 +1,10 @@
 package org.fiteagle.adapters.tosca.client;
 
+import info.openmultinet.ontology.translators.AbstractConverter;
+import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
+import info.openmultinet.ontology.translators.tosca.jaxb.TDefinitions;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -9,50 +14,66 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpException;
 
 public class ToscaClient {
   
   private static Logger LOGGER = Logger.getLogger(ToscaClient.class.toString());
   
-  private static String URL = "http://localhost:8080/api/rest/";
-  private static String URL_ADMIN = URL+"admin/v2/";
-  private static String URL_ORCHESTRATOR = URL+"orchestrator/v2/";
-  private static String URL_TOSCA = URL+"tosca/v2";
+  private final String URL_TOSCA_DEFINITIONS;
   
-  public static void getTest(){
+  public ToscaClient(String toscaURL){
+    URL_TOSCA_DEFINITIONS = toscaURL;
+  }
+  
+  public String getDefinitions(){
     Client client = ClientBuilder.newClient();
-    String result = client.target(URL_ADMIN+"templates/")
-                       .request("application/json").get(String.class); 
-    System.out.println(result);
+    String result = client.target(URL_TOSCA_DEFINITIONS).request().get(String.class); 
+    return result;
   }
   
-  public ToscaClient(){
+  public Definitions createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException {
+    String definitionsString = AbstractConverter.toString(definitions, "info.openmultinet.ontology.translators.tosca.jaxb");
     
-  }
-  
-  public void putTest() {
     Client client = ClientBuilder.newClient();
+    Entity<String> e = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
+    String result = client.target(URL_TOSCA_DEFINITIONS).request().post(e, String.class); 
     
-    String body = loadResource("/openMTCGateway.json");
+    InputStream resultStream = new ByteArrayInputStream(result.getBytes());
     
-    Entity<String> e = Entity.entity(body, MediaType.APPLICATION_JSON);
-        
-    Response result = client.target(URL_ORCHESTRATOR+"topologies/")
-                       .request(MediaType.APPLICATION_JSON).post(e); 
+    return convertToDefinitions(resultStream);
   }
   
-  protected String loadResource(String path){
-    InputStream is = getClass().getResourceAsStream(path);    
-    String content = null;
+  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException {
+    Client client = ClientBuilder.newClient();
+    Entity<String> e = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
+    String result = client.target(URL_TOSCA_DEFINITIONS).request().post(e, String.class); 
+    
+    InputStream resultStream = new ByteArrayInputStream(result.getBytes());
+    
+    return convertToDefinitions(resultStream);
+  }
+  
+  protected Definitions loadToscaResource(String path){
+    InputStream input = getClass().getResourceAsStream(path);
+    return convertToDefinitions(input);
+  }
+  
+  private Definitions convertToDefinitions(InputStream input){
+    Definitions definitions = null;
     try {
-      content = IOUtils.toString(is, "UTF-8");
-    } catch (IOException e) {
+      JAXBContext context = JAXBContext.newInstance(Definitions.class);
+      Unmarshaller unmarshaller = context.createUnmarshaller();
+      definitions = unmarshaller.unmarshal(new StreamSource(input), Definitions.class).getValue();
+    } catch (JAXBException e) {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }
-    return content;
+    return definitions;
   }
 }
 
