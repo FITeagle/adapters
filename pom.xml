@@ -49,6 +49,6 @@
 		<module>epcMeasurementServer</module>
 		<module>openstack</module>
 		<module>openMTC</module>
-		<module>openSDNCore</module>
+		<module>tosca</module>
 	</modules>
 </project>

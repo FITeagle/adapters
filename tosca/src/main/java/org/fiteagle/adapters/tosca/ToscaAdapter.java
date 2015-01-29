@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.openSDNCore;
+package org.fiteagle.adapters.tosca;
 
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
@@ -14,12 +14,13 @@ import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-public final class OpenSDNCoreAdapter extends AbstractAdapter {
+public final class ToscaAdapter extends AbstractAdapter {
   
   private Model adapterModel;
   private Resource adapterInstance;
@@ -33,35 +34,34 @@ public final class OpenSDNCoreAdapter extends AbstractAdapter {
   static {
     Model adapterModel = OntologyModelUtil.loadModel("ontologies/openSDNCore.ttl", IMessageBus.SERIALIZATION_TURTLE);
     
-    StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf,
-        MessageBusOntologyModel.classAdapter);
+    
+    ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
-      adapter = adapterIterator.next().getSubject();
+      adapter = adapterIterator.next();
     }
     
-    StmtIterator resourceIterator = adapterModel.listStatements(adapter,
-        Omn_lifecycle.implements_, (Resource) null);
+    StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
     }
     
-    StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
+    ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
     while (propertiesIterator.hasNext()) {
-      Property p = adapterModel.getProperty(propertiesIterator.next().getSubject().getURI());
+      Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
       properties.add(p);
     }
     
-    StmtIterator adapterInstanceIterator = adapterModel.listStatements(null, RDF.type, adapter);
+    ResIterator adapterInstanceIterator = adapterModel.listSubjectsWithProperty(RDF.type, adapter);
     while (adapterInstanceIterator.hasNext()) {
-      Resource adapterInstance = adapterInstanceIterator.next().getSubject();
+      Resource adapterInstance = adapterInstanceIterator.next();
       
-      OpenSDNCoreAdapter motorAdapter = new OpenSDNCoreAdapter(adapterInstance, adapterModel);
+      ToscaAdapter toscaAdapter = new ToscaAdapter(adapterInstance, adapterModel);
       
-      adapterInstances.put(adapterInstance.getURI(), motorAdapter);
+      adapterInstances.put(adapterInstance.getURI(), toscaAdapter);
     }
   }
   
-  private OpenSDNCoreAdapter(Resource adapterInstance, Model adapterModel) {
+  private ToscaAdapter(Resource adapterInstance, Model adapterModel) {
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
   }

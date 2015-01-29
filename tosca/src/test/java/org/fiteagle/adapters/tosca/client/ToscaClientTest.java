@@ -1,11 +1,13 @@
-package org.fiteagle.adapters.openSDNCore.client;
+package org.fiteagle.adapters.tosca.client;
 
+import org.fiteagle.adapters.tosca.client.ToscaClient;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
-public class OpenSDNCoreClientTest {
+public class ToscaClientTest {
   
-  private OpenSDNCoreClient client = new OpenSDNCoreClient();
+  private ToscaClient client = new ToscaClient();
   
   @Test
   public void testLoadResource() {

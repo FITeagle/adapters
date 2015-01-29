@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.openSDNCore.client;
+package org.fiteagle.adapters.tosca.client;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,9 +13,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 
-public class OpenSDNCoreClient {
+public class ToscaClient {
   
-  private static Logger LOGGER = Logger.getLogger(OpenSDNCoreClient.class.toString());
+  private static Logger LOGGER = Logger.getLogger(ToscaClient.class.toString());
   
   private static String URL = "http://localhost:8080/api/rest/";
   private static String URL_ADMIN = URL+"admin/v2/";
@@ -29,7 +29,7 @@ public class OpenSDNCoreClient {
     System.out.println(result);
   }
   
-  public OpenSDNCoreClient(){
+  public ToscaClient(){
     
   }
   

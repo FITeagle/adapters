@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.openSDNCore.dm;
+package org.fiteagle.adapters.tosca.dm;
 
 import java.util.Map;
 
@@ -7,7 +7,7 @@ import javax.ejb.MessageDriven;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
-import org.fiteagle.adapters.openSDNCore.OpenSDNCoreAdapter;
+import org.fiteagle.adapters.tosca.ToscaAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageFilters;
 
@@ -16,11 +16,11 @@ import org.fiteagle.api.core.MessageFilters;
     @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
     @ActivationConfigProperty(propertyName = "messageSelector", propertyValue = MessageFilters.FILTER_ADAPTER),
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
-public class OpenSDNCoreMDBListener extends AbstractAdapterMDBListener {
+public class ToscaMDBListener extends AbstractAdapterMDBListener {
   
   @Override
   protected Map<String, AbstractAdapter> getAdapterInstances() {
-    return OpenSDNCoreAdapter.adapterInstances;
+    return ToscaAdapter.adapterInstances;
   }
   
 }
