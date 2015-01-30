@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
-import org.fiteagle.api.core.MessageBusOntologyModel;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
