@@ -34,20 +34,20 @@ public class OpenMTCAdapterTest {
   
   @Test
   public void testAdapterPrefixes() {
-    assertNotNull(adapter.getAdapterManagedResource().getNameSpace());
+    assertNotNull(adapter.getAdapterManagedResources().get(0).getNameSpace());
     assertNotNull(adapter.getAdapterInstance().getNameSpace());
   }
   
   @Test
   public void testAdapterResource() {
-    assertTrue(adapter.getAdapterManagedResource().hasProperty(Omn_lifecycle.implementedBy, adapter.getAdapterType()));
-    assertTrue(adapter.getAdapterManagedResource().hasProperty(RDFS.subClassOf, Omn.Resource));
+    assertTrue(adapter.getAdapterManagedResources().get(0).hasProperty(Omn_lifecycle.implementedBy, adapter.getAdapterType()));
+    assertTrue(adapter.getAdapterManagedResources().get(0).hasProperty(RDFS.subClassOf, Omn.Resource));
   }
 
   @Test
   public void testAdapterType() {
       assertTrue(adapter.getAdapterType().hasProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
-      assertTrue(adapter.getAdapterType().hasProperty(Omn_lifecycle.implements_, adapter.getAdapterManagedResource()));
+      assertTrue(adapter.getAdapterType().hasProperty(Omn_lifecycle.implements_, adapter.getAdapterManagedResources().get(0)));
   }
   
   @Test

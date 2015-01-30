@@ -25,7 +25,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
   private OpenMTCClient openMTCClient;
   
   private static Resource adapter;
-  private static Resource resource;
+  private static List<Resource> resources = new ArrayList<>();
   public static List<Property> resourceInstanceProperties = new ArrayList<Property>();
   
   private Model adapterModel;
@@ -43,16 +43,16 @@ public class OpenMTCAdapter extends AbstractAdapter {
     
     StmtIterator resourceIterator = adapterModel.listStatements(adapter, Omn_lifecycle.implements_, (Resource) null);
     if (resourceIterator.hasNext()) {
-      resource = resourceIterator.next().getObject().asResource();
+      Resource resource = resourceIterator.next().getObject().asResource();
+      resources.add(resource);
+      
+      StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
+      while (propertiesIterator.hasNext()) {
+        Property p = adapterModel.getProperty(propertiesIterator.next().getSubject().getURI());
+        resourceInstanceProperties.add(p);
+      }
     }
     
-    StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
-    while (propertiesIterator.hasNext()) {
-      Property p = adapterModel.getProperty(propertiesIterator.next().getSubject().getURI());
-      resourceInstanceProperties.add(p);
-    }
-    
-    //TODO: remove this creation of a static instance
     Resource adapterInstance = adapterModel.createResource("http://federation.av.tu-berlin.de/about#OpenMTC-1");
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("An OpenMTC Adapter instance"));
@@ -95,8 +95,8 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Resource getAdapterManagedResource() {
-    return resource;
+  public List<Resource> getAdapterManagedResources() {
+    return resources;
   }
 
   @Override

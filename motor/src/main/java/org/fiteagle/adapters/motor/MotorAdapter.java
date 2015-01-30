@@ -16,6 +16,7 @@ import org.fiteagle.api.core.OntologyModelUtil;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -26,7 +27,7 @@ public final class MotorAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   private static Resource adapter;
-  private static Resource resource;
+  private static List<Resource> resources = new ArrayList<>();
   
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
@@ -37,22 +38,21 @@ public final class MotorAdapter extends AbstractAdapter {
   static {
     Model adapterModel = OntologyModelUtil.loadModel("ontologies/motor.ttl", IMessageBus.SERIALIZATION_TURTLE);
     
-    StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf,
-        MessageBusOntologyModel.classAdapter);
+    ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
-      adapter = adapterIterator.next().getSubject();
+      adapter = adapterIterator.next();
     }
     
-    StmtIterator resourceIterator = adapterModel.listStatements(adapter,
-        Omn_lifecycle.implements_, (Resource) null);
+    StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
-      resource = resourceIterator.next().getObject().asResource();
-    }
-    
-    StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
-    while (propertiesIterator.hasNext()) {
-      Property p = adapterModel.getProperty(propertiesIterator.next().getSubject().getURI());
-      motorControlProperties.add(p);
+      Resource resource = resourceIterator.next().getObject().asResource();
+      resources.add(resource);
+      
+      ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
+      while (propertiesIterator.hasNext()) {
+        Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
+        motorControlProperties.add(p);
+      }
     }
     
     createDefaultAdapterInstance(adapterModel);
@@ -90,7 +90,7 @@ public final class MotorAdapter extends AbstractAdapter {
   
   protected Model parseToModel(Motor motor) {
     Resource resource = ModelFactory.createDefaultModel().createResource(motor.getInstanceName());
-    resource.addProperty(RDF.type, MotorAdapter.resource);
+    resource.addProperty(RDF.type, MotorAdapter.resources.get(0));
     resource.addProperty(RDFS.label, resource.getLocalName());
     for (Property p : motorControlProperties) {
       switch (p.getLocalName()) {
@@ -139,8 +139,8 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource getAdapterManagedResource() {
-    return resource;
+  public List<Resource> getAdapterManagedResources() {
+    return resources;
   }
   
   @Override

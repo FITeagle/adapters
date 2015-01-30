@@ -38,19 +38,19 @@ public class OpenstackAdapterTest {
   @Test
   public void testAdapterPrefixes() {
     assertNotNull(adapter.getAdapterInstance().getNameSpace());
-    assertNotNull(adapter.getAdapterManagedResource().getNameSpace());
+    assertNotNull(adapter.getAdapterManagedResources().get(0).getNameSpace());
   }
   
   @Test
   public void testAdapterResource() {
-    assertTrue(adapter.getAdapterManagedResource().hasProperty(Omn_lifecycle.implementedBy, adapter.getAdapterType()));
-    assertTrue(adapter.getAdapterManagedResource().hasProperty(RDFS.subClassOf, Omn.Resource));
+    assertTrue(adapter.getAdapterManagedResources().get(0).hasProperty(Omn_lifecycle.implementedBy, adapter.getAdapterType()));
+    assertTrue(adapter.getAdapterManagedResources().get(0).hasProperty(RDFS.subClassOf, Omn.Resource));
   }
 
   @Test
   public void testAdapterType() {
       assertTrue(adapter.getAdapterType().hasProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
-      assertTrue(adapter.getAdapterType().hasProperty(Omn_lifecycle.implements_, adapter.getAdapterManagedResource()));
+      assertTrue(adapter.getAdapterType().hasProperty(Omn_lifecycle.implements_, adapter.getAdapterManagedResources().get(0)));
   }
   
   @Test
@@ -64,7 +64,7 @@ public class OpenstackAdapterTest {
   public void testCreateInstance() throws AdapterException, InstanceNotFoundException{
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"server1");
-    instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
+    instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
     instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstance().getNameSpace()+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
@@ -72,7 +72,7 @@ public class OpenstackAdapterTest {
     adapter.createInstances(modelCreate);
     Model instanceModel = adapter.getInstance(adapter.getAdapterInstance().getNameSpace()+"server1");
     assertNotNull(instanceModel);
-    StmtIterator iterator = instanceModel.listStatements(null, RDF.type, adapter.getAdapterManagedResource());
+    StmtIterator iterator = instanceModel.listStatements(null, RDF.type, adapter.getAdapterManagedResources().get(0));
     assertTrue(iterator.hasNext());
     Resource server = iterator.next().getSubject();
     assertEquals(server.toString(), adapter.getAdapterInstance().getNameSpace()+"server1");
@@ -88,7 +88,7 @@ public class OpenstackAdapterTest {
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"server2";
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(instanceURI);
-    instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResource());
+    instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
     instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstance().getNameSpace()+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);

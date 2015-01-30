@@ -44,12 +44,12 @@ public class OpenstackParser {
   
   public OpenstackParser(OpenstackAdapter adapter) {
     this.adapter = adapter;
-    PROPERTY_IMAGES = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"images");
-    PROPERTY_IMAGE = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"image");
-    PROPERTY_ID = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"id");
-    PROPERTY_IMAGE_ID = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"imageid");
-    PROPERTY_KEYPAIRNAME = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"keypairname");
-    PROPERTY_FLAVOR = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResource().getNameSpace()+"flavor");
+    PROPERTY_IMAGES = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"images");
+    PROPERTY_IMAGE = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"image");
+    PROPERTY_ID = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"id");
+    PROPERTY_IMAGE_ID = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"imageid");
+    PROPERTY_KEYPAIRNAME = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"keypairname");
+    PROPERTY_FLAVOR = adapter.getAdapterDescriptionModel().getProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"flavor");
   }
 
   public static synchronized OpenstackParser getInstance(OpenstackAdapter adapter) {
@@ -124,7 +124,7 @@ public class OpenstackParser {
 	    server.setName(adapter.getAdapterInstance().getNameSpace()+server.getName());
 	  }
 	  Resource resource = ModelFactory.createDefaultModel().createResource(server.getName());
-	  resource.addProperty(RDF.type, adapter.getAdapterManagedResource());
+	  resource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
 	  resource.addProperty(RDFS.label, resource.getLocalName());
     for(Property p : OpenstackAdapter.resourceInstanceProperties){
       switch(p.getLocalName()){

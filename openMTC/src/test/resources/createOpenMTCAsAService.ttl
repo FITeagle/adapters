@@ -5,5 +5,5 @@
 av:OpenMTC-1 a openmtc:OpenMTC .
 
 av:OpenMTCAsAService-1 a openmtc:OpenMTCAsAService ;
-          openmtc:url "http://example.com"^^xsd:string ;
+          openmtc:url "http://example.com"^^xsd:string .
           

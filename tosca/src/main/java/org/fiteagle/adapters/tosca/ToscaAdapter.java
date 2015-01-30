@@ -23,7 +23,6 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -39,9 +38,9 @@ public final class ToscaAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   private static Resource adapter;
-  private static Resource resource;
   
-  private static List<Property> properties = new ArrayList<Property>();
+  private static List<Resource> resources = new ArrayList<>();
+  
   
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
@@ -54,14 +53,9 @@ public final class ToscaAdapter extends AbstractAdapter {
     }
     
     StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
-    if (resourceIterator.hasNext()) {
-      resource = resourceIterator.next().getObject().asResource();
-    }
-    
-    ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
-    while (propertiesIterator.hasNext()) {
-      Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
-      properties.add(p);
+    while (resourceIterator.hasNext()) {
+      Resource resource = resourceIterator.next().getResource();
+      resources.add(resource);
     }
     
     createDefaultAdapterInstance(adapterModel);
@@ -101,8 +95,8 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource getAdapterManagedResource() {
-    return resource;
+  public List<Resource> getAdapterManagedResources() {
+    return resources;
   }
   
   @Override

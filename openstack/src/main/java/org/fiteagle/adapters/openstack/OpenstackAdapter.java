@@ -35,7 +35,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   private OpenstackParser openstackParser;
   
   private static Resource adapter;
-  private static Resource resource;
+  private static List<Resource> resources = new ArrayList<>();
   public static List<Property> resourceInstanceProperties = new ArrayList<Property>();
   
   private Model adapterModel;
@@ -60,13 +60,14 @@ public class OpenstackAdapter extends AbstractAdapter {
     
     StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
-      resource = resourceIterator.next().getObject().asResource();
-    }
-    
-    ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
-    while (propertiesIterator.hasNext()) {
-      Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
-      resourceInstanceProperties.add(p);
+      Resource resource = resourceIterator.next().getObject().asResource();
+      resources.add(resource);
+      
+      ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
+      while (propertiesIterator.hasNext()) {
+        Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
+        resourceInstanceProperties.add(p);
+      }
     }
     
     createDefaultAdapterInstance(adapterModel);
@@ -103,9 +104,9 @@ public class OpenstackAdapter extends AbstractAdapter {
   @Override
   public void deleteInstance(String instanceURI) throws InstanceNotFoundException {
     Model model = getInstance(instanceURI);
-    StmtIterator iter = getResourceInstanceIterator(model);
+    ResIterator iter = model.listSubjectsWithProperty(RDF.type, resources.get(0));
     if (iter.hasNext()) {
-      Resource instance = iter.next().getSubject();
+      Resource instance = iter.next();
       String id = instance.getRequiredProperty(openstackParser.getPROPERTY_ID()).getLiteral().getString();
       openstackClient.deleteServer(id);
       return;
@@ -128,12 +129,12 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Resource getAdapterManagedResource() {
-    return resource;
+  public List<Resource> getAdapterManagedResources() {
+    return resources;
   }
   
   public Resource getImageResource(){
-    return adapterModel.getResource(getAdapterManagedResource().getNameSpace()+"OpenstackImage");
+    return adapterModel.getResource(getAdapterManagedResources().get(0).getNameSpace()+"OpenstackImage");
   }
 
   @Override
