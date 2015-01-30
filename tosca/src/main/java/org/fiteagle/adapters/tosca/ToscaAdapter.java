@@ -1,13 +1,23 @@
 package org.fiteagle.adapters.tosca;
 
+import info.openmultinet.ontology.exceptions.InvalidModelException;
+import info.openmultinet.ontology.translators.tosca.Tosca2OMN;
+import info.openmultinet.ontology.translators.tosca.Tosca2OMN.UnsupportedException;
+import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBException;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.adapters.tosca.client.ToscaClient;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
@@ -22,6 +32,10 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public final class ToscaAdapter extends AbstractAdapter {
   
+  private static Logger LOGGER = Logger.getLogger(ToscaAdapter.class.toString());
+  
+  private ToscaClient client;
+  
   private Model adapterModel;
   private Resource adapterInstance;
   private static Resource adapter;
@@ -32,8 +46,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
   static {
-    Model adapterModel = OntologyModelUtil.loadModel("ontologies/openSDNCore.ttl", IMessageBus.SERIALIZATION_TURTLE);
-    
+    Model adapterModel = OntologyModelUtil.loadModel("ontologies/tosca.ttl", IMessageBus.SERIALIZATION_TURTLE);
     
     ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
@@ -51,19 +64,25 @@ public final class ToscaAdapter extends AbstractAdapter {
       properties.add(p);
     }
     
-    ResIterator adapterInstanceIterator = adapterModel.listSubjectsWithProperty(RDF.type, adapter);
-    while (adapterInstanceIterator.hasNext()) {
-      Resource adapterInstance = adapterInstanceIterator.next();
-      
-      ToscaAdapter toscaAdapter = new ToscaAdapter(adapterInstance, adapterModel);
-      
-      adapterInstances.put(adapterInstance.getURI(), toscaAdapter);
-    }
+    createDefaultAdapterInstance(adapterModel);
   }
   
-  private ToscaAdapter(Resource adapterInstance, Model adapterModel) {
+  private static void createDefaultAdapterInstance(Model model){
+    Resource adapterInstance = model.createResource("http://federation.av.tu-berlin.de/about#Tosca-1");
+    adapterInstance.addProperty(RDF.type, adapter);
+    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
+    adapterInstance.addProperty(RDFS.comment, "An adapter for TOSCA-compliant resources");
+    Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
+    new ToscaAdapter(adapterInstance, model, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/definitions"));
+  }
+  
+  private ToscaAdapter(Resource adapterInstance, Model adapterModel, ToscaClient client) {
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
+    this.client = client;
+    
+    adapterInstances.put(adapterInstance.getURI(), this);
   }
   
   @Override
@@ -113,8 +132,14 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   @Override
   public Model getAllInstances() throws InstanceNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    InputStream definitions = client.getDefinitionsStream();
+    Model model = null;
+    try {
+      model = Tosca2OMN.getModel(definitions);
+    } catch (JAXBException | InvalidModelException | UnsupportedException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+    return model;
   }
   
 }

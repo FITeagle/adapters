@@ -37,6 +37,12 @@ public class ToscaClient {
     return result;
   }
   
+  public InputStream getDefinitionsStream(){
+    Client client = ClientBuilder.newClient();
+    String result = client.target(URL_TOSCA_DEFINITIONS).request().get(String.class); 
+    return new ByteArrayInputStream(result.getBytes());
+  }
+  
   public Definitions createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException {
     String definitionsString = AbstractConverter.toString(definitions, "info.openmultinet.ontology.translators.tosca.jaxb");
     
