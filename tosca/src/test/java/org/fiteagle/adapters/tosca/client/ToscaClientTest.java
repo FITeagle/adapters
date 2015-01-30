@@ -2,7 +2,6 @@ package org.fiteagle.adapters.tosca.client;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import info.openmultinet.ontology.translators.AbstractConverter;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.translators.tosca.jaxb.TDefinitions;
 
@@ -46,7 +45,7 @@ public class ToscaClientTest {
 //  @Test
   public void testCreateDefinitions() throws JAXBException, HttpException, IOException {
     TDefinitions inputDefinitions = client.loadToscaResource("/dummy.xml");
-    TDefinitions definitions = null; 
+    String definitions = null; 
     try {
       definitions = client.createDefinitions(inputDefinitions);
     } catch(ProcessingException e){
@@ -54,7 +53,7 @@ public class ToscaClientTest {
       return;
     }
     assertNotNull(definitions);
-    System.out.println(AbstractConverter.toString(definitions, "info.openmultinet.ontology.translators.tosca.jaxb"));
+    System.out.println(definitions);
   }
   
 }

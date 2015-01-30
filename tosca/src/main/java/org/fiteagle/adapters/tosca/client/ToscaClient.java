@@ -43,26 +43,22 @@ public class ToscaClient {
     return new ByteArrayInputStream(result.getBytes());
   }
   
-  public Definitions createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException {
+  public String createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException {
     String definitionsString = AbstractConverter.toString(definitions, "info.openmultinet.ontology.translators.tosca.jaxb");
     
     Client client = ClientBuilder.newClient();
     Entity<String> e = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result = client.target(URL_TOSCA_DEFINITIONS).request().post(e, String.class); 
     
-    InputStream resultStream = new ByteArrayInputStream(result.getBytes());
-    
-    return convertToDefinitions(resultStream);
+    return result;
   }
   
-  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException {
+  public String createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException {
     Client client = ClientBuilder.newClient();
     Entity<String> e = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result = client.target(URL_TOSCA_DEFINITIONS).request().post(e, String.class); 
     
-    InputStream resultStream = new ByteArrayInputStream(result.getBytes());
-    
-    return convertToDefinitions(resultStream);
+    return result;
   }
   
   protected Definitions loadToscaResource(String path){

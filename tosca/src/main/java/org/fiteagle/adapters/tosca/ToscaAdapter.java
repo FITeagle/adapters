@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.tosca;
 
+import info.openmultinet.ontology.Parser;
 import info.openmultinet.ontology.exceptions.InvalidModelException;
 import info.openmultinet.ontology.translators.tosca.OMN2Tosca;
 import info.openmultinet.ontology.translators.tosca.OMN2Tosca.MultipleNamespacesException;
@@ -11,6 +12,7 @@ import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,12 +23,14 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.http.HttpException;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.tosca.client.ToscaClient;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
 
+import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -83,17 +87,37 @@ public final class ToscaAdapter extends AbstractAdapter {
     adapterInstances.put(adapterInstance.getURI(), this);
   }
   
+  private static InfModel createInfModel(Model model) throws InvalidModelException{
+    Parser parser = new Parser(model);
+    final InfModel infModel = parser.getInfModel();
+    return infModel;
+  }
+  
   @Override
   public Model createInstances(Model createModel){
+    InfModel model = null;
+    try {
+      model = createInfModel(createModel);
+    } catch (InvalidModelException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+    
     String definitions = null;
     try {
-      definitions = OMN2Tosca.getTopology(createModel);
+      definitions = OMN2Tosca.getTopology(model);
     } catch (JAXBException | InvalidModelException | MultipleNamespacesException | RequiredResourceNotFoundException
         | MultiplePropertyValuesException e) {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }
     
-    InputStream resultStream = new ByteArrayInputStream(definitions.getBytes());
+    String resultDefinitions = null;
+    try {
+      resultDefinitions = client.createDefinitions(definitions);
+    } catch (HttpException | IOException | JAXBException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+    
+    InputStream resultStream = new ByteArrayInputStream(resultDefinitions.getBytes());
     Model resultModel = null;
     try {
       resultModel = Tosca2OMN.getModel(resultStream);
@@ -106,7 +130,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public Model createInstance(String instanceURI, Model createModel) {
-    return null;
+    return createInstances(createModel);
   }
   
   @Override
