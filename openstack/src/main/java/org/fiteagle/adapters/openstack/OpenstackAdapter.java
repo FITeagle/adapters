@@ -23,6 +23,7 @@ import org.fiteagle.api.core.OntologyModelUtil;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -52,19 +53,19 @@ public class OpenstackAdapter extends AbstractAdapter {
   static {
     Model adapterModel = OntologyModelUtil.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
     
-    StmtIterator adapterIterator = adapterModel.listStatements(null, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+    ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
-      adapter = adapterIterator.next().getSubject();
+      adapter = adapterIterator.next();
     }
     
-    StmtIterator resourceIterator = adapterModel.listStatements(adapter, Omn_lifecycle.implements_, (Resource) null);
+    StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
       resource = resourceIterator.next().getObject().asResource();
     }
     
-    StmtIterator propertiesIterator = adapterModel.listStatements(null, RDFS.domain, resource);
+    ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
     while (propertiesIterator.hasNext()) {
-      Property p = adapterModel.getProperty(propertiesIterator.next().getSubject().getURI());
+      Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
       resourceInstanceProperties.add(p);
     }
     
