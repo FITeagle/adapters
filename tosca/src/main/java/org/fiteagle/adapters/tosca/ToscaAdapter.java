@@ -1,11 +1,16 @@
 package org.fiteagle.adapters.tosca;
 
 import info.openmultinet.ontology.exceptions.InvalidModelException;
+import info.openmultinet.ontology.translators.tosca.OMN2Tosca;
+import info.openmultinet.ontology.translators.tosca.OMN2Tosca.MultipleNamespacesException;
+import info.openmultinet.ontology.translators.tosca.OMN2Tosca.MultiplePropertyValuesException;
+import info.openmultinet.ontology.translators.tosca.OMN2Tosca.RequiredResourceNotFoundException;
 import info.openmultinet.ontology.translators.tosca.Tosca2OMN;
 import info.openmultinet.ontology.translators.tosca.Tosca2OMN.UnsupportedException;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +45,6 @@ public final class ToscaAdapter extends AbstractAdapter {
   private static Resource adapter;
   
   private static List<Resource> resources = new ArrayList<>();
-  
   
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
@@ -80,7 +84,28 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Model createInstance(String instanceURI, Model modelCreate) {
+  public Model createInstances(Model createModel){
+    String definitions = null;
+    try {
+      definitions = OMN2Tosca.getTopology(createModel);
+    } catch (JAXBException | InvalidModelException | MultipleNamespacesException | RequiredResourceNotFoundException
+        | MultiplePropertyValuesException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+    
+    InputStream resultStream = new ByteArrayInputStream(definitions.getBytes());
+    Model resultModel = null;
+    try {
+      resultModel = Tosca2OMN.getModel(resultStream);
+    } catch (JAXBException | InvalidModelException | UnsupportedException e) {
+      LOGGER.log(Level.SEVERE, e.getMessage());
+    }
+    
+    return resultModel;
+  }
+  
+  @Override
+  public Model createInstance(String instanceURI, Model createModel) {
     return null;
   }
   
@@ -120,8 +145,7 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   @Override
   public Model getInstance(String instanceURI) throws InstanceNotFoundException {
-    // TODO Auto-generated method stub
-    return null;
+    throw new InstanceNotFoundException();
   }
 
   @Override
