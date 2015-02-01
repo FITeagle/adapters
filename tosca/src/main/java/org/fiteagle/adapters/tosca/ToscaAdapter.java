@@ -117,6 +117,8 @@ public final class ToscaAdapter extends AbstractAdapter {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }
     
+    LOGGER.log(Level.INFO, "Result definitions: "+resultDefinitions);
+    
     InputStream resultStream = new ByteArrayInputStream(resultDefinitions.getBytes());
     Model resultModel = null;
     try {
