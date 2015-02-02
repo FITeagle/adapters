@@ -45,7 +45,7 @@ public class MotorAdapterTest {
   }
   
   @Test(expected=InstanceNotFoundException.class)
-  public void testGetNonExistingInstance() throws InstanceNotFoundException{
+  public void testGetNonExistingInstance() throws InstanceNotFoundException, AdapterException{
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
     adapter.getInstance(instanceURI);
   }

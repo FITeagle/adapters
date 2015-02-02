@@ -45,7 +45,7 @@ public class ToscaClientTest {
 //  @Test
   public void testCreateDefinitions() throws JAXBException, HttpException, IOException {
     TDefinitions inputDefinitions = client.loadToscaResource("/dummy.xml");
-    String definitions = null; 
+    Definitions definitions = null; 
     try {
       definitions = client.createDefinitions(inputDefinitions);
     } catch(ProcessingException e){

@@ -11,6 +11,7 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
@@ -36,7 +37,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   }
   
   @OnMessage
-  public String onMessage(final String message) throws InstanceNotFoundException {
+  public String onMessage(final String message) throws InstanceNotFoundException, AdapterException {
     for(AbstractAdapter adapter : getAdapterInstances().values()){
       if (message.equals(adapter.getAdapterInstance().getURI())) {
         return MessageUtil.serializeModel(adapter.getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);

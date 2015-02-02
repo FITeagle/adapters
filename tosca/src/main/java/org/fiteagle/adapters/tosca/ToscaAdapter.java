@@ -2,12 +2,14 @@ package org.fiteagle.adapters.tosca;
 
 import info.openmultinet.ontology.Parser;
 import info.openmultinet.ontology.exceptions.InvalidModelException;
+import info.openmultinet.ontology.translators.AbstractConverter;
 import info.openmultinet.ontology.translators.tosca.OMN2Tosca;
 import info.openmultinet.ontology.translators.tosca.OMN2Tosca.MultipleNamespacesException;
 import info.openmultinet.ontology.translators.tosca.OMN2Tosca.MultiplePropertyValuesException;
 import info.openmultinet.ontology.translators.tosca.OMN2Tosca.RequiredResourceNotFoundException;
 import info.openmultinet.ontology.translators.tosca.Tosca2OMN;
 import info.openmultinet.ontology.translators.tosca.Tosca2OMN.UnsupportedException;
+import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
@@ -32,6 +34,7 @@ import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -87,51 +90,29 @@ public final class ToscaAdapter extends AbstractAdapter {
     adapterInstances.put(adapterInstance.getURI(), this);
   }
   
-  private static InfModel createInfModel(Model model) throws InvalidModelException{
-    Parser parser = new Parser(model);
-    final InfModel infModel = parser.getInfModel();
-    return infModel;
-  }
-  
   @Override
-  public Model createInstances(Model createModel){
-    InfModel model = null;
-    try {
-      model = createInfModel(createModel);
-    } catch (InvalidModelException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
-    }
-    
-    String definitions = null;
-    try {
-      definitions = OMN2Tosca.getTopology(model);
-    } catch (JAXBException | InvalidModelException | MultipleNamespacesException | RequiredResourceNotFoundException
-        | MultiplePropertyValuesException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
-    }
-    
-    String resultDefinitions = null;
-    try {
-      resultDefinitions = client.createDefinitions(definitions);
-    } catch (HttpException | IOException | JAXBException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
-    }
-    
-    LOGGER.log(Level.INFO, "Result definitions: "+resultDefinitions);
-    
-    InputStream resultStream = new ByteArrayInputStream(resultDefinitions.getBytes());
-    Model resultModel = null;
-    try {
+  public Model createInstances(Model createModel) throws AdapterException {
+    Model resultModel = ModelFactory.createDefaultModel();
+    try{
+      InfModel infModel = createInfModel(createModel);
+      String definitions = OMN2Tosca.getTopology(infModel);      
+      LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
+      
+      Definitions resultDefinitions = client.createDefinitions(definitions);
+      String resultString = AbstractConverter.toString(resultDefinitions, OMN2Tosca.JAXB_PACKAGE_NAME);      
+      LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
+      
+      InputStream resultStream = new ByteArrayInputStream(resultString.getBytes());
       resultModel = Tosca2OMN.getModel(resultStream);
-    } catch (JAXBException | InvalidModelException | UnsupportedException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
+      
+    } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException |RequiredResourceNotFoundException | MultipleNamespacesException e){
+      throw new AdapterException(e);
     }
-    
     return resultModel;
   }
   
   @Override
-  public Model createInstance(String instanceURI, Model createModel) {
+  public Model createInstance(String instanceURI, Model createModel) throws AdapterException {
     return createInstances(createModel);
   }
   
@@ -175,15 +156,21 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Model getAllInstances() throws InstanceNotFoundException {
+  public Model getAllInstances() throws InstanceNotFoundException, AdapterException {
     InputStream definitions = client.getDefinitionsStream();
     Model model = null;
     try {
       model = Tosca2OMN.getModel(definitions);
     } catch (JAXBException | InvalidModelException | UnsupportedException e) {
-      LOGGER.log(Level.SEVERE, e.getMessage());
+      throw new AdapterException(e);
     }
     return model;
+  }
+  
+  private static InfModel createInfModel(Model model) throws InvalidModelException{
+    Parser parser = new Parser(model);
+    final InfModel infModel = parser.getInfModel();
+    return infModel;
   }
   
 }

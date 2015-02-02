@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
@@ -38,7 +39,11 @@ public abstract class AbstractAdapterREST {
   @Produces("text/turtle")
   public String getAllInstancesTurtle(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
-    return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
+    try {
+      return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
+    } catch (AdapterException e) {
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    }
   }
   
   @GET
@@ -46,7 +51,11 @@ public abstract class AbstractAdapterREST {
   @Produces("application/rdf+xml")
   public String getAllInstancesRDF(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
-    return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_RDFXML);
+    try {
+      return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_RDFXML);
+    } catch (AdapterException e) {
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    }
   }
   
   @GET
@@ -54,7 +63,11 @@ public abstract class AbstractAdapterREST {
   @Produces("application/n-triples")
   public String getAllInstancesNTRIPLE(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
-    return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_NTRIPLE);
+    try {
+      return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_NTRIPLE);
+    } catch (AdapterException e) {
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    }
   }
   
   @PUT
@@ -67,7 +80,7 @@ public abstract class AbstractAdapterREST {
       Model resultModel = adapter.createInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
-      return e.getMessage();
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
   }
   
@@ -81,7 +94,7 @@ public abstract class AbstractAdapterREST {
       Model resultModel = adapter.configureInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
-      return e.getMessage();
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
   }
     
@@ -93,7 +106,9 @@ public abstract class AbstractAdapterREST {
     try {
       adapter.deleteInstance(instanceURI);
     } catch (InstanceNotFoundException e) {
-      return Response.status(Response.Status.NOT_FOUND.getStatusCode()).build();
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, "The instance could not be found");
+    } catch (AdapterException e) {
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
     return Response.status(Response.Status.OK.getStatusCode()).build();
   }
@@ -107,7 +122,9 @@ public abstract class AbstractAdapterREST {
     try {
       model = adapter.getInstance(instanceURI);
     } catch (InstanceNotFoundException e) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
+      throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+    } catch (AdapterException e) {
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_TURTLE);
   }
@@ -121,7 +138,9 @@ public abstract class AbstractAdapterREST {
     try {
       model = adapter.getInstance(instanceURI);
     } catch (InstanceNotFoundException e) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
+      throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+    } catch (AdapterException e) {
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_RDFXML);
   }
@@ -135,7 +154,9 @@ public abstract class AbstractAdapterREST {
     try {
       model = adapter.getInstance(instanceURI);
     } catch (InstanceNotFoundException e) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
+      throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+    } catch (AdapterException e) {
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_NTRIPLE);
   }
@@ -143,8 +164,21 @@ public abstract class AbstractAdapterREST {
   private AbstractAdapter getAdapterInstance(String adapterName) {
     AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
     if(adapter == null){
-      throw new WebApplicationException(Response.Status.NOT_FOUND.getStatusCode());
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, "The adapter instance "+adapterName+" could not be found");
     }
     return adapter;
   }
+  
+  public static class AdapterWebApplicationException extends WebApplicationException {
+    private static final long serialVersionUID = -9105333519515224562L;
+
+    public AdapterWebApplicationException(final Status status, final Throwable cause) {
+      super(Response.status(status).entity(cause).build());
+    }
+    
+    public AdapterWebApplicationException(final Status status, final String message) {
+      super(Response.status(status).entity(message).build());
+    }
+}
+
 }

@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.tosca.client;
 
 import info.openmultinet.ontology.translators.AbstractConverter;
+import info.openmultinet.ontology.translators.tosca.OMN2Tosca;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.translators.tosca.jaxb.TDefinitions;
 
@@ -43,22 +44,24 @@ public class ToscaClient {
     return new ByteArrayInputStream(result.getBytes());
   }
   
-  public String createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException {
-    String definitionsString = AbstractConverter.toString(definitions, "info.openmultinet.ontology.translators.tosca.jaxb");
+  public Definitions createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException {
+    String definitionsString = AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
     
     Client client = ClientBuilder.newClient();
     Entity<String> e = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result = client.target(URL_TOSCA_DEFINITIONS).request().post(e, String.class); 
     
-    return result;
+    InputStream input = new ByteArrayInputStream(result.getBytes());
+    return convertToDefinitions(input);
   }
   
-  public String createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException {
+  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException {
     Client client = ClientBuilder.newClient();
     Entity<String> e = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result = client.target(URL_TOSCA_DEFINITIONS).request().post(e, String.class); 
     
-    return result;
+    InputStream input = new ByteArrayInputStream(result.getBytes());
+    return convertToDefinitions(input);
   }
   
   protected Definitions loadToscaResource(String path){

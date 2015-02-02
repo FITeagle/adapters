@@ -111,15 +111,15 @@ public abstract class AbstractAdapter {
   
   public abstract void updateAdapterDescription();
   
-  public abstract Model configureInstance(String instanceURI, Model configureModel);
+  public abstract Model configureInstance(String instanceURI, Model configureModel) throws AdapterException;
   
-  public abstract Model createInstance(String instanceURI, Model newInstanceModel);
+  public abstract Model createInstance(String instanceURI, Model newInstanceModel) throws AdapterException;
   
-  public abstract void deleteInstance(String instanceURI) throws InstanceNotFoundException;
+  public abstract void deleteInstance(String instanceURI) throws InstanceNotFoundException, AdapterException;
   
-  public abstract Model getInstance(String instanceURI) throws InstanceNotFoundException;
+  public abstract Model getInstance(String instanceURI) throws InstanceNotFoundException, AdapterException;
   
-  public abstract Model getAllInstances() throws InstanceNotFoundException;
+  public abstract Model getAllInstances() throws InstanceNotFoundException, AdapterException;
   
   public static class AdapterException extends Exception {
     
@@ -127,6 +127,10 @@ public abstract class AbstractAdapter {
     
     public AdapterException(String message) {
       super(message);
+    }
+    
+    public AdapterException(Throwable cause) {
+      super(cause);
     }
   }
   
