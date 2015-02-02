@@ -50,5 +50,6 @@
 		<module>openstack</module>
 		<module>openMTC</module>
 		<module>tosca</module>
-	</modules>
+
+    </modules>
 </project>

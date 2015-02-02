@@ -10,7 +10,7 @@ motorgarage:MotorGarage
         a                          owl:Class ;
         rdfs:label                 "MotorGarage"@en ;
         rdfs:subClassOf            omn:Adapter ;
-        omnLifecycle:implements   motor:Motor .
+        omnLifecycle:parentTo   motor:Motor .
         
 motor:Motor
         a                            owl:Class ;
