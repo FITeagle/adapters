@@ -19,9 +19,10 @@ public class ToscaClientTest {
   
   private static Logger LOGGER = Logger.getLogger(ToscaClientTest.class.toString());
   
-  private static String URL_TOSCA_DEFINITIONS = "http://localhost:8080/api/rest/tosca/v2/definitions";
+  private static String URL_TOSCA_DEFINITIONS = "http://localhost:8080/api/rest/tosca/v2/definitions/";
+  private static String URL_TOSCA_NODES = "http://localhost:8080/api/rest/tosca/v2/nodes/";
   
-  private ToscaClient client = new ToscaClient(URL_TOSCA_DEFINITIONS);
+  private ToscaClient client = new ToscaClient(URL_TOSCA_DEFINITIONS, URL_TOSCA_NODES);
   
   @Test
   public void testLoadToscaResource() {

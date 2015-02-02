@@ -116,7 +116,7 @@ public abstract class AbstractAdapterREST {
   @GET
   @Path("/{adapterName}/instance/{instanceURI}")
   @Produces("text/turtle")
-  public String monitorInstanceTurtle(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+  public String getInstanceTurtle(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     Model model;
     try {
@@ -132,7 +132,7 @@ public abstract class AbstractAdapterREST {
   @GET
   @Path("/{adapterName}/instance/{instanceURI}")
   @Produces("application/rdf+xml")
-  public String monitorInstanceRDF(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+  public String getInstanceRDFXML(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     Model model;
     try {
@@ -148,7 +148,7 @@ public abstract class AbstractAdapterREST {
   @GET
   @Path("/{adapterName}/instance/{instanceURI}")
   @Produces("application/n-triples")
-  public String monitorInstanceNTRIPLE(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+  public String getInstanceNTRIPLE(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     Model model;
     try {

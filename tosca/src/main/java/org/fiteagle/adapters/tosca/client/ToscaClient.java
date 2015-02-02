@@ -27,9 +27,11 @@ public class ToscaClient {
   private static Logger LOGGER = Logger.getLogger(ToscaClient.class.toString());
   
   private final String URL_TOSCA_DEFINITIONS;
+  private final String URL_TOSCA_NODES;
   
-  public ToscaClient(String toscaURL){
-    URL_TOSCA_DEFINITIONS = toscaURL;
+  public ToscaClient(String definitionsURL, String nodesURL){
+    URL_TOSCA_DEFINITIONS = definitionsURL;
+    URL_TOSCA_NODES = nodesURL;
   }
   
   public String getDefinitions(){
@@ -41,6 +43,12 @@ public class ToscaClient {
   public InputStream getDefinitionsStream(){
     Client client = ClientBuilder.newClient();
     String result = client.target(URL_TOSCA_DEFINITIONS).request().get(String.class); 
+    return new ByteArrayInputStream(result.getBytes());
+  }
+  
+  public InputStream getSingleNodeDefinitions(String id){
+    Client client = ClientBuilder.newClient();
+    String result = client.target(URL_TOSCA_NODES+id).request().get(String.class); 
     return new ByteArrayInputStream(result.getBytes());
   }
   

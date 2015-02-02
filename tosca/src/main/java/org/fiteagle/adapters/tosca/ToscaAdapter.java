@@ -79,7 +79,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     adapterInstance.addProperty(RDFS.comment, "An adapter for TOSCA-compliant resources");
     Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
     adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-    new ToscaAdapter(adapterInstance, model, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/definitions"));
+    new ToscaAdapter(adapterInstance, model, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/definitions/", "http://localhost:8080/api/rest/tosca/v2/nodes/"));
   }
   
   private ToscaAdapter(Resource adapterInstance, Model adapterModel, ToscaClient client) {
@@ -151,8 +151,15 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Model getInstance(String instanceURI) throws InstanceNotFoundException {
-    throw new InstanceNotFoundException();
+  public Model getInstance(String instanceURI) throws InstanceNotFoundException, AdapterException {
+    InputStream definitions = client.getSingleNodeDefinitions(instanceURI);
+    Model model = null;
+    try {
+      model = Tosca2OMN.getModel(definitions);
+    } catch (JAXBException | InvalidModelException | UnsupportedException e) {
+      throw new AdapterException(e);
+    }
+    return model;
   }
 
   @Override
