@@ -1,5 +1,7 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -20,6 +22,7 @@ import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
+import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -30,12 +33,8 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public abstract class AbstractAdapterREST {
   
-  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
-  
-  private final static String adapterInstancesPrefix = "http://federation.av.tu-berlin.de/about#";
-  
   @GET
-  @Path("/{adapterName}/instance")
+  @Path("/{adapterName}/instances")
   @Produces("text/turtle")
   public String getAllInstancesTurtle(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
@@ -47,7 +46,7 @@ public abstract class AbstractAdapterREST {
   }
   
   @GET
-  @Path("/{adapterName}/instance")
+  @Path("/{adapterName}/instances")
   @Produces("application/rdf+xml")
   public String getAllInstancesRDF(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
@@ -59,7 +58,7 @@ public abstract class AbstractAdapterREST {
   }
   
   @GET
-  @Path("/{adapterName}/instance")
+  @Path("/{adapterName}/instances")
   @Produces("application/n-triples")
   public String getAllInstancesNTRIPLE(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
@@ -70,8 +69,8 @@ public abstract class AbstractAdapterREST {
     }
   }
   
-  @PUT
-  @Path("/{adapterName}/instance")
+  @POST
+  @Path("/{adapterName}/instances")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/html")
   public String createInstances(@PathParam("adapterName") String adapterName, String rdfInput) {
@@ -84,14 +83,14 @@ public abstract class AbstractAdapterREST {
     }
   }
   
-  @POST
-  @Path("/{adapterName}/instance")
+  @PUT
+  @Path("/{adapterName}/instances/{instanceURI}")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
   @Produces("text/html")
-  public String configureInstances(@PathParam("adapterName") String adapterName, String rdfInput) {
+  public String configureInstance(@PathParam("adapterName") String adapterName, String rdfInput, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     try {
-      Model resultModel = adapter.configureInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
+      Model resultModel = adapter.configureInstance(decode(instanceURI), MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
@@ -99,14 +98,14 @@ public abstract class AbstractAdapterREST {
   }
     
   @DELETE
-  @Path("/{adapterName}/instance/{instanceURI}")
+  @Path("/{adapterName}/instances/{instanceURI}")
   @Produces("text/html")
   public Response terminateInstance(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     try {
-      adapter.deleteInstance(instanceURI);
+      adapter.deleteInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
-      throw new AdapterWebApplicationException(Status.NOT_FOUND, "The instance could not be found");
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
     } catch (AdapterException e) {
       throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
@@ -114,15 +113,15 @@ public abstract class AbstractAdapterREST {
   }
   
   @GET
-  @Path("/{adapterName}/instance/{instanceURI}")
+  @Path("/{adapterName}/instances/{instanceURI}")
   @Produces("text/turtle")
   public String getInstanceTurtle(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     Model model;
     try {
-      model = adapter.getInstance(instanceURI);
+      model = adapter.getInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
-      throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
     } catch (AdapterException e) {
       throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
@@ -130,15 +129,15 @@ public abstract class AbstractAdapterREST {
   }
   
   @GET
-  @Path("/{adapterName}/instance/{instanceURI}")
+  @Path("/{adapterName}/instances/{instanceURI}")
   @Produces("application/rdf+xml")
   public String getInstanceRDFXML(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     Model model;
     try {
-      model = adapter.getInstance(instanceURI);
+      model = adapter.getInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
-      throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
     } catch (AdapterException e) {
       throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
@@ -146,15 +145,15 @@ public abstract class AbstractAdapterREST {
   }
   
   @GET
-  @Path("/{adapterName}/instance/{instanceURI}")
+  @Path("/{adapterName}/instances/{instanceURI}")
   @Produces("application/n-triples")
   public String getInstanceNTRIPLE(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     Model model;
     try {
-      model = adapter.getInstance(instanceURI);
+      model = adapter.getInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
-      throw new WebApplicationException(Status.NOT_FOUND.getStatusCode());
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
     } catch (AdapterException e) {
       throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
     }
@@ -162,18 +161,28 @@ public abstract class AbstractAdapterREST {
   }
 
   private AbstractAdapter getAdapterInstance(String adapterName) {
-    AbstractAdapter adapter = getAdapterInstances().get(adapterInstancesPrefix+adapterName);
+    AbstractAdapter adapter = getAdapterInstances().get(OntologyModelUtil.getLocalNamespace()+adapterName);
     if(adapter == null){
       throw new AdapterWebApplicationException(Status.NOT_FOUND, "The adapter instance "+adapterName+" could not be found");
     }
     return adapter;
   }
   
+  private String decode(String string){
+    try {
+      return URLDecoder.decode(string, "UTF8");
+    } catch (UnsupportedEncodingException e) {
+      throw new AdapterWebApplicationException(Status.BAD_REQUEST, e);
+    }
+  }
+
+  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  
   public static class AdapterWebApplicationException extends WebApplicationException {
     private static final long serialVersionUID = -9105333519515224562L;
 
     public AdapterWebApplicationException(final Status status, final Throwable cause) {
-      super(Response.status(status).entity(cause).build());
+      super(Response.status(status).entity(cause.getMessage()).type(MediaType.TEXT_PLAIN).build());
     }
     
     public AdapterWebApplicationException(final Status status, final String message) {

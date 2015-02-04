@@ -88,6 +88,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     this.client = client;
     
     adapterInstances.put(adapterInstance.getURI(), this);
+    prefixes.putAll(adapterModel.getNsPrefixMap());
   }
   
   @Override
@@ -104,6 +105,8 @@ public final class ToscaAdapter extends AbstractAdapter {
       
       InputStream resultStream = new ByteArrayInputStream(resultString.getBytes());
       resultModel = Tosca2OMN.getModel(resultStream);
+      
+      prefixes.putAll(resultModel.getNsPrefixMap());
       
     } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException |RequiredResourceNotFoundException | MultipleNamespacesException e){
       throw new AdapterException(e);
@@ -152,7 +155,13 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   @Override
   public Model getInstance(String instanceURI) throws InstanceNotFoundException, AdapterException {
-    InputStream definitions = client.getSingleNodeDefinitions(instanceURI);
+    String id;
+    try{
+      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, prefixes)[1];
+    } catch(IllegalArgumentException e){
+      throw new AdapterException(e);
+    }
+    InputStream definitions = client.getSingleNodeDefinitions(id);
     Model model = null;
     try {
       model = Tosca2OMN.getModel(definitions);

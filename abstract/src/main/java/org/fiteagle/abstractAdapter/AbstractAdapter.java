@@ -3,7 +3,9 @@ package org.fiteagle.abstractAdapter;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,6 +26,8 @@ public abstract class AbstractAdapter {
   private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
   
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
+  
+  protected static Map<String, String> prefixes = new HashMap<String, String>();
   
   public boolean isRecipient(Model messageModel) {
     return messageModel.containsResource(getAdapterInstance());
