@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.openMTC;
 
+import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.ArrayList;
@@ -53,11 +54,11 @@ public class OpenMTCAdapter extends AbstractAdapter {
       }
     }
     
-    Resource adapterInstance = adapterModel.createResource("http://federation.av.tu-berlin.de/about#OpenMTC-1");
+    Resource adapterInstance = adapterModel.createResource(OntologyModelUtil.getLocalNamespace()+"OpenMTC-1");
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("An OpenMTC Adapter instance"));
     adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("An OpenMTC Adapter instance that can handle multiple OpenMTC as a Service instances", "en"));
-    adapterInstance.addProperty(adapterModel.createProperty("http://open-multinet.info/ontology/omn#partOfGroup"),adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
+    adapterInstance.addProperty(Omn_federation.partOfFederation, adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
     
     OpenMTCAdapter openMTCAdapter = new OpenMTCAdapter(adapterInstance, adapterModel);
       

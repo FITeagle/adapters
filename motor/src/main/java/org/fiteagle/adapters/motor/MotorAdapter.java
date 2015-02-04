@@ -59,7 +59,7 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   private static void createDefaultAdapterInstance(Model model){
-    Resource adapterInstance = model.createResource("http://federation.av.tu-berlin.de/about#MotorGarage-1");
+    Resource adapterInstance = model.createResource(OntologyModelUtil.getLocalNamespace()+"MotorGarage-1");
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(Omn_lifecycle.parentTo,"http://open-multinet.info/ontology/resource/motor#Motor" );
     adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
