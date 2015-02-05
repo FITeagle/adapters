@@ -65,6 +65,7 @@ public class OpenstackAdapterTest {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"server1");
     instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
+    instanceResource.addProperty(RDF.type,Omn.Resource);
     instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstance().getNameSpace()+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
@@ -89,10 +90,11 @@ public class OpenstackAdapterTest {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(instanceURI);
     instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
+    instanceResource.addProperty(RDF.type,Omn.Resource);
     instanceResource.addProperty(adapter.getOpenstackParser().getPROPERTY_IMAGE(), adapter.getAdapterInstance().getNameSpace()+"testImageName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_KEYPAIRNAME(), "testKeypairName");
     instanceResource.addLiteral(adapter.getOpenstackParser().getPROPERTY_FLAVOR(), 2);
-    
+
     adapter.createInstances(modelCreate);
     adapter.deleteInstance(instanceURI);
     adapter.getInstance(instanceURI);
