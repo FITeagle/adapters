@@ -74,7 +74,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   private static void createDefaultAdapterInstance(Model model){
-    Resource adapterInstance = model.createResource("http://federation.av.tu-berlin.de/about#Openstack-1");
+    Resource adapterInstance = model.createResource(OntologyModelUtil.getLocalNamespace()+"Openstack-1");
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
     adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");

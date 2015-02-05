@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -21,6 +22,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.http.HttpException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 
 public class ToscaClient {
   
@@ -46,9 +48,14 @@ public class ToscaClient {
     return new ByteArrayInputStream(result.getBytes());
   }
   
-  public InputStream getSingleNodeDefinitions(String id){
+  public InputStream getSingleNodeDefinitions(String id) throws InstanceNotFoundException{
     Client client = ClientBuilder.newClient();
-    String result = client.target(URL_TOSCA_NODES+id).request().get(String.class); 
+    String result = null;
+    try{
+      result = client.target(URL_TOSCA_NODES+id).request().get(String.class); 
+    } catch(NotFoundException e){
+      throw new InstanceNotFoundException("Node with id "+id+" not found");
+    }
     return new ByteArrayInputStream(result.getBytes());
   }
   

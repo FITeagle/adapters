@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.xml.bind.JAXBException;
 
@@ -35,7 +36,7 @@ public class ToscaClientTest {
     String definitons = null; 
     try {
       definitons = client.getDefinitions();
-    } catch(ProcessingException e){
+    } catch(ProcessingException | NotFoundException e){
       LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA_DEFINITIONS);
       return;
     }

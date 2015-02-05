@@ -39,18 +39,18 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   @OnMessage
   public String onMessage(final String message) throws InstanceNotFoundException, AdapterException {
     for(AbstractAdapter adapter : getAdapterInstances().values()){
-      if (message.equals(adapter.getAdapterInstance().getURI())) {
+      if (message.equals(adapter.getAdapterInstance().getLocalName())) {
         return MessageUtil.serializeModel(adapter.getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
         
-      } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/ttl")) {
+      } else if (message.equals(adapter.getAdapterInstance().getLocalName()+"/instances/ttl")) {
         
         return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
         
-      } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/rdfxml")) {
+      } else if (message.equals(adapter.getAdapterInstance().getLocalName()+"/instances/rdfxml")) {
         
         return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_RDFXML);
         
-      } else if (message.equals(adapter.getAdapterInstance().getURI()+"/instances/ntriple")) {
+      } else if (message.equals(adapter.getAdapterInstance().getLocalName()+"/instances/ntriple")) {
         
         return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_NTRIPLE);
       }
