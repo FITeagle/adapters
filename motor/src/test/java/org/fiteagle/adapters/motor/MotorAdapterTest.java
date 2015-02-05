@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.motor;
 
+import info.openmultinet.ontology.vocabulary.Omn;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
@@ -32,8 +33,8 @@ public class MotorAdapterTest {
     motor.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
     Property propertyRPM = modelCreate.createProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"rpm");
     motor.addLiteral(propertyRPM, 42);
-    
-    adapter.createInstances(modelCreate);
+      motor.addProperty(RDF.type, Omn.Resource);
+      adapter.createInstances(modelCreate);
     
     Model createdResourceModel = adapter.getInstance(instanceURI);
     Resource resource = createdResourceModel.getResource(instanceURI);
@@ -57,6 +58,7 @@ public class MotorAdapterTest {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource motorResource = modelCreate.createResource(instanceURI);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
+    motorResource.addProperty(RDF.type, Omn.Resource);
     adapter.createInstances(modelCreate);
     
     Model monitorData = adapter.getInstance(instanceURI);
@@ -85,6 +87,7 @@ public class MotorAdapterTest {
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource motorResource = modelCreate.createResource(instanceURI);
     motorResource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
+    motorResource.addProperty(RDF.type, Omn.Resource);
     adapter.createInstances(modelCreate);
 
     Model modelConfigure = ModelFactory.createDefaultModel();

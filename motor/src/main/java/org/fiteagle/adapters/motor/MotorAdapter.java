@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.motor;
 
+import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
@@ -92,6 +93,7 @@ public final class MotorAdapter extends AbstractAdapter {
   protected Model parseToModel(Motor motor) {
     Resource resource = ModelFactory.createDefaultModel().createResource(motor.getInstanceName());
     resource.addProperty(RDF.type, MotorAdapter.resources.get(0));
+    resource.addProperty(RDF.type, Omn.Resource);
     resource.addProperty(RDFS.label, resource.getLocalName());
     for (Property p : motorControlProperties) {
       switch (p.getLocalName()) {
