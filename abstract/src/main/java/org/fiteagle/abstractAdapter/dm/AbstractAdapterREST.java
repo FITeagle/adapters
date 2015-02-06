@@ -100,7 +100,7 @@ public abstract class AbstractAdapterREST {
   @DELETE
   @Path("/{adapterName}/instances/{instanceURI}")
   @Produces("text/html")
-  public Response terminateInstance(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
+  public Response deleteInstance(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     try {
       adapter.deleteInstance(decode(instanceURI));

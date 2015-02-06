@@ -16,12 +16,14 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.http.HttpException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 
 public class ToscaClient {
@@ -57,6 +59,14 @@ public class ToscaClient {
       throw new InstanceNotFoundException("Node with id "+id+" not found");
     }
     return new ByteArrayInputStream(result.getBytes());
+  }
+  
+  public void deleteDefinitions(String id) throws AdapterException{
+    Client client = ClientBuilder.newClient();
+    Response response = client.target(URL_TOSCA_DEFINITIONS+id).request().delete(); 
+    if(!(response.getStatusInfo().equals(Response.Status.NO_CONTENT) || response.getStatusInfo().equals(Response.Status.OK))){
+      throw new AdapterException("Unexpected response while delete: "+response.getStatus());
+    }
   }
   
   public Definitions createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException {

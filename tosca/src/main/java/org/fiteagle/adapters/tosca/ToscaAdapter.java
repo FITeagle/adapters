@@ -125,8 +125,14 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
-  public void deleteInstance(String instanceURI) {
-    return;
+  public void deleteInstance(String instanceURI) throws AdapterException {
+    String id;
+    try{
+      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, prefixes)[1];
+    } catch(IllegalArgumentException e){
+      throw new AdapterException(e);
+    }
+    client.deleteDefinitions(id);
   }
   
   @Override
@@ -151,6 +157,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public void updateAdapterDescription() {
+    //TODO: get service types from osco
   }
 
   @Override
