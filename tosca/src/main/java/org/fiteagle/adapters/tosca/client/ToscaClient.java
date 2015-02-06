@@ -44,21 +44,23 @@ public class ToscaClient {
     return new ByteArrayInputStream(result.getBytes());
   }
   
-  public InputStream getDefinitions(String id) throws InstanceNotFoundException{
+  public Definitions getDefinitions(String id) throws InstanceNotFoundException{
     Client client = ClientBuilder.newClient();
     try{
       String result = client.target(URL_TOSCA_DEFINITIONS+id).request().get(String.class); 
-      return new ByteArrayInputStream(result.getBytes());
+      InputStream input = new ByteArrayInputStream(result.getBytes());
+      return convertToDefinitions(input);
     } catch(NotFoundException e){
       throw new InstanceNotFoundException("Definitions with id "+id+" not found");
     }
   }
   
-  public InputStream getSingleNodeDefinitions(String id) throws InstanceNotFoundException{
+  public Definitions getSingleNodeDefinitions(String id) throws InstanceNotFoundException{
     Client client = ClientBuilder.newClient();
     try{
       String result = client.target(URL_TOSCA_NODES+id).request().get(String.class);
-      return new ByteArrayInputStream(result.getBytes());
+      InputStream input = new ByteArrayInputStream(result.getBytes());
+      return convertToDefinitions(input);
     } catch(NotFoundException e){
       throw new InstanceNotFoundException("Node with id "+id+" not found");
     }

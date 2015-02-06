@@ -168,7 +168,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     } catch(IllegalArgumentException e){
       throw new AdapterException(e);
     }
-    InputStream definitions;
+    Definitions definitions;
     try{
       definitions = client.getSingleNodeDefinitions(id);
     } catch(InstanceNotFoundException e){
@@ -180,9 +180,18 @@ public final class ToscaAdapter extends AbstractAdapter {
       }
     }
     
+    String resultString;
+    try {
+      resultString = AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
+    } catch (JAXBException e) {
+      throw new AdapterException(e);
+    }      
+    LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
+    InputStream resultStream = new ByteArrayInputStream(resultString.getBytes());
+    
     Model model = null;
     try {
-      model = Tosca2OMN.getModel(definitions);
+      model = Tosca2OMN.getModel(resultStream);
     } catch (JAXBException | InvalidModelException | UnsupportedException e) {
       throw new AdapterException(e);
     }
