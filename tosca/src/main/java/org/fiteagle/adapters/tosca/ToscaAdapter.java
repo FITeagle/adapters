@@ -168,7 +168,18 @@ public final class ToscaAdapter extends AbstractAdapter {
     } catch(IllegalArgumentException e){
       throw new AdapterException(e);
     }
-    InputStream definitions = client.getSingleNodeDefinitions(id);
+    InputStream definitions;
+    try{
+      definitions = client.getSingleNodeDefinitions(id);
+    } catch(InstanceNotFoundException e){
+      LOGGER.log(Level.INFO, "No node with id "+id+" found, looking for topologies");
+      try{
+        definitions = client.getDefinitions(id);
+      } catch(InstanceNotFoundException e1){
+        throw new InstanceNotFoundException("No node or topologies with id "+id+" found");
+      }
+    }
+    
     Model model = null;
     try {
       model = Tosca2OMN.getModel(definitions);
@@ -180,7 +191,7 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   @Override
   public Model getAllInstances() throws InstanceNotFoundException, AdapterException {
-    InputStream definitions = client.getDefinitionsStream();
+    InputStream definitions = client.getAllDefinitionsStream();
     Model model = null;
     try {
       model = Tosca2OMN.getModel(definitions);

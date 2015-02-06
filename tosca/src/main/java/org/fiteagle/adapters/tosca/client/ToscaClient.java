@@ -38,27 +38,30 @@ public class ToscaClient {
     URL_TOSCA_NODES = nodesURL;
   }
   
-  public String getDefinitions(){
-    Client client = ClientBuilder.newClient();
-    String result = client.target(URL_TOSCA_DEFINITIONS).request().get(String.class); 
-    return result;
-  }
-  
-  public InputStream getDefinitionsStream(){
+  public InputStream getAllDefinitionsStream(){
     Client client = ClientBuilder.newClient();
     String result = client.target(URL_TOSCA_DEFINITIONS).request().get(String.class); 
     return new ByteArrayInputStream(result.getBytes());
+  }
+  
+  public InputStream getDefinitions(String id) throws InstanceNotFoundException{
+    Client client = ClientBuilder.newClient();
+    try{
+      String result = client.target(URL_TOSCA_DEFINITIONS+id).request().get(String.class); 
+      return new ByteArrayInputStream(result.getBytes());
+    } catch(NotFoundException e){
+      throw new InstanceNotFoundException("Definitions with id "+id+" not found");
+    }
   }
   
   public InputStream getSingleNodeDefinitions(String id) throws InstanceNotFoundException{
     Client client = ClientBuilder.newClient();
-    String result = null;
     try{
-      result = client.target(URL_TOSCA_NODES+id).request().get(String.class); 
+      String result = client.target(URL_TOSCA_NODES+id).request().get(String.class);
+      return new ByteArrayInputStream(result.getBytes());
     } catch(NotFoundException e){
       throw new InstanceNotFoundException("Node with id "+id+" not found");
     }
-    return new ByteArrayInputStream(result.getBytes());
   }
   
   public void deleteDefinitions(String id) throws AdapterException{

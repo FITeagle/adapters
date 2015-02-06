@@ -1,11 +1,11 @@
 package org.fiteagle.adapters.tosca.client;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.translators.tosca.jaxb.TDefinitions;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,15 +33,14 @@ public class ToscaClientTest {
   
   @Test
   public void testGetDefinitions() {
-    String definitons = null; 
+    InputStream definitons = null; 
     try {
-      definitons = client.getDefinitions();
+      definitons = client.getAllDefinitionsStream();
     } catch(ProcessingException | NotFoundException e){
       LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA_DEFINITIONS);
       return;
     }
     assertNotNull(definitons);
-    assertFalse(definitons.isEmpty());
   }
   
 //  @Test
