@@ -7,8 +7,7 @@
 
 tosca:Tosca
         a                owl:Class ;
-        rdfs:label       "TOSCA-compliant resource manager"@en ;
+        rdfs:label       "ToscaAdapter"@en ;
+        rdfs:comment     "A manager for TOSCA-compliant resources"@en ;
         rdfs:subClassOf  omn:Adapter .
-#        omnLifecycle:implements   tosca:??? .
         
-

@@ -5,7 +5,6 @@ import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.translators.tosca.jaxb.TDefinitions;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,10 +19,9 @@ public class ToscaClientTest {
   
   private static Logger LOGGER = Logger.getLogger(ToscaClientTest.class.toString());
   
-  private static String URL_TOSCA_DEFINITIONS = "http://localhost:8080/api/rest/tosca/v2/definitions/";
-  private static String URL_TOSCA_NODES = "http://localhost:8080/api/rest/tosca/v2/nodes/";
+  private static String URL_TOSCA = "http://localhost:8080/api/rest/tosca/v2/";
   
-  private ToscaClient client = new ToscaClient(URL_TOSCA_DEFINITIONS, URL_TOSCA_NODES);
+  private ToscaClient client = new ToscaClient(URL_TOSCA);
   
   @Test
   public void testLoadToscaResource() {
@@ -33,11 +31,11 @@ public class ToscaClientTest {
   
   @Test
   public void testGetDefinitions() {
-    InputStream definitons = null; 
+    Definitions definitons = null; 
     try {
-      definitons = client.getAllDefinitionsStream();
+      definitons = client.getAllDefinitions();
     } catch(ProcessingException | NotFoundException e){
-      LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA_DEFINITIONS);
+      LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA);
       return;
     }
     assertNotNull(definitons);
@@ -50,7 +48,7 @@ public class ToscaClientTest {
     try {
       definitions = client.createDefinitions(inputDefinitions);
     } catch(ProcessingException e){
-      LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA_DEFINITIONS);
+      LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA);
       return;
     }
     assertNotNull(definitions);

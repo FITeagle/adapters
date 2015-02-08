@@ -114,7 +114,7 @@ public abstract class AbstractAdapter {
   
   public abstract Model getAdapterDescriptionModel();
   
-  public abstract void updateAdapterDescription();
+  public abstract void updateAdapterDescription() throws AdapterException;
   
   public abstract Model configureInstance(String instanceURI, Model configureModel) throws AdapterException;
   

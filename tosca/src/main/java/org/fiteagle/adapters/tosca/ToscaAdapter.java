@@ -10,12 +10,11 @@ import info.openmultinet.ontology.translators.tosca.OMN2Tosca.RequiredResourceNo
 import info.openmultinet.ontology.translators.tosca.Tosca2OMN;
 import info.openmultinet.ontology.translators.tosca.Tosca2OMN.UnsupportedException;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
+import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +78,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     adapterInstance.addProperty(RDFS.comment, "An adapter for TOSCA-compliant resources");
     Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
     adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-    new ToscaAdapter(adapterInstance, model, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/definitions/", "http://localhost:8080/api/rest/tosca/v2/nodes/"));
+    new ToscaAdapter(adapterInstance, model, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/"));
   }
   
   private ToscaAdapter(Resource adapterInstance, Model adapterModel, ToscaClient client) {
@@ -100,12 +99,11 @@ public final class ToscaAdapter extends AbstractAdapter {
       LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
       
       Definitions resultDefinitions = client.createDefinitions(definitions);
+      
       String resultString = AbstractConverter.toString(resultDefinitions, OMN2Tosca.JAXB_PACKAGE_NAME);      
       LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
       
-      InputStream resultStream = new ByteArrayInputStream(resultString.getBytes());
-      resultModel = Tosca2OMN.getModel(resultStream);
-      
+      resultModel = Tosca2OMN.getModel(resultDefinitions);      
       prefixes.putAll(resultModel.getNsPrefixMap());
       
     } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException |RequiredResourceNotFoundException | MultipleNamespacesException e){
@@ -156,8 +154,24 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
-  public void updateAdapterDescription() {
-    //TODO: get service types from osco
+  public void updateAdapterDescription() throws AdapterException {
+    LOGGER.log(Level.INFO, "Updating adapter description: Getting NodeTypes via ToscaClient");
+    Definitions nodeTypes = client.getAllNodeTypes();
+    Model model = null;
+    try {
+      model = Tosca2OMN.getModel(nodeTypes);
+    } catch (UnsupportedException e) {
+      throw new AdapterException(e);
+    }
+    List<Resource> resources = model.listSubjectsWithProperty(RDFS.subClassOf, Omn.Resource).toList();
+    if(resources.isEmpty()){
+      LOGGER.log(Level.WARNING, "Could not find any resources to manage!");
+    }
+    for(Resource resource : resources){
+      LOGGER.log(Level.INFO, "Updating adapter description: Found resource: "+resource.getURI());
+      adapterInstance.addProperty(Omn_lifecycle.implements_, resource);
+    }
+    adapterModel.add(model);
   }
 
   @Override
@@ -180,19 +194,18 @@ public final class ToscaAdapter extends AbstractAdapter {
       }
     }
     
-    String resultString;
     try {
-      resultString = AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
+      String resultString = AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
+      LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
     } catch (JAXBException e) {
       throw new AdapterException(e);
     }      
-    LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
-    InputStream resultStream = new ByteArrayInputStream(resultString.getBytes());
+    
     
     Model model = null;
     try {
-      model = Tosca2OMN.getModel(resultStream);
-    } catch (JAXBException | InvalidModelException | UnsupportedException e) {
+      model = Tosca2OMN.getModel(definitions);
+    } catch (UnsupportedException e) {
       throw new AdapterException(e);
     }
     return model;
@@ -200,11 +213,11 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   @Override
   public Model getAllInstances() throws InstanceNotFoundException, AdapterException {
-    InputStream definitions = client.getAllDefinitionsStream();
+    Definitions definitions = client.getAllDefinitions();
     Model model = null;
     try {
       model = Tosca2OMN.getModel(definitions);
-    } catch (JAXBException | InvalidModelException | UnsupportedException e) {
+    } catch (UnsupportedException e) {
       throw new AdapterException(e);
     }
     return model;

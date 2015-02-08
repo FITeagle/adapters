@@ -32,16 +32,26 @@ public class ToscaClient {
   
   private final String URL_TOSCA_DEFINITIONS;
   private final String URL_TOSCA_NODES;
+  private final String URL_TOSCA_NODETYPES;
   
-  public ToscaClient(String definitionsURL, String nodesURL){
-    URL_TOSCA_DEFINITIONS = definitionsURL;
-    URL_TOSCA_NODES = nodesURL;
+  public ToscaClient(String serverURL){
+    URL_TOSCA_DEFINITIONS = serverURL+"definitions/";
+    URL_TOSCA_NODES = serverURL+"nodes/";
+    URL_TOSCA_NODETYPES = serverURL+"types/";
   }
   
-  public InputStream getAllDefinitionsStream(){
+  public Definitions getAllDefinitions(){
     Client client = ClientBuilder.newClient();
     String result = client.target(URL_TOSCA_DEFINITIONS).request().get(String.class); 
-    return new ByteArrayInputStream(result.getBytes());
+    InputStream input = new ByteArrayInputStream(result.getBytes());
+    return convertToDefinitions(input);
+  }
+  
+  public Definitions getAllNodeTypes(){
+    Client client = ClientBuilder.newClient();
+    String result = client.target(URL_TOSCA_NODETYPES).request().get(String.class); 
+    InputStream input = new ByteArrayInputStream(result.getBytes());
+    return convertToDefinitions(input);
   }
   
   public Definitions getDefinitions(String id) throws InstanceNotFoundException{
