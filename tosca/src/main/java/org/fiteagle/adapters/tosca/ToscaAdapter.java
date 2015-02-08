@@ -87,7 +87,6 @@ public final class ToscaAdapter extends AbstractAdapter {
     this.client = client;
     
     adapterInstances.put(adapterInstance.getURI(), this);
-    prefixes.putAll(adapterModel.getNsPrefixMap());
   }
   
   @Override
@@ -104,7 +103,7 @@ public final class ToscaAdapter extends AbstractAdapter {
       LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
       
       resultModel = Tosca2OMN.getModel(resultDefinitions);      
-      prefixes.putAll(resultModel.getNsPrefixMap());
+      adapterModel.setNsPrefixes(resultModel.getNsPrefixMap());
       
     } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException |RequiredResourceNotFoundException | MultipleNamespacesException e){
       throw new AdapterException(e);
@@ -126,7 +125,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   public void deleteInstance(String instanceURI) throws AdapterException {
     String id;
     try{
-      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, prefixes)[1];
+      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
     } catch(IllegalArgumentException e){
       throw new AdapterException(e);
     }
@@ -172,13 +171,14 @@ public final class ToscaAdapter extends AbstractAdapter {
       adapterInstance.addProperty(Omn_lifecycle.implements_, resource);
     }
     adapterModel.add(model);
+    adapterModel.setNsPrefixes(model.getNsPrefixMap());
   }
 
   @Override
   public Model getInstance(String instanceURI) throws InstanceNotFoundException, AdapterException {
     String id;
     try{
-      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, prefixes)[1];
+      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
     } catch(IllegalArgumentException e){
       throw new AdapterException(e);
     }
