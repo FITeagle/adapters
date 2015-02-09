@@ -29,21 +29,37 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
   private Topic topic;
   
+  @Inject
+  public AbstractAdapterMDBSender mdbSender;
+  
   @PostConstruct
-  public void initializeAdapter() {
+  public void initializeAdapters() {
     for(AbstractAdapter adapter : getAdapterInstances().values()){
       LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Adding MDB-Sender for " + adapter.getAdapterInstance().getURI());
       adapter.addListener(this);
-      
+      register(adapter, 1000);
+    }
+  }
+  
+  public void register(AbstractAdapter adapter, long delay){
+    if(delay < 3600000){
       LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Registering " + adapter.getAdapterInstance().getURI());
       try {
         adapter.updateAdapterDescription();
+        adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
       } catch (AdapterException e) {
-        LOGGER.log(Level.SEVERE, "Error while registering: "+e.getMessage());
+        LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while registering: "+e.getMessage());
+        delay = delay*2;
+        LOGGER.log(Level.WARNING, "Retry in "+delay+"ms");
+        try {
+          Thread.sleep(delay);
+          register(adapter, delay);
+        } catch (InterruptedException e1) {
+          e1.printStackTrace();
+        }
       }
-      adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
     }
-   }
+  }
   
   @Override
   public void publishModelUpdate(Model eventRDF, String requestID, String methodType, String methodTarget) {

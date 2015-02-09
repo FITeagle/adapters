@@ -154,7 +154,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public void updateAdapterDescription() throws AdapterException {
-    LOGGER.log(Level.INFO, "Updating adapter description: Getting NodeTypes via ToscaClient");
+    LOGGER.log(Level.INFO, "Updating adapter description: Getting NodeTypes via ToscaClient..");
     Definitions nodeTypes = client.getAllNodeTypes();
     Model model = null;
     try {

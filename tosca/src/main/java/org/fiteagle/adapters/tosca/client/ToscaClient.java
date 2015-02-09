@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -47,9 +48,14 @@ public class ToscaClient {
     return convertToDefinitions(input);
   }
   
-  public Definitions getAllNodeTypes(){
+  public Definitions getAllNodeTypes() throws AdapterException{
     Client client = ClientBuilder.newClient();
-    String result = client.target(URL_TOSCA_NODETYPES).request().get(String.class); 
+    String result = null;
+    try{
+      result = client.target(URL_TOSCA_NODETYPES).request().get(String.class); 
+    } catch(WebApplicationException e){
+      throw new AdapterException(e);
+    }
     InputStream input = new ByteArrayInputStream(result.getBytes());
     return convertToDefinitions(input);
   }
