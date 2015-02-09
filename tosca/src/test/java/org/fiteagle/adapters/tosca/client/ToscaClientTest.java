@@ -13,6 +13,7 @@ import javax.ws.rs.ProcessingException;
 import javax.xml.bind.JAXBException;
 
 import org.apache.http.HttpException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.junit.Test;
 
 public class ToscaClientTest {
@@ -34,7 +35,7 @@ public class ToscaClientTest {
     Definitions definitons = null; 
     try {
       definitons = client.getAllDefinitions();
-    } catch(ProcessingException | NotFoundException e){
+    } catch(ProcessingException | NotFoundException | AdapterException e){
       LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA);
       return;
     }
@@ -47,7 +48,7 @@ public class ToscaClientTest {
     Definitions definitions = null; 
     try {
       definitions = client.createDefinitions(inputDefinitions);
-    } catch(ProcessingException e){
+    } catch(ProcessingException | AdapterException e){
       LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA);
       return;
     }
