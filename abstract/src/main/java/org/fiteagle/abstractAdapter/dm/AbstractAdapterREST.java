@@ -34,6 +34,14 @@ import com.hp.hpl.jena.rdf.model.Model;
 public abstract class AbstractAdapterREST {
   
   @GET
+  @Path("/{adapterName}")
+  @Produces("text/turtle")
+  public String getAdapterDescriptionTurtle(@PathParam("adapterName") String adapterName) {
+    AbstractAdapter adapter = getAdapterInstance(adapterName);
+    return MessageUtil.serializeModel(adapter.getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
+  }
+  
+  @GET
   @Path("/{adapterName}/instances")
   @Produces("text/turtle")
   public String getAllInstancesTurtle(@PathParam("adapterName") String adapterName) throws InstanceNotFoundException {
