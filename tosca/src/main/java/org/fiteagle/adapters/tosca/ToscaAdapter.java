@@ -223,7 +223,8 @@ public final class ToscaAdapter extends AbstractAdapter {
     return model;
   }
   
-  private static InfModel createInfModel(Model model) throws InvalidModelException{
+  private InfModel createInfModel(Model model) throws InvalidModelException{
+    model.add(adapterModel);
     Parser parser = new Parser(model);
     final InfModel infModel = parser.getInfModel();
     return infModel;
