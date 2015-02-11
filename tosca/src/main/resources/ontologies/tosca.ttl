@@ -3,7 +3,6 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix omn:   <http://open-multinet.info/ontology/omn#> .
 @prefix tosca:    <http://docs.oasis-open.org/tosca/TOSCA/v1.0/ontology/> .
-@prefix omnLifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
 
 tosca:Tosca
         a                owl:Class ;
