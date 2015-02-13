@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/FITeagle/adapters.svg)](https://travis-ci.org/FITeagle/adapters)
+[![Coverage Status](https://coveralls.io/repos/FITeagle/adapters/badge.svg)](https://coveralls.io/r/FITeagle/adapters)
 
 FITeagle Resource Adapters
 ===========================
