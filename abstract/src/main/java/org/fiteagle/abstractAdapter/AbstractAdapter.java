@@ -31,20 +31,21 @@ public abstract class AbstractAdapter {
   }
   
   public Model createInstances(Model model) throws AdapterException {
-    Model createdInstancesModel = ModelFactory.createDefaultModel();    
-
-      ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Resource);
-      while (resourceInstanceIterator.hasNext()) {
-        String instanceURI = resourceInstanceIterator.next().getURI();
-        LOGGER.log(Level.INFO, "Creating instance: " + instanceURI);
-        Model createdInstance = createInstance(instanceURI, model);
-        createdInstancesModel.add(createdInstance);
+    Model createdInstancesModel = ModelFactory.createDefaultModel();
+      for(Resource resource : getAdapterManagedResources()) {
+          ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
+          //ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Resource);
+          while (resourceInstanceIterator.hasNext()) {
+              String instanceURI = resourceInstanceIterator.next().getURI();
+              LOGGER.log(Level.INFO, "Creating instance: " + instanceURI);
+              Model createdInstance = createInstance(instanceURI, model);
+              createdInstancesModel.add(createdInstance);
+          }
+          if (createdInstancesModel.isEmpty()) {
+              LOGGER.log(Level.INFO, "Could not find any new instances to create");
+              throw new AdapterException(Response.Status.CONFLICT.name());
+          }
       }
-      if (createdInstancesModel.isEmpty()) {
-        LOGGER.log(Level.INFO, "Could not find any new instances to create");
-        throw new AdapterException(Response.Status.CONFLICT.name());
-      }
-
     return createdInstancesModel;
   }
   
