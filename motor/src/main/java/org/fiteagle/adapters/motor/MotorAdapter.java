@@ -95,6 +95,7 @@ public final class MotorAdapter extends AbstractAdapter {
     resource.addProperty(RDF.type, MotorAdapter.resources.get(0));
     resource.addProperty(RDF.type, Omn.Resource);
     resource.addProperty(RDFS.label, resource.getLocalName());
+    resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Ready);
     for (Property p : motorControlProperties) {
       switch (p.getLocalName()) {
         case "rpm":
