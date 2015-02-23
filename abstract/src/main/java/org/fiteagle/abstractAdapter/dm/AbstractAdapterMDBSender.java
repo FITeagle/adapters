@@ -13,6 +13,7 @@ import javax.jms.Topic;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
@@ -47,6 +48,8 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       try {
         adapter.updateAdapterDescription();
         adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
+        String fileName = adapter.getAdapterInstance().getLocalName();
+        Config.getInstance(fileName);
       } catch (AdapterException e) {
         LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while registering: "+e.getMessage());
         delay = delay*2;
@@ -73,6 +76,8 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + adapter.getAdapterInstance().getURI());
       Model messageModel = ModelFactory.createDefaultModel();
       messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
+      String fileName = adapter.getAdapterInstance().getLocalName();
+      Config.getInstance(fileName).deletePropertiesFile();
       adapter.notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
     }
   }
