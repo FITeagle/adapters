@@ -1,6 +1,5 @@
 package org.fiteagle.abstractAdapter;
 
-import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.ArrayList;
@@ -30,22 +29,38 @@ public abstract class AbstractAdapter {
     return messageModel.containsResource(getAdapterInstance());
   }
   
+  public Model getInstances(Model model) throws AdapterException {
+    Model instancesModel = ModelFactory.createDefaultModel();
+    for (Resource resource : getAdapterManagedResources()) {
+      ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
+      while (resourceInstanceIterator.hasNext()) {
+        String instanceURI = resourceInstanceIterator.next().getURI();
+        try {
+          Model createdInstance = getInstance(instanceURI);
+          instancesModel.add(createdInstance);
+        } catch (InstanceNotFoundException e) {
+          LOGGER.log(Level.WARNING, "Could not find instance: " + instanceURI);
+        }
+      }
+    }
+    return instancesModel;
+  }
+  
   public Model createInstances(Model model) throws AdapterException {
     Model createdInstancesModel = ModelFactory.createDefaultModel();
-      for(Resource resource : getAdapterManagedResources()) {
-          ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
-          //ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Resource);
-          while (resourceInstanceIterator.hasNext()) {
-              String instanceURI = resourceInstanceIterator.next().getURI();
-              LOGGER.log(Level.INFO, "Creating instance: " + instanceURI);
-              Model createdInstance = createInstance(instanceURI, model);
-              createdInstancesModel.add(createdInstance);
-          }
-          if (createdInstancesModel.isEmpty()) {
-              LOGGER.log(Level.INFO, "Could not find any new instances to create");
-              throw new AdapterException(Response.Status.CONFLICT.name());
-          }
+    for (Resource resource : getAdapterManagedResources()) {
+      ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
+      while (resourceInstanceIterator.hasNext()) {
+        String instanceURI = resourceInstanceIterator.next().getURI();
+        LOGGER.log(Level.INFO, "Creating instance: " + instanceURI);
+        Model createdInstance = createInstance(instanceURI, model);
+        createdInstancesModel.add(createdInstance);
       }
+      if (createdInstancesModel.isEmpty()) {
+        LOGGER.log(Level.INFO, "Could not find any new instances to create");
+        throw new AdapterException(Response.Status.CONFLICT.name());
+      }
+    }
     return createdInstancesModel;
   }
   
