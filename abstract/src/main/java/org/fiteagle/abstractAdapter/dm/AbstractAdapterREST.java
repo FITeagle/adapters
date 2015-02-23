@@ -188,7 +188,7 @@ public abstract class AbstractAdapterREST {
   
   public static class AdapterWebApplicationException extends WebApplicationException {
     private static final long serialVersionUID = -9105333519515224562L;
-
+    
     public AdapterWebApplicationException(final Status status, final Throwable cause) {
       super(Response.status(status).entity(cause.getMessage()).type(MediaType.TEXT_PLAIN).build());
     }
@@ -196,6 +196,6 @@ public abstract class AbstractAdapterREST {
     public AdapterWebApplicationException(final Status status, final String message) {
       super(Response.status(status).entity(message).build());
     }
-}
+  }
 
 }
