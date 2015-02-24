@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
+import org.fiteagle.api.core.Config;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -24,6 +25,10 @@ public abstract class AbstractAdapter {
   private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
   
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
+  
+  public AbstractAdapter(String instanceName){
+    Config.getInstance(instanceName);
+  }
   
   public boolean isRecipient(Model messageModel) {
     return messageModel.containsResource(getAdapterInstance());

@@ -77,6 +77,8 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   private MotorAdapter(Resource adapterInstance, Model adapterModel) {
+    super(adapterInstance.getLocalName());
+    
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;
     adapterInstances.put(adapterInstance.getURI(), this);

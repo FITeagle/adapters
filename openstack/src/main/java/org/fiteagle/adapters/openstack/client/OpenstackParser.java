@@ -120,7 +120,7 @@ public class OpenstackParser {
 	
 	public Model parseToModel(Server server){
 	  //TODO: better check whether it's already an URI
-	  if(!server.getName().startsWith("http://")){
+	  if(!(server.getName().startsWith("http://") || server.getName().startsWith("urn:"))){
 	    server.setName(adapter.getAdapterInstance().getNameSpace()+server.getName());
 	  }
 	  Resource resource = ModelFactory.createDefaultModel().createResource(server.getName());

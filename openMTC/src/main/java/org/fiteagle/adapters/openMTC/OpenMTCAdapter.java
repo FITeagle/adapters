@@ -67,6 +67,8 @@ public class OpenMTCAdapter extends AbstractAdapter {
   
   
   private OpenMTCAdapter(Resource adapterInstance, Model adapterModel){
+    super(adapterInstance.getLocalName());
+    
     openMTCClient = OpenMTCClient.getInstance();
     
     this.adapterInstance = adapterInstance;

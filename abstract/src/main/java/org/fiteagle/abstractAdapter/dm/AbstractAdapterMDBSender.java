@@ -48,8 +48,6 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       try {
         adapter.updateAdapterDescription();
         adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
-        String fileName = adapter.getAdapterInstance().getLocalName();
-        Config.getInstance(fileName);
       } catch (AdapterException e) {
         LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while registering: "+e.getMessage());
         delay = delay*2;
