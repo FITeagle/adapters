@@ -18,14 +18,15 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.ws.rs.core.Response;
 
 import org.apache.jena.riot.RiotException;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
-import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -52,46 +53,99 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   }
   
   @OnMessage
-  public String onMessage(final String message) throws InstanceNotFoundException, AdapterException {
+  public String onMessage(final String message) {
+    Model responseModel = ModelFactory.createDefaultModel();
+    Resource response = responseModel.createResource();
+    response.addProperty(RDF.type, Http.Response);
+    
+    Literal responseCode = responseModel.createLiteral(String.valueOf(Response.Status.OK.getStatusCode()));
+    Literal responseBody = null;
+    try{
+      Model requestModel = parseInputString(message);
+      
+      Resource request = getRequestResource(requestModel);
+      responseModel.add(request, Http.response, response);
+      
+      AbstractAdapter targetAdapter = getTargetAdapterInstance(requestModel);
+    
+      Model responseBodyModel = null;
+      if(request.hasProperty(RDF.type, Http.GetRequest)){
+        responseBodyModel = targetAdapter.getInstances(requestModel);
+      }
+      else if(request.hasProperty(RDF.type, Http.PostRequest)){
+        responseBodyModel = targetAdapter.createInstances(requestModel);
+      }
+      else if(request.hasProperty(RDF.type, Http.PutRequest)){
+        responseBodyModel = targetAdapter.configureInstances(requestModel);
+      }
+      else if(request.hasProperty(RDF.type, Http.DeleteRequest)){
+        responseBodyModel = targetAdapter.deleteInstances(requestModel);
+      }
+      String serializedModel = MessageUtil.serializeModel(responseBodyModel, IMessageBus.SERIALIZATION_TURTLE);
+      responseBody = responseModel.createLiteral(serializedModel);
+      
+    } catch(AdapterException e){
+      responseBody = getResponseBodyFromException(responseModel, e);
+      responseCode = getResponseCodeFromException(responseModel);
+    }
+
+    response.addProperty(Http.body, responseBody);
+    response.addProperty(Http.responseCode, responseCode);
+    
+    return MessageUtil.serializeModel(responseModel, IMessageBus.SERIALIZATION_TURTLE);
+  }
+
+  private Literal getResponseCodeFromException(Model responseModel) {
+    return responseModel.createLiteral(String.valueOf(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
+  }
+
+  private Literal getResponseBodyFromException(Model responseModel, AdapterException e) {
+    Literal responseBody;
+    if(e.getCause() != null){
+      responseBody = responseModel.createLiteral(e.getCause().getMessage());
+    } 
+    else {
+      responseBody = responseModel.createLiteral(e.getMessage());
+    }
+    return responseBody;
+  }
+
+  private AbstractAdapter getTargetAdapterInstance(Model requestModel) throws AdapterException {
+    AbstractAdapter targetAdapter = null;
+    for(AbstractAdapter adapterInstance : getAdapterInstances().values()){
+      if(adapterInstance.isRecipient(requestModel)){
+        targetAdapter = adapterInstance;
+      }
+    }
+    if(targetAdapter == null){
+      throw new AdapterException("No target adapter found");
+    }
+    return targetAdapter;
+  }
+
+  private Model parseInputString(final String message) throws AdapterException {
     Model requestModel; 
     try{
       requestModel = MessageUtil.parseSerializedModel(message, IMessageBus.SERIALIZATION_TURTLE);
     } catch(RiotException e){
-      return "Error: Input must be a turtle-serialized RDF model";
+      throw new AdapterException("Input must be a turtle-serialized RDF model");
     }
-    
+    return requestModel;
+  }
+  
+  private Resource getRequestResource(Model requestModel) throws AdapterException {
     List<Resource> requests = getAllRequestResources(requestModel);
     if(requests.size() == 0){
-      return "Error: No request resource was found";
+      throw new AdapterException("No request resource was found");
     }
     if(requests.size() > 1){
-      return "Error: Multiple requests are not supported";
+      throw new AdapterException("Multiple requests are not supported");
     }
     
     Resource request = requests.get(0);
-    
-    Model responseModel = ModelFactory.createDefaultModel();
-    for(AbstractAdapter adapterInstance : getAdapterInstances().values()){
-      if(adapterInstance.isRecipient(requestModel)){
-        if(request.hasProperty(RDF.type, Http.GetRequest)){
-          responseModel.add(adapterInstance.getInstances(requestModel));
-          break;
-        }
-        else if(request.hasProperty(RDF.type, Http.PostRequest)){
-          adapterInstance.createInstances(requestModel);
-        }
-        else if(request.hasProperty(RDF.type, Http.PutRequest)){
-          adapterInstance.configureInstances(requestModel);
-        }
-        else if(request.hasProperty(RDF.type, Http.DeleteRequest)){
-          adapterInstance.deleteInstances(requestModel);
-        }
-      }
-    }
-    
-    return MessageUtil.serializeModel(responseModel, IMessageBus.SERIALIZATION_TURTLE);
+    return request;
   }
-  
+ 
   private static List<Resource> getAllRequestResources(Model requestModel) {
     List<Resource> requests = new ArrayList<>();
     requests.addAll(getRequestResources(requestModel, Http.GetRequest));
@@ -125,20 +179,20 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   }
   
   private static void sendToAllSessions(String message) {
-      ArrayList<Session> closedSessions = new ArrayList<Session>();
-      for (Session session : queue) {
-        if (!session.isOpen()) {
-          LOGGER.log(Level.INFO, "Closed session: " + session.getId());
-          closedSessions.add(session);
-        } else {
-          try {
-            session.getBasicRemote().sendText(message);
-          } catch (IOException e) {
-            e.printStackTrace();
-          }
+    ArrayList<Session> closedSessions = new ArrayList<Session>();
+    for (Session session : queue) {
+      if (!session.isOpen()) {
+        LOGGER.log(Level.INFO, "Closed session: " + session.getId());
+        closedSessions.add(session);
+      } else {
+        try {
+          session.getBasicRemote().sendText(message);
+        } catch (IOException e) {
+          e.printStackTrace();
         }
       }
-      queue.removeAll(closedSessions);
+    }
+    queue.removeAll(closedSessions);
   }
   
   @Override
@@ -147,12 +201,4 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
     sendToAllSessions(serializedModel);
   }
   
-//  public static class WebSocketException extends Exception {
-//    
-//    public WebSocketException(String message){
-//        super(message);
-//    }
-//    
-//  }
-//  
 }
