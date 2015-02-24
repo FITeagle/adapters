@@ -80,7 +80,7 @@ public abstract class AbstractAdapter {
           deleteInstance(instanceURI);
         } catch (InstanceNotFoundException e) {
           LOGGER.log(Level.INFO, "Instance: " + instanceURI + " not found");
-          throw new AdapterException(Response.Status.NOT_FOUND.name());
+          throw new AdapterException(e);
         }    
         Resource deletedInstance = deletedInstancesModel.createResource(instanceURI);
         deletedInstance.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Removing);
