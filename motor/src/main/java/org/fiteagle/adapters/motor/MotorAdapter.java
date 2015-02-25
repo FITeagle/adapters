@@ -88,7 +88,7 @@ public final class MotorAdapter extends AbstractAdapter {
   public Model createInstance(String instanceURI, Model modelCreate) {
     Motor motor = new Motor(this, instanceURI);
     instanceList.put(instanceURI, motor);
-    configureInstance(instanceURI, modelCreate);
+    updateInstance(instanceURI, modelCreate);
     return parseToModel(motor);
   }
   
@@ -121,7 +121,7 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Model configureInstance(String instanceURI, Model configureModel) {
+  public Model updateInstance(String instanceURI, Model configureModel) {
     if (instanceList.containsKey(instanceURI)) {
       Motor currentMotor = (Motor) instanceList.get(instanceURI);
       StmtIterator iter = configureModel.listStatements();

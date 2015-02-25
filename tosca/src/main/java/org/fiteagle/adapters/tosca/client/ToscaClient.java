@@ -1,9 +1,6 @@
 package org.fiteagle.adapters.tosca.client;
 
-import info.openmultinet.ontology.translators.AbstractConverter;
-import info.openmultinet.ontology.translators.tosca.OMN2Tosca;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
-import info.openmultinet.ontology.translators.tosca.jaxb.TDefinitions;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -99,14 +96,12 @@ public class ToscaClient {
     }
   }
   
-  public Definitions createDefinitions(TDefinitions definitions) throws HttpException, IOException, JAXBException, AdapterException {
-    String definitionsString = AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
-    
+  public Definitions updateDefinitions(String id, String definitionsString) throws HttpException, IOException, JAXBException, AdapterException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result;
     try{
-      result = client.target(URL_TOSCA_DEFINITIONS).request().post(entity, String.class); 
+      result = client.target(URL_TOSCA_DEFINITIONS+id).request().put(entity, String.class); 
     } catch(WebApplicationException e){
       throw new AdapterException(e);
     }

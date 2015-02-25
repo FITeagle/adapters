@@ -89,8 +89,8 @@ public abstract class AbstractAdapter {
     return deletedInstancesModel;
   }
   
-  public Model configureInstances(Model model) throws AdapterException {
-    Model configuredInstancesModel = ModelFactory.createDefaultModel();  
+  public Model updateInstances(Model model) throws AdapterException {
+    Model updatedInstancesModel = ModelFactory.createDefaultModel();  
     for(Resource resource : getAdapterManagedResources()){
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
       while (resourceInstanceIterator.hasNext()) {
@@ -98,19 +98,19 @@ public abstract class AbstractAdapter {
         LOGGER.log(Level.INFO, "Configuring instance: " + resourceInstance);
         
         StmtIterator propertiesIterator = model.listStatements(resourceInstance, null, (RDFNode) null);
-        Model configureModel = ModelFactory.createDefaultModel();
+        Model updateModel = ModelFactory.createDefaultModel();
         while (propertiesIterator.hasNext()) {
-          configureModel.add(propertiesIterator.next());
+          updateModel.add(propertiesIterator.next());
         }
-        Model updatedModel = configureInstance(resourceInstance.getURI(), configureModel);
-        configuredInstancesModel.add(updatedModel);
+        Model updatedModel = updateInstance(resourceInstance.getURI(), updateModel);
+        updatedInstancesModel.add(updatedModel);
       }
-      if (configuredInstancesModel.isEmpty()) {
+      if (updatedInstancesModel.isEmpty()) {
         LOGGER.log(Level.INFO, "Could not find any instances to configure");
         throw new AdapterException(Response.Status.NOT_FOUND.name());
       }
     }
-    return configuredInstancesModel;
+    return updatedInstancesModel;
   }
   
   public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
@@ -133,7 +133,7 @@ public abstract class AbstractAdapter {
   
   public abstract void updateAdapterDescription() throws AdapterException;
   
-  public abstract Model configureInstance(String instanceURI, Model configureModel) throws AdapterException;
+  public abstract Model updateInstance(String instanceURI, Model configureModel) throws AdapterException;
   
   public abstract Model createInstance(String instanceURI, Model newInstanceModel) throws AdapterException;
   

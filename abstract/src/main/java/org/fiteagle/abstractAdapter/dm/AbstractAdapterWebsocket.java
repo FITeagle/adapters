@@ -76,7 +76,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
         responseBodyModel = targetAdapter.createInstances(requestModel);
       }
       else if(request.hasProperty(RDF.type, Http.PutRequest)){
-        responseBodyModel = targetAdapter.configureInstances(requestModel);
+        responseBodyModel = targetAdapter.updateInstances(requestModel);
       }
       else if(request.hasProperty(RDF.type, Http.DeleteRequest)){
         responseBodyModel = targetAdapter.deleteInstances(requestModel);

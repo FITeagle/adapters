@@ -92,7 +92,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Model configureInstance(String instanceName, Model configureModel) {
+  public Model updateInstance(String instanceName, Model configureModel) {
     return null;
     // TODO Auto-generated method stub
   }

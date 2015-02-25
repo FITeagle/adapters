@@ -125,7 +125,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Model configureInstance(String instanceURI, Model configureModel) {
+  public Model updateInstance(String instanceURI, Model configureModel) {
     // TODO Auto-generated method stub
     return null;
   }

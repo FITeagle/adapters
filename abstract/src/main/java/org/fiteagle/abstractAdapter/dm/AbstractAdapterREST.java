@@ -103,7 +103,7 @@ public abstract class AbstractAdapterREST {
   public String configureInstance(@PathParam("adapterName") String adapterName, String rdfInput, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     try {
-      Model resultModel = adapter.configureInstance(decode(instanceURI), MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
+      Model resultModel = adapter.updateInstance(decode(instanceURI), MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
     } catch (AdapterException e) {
       processAdapterException(e);

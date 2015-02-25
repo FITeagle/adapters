@@ -39,7 +39,7 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
     Model resultModel = ModelFactory.createDefaultModel();
     for(AbstractAdapter adapter : getAdapterInstances().values()){
       if(adapter.isRecipient(configureModel)){
-        resultModel.add(adapter.configureInstances(configureModel));
+        resultModel.add(adapter.updateInstances(configureModel));
       }
     }
     return resultModel;

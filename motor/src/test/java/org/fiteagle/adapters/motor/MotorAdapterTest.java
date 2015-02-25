@@ -98,7 +98,7 @@ public class MotorAdapterTest {
     Property propertyManufacturer = modelConfigure.createProperty(adapter.getAdapterManagedResources().get(0).getNameSpace()+"manufacturer");
     motor.addLiteral(propertyManufacturer, "TU Berlin");
     
-    Model updatedResourceModel = adapter.configureInstances(modelConfigure);
+    Model updatedResourceModel = adapter.updateInstances(modelConfigure);
     
     Resource updatedResource = updatedResourceModel.getResource(instanceURI);
     Assert.assertEquals(23, updatedResource.getProperty(propertyRPM).getInt());
