@@ -88,9 +88,9 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
       responseBody = getResponseBodyFromException(responseModel, e);
       responseCode = getResponseCodeFromException(responseModel);
     }
-
-    response.addProperty(Http.body, responseBody);
+    
     response.addProperty(Http.responseCode, responseCode);
+    response.addProperty(Http.body, responseBody);
     
     return MessageUtil.serializeModel(responseModel, IMessageBus.SERIALIZATION_TURTLE);
   }
