@@ -50,7 +50,7 @@ public class ToscaClient {
     return convertToDefinitions(input);
   }
   
-  public Definitions getAllNodeTypes() throws AdapterException{
+  public Definitions getAllTypes() throws AdapterException{
     Client client = ClientBuilder.newClient();
     String result = null;
     try{
@@ -124,12 +124,7 @@ public class ToscaClient {
     return convertToDefinitions(input);
   }
   
-  protected Definitions loadToscaResource(String path){
-    InputStream input = getClass().getResourceAsStream(path);
-    return convertToDefinitions(input);
-  }
-  
-  private Definitions convertToDefinitions(InputStream input){
+  protected Definitions convertToDefinitions(InputStream input){
     Definitions definitions = null;
     try {
       JAXBContext context = JAXBContext.newInstance(Definitions.class);

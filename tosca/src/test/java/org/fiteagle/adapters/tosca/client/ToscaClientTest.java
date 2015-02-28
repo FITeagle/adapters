@@ -3,6 +3,7 @@ package org.fiteagle.adapters.tosca.client;
 import static org.junit.Assert.assertNotNull;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,9 +22,13 @@ public class ToscaClientTest {
   private ToscaClient client = new ToscaClient(URL_TOSCA);
   
   @Test
-  public void testLoadToscaResource() {
-    Definitions resource = client.loadToscaResource("/dummy.xml");
-    assertNotNull(resource);
+  public void testConvertToDefinitions(){
+    InputStream input = getClass().getResourceAsStream("/request-dummy.xml");
+    Definitions definitions = client.convertToDefinitions(input);
+    assertNotNull(definitions);
+    assertNotNull(definitions.getTargetNamespace());
+    assertNotNull(definitions.getServiceTemplateOrNodeTypeOrNodeTypeImplementation().get(0));
+    assertNotNull(definitions.getTypes());
   }
   
   @Test
