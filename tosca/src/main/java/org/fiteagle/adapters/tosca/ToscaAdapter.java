@@ -33,10 +33,8 @@ import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -60,12 +58,6 @@ public final class ToscaAdapter extends AbstractAdapter {
     ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     if (adapterIterator.hasNext()) {
       adapter = adapterIterator.next();
-    }
-    
-    StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
-    while (resourceIterator.hasNext()) {
-      Resource resource = resourceIterator.next().getResource();
-      resources.add(resource);
     }
     
     createDefaultAdapterInstance(adapterModel);
@@ -93,24 +85,22 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public Model createInstances(Model createModel) throws AdapterException {
-    Model resultModel = ModelFactory.createDefaultModel();
     try{
       InfModel infModel = createInfModel(createModel);
       String definitions = OMN2Tosca.getTopology(infModel);      
       LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
       
       Definitions resultDefinitions = client.createDefinitions(definitions);
+      LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
       
-      String resultString = AbstractConverter.toString(resultDefinitions, OMN2Tosca.JAXB_PACKAGE_NAME);      
-      LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
-      
-      resultModel = Tosca2OMN.getModel(resultDefinitions);      
+      Model resultModel = Tosca2OMN.getModel(resultDefinitions);      
       adapterModel.setNsPrefixes(resultModel.getNsPrefixMap());
+      
+      return resultModel;
       
     } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException |RequiredResourceNotFoundException | MultipleNamespacesException e){
       throw new AdapterException(e);
     }
-    return resultModel;
   }
   
   @Override
@@ -120,42 +110,29 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public Model updateInstance(String instanceURI, Model udpateModel) throws AdapterException {
-    String id;
-    try{
-      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
-    } catch(IllegalArgumentException e){
-      throw new AdapterException(e);
-    }
+    String id = getFullURI(instanceURI);
     
-    Model resultModel = ModelFactory.createDefaultModel();
     try{
       InfModel infModel = createInfModel(udpateModel);
       String definitions = OMN2Tosca.getTopology(infModel);      
       LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
       
-      Definitions resultDefinitions = client.updateDefinitions(id, definitions);
+      Definitions resultDefinitions = client.updateDefinitions(id, definitions);      
+      LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
       
-      String resultString = AbstractConverter.toString(resultDefinitions, OMN2Tosca.JAXB_PACKAGE_NAME);      
-      LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
-      
-      resultModel = Tosca2OMN.getModel(resultDefinitions);      
+      Model resultModel = Tosca2OMN.getModel(resultDefinitions);      
       adapterModel.setNsPrefixes(resultModel.getNsPrefixMap());
+      
+      return resultModel;
       
     } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){
       throw new AdapterException(e);
     }
-    
-    return resultModel;
   }
-  
+
   @Override
   public void deleteInstance(String instanceURI) throws AdapterException {
-    String id;
-    try{
-      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
-    } catch(IllegalArgumentException e){
-      throw new AdapterException(e);
-    }
+    String id = getFullURI(instanceURI);
     client.deleteDefinitions(id);
   }
   
@@ -189,12 +166,13 @@ public final class ToscaAdapter extends AbstractAdapter {
     } catch (UnsupportedException e) {
       throw new AdapterException(e);
     }
+    
     List<Resource> resources = model.listSubjectsWithProperty(RDFS.subClassOf, Omn.Resource).toList();
     if(resources.isEmpty()){
       LOGGER.log(Level.WARNING, "Could not find any resources to manage!");
     }
     for(Resource resource : resources){
-      LOGGER.log(Level.INFO, "Updating adapter description: Found resource: "+resource.getURI());
+      LOGGER.log(Level.INFO, "Found resource: "+resource.getURI());
       adapterInstance.addProperty(Omn_lifecycle.implements_, resource);
     }
     adapterModel.add(model);
@@ -203,12 +181,7 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   @Override
   public Model getInstance(String instanceURI) throws InstanceNotFoundException, AdapterException {
-    String id;
-    try{
-      id = OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
-    } catch(IllegalArgumentException e){
-      throw new AdapterException(e);
-    }
+    String id = getFullURI(instanceURI);
     Definitions definitions;
     try{
       definitions = client.getSingleNodeDefinitions(id);
@@ -220,41 +193,45 @@ public final class ToscaAdapter extends AbstractAdapter {
         throw new InstanceNotFoundException("No node or topologies with id "+id+" found");
       }
     }
+    LOGGER.log(Level.INFO, "Result definitions: \n"+toString(definitions));
     
     try {
-      String resultString = AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
-      LOGGER.log(Level.INFO, "Result definitions: \n"+resultString);
-    } catch (JAXBException e) {
-      throw new AdapterException(e);
-    }      
-    
-    
-    Model model = null;
-    try {
-      model = Tosca2OMN.getModel(definitions);
+      return Tosca2OMN.getModel(definitions);
     } catch (UnsupportedException e) {
       throw new AdapterException(e);
     }
-    return model;
   }
-
+  
   @Override
   public Model getAllInstances() throws InstanceNotFoundException, AdapterException {
     Definitions definitions = client.getAllDefinitions();
-    Model model = null;
     try {
-      model = Tosca2OMN.getModel(definitions);
+      return Tosca2OMN.getModel(definitions);
     } catch (UnsupportedException e) {
       throw new AdapterException(e);
     }
-    return model;
+  }
+
+  private String getFullURI(String instanceURI) throws AdapterException {
+    try{
+      return OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
+    } catch(IllegalArgumentException e){
+      throw new AdapterException(e);
+    }
+  }
+  
+  private String toString(Definitions definitions) throws AdapterException {
+    try {
+      return AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
+    } catch (JAXBException e) {
+      throw new AdapterException(e);
+    }
   }
   
   private InfModel createInfModel(Model model) throws InvalidModelException{
     model.add(adapterModel);
     Parser parser = new Parser(model);
-    final InfModel infModel = parser.getInfModel();
-    return infModel;
+    return parser.getInfModel();
   }
   
 }
