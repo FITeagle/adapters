@@ -35,7 +35,7 @@ public class ToscaClientTest {
     Definitions definitons = null; 
     try {
       definitons = client.getAllDefinitions();
-    } catch(NotFoundException | ProcessingException e){
+    } catch(NotFoundException | ProcessingException | javax.ws.rs.ProcessingException e){
       LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA);
       return;
     }
