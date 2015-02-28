@@ -59,7 +59,8 @@ _:subnet1 rdf:type osco:Subnet ,
          osco:floatingIp "random"^^xsd:string .
 
 
-_:dummy1 rdf:type osco:dummy , omn:Resource , owl:NamedIndividual ;
+_:dummy1 rdf:type osco:dummy , 
+                      owl:NamedIndividual ;
         
         omn-lifecycle:hasID "dummy1"^^xsd:string ;     
         
