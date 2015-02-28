@@ -21,8 +21,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.http.HttpException;
-import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 
 public class ToscaClient {
   
@@ -38,31 +38,31 @@ public class ToscaClient {
     URL_TOSCA_NODETYPES = serverURL+"types/";
   }
   
-  public Definitions getAllDefinitions() throws AdapterException{
+  public Definitions getAllDefinitions() throws ProcessingException{
     Client client = ClientBuilder.newClient();
     String result;
     try{
       result = client.target(URL_TOSCA_DEFINITIONS).request().get(String.class); 
     } catch(WebApplicationException e){
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
     InputStream input = new ByteArrayInputStream(result.getBytes());
     return convertToDefinitions(input);
   }
   
-  public Definitions getAllTypes() throws AdapterException{
+  public Definitions getAllTypes() throws ProcessingException {
     Client client = ClientBuilder.newClient();
     String result = null;
     try{
       result = client.target(URL_TOSCA_NODETYPES).request().get(String.class); 
     } catch(WebApplicationException e){
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
     InputStream input = new ByteArrayInputStream(result.getBytes());
     return convertToDefinitions(input);
   }
   
-  public Definitions getDefinitions(String id) throws InstanceNotFoundException, AdapterException{
+  public Definitions getDefinitions(String id) throws InstanceNotFoundException, ProcessingException{
     Client client = ClientBuilder.newClient();
     try{
       String result = client.target(URL_TOSCA_DEFINITIONS+id).request().get(String.class); 
@@ -71,11 +71,11 @@ public class ToscaClient {
     } catch(NotFoundException e){
       throw new InstanceNotFoundException("Definitions with id "+id+" not found");
     } catch(WebApplicationException e){
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
   }
   
-  public Definitions getSingleNodeDefinitions(String id) throws InstanceNotFoundException, AdapterException{
+  public Definitions getSingleNodeDefinitions(String id) throws InstanceNotFoundException, ProcessingException{
     Client client = ClientBuilder.newClient();
     try{
       String result = client.target(URL_TOSCA_NODES+id).request().get(String.class);
@@ -84,40 +84,40 @@ public class ToscaClient {
     } catch(NotFoundException e){
       throw new InstanceNotFoundException("Node with id "+id+" not found");
     } catch(WebApplicationException e){
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
   }
   
-  public void deleteDefinitions(String id) throws AdapterException{
+  public void deleteDefinitions(String id) throws ProcessingException{
     Client client = ClientBuilder.newClient();
     Response response = client.target(URL_TOSCA_DEFINITIONS+id).request().delete(); 
     if(!(response.getStatusInfo().equals(Response.Status.NO_CONTENT) || response.getStatusInfo().equals(Response.Status.OK))){
-      throw new AdapterException("Unexpected response while delete: "+response.getStatus());
+      throw new ProcessingException("Unexpected response while delete: "+response.getStatus());
     }
   }
   
-  public Definitions updateDefinitions(String id, String definitionsString) throws HttpException, IOException, JAXBException, AdapterException {
+  public Definitions updateDefinitions(String id, String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result;
     try{
       result = client.target(URL_TOSCA_DEFINITIONS+id).request().put(entity, String.class); 
     } catch(WebApplicationException e){
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
     
     InputStream input = new ByteArrayInputStream(result.getBytes());
     return convertToDefinitions(input);
   }
   
-  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException, AdapterException {
+  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result;
     try{
       result = client.target(URL_TOSCA_DEFINITIONS).request().post(entity, String.class); 
     } catch(WebApplicationException e){
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
     
     InputStream input = new ByteArrayInputStream(result.getBytes());

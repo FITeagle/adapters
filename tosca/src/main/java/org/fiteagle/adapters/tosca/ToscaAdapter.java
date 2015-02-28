@@ -84,54 +84,43 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Model createInstances(Model createModel) throws AdapterException {
+  public Model createInstances(Model createModel) throws ProcessingException, InvalidRequestException {
+    String definitions = parseToDefinitions(createModel);
+    
+    Definitions resultDefinitions;
     try{
-      InfModel infModel = createInfModel(createModel);
-      String definitions = OMN2Tosca.getTopology(infModel);      
-      LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
-      
-      Definitions resultDefinitions = client.createDefinitions(definitions);
-      LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
-      
-      Model resultModel = Tosca2OMN.getModel(resultDefinitions);      
-      adapterModel.setNsPrefixes(resultModel.getNsPrefixMap());
-      
-      return resultModel;
-      
-    } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException |RequiredResourceNotFoundException | MultipleNamespacesException e){
-      throw new AdapterException(e);
+      resultDefinitions = client.createDefinitions(definitions);
+    } catch(JAXBException | HttpException | IOException e){
+      throw new ProcessingException(e);
     }
+    LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
+    
+    return parseToModel(resultDefinitions);    
   }
-  
+
   @Override
-  public Model createInstance(String instanceURI, Model createModel) throws AdapterException {
+  public Model createInstance(String instanceURI, Model createModel) throws ProcessingException, InvalidRequestException {
     return createInstances(createModel);
   }
   
   @Override
-  public Model updateInstance(String instanceURI, Model udpateModel) throws AdapterException {
+  public Model updateInstance(String instanceURI, Model udpateModel) throws InvalidRequestException, ProcessingException {
     String id = getFullURI(instanceURI);
+    String definitions = parseToDefinitions(udpateModel);
     
+    Definitions resultDefinitions;
     try{
-      InfModel infModel = createInfModel(udpateModel);
-      String definitions = OMN2Tosca.getTopology(infModel);      
-      LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
-      
-      Definitions resultDefinitions = client.updateDefinitions(id, definitions);      
-      LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
-      
-      Model resultModel = Tosca2OMN.getModel(resultDefinitions);      
-      adapterModel.setNsPrefixes(resultModel.getNsPrefixMap());
-      
-      return resultModel;
-      
-    } catch(InvalidModelException | JAXBException | UnsupportedException | HttpException | IOException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){
-      throw new AdapterException(e);
+      resultDefinitions = client.updateDefinitions(id, definitions);     
+    } catch(JAXBException | HttpException | IOException e){
+      throw new ProcessingException(e);
     }
+    LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
+    
+    return parseToModel(resultDefinitions);
   }
 
   @Override
-  public void deleteInstance(String instanceURI) throws AdapterException {
+  public void deleteInstance(String instanceURI) throws InvalidRequestException, ProcessingException {
     String id = getFullURI(instanceURI);
     client.deleteDefinitions(id);
   }
@@ -157,14 +146,14 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
-  public void updateAdapterDescription() throws AdapterException {
+  public void updateAdapterDescription() throws ProcessingException {
     LOGGER.log(Level.INFO, "Updating adapter description: Getting types via ToscaClient..");
     Definitions types = client.getAllTypes();
     Model model = null;
     try {
       model = Tosca2OMN.getModel(types);
     } catch (UnsupportedException e) {
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
     
     List<Resource> resources = model.listSubjectsWithProperty(RDFS.subClassOf, Omn.Resource).toList();
@@ -180,7 +169,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Model getInstance(String instanceURI) throws InstanceNotFoundException, AdapterException {
+  public Model getInstance(String instanceURI) throws InstanceNotFoundException, ProcessingException, InvalidRequestException {
     String id = getFullURI(instanceURI);
     Definitions definitions;
     try{
@@ -195,36 +184,52 @@ public final class ToscaAdapter extends AbstractAdapter {
     }
     LOGGER.log(Level.INFO, "Result definitions: \n"+toString(definitions));
     
-    try {
-      return Tosca2OMN.getModel(definitions);
-    } catch (UnsupportedException e) {
-      throw new AdapterException(e);
-    }
+    return parseToModel(definitions);
   }
   
   @Override
-  public Model getAllInstances() throws InstanceNotFoundException, AdapterException {
+  public Model getAllInstances() throws InstanceNotFoundException, ProcessingException {
     Definitions definitions = client.getAllDefinitions();
-    try {
-      return Tosca2OMN.getModel(definitions);
-    } catch (UnsupportedException e) {
-      throw new AdapterException(e);
-    }
+    return parseToModel(definitions);
   }
 
-  private String getFullURI(String instanceURI) throws AdapterException {
+  private String parseToDefinitions(Model createModel) throws InvalidRequestException {
+    String definitions;
+    try{
+      InfModel infModel = createInfModel(createModel);
+      definitions = OMN2Tosca.getTopology(infModel);      
+      LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
+    } catch(InvalidModelException | JAXBException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){
+      throw new InvalidRequestException(e);
+    }
+    return definitions;
+  }
+  
+  private Model parseToModel(Definitions definitions) throws ProcessingException {
+    Model resultModel;
+    try {
+      resultModel = Tosca2OMN.getModel(definitions);
+    } catch (UnsupportedException e) {
+      throw new ProcessingException(e);
+    }      
+    adapterModel.setNsPrefixes(resultModel.getNsPrefixMap());
+    
+    return resultModel;
+  }
+    
+  private String getFullURI(String instanceURI) throws InvalidRequestException {
     try{
       return OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
     } catch(IllegalArgumentException e){
-      throw new AdapterException(e);
+      throw new InvalidRequestException(e);
     }
   }
   
-  private String toString(Definitions definitions) throws AdapterException {
+  private String toString(Definitions definitions) throws ProcessingException {
     try {
       return AbstractConverter.toString(definitions, OMN2Tosca.JAXB_PACKAGE_NAME);
     } catch (JAXBException e) {
-      throw new AdapterException(e);
+      throw new ProcessingException(e);
     }
   }
   

@@ -34,7 +34,7 @@ public abstract class AbstractAdapter {
     return messageModel.containsResource(getAdapterInstance());
   }
   
-  public Model getInstances(Model model) throws AdapterException {
+  public Model getInstances(Model model) throws ProcessingException, InvalidRequestException {
     Model instancesModel = ModelFactory.createDefaultModel();
     for (Resource resource : getAdapterManagedResources()) {
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
@@ -51,7 +51,7 @@ public abstract class AbstractAdapter {
     return instancesModel;
   }
   
-  public Model createInstances(Model model) throws AdapterException {
+  public Model createInstances(Model model) throws ProcessingException, InvalidRequestException {
     Model createdInstancesModel = ModelFactory.createDefaultModel();
     for (Resource resource : getAdapterManagedResources()) {
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
@@ -63,13 +63,13 @@ public abstract class AbstractAdapter {
       }
       if (createdInstancesModel.isEmpty()) {
         LOGGER.log(Level.INFO, "Could not find any new instances to create");
-        throw new AdapterException(Response.Status.CONFLICT.name());
+        throw new ProcessingException(Response.Status.CONFLICT.name());
       }
     }
     return createdInstancesModel;
   }
   
-  public Model deleteInstances(Model model) throws AdapterException {
+  public Model deleteInstances(Model model) throws InvalidRequestException, ProcessingException {
     Model deletedInstancesModel = ModelFactory.createDefaultModel();
     for(Resource resource : getAdapterManagedResources()){
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
@@ -80,7 +80,7 @@ public abstract class AbstractAdapter {
           deleteInstance(instanceURI);
         } catch (InstanceNotFoundException e) {
           LOGGER.log(Level.INFO, "Instance: " + instanceURI + " not found");
-          throw new AdapterException(e);
+          throw new ProcessingException(e);
         }    
         Resource deletedInstance = deletedInstancesModel.createResource(instanceURI);
         deletedInstance.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Removing);
@@ -89,7 +89,7 @@ public abstract class AbstractAdapter {
     return deletedInstancesModel;
   }
   
-  public Model updateInstances(Model model) throws AdapterException {
+  public Model updateInstances(Model model) throws InvalidRequestException, ProcessingException {
     Model updatedInstancesModel = ModelFactory.createDefaultModel();  
     for(Resource resource : getAdapterManagedResources()){
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
@@ -107,7 +107,7 @@ public abstract class AbstractAdapter {
       }
       if (updatedInstancesModel.isEmpty()) {
         LOGGER.log(Level.INFO, "Could not find any instances to configure");
-        throw new AdapterException(Response.Status.NOT_FOUND.name());
+        throw new ProcessingException(Response.Status.NOT_FOUND.name());
       }
     }
     return updatedInstancesModel;
@@ -131,41 +131,50 @@ public abstract class AbstractAdapter {
   
   public abstract Model getAdapterDescriptionModel();
   
-  public abstract void updateAdapterDescription() throws AdapterException;
+  public abstract void updateAdapterDescription() throws ProcessingException;
   
-  public abstract Model updateInstance(String instanceURI, Model configureModel) throws AdapterException;
+  public abstract Model updateInstance(String instanceURI, Model configureModel) throws InvalidRequestException, ProcessingException;
   
-  public abstract Model createInstance(String instanceURI, Model newInstanceModel) throws AdapterException;
+  public abstract Model createInstance(String instanceURI, Model newInstanceModel) throws ProcessingException, InvalidRequestException;
   
-  public abstract void deleteInstance(String instanceURI) throws InstanceNotFoundException, AdapterException;
+  public abstract void deleteInstance(String instanceURI) throws InstanceNotFoundException, InvalidRequestException, ProcessingException;
   
-  public abstract Model getInstance(String instanceURI) throws InstanceNotFoundException, AdapterException;
+  public abstract Model getInstance(String instanceURI) throws InstanceNotFoundException, ProcessingException, InvalidRequestException;
   
-  public abstract Model getAllInstances() throws InstanceNotFoundException, AdapterException;
-  
-  public static class AdapterException extends Exception {
-    
-    private static final long serialVersionUID = -1664977530188161479L;
-    
-    public AdapterException(String message) {
-      super(message);
-    }
-    
-    public AdapterException(Throwable cause) {
-      super(cause);
-    }
-  }
+  public abstract Model getAllInstances() throws InstanceNotFoundException, ProcessingException;
   
   public static class InstanceNotFoundException extends Exception {
 
     private static final long serialVersionUID = 2310151290668732710L;
 
-    public InstanceNotFoundException(){
-      super();
-    }
-    
     public InstanceNotFoundException(String message) {
       super(message);
+    }
+  }
+  
+  public static class InvalidRequestException extends Exception {
+
+    private static final long serialVersionUID = -217391164873287337L;
+
+    public InvalidRequestException(String message) {
+      super(message);
+    }
+    
+    public InvalidRequestException(Throwable cause) {
+      super(cause);
+    }
+  }
+  
+  public static class ProcessingException extends Exception {
+
+    private static final long serialVersionUID = 7943720534259771304L;
+
+    public ProcessingException(String message) {
+      super(message);
+    }
+    
+    public ProcessingException(Throwable cause) {
+      super(cause);
     }
   }
   

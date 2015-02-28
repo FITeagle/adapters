@@ -1,9 +1,11 @@
 package org.fiteagle.adapters.motor;
 
 import info.openmultinet.ontology.vocabulary.Omn;
+
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +27,7 @@ public class MotorAdapterTest {
   }
   
   @Test
-  public void testCreateAndTerminate() throws AdapterException, InstanceNotFoundException {
+  public void testCreateAndTerminate() throws InstanceNotFoundException, ProcessingException, InvalidRequestException {
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
     
     Model modelCreate = ModelFactory.createDefaultModel();
@@ -46,13 +48,13 @@ public class MotorAdapterTest {
   }
   
   @Test(expected=InstanceNotFoundException.class)
-  public void testGetNonExistingInstance() throws InstanceNotFoundException, AdapterException{
+  public void testGetNonExistingInstance() throws InstanceNotFoundException, ProcessingException, InvalidRequestException{
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
     adapter.getInstance(instanceURI);
   }
   
   @Test
-  public void testMonitor() throws AdapterException, InstanceNotFoundException {
+  public void testMonitor() throws InstanceNotFoundException, ProcessingException, InvalidRequestException {
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";  
     
     Model modelCreate = ModelFactory.createDefaultModel();
@@ -81,7 +83,7 @@ public class MotorAdapterTest {
   }
   
   @Test
-  public void testConfigure() throws AdapterException, InstanceNotFoundException {
+  public void testConfigure() throws InstanceNotFoundException, ProcessingException, InvalidRequestException {
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"InstanceOne";
     
     Model modelCreate = ModelFactory.createDefaultModel();

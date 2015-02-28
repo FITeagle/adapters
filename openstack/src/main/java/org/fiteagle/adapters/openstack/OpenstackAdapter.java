@@ -113,7 +113,7 @@ public class OpenstackAdapter extends AbstractAdapter {
       openstackClient.deleteServer(id);
       return;
     }
-    throw new InstanceNotFoundException();
+    throw new InstanceNotFoundException("Instance "+instanceURI+" not found");
   }
   
   @Override
@@ -166,7 +166,7 @@ public class OpenstackAdapter extends AbstractAdapter {
         return openstackParser.parseToModel(server);
       }
     }
-    throw new InstanceNotFoundException();
+    throw new InstanceNotFoundException("Instance "+instanceURI+" not found");
   }
 
   @Override

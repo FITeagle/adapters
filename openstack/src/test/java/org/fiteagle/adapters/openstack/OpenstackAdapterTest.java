@@ -7,8 +7,9 @@ import static org.junit.Assert.assertTrue;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
-import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.adapters.openstack.client.OpenstackTestClient;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.junit.BeforeClass;
@@ -61,7 +62,7 @@ public class OpenstackAdapterTest {
   }
   
   @Test
-  public void testCreateInstance() throws AdapterException, InstanceNotFoundException{
+  public void testCreateInstance() throws InstanceNotFoundException, ProcessingException, InvalidRequestException{
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(adapter.getAdapterInstance().getNameSpace()+"server1");
     instanceResource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
@@ -85,7 +86,7 @@ public class OpenstackAdapterTest {
   }
   
   @Test(expected = InstanceNotFoundException.class)
-  public void testTerminateInstance() throws AdapterException, InstanceNotFoundException{
+  public void testTerminateInstance() throws InstanceNotFoundException, ProcessingException, InvalidRequestException{
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"server2";
     Model modelCreate = ModelFactory.createDefaultModel();
     Resource instanceResource = modelCreate.createResource(instanceURI);
@@ -101,7 +102,7 @@ public class OpenstackAdapterTest {
   }
   
   @Test(expected = InstanceNotFoundException.class)
-  public void testTerminateNonExistingInstance() throws AdapterException, InstanceNotFoundException{
+  public void testTerminateNonExistingInstance() throws InstanceNotFoundException{
     String instanceURI = adapter.getAdapterInstance().getNameSpace()+"server2";
     adapter.deleteInstance(instanceURI);
   }

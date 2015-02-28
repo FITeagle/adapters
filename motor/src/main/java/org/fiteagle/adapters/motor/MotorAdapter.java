@@ -172,7 +172,7 @@ public final class MotorAdapter extends AbstractAdapter {
   public Model getInstance(String instanceURI) throws InstanceNotFoundException {
     Motor motor = instanceList.get(instanceURI);
     if(motor == null){
-      throw new InstanceNotFoundException();
+      throw new InstanceNotFoundException("Instance "+instanceURI+" not found");
     }
     return parseToModel(motor);
   }

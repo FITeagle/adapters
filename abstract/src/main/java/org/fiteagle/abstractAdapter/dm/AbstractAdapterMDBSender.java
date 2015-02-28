@@ -12,7 +12,7 @@ import javax.jms.Message;
 import javax.jms.Topic;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
@@ -48,7 +48,7 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       try {
         adapter.updateAdapterDescription();
         adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
-      } catch (AdapterException e) {
+      } catch (ProcessingException e) {
         LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while registering: "+e.getMessage());
         delay = delay*2;
         LOGGER.log(Level.WARNING, "Retry in "+delay+"ms");

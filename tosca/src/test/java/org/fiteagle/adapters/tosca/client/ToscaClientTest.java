@@ -8,9 +8,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
 
-import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.junit.Test;
 
 public class ToscaClientTest {
@@ -36,7 +35,7 @@ public class ToscaClientTest {
     Definitions definitons = null; 
     try {
       definitons = client.getAllDefinitions();
-    } catch(ProcessingException | NotFoundException | AdapterException e){
+    } catch(NotFoundException | ProcessingException e){
       LOGGER.log(Level.INFO, "Unable to connect to tosca interface at: "+URL_TOSCA);
       return;
     }

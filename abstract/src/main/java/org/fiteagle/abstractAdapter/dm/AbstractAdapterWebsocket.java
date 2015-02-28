@@ -22,7 +22,9 @@ import javax.ws.rs.core.Response;
 
 import org.apache.jena.riot.RiotException;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AbstractAdapter.AdapterException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
@@ -84,7 +86,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
       String serializedModel = MessageUtil.serializeModel(responseBodyModel, IMessageBus.SERIALIZATION_TURTLE);
       responseBody = responseModel.createLiteral(serializedModel);
       
-    } catch(AdapterException e){
+    } catch(ProcessingException | InvalidRequestException | InstanceNotFoundException e){
       responseBody = getResponseBodyFromException(responseModel, e);
       responseCode = getResponseCodeFromException(responseModel);
     }
@@ -99,7 +101,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
     return responseModel.createLiteral(String.valueOf(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
   }
 
-  private Literal getResponseBodyFromException(Model responseModel, AdapterException e) {
+  private Literal getResponseBodyFromException(Model responseModel, Exception e) {
     Literal responseBody;
     if(e.getCause() != null){
       responseBody = responseModel.createLiteral(e.getCause().getMessage());
@@ -110,7 +112,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
     return responseBody;
   }
 
-  private AbstractAdapter getTargetAdapterInstance(Model requestModel) throws AdapterException {
+  private AbstractAdapter getTargetAdapterInstance(Model requestModel) throws ProcessingException, InvalidRequestException, InstanceNotFoundException {
     AbstractAdapter targetAdapter = null;
     for(AbstractAdapter adapterInstance : getAdapterInstances().values()){
       if(adapterInstance.isRecipient(requestModel)){
@@ -118,28 +120,28 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
       }
     }
     if(targetAdapter == null){
-      throw new AdapterException("No target adapter found");
+      throw new InstanceNotFoundException("No target adapter found");
     }
     return targetAdapter;
   }
 
-  private Model parseInputString(final String message) throws AdapterException {
+  private Model parseInputString(final String message) throws InvalidRequestException {
     Model requestModel; 
     try{
       requestModel = MessageUtil.parseSerializedModel(message, IMessageBus.SERIALIZATION_TURTLE);
     } catch(RiotException e){
-      throw new AdapterException("Input must be a turtle-serialized RDF model");
+      throw new InvalidRequestException("Input must be a turtle-serialized RDF model");
     }
     return requestModel;
   }
   
-  private Resource getRequestResource(Model requestModel) throws AdapterException {
+  private Resource getRequestResource(Model requestModel) throws InvalidRequestException {
     List<Resource> requests = getAllRequestResources(requestModel);
     if(requests.size() == 0){
-      throw new AdapterException("No request resource was found");
+      throw new InvalidRequestException("No request resource was found");
     }
     if(requests.size() > 1){
-      throw new AdapterException("Multiple requests are not supported");
+      throw new InvalidRequestException("Multiple requests are not supported");
     }
     
     Resource request = requests.get(0);
