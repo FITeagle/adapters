@@ -9,7 +9,6 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.motor.MotorAdapter;
 import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageFilters;
 
 @MessageDriven(activationConfig = {
     @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
