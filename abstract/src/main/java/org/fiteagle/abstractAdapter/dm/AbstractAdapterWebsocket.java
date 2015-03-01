@@ -164,6 +164,11 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   @OnOpen
   public void onOpen(final Session session, final EndpointConfig config) throws IOException {
     LOGGER.log(Level.INFO, "Opening WebSocket connection with " + session.getId() + "...");
+    LOGGER.log(Level.INFO, "Sending adapter description... ");
+    for(AbstractAdapter adapter : getAdapterInstances().values()){
+      String description = MessageUtil.serializeModel(adapter.getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
+      session.getBasicRemote().sendText(description);
+    }
     queue.add(session);
   }
   
