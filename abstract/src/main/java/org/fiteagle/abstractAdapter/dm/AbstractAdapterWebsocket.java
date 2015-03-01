@@ -83,22 +83,23 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
       else if(request.hasProperty(RDF.type, Http.DeleteRequest)){
         responseBodyModel = targetAdapter.deleteInstances(requestModel);
       }
-      String serializedModel = MessageUtil.serializeModel(responseBodyModel, IMessageBus.SERIALIZATION_TURTLE);
-      responseBody = responseModel.createLiteral(serializedModel);
+      responseModel.add(responseBodyModel);
       
     } catch(ProcessingException e){
       responseBody = getResponseBodyFromException(responseModel, e);
+      response.addProperty(Http.body, responseBody);
       responseCode = getServerErrorResponseCode(responseModel);
     } catch (InvalidRequestException e) {
       responseBody = getResponseBodyFromException(responseModel, e);
+      response.addProperty(Http.body, responseBody);
       responseCode = getBadRequestResponseCode(responseModel);
     } catch (InstanceNotFoundException e) {
       responseBody = getResponseBodyFromException(responseModel, e);
+      response.addProperty(Http.body, responseBody);
       responseCode = getNotFoundResponseCode(responseModel);
     }
     
     response.addProperty(Http.responseCode, responseCode);
-    response.addProperty(Http.body, responseBody);
     
     return MessageUtil.serializeModel(responseModel, IMessageBus.SERIALIZATION_TURTLE);
   }
