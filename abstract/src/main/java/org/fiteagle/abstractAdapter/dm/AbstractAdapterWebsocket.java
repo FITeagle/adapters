@@ -86,9 +86,15 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
       String serializedModel = MessageUtil.serializeModel(responseBodyModel, IMessageBus.SERIALIZATION_TURTLE);
       responseBody = responseModel.createLiteral(serializedModel);
       
-    } catch(ProcessingException | InvalidRequestException | InstanceNotFoundException e){
+    } catch(ProcessingException e){
       responseBody = getResponseBodyFromException(responseModel, e);
-      responseCode = getResponseCodeFromException(responseModel);
+      responseCode = getServerErrorResponseCode(responseModel);
+    } catch (InvalidRequestException e) {
+      responseBody = getResponseBodyFromException(responseModel, e);
+      responseCode = getBadRequestResponseCode(responseModel);
+    } catch (InstanceNotFoundException e) {
+      responseBody = getResponseBodyFromException(responseModel, e);
+      responseCode = getNotFoundResponseCode(responseModel);
     }
     
     response.addProperty(Http.responseCode, responseCode);
@@ -96,9 +102,17 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
     
     return MessageUtil.serializeModel(responseModel, IMessageBus.SERIALIZATION_TURTLE);
   }
-
-  private Literal getResponseCodeFromException(Model responseModel) {
+  
+  private Literal getNotFoundResponseCode(Model responseModel) {
+    return responseModel.createLiteral(String.valueOf(Response.Status.NOT_FOUND.getStatusCode()));
+  }
+  
+  private Literal getServerErrorResponseCode(Model responseModel) {
     return responseModel.createLiteral(String.valueOf(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()));
+  }
+  
+  private Literal getBadRequestResponseCode(Model responseModel) {
+    return responseModel.createLiteral(String.valueOf(Response.Status.BAD_REQUEST.getStatusCode()));
   }
 
   private Literal getResponseBodyFromException(Model responseModel, Exception e) {
