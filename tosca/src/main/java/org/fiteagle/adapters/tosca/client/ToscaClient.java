@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -23,6 +24,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.http.HttpException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 
 public class ToscaClient {
   
@@ -110,12 +112,14 @@ public class ToscaClient {
     return convertToDefinitions(input);
   }
   
-  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException {
+  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException, InvalidRequestException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result;
     try{
       result = client.target(URL_TOSCA_DEFINITIONS).request().post(entity, String.class); 
+    } catch(BadRequestException e){
+      throw new InvalidRequestException(e);
     } catch(WebApplicationException e){
       throw new ProcessingException(e);
     }
