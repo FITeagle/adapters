@@ -52,6 +52,10 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
             } else if (messageType.equals(IMessageBus.TYPE_DELETE)) {
               Model resultModel = adapter.deleteInstances(messageModel);
               adapter.notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, null);
+              
+            } else if (messageType.equals(IMessageBus.TYPE_GET)) {
+              Model resultModel = adapter.getInstances(messageModel);
+              adapter.notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, null);
             }
           } catch(ProcessingException | InvalidRequestException e){
             Message errorMessage = MessageUtil.createErrorMessage(e.getMessage(), MessageUtil.getJMSCorrelationID(message), context);
