@@ -50,10 +50,12 @@ public abstract class AbstractAdapterREST {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     try {
       return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
+    } catch (InstanceNotFoundException e) {
+      processInstanceNotFoundException(e);
     } catch (ProcessingException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+      processProcessingRequestException(e);
     }
+    return null;
   }
   
   @GET
@@ -63,10 +65,12 @@ public abstract class AbstractAdapterREST {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     try {
       return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_RDFXML);
+    } catch (InstanceNotFoundException e) {
+      processInstanceNotFoundException(e);
     } catch (ProcessingException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+      processProcessingRequestException(e);
     }
+    return null;
   }
   
   @GET
@@ -76,10 +80,12 @@ public abstract class AbstractAdapterREST {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
     try {
       return MessageUtil.serializeModel(adapter.getAllInstances(), IMessageBus.SERIALIZATION_NTRIPLE);
+    } catch (InstanceNotFoundException e) {
+      processInstanceNotFoundException(e);
     } catch (ProcessingException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+      processProcessingRequestException(e);
     }
+    return null;
   }
   
   @POST
@@ -91,10 +97,12 @@ public abstract class AbstractAdapterREST {
     try {
       Model resultModel = adapter.createInstances(MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
-    } catch (ProcessingException | InvalidRequestException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    } catch (ProcessingException e) {
+      processProcessingRequestException(e);
+    } catch (InvalidRequestException e) {
+      processInvalidRequestException(e);
     }
+    return null;
   }
 
   @PUT
@@ -106,10 +114,12 @@ public abstract class AbstractAdapterREST {
     try {
       Model resultModel = adapter.updateInstance(decode(instanceURI), MessageUtil.parseSerializedModel(rdfInput, IMessageBus.SERIALIZATION_TURTLE));
       return MessageUtil.serializeModel(resultModel, IMessageBus.SERIALIZATION_TURTLE);
-    } catch (ProcessingException | InvalidRequestException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    } catch (ProcessingException e) {
+      processProcessingRequestException(e);
+    } catch (InvalidRequestException e) {
+      processInvalidRequestException(e);
     }
+    return null;
   }
     
   @DELETE
@@ -121,9 +131,10 @@ public abstract class AbstractAdapterREST {
       adapter.deleteInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
       throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
-    } catch (ProcessingException | InvalidRequestException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    } catch (ProcessingException e) {
+      processProcessingRequestException(e);
+    } catch (InvalidRequestException e) {
+      processInvalidRequestException(e);
     }
     return Response.status(Response.Status.OK.getStatusCode()).build();
   }
@@ -133,14 +144,15 @@ public abstract class AbstractAdapterREST {
   @Produces("text/turtle")
   public String getInstanceTurtle(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
-    Model model;
+    Model model = null;
     try {
       model = adapter.getInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
       throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
-    } catch (ProcessingException | InvalidRequestException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    } catch (ProcessingException e) {
+      processProcessingRequestException(e);
+    } catch (InvalidRequestException e) {
+      processInvalidRequestException(e);
     }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_TURTLE);
   }
@@ -150,14 +162,15 @@ public abstract class AbstractAdapterREST {
   @Produces("application/rdf+xml")
   public String getInstanceRDFXML(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
-    Model model;
+    Model model = null;
     try {
       model = adapter.getInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
       throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
-    } catch (ProcessingException | InvalidRequestException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+    } catch (ProcessingException e) {
+      processProcessingRequestException(e);
+    } catch (InvalidRequestException e) {
+      processInvalidRequestException(e);
     }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_RDFXML);
   }
@@ -167,14 +180,15 @@ public abstract class AbstractAdapterREST {
   @Produces("application/n-triples")
   public String getInstanceNTRIPLE(@PathParam("adapterName") String adapterName, @PathParam("instanceURI") String instanceURI) {
     AbstractAdapter adapter = getAdapterInstance(adapterName);
-    Model model;
+    Model model = null;
     try {
       model = adapter.getInstance(decode(instanceURI));
     } catch (InstanceNotFoundException e) {
-      throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
-    } catch (ProcessingException | InvalidRequestException e) {
-      processAdapterException(e);
-      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e);
+      processInstanceNotFoundException(e);
+    } catch (ProcessingException e) {
+      processProcessingRequestException(e);
+    } catch (InvalidRequestException e) {
+      processInvalidRequestException(e);
     }
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_NTRIPLE);
   }
@@ -187,11 +201,25 @@ public abstract class AbstractAdapterREST {
     return adapter;
   }
   
-  private void processAdapterException(Exception e) {
-    if(e.getCause() != null && e.getCause() instanceof WebApplicationException){
-      WebApplicationException webapplicationException = (WebApplicationException) e.getCause();
-      throw new AdapterWebApplicationException(webapplicationException.getResponse().getStatusInfo(), e.getCause());
+  private void processInvalidRequestException(InvalidRequestException e) {
+    if(e.getCause() != null){
+      throw new AdapterWebApplicationException(Status.BAD_REQUEST, e.getCause());
     }
+    throw new AdapterWebApplicationException(Status.BAD_REQUEST, e.getMessage());
+  }
+  
+  private void processProcessingRequestException(ProcessingException e) {
+    if(e.getCause() != null){
+      throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e.getCause());
+    }
+    throw new AdapterWebApplicationException(Status.INTERNAL_SERVER_ERROR, e.getMessage());
+  }
+  
+  private void processInstanceNotFoundException(InstanceNotFoundException e){
+    if(e.getCause() != null){
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, e.getCause());
+    }
+    throw new AdapterWebApplicationException(Status.NOT_FOUND, e.getMessage());
   }
   
   private String decode(String string){
