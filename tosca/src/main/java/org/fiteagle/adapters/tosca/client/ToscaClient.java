@@ -3,7 +3,6 @@ package org.fiteagle.adapters.tosca.client;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,10 +20,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.http.HttpException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
-import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 
 public class ToscaClient implements IToscaClient {
   
@@ -104,7 +102,7 @@ public class ToscaClient implements IToscaClient {
   }
   
   @Override
-  public Definitions updateDefinitions(String id, String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException {
+  public Definitions updateDefinitions(String id, String definitionsString) throws ProcessingException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result;
@@ -119,7 +117,7 @@ public class ToscaClient implements IToscaClient {
   }
   
   @Override
-  public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException, InvalidRequestException {
+  public Definitions createDefinitions(String definitionsString) throws ProcessingException, InvalidRequestException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
     String result;

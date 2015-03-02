@@ -14,7 +14,6 @@ import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +23,6 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBException;
 
-import org.apache.http.HttpException;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.tosca.client.IToscaClient;
 import org.fiteagle.adapters.tosca.client.ToscaClient;
@@ -61,17 +59,17 @@ public final class ToscaAdapter extends AbstractAdapter {
       adapter = adapterIterator.next();
     }
     
-    createDefaultAdapterInstance(adapterModel);
+    createDefaultAdapterInstance(adapterModel, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/"));
   }
   
-  private static void createDefaultAdapterInstance(Model model){
+  protected static ToscaAdapter createDefaultAdapterInstance(Model model, IToscaClient client){
     Resource adapterInstance = model.createResource(OntologyModelUtil.getLocalNamespace()+"Tosca-1");
     adapterInstance.addProperty(RDF.type, adapter);
     adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
     adapterInstance.addProperty(RDFS.comment, "An adapter for TOSCA-compliant resources");
     Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
     adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-    new ToscaAdapter(adapterInstance, model, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/"));
+    return new ToscaAdapter(adapterInstance, model, client);
   }
   
   private ToscaAdapter(Resource adapterInstance, Model adapterModel, IToscaClient client) {
@@ -89,12 +87,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     String definitions = parseToDefinitions(createModel);
     LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
     
-    Definitions resultDefinitions;
-    try{
-      resultDefinitions = client.createDefinitions(definitions);
-    } catch(JAXBException | HttpException | IOException e){
-      throw new ProcessingException(e);
-    }
+    Definitions resultDefinitions = client.createDefinitions(definitions);
     LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
     
     return parseToModel(resultDefinitions);    
@@ -111,12 +104,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     String definitions = parseToDefinitions(udpateModel);
     LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
     
-    Definitions resultDefinitions;
-    try{
-      resultDefinitions = client.updateDefinitions(id, definitions);     
-    } catch(JAXBException | HttpException | IOException e){
-      throw new ProcessingException(e);
-    }
+    Definitions resultDefinitions = client.updateDefinitions(id, definitions);     
     LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
     
     return parseToModel(resultDefinitions);

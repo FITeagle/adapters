@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Definitions id="topology-2430594407" targetNamespace="http://open-multinet.info/ontology/examples/" xmlns="http://docs.oasis-open.org/tosca/ns/2011/12">
+    <Locations/>
+    <Types>
+        <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://opensdncore.org/ontology/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="ServiceContainerProperties">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="subnet" type="Subnet">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="floatingIp" type="xs:string"/>
+                                    <xs:element name="fixedIp" type="xs:string"/>
+                                    <xs:element name="mgmt" type="xs:boolean"/>
+                                    <xs:element name="datacenter" type="xs:string"/>
+                                    <xs:element name="name" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="image" type="Image">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="datacenter" type="xs:string"/>
+                                    <xs:element name="id" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="location" type="Location">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="name" type="xs:string"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element name="maxNumInst" type="xs:integer"/>
+                        <xs:element name="minNumInst" type="xs:integer"/>
+                        <xs:element name="flavour" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://opensdncore.org/ontology/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:element name="dummyProperties">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="ORCHESTRATOR_PORT" type="xs:string"/>
+                        <xs:element name="ZABBIX_IP" type="xs:string"/>
+                        <xs:element name="parameter2" type="xs:string"/>
+                        <xs:element name="nameserver" type="xs:string"/>
+                        <xs:element name="PORT" type="xs:string"/>
+                        <xs:element name="parameter1" type="xs:string"/>
+                        <xs:element name="TEST_PARAM" type="xs:string"/>
+                        <xs:element name="ORCHESTRATOR_IP" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </Types>
+    <NodeType name="dummy" targetNamespace="http://opensdncore.org/ontology/">
+        <PropertiesDefinition element="osco:dummyProperties" xmlns:osco="http://opensdncore.org/ontology/"/>
+        <InstanceStates>
+            <InstanceState state="ERROR"/>
+            <InstanceState state="UNCOMPLETED"/>
+            <InstanceState state="NOTYETINITIALIZED"/>
+            <InstanceState state="PENDING"/>
+            <InstanceState state="CLEANED"/>
+            <InstanceState state="INITIALIZED"/>
+            <InstanceState state="REMOVING"/>
+            <InstanceState state="PREINIT"/>
+            <InstanceState state="UPDATING"/>
+            <InstanceState state="INSTALLED"/>
+            <InstanceState state="READY"/>
+            <InstanceState state="ACTIVE"/>
+            <InstanceState state="STARTED"/>
+            <InstanceState state="STOPPED"/>
+        </InstanceStates>
+    </NodeType>
+    <NodeType name="ServiceContainer" targetNamespace="http://opensdncore.org/ontology/">
+        <PropertiesDefinition element="osco:ServiceContainerProperties" xmlns:osco="http://opensdncore.org/ontology/"/>
+        <InstanceStates>
+            <InstanceState state="ERROR"/>
+            <InstanceState state="UNCOMPLETED"/>
+            <InstanceState state="NOTYETINITIALIZED"/>
+            <InstanceState state="PENDING"/>
+            <InstanceState state="CLEANED"/>
+            <InstanceState state="INITIALIZED"/>
+            <InstanceState state="REMOVING"/>
+            <InstanceState state="PREINIT"/>
+            <InstanceState state="UPDATING"/>
+            <InstanceState state="INSTALLED"/>
+            <InstanceState state="READY"/>
+            <InstanceState state="ACTIVE"/>
+            <InstanceState state="STARTED"/>
+            <InstanceState state="STOPPED"/>
+        </InstanceStates>
+    </NodeType>
+    <RelationshipType name="deployedOn" targetNamespace="http://opensdncore.org/ontology/">
+        <ValidTarget typeRef="osco:ServiceContainer" xmlns:osco="http://opensdncore.org/ontology/"/>
+    </RelationshipType>
+    <ServiceTemplate id="topology-2430594407">
+        <TopologyTemplate>
+            <NodeTemplate name="container1" id="container-3237537212" type="osco:ServiceContainer" xmlns:osco="http://opensdncore.org/ontology/">
+                <InstanceState state="INITIALIZED"/>
+                <Properties>
+                    <osco:ServiceContainerProperties>
+                        <osco:maxNumInst>1</osco:maxNumInst>
+                        <osco:minNumInst>1</osco:minNumInst>
+                        <osco:flavour>1024MB_10GB</osco:flavour>
+                        <osco:location>
+                            <osco:name>Berlin</osco:name>
+                        </osco:location>
+                        <osco:subnet>
+                            <osco:name>av-net</osco:name>
+                            <osco:datacenter>AV-Openstack</osco:datacenter>
+                            <osco:mgmt>true</osco:mgmt>
+                            <osco:floatingIp>130.149.247.222</osco:floatingIp>
+                            <osco:fixedIp>10.23.0.49</osco:fixedIp>
+                        </osco:subnet>
+                        <osco:image>
+                            <osco:id>074b99ed-0e8a-4307-8e59-87ca9f22ca53</osco:id>
+                            <osco:datacenter>AV-Openstack</osco:datacenter>
+                        </osco:image>
+                    </osco:ServiceContainerProperties>
+                </Properties>
+            </NodeTemplate>
+            <NodeTemplate name="dummy1" id="dummy-2297493447" type="osco:dummy" xmlns:osco="http://opensdncore.org/ontology/">
+                <InstanceState state="INITIALIZED"/>
+                <Properties>
+                    <osco:dummyProperties>
+                        <osco:ORCHESTRATOR_PORT>8080</osco:ORCHESTRATOR_PORT>
+                        <osco:ZABBIX_IP>127.0.0.1</osco:ZABBIX_IP>
+                        <osco:parameter2>bar</osco:parameter2>
+                        <osco:nameserver>10.147.9.3</osco:nameserver>
+                        <osco:PORT>8088</osco:PORT>
+                        <osco:parameter1>test</osco:parameter1>
+                        <osco:TEST_PARAM>foo</osco:TEST_PARAM>
+                        <osco:ORCHESTRATOR_IP>127.0.1.1</osco:ORCHESTRATOR_IP>
+                    </osco:dummyProperties>
+                </Properties>
+            </NodeTemplate>
+            <RelationshipTemplate name="deployedOncontainer1" id="deployedOn-dummy-2297493447container-3237537212" type="osco:deployedOn" xmlns:osco="http://opensdncore.org/ontology/">
+                <SourceElement ref="dummy-2297493447"/>
+                <TargetElement ref="container-3237537212"/>
+            </RelationshipTemplate>
+        </TopologyTemplate>
+    </ServiceTemplate>
+</Definitions>
