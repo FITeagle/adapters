@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.http.HttpException;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.adapters.tosca.client.IToscaClient;
 import org.fiteagle.adapters.tosca.client.ToscaClient;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -42,7 +43,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   private static Logger LOGGER = Logger.getLogger(ToscaAdapter.class.toString());
   
-  private ToscaClient client;
+  private IToscaClient client;
   
   private Model adapterModel;
   private Resource adapterInstance;
@@ -73,7 +74,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     new ToscaAdapter(adapterInstance, model, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/"));
   }
   
-  private ToscaAdapter(Resource adapterInstance, Model adapterModel, ToscaClient client) {
+  private ToscaAdapter(Resource adapterInstance, Model adapterModel, IToscaClient client) {
     super(adapterInstance.getLocalName());
     
     this.adapterInstance = adapterInstance;

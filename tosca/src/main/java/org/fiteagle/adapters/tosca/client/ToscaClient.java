@@ -26,7 +26,7 @@ import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 
-public class ToscaClient {
+public class ToscaClient implements IToscaClient {
   
   private static Logger LOGGER = Logger.getLogger(ToscaClient.class.toString());
   
@@ -40,6 +40,7 @@ public class ToscaClient {
     URL_TOSCA_NODETYPES = serverURL+"types/";
   }
   
+  @Override
   public Definitions getAllDefinitions() throws ProcessingException{
     Client client = ClientBuilder.newClient();
     String result;
@@ -52,6 +53,7 @@ public class ToscaClient {
     return convertToDefinitions(input);
   }
   
+  @Override
   public Definitions getAllTypes() throws ProcessingException {
     Client client = ClientBuilder.newClient();
     String result = null;
@@ -64,6 +66,7 @@ public class ToscaClient {
     return convertToDefinitions(input);
   }
   
+  @Override
   public Definitions getDefinitions(String id) throws InstanceNotFoundException, ProcessingException{
     Client client = ClientBuilder.newClient();
     try{
@@ -77,6 +80,7 @@ public class ToscaClient {
     }
   }
   
+  @Override
   public Definitions getSingleNodeDefinitions(String id) throws InstanceNotFoundException, ProcessingException{
     Client client = ClientBuilder.newClient();
     try{
@@ -90,6 +94,7 @@ public class ToscaClient {
     }
   }
   
+  @Override
   public void deleteDefinitions(String id) throws ProcessingException{
     Client client = ClientBuilder.newClient();
     Response response = client.target(URL_TOSCA_DEFINITIONS+id).request().delete(); 
@@ -98,6 +103,7 @@ public class ToscaClient {
     }
   }
   
+  @Override
   public Definitions updateDefinitions(String id, String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
@@ -112,6 +118,7 @@ public class ToscaClient {
     return convertToDefinitions(input);
   }
   
+  @Override
   public Definitions createDefinitions(String definitionsString) throws HttpException, IOException, JAXBException, ProcessingException, InvalidRequestException {
     Client client = ClientBuilder.newClient();
     Entity<String> entity = Entity.entity(definitionsString, MediaType.APPLICATION_XML);
