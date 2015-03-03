@@ -43,10 +43,27 @@ public final class MotorAdapter extends AbstractAdapter {
       adapter = adapterIterator.next();
     }
     
+    createDefaultAdapterInstance(adapterModel);
+  }
+  
+  private static void createDefaultAdapterInstance(Model adapterModel){
+    Resource adapterInstance = adapterModel.createResource(OntologyModelUtil.getLocalNamespace()+"MotorGarage-1");
+    adapterInstance.addProperty(RDF.type, adapter);
+    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
+    adapterInstance.addProperty(RDFS.comment, "A motor garage adapter that can simulate different dynamic motor resources.");
+    adapterInstance.addLiteral(MessageBusOntologyModel.maxInstances, 10);
+    Resource testbed = adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
+    Property longitude = adapterModel.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long");
+    Property latitude = adapterModel.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
+    adapterInstance.addProperty(latitude, "52.516377");
+    adapterInstance.addProperty(longitude, "13.323732");
+    
     StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
       Resource resource = resourceIterator.next().getObject().asResource();
       
+      adapterInstance.addProperty(Omn_lifecycle.parentTo, resource);
       ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
       while (propertiesIterator.hasNext()) {
         Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
@@ -54,24 +71,7 @@ public final class MotorAdapter extends AbstractAdapter {
       }
     }
     
-    createDefaultAdapterInstance(adapterModel);
-  }
-  
-  private static void createDefaultAdapterInstance(Model model){
-    Resource adapterInstance = model.createResource(OntologyModelUtil.getLocalNamespace()+"MotorGarage-1");
-    adapterInstance.addProperty(RDF.type, adapter);
-    adapterInstance.addProperty(Omn_lifecycle.parentTo,model.createResource("http://open-multinet.info/ontology/resource/motor#Motor"));
-    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
-    adapterInstance.addProperty(RDFS.comment, "A motor garage adapter that can simulate different dynamic motor resources.");
-    adapterInstance.addLiteral(MessageBusOntologyModel.maxInstances, 10);
-    Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-    Property longitude = model.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long");
-    Property latitude = model.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
-    adapterInstance.addProperty(latitude, "52.516377");
-    adapterInstance.addProperty(longitude, "13.323732");
-    
-    new MotorAdapter(adapterInstance, model);
+    new MotorAdapter(adapterInstance, adapterModel);
   }
   
   private MotorAdapter(Resource adapterInstance, Model adapterModel) {

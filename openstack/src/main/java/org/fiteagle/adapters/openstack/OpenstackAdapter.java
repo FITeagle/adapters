@@ -57,10 +57,22 @@ public class OpenstackAdapter extends AbstractAdapter {
       adapter = adapterIterator.next();
     }
     
+    createDefaultAdapterInstance(adapterModel);
+  }
+  
+  private static void createDefaultAdapterInstance(Model adapterModel){
+    Resource adapterInstance = adapterModel.createResource(OntologyModelUtil.getLocalNamespace()+"Openstack-1");
+    adapterInstance.addProperty(RDF.type, adapter);
+    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
+    adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");
+    Resource testbed = adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
+    
     StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
       Resource resource = resourceIterator.next().getObject().asResource();
       
+      adapterInstance.addProperty(Omn_lifecycle.parentTo, resource);
       ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
       while (propertiesIterator.hasNext()) {
         Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
@@ -68,17 +80,7 @@ public class OpenstackAdapter extends AbstractAdapter {
       }
     }
     
-    createDefaultAdapterInstance(adapterModel);
-  }
-  
-  private static void createDefaultAdapterInstance(Model model){
-    Resource adapterInstance = model.createResource(OntologyModelUtil.getLocalNamespace()+"Openstack-1");
-    adapterInstance.addProperty(RDF.type, adapter);
-    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
-    adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");
-    Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-    new OpenstackAdapter(adapterInstance, model, new OpenstackClient());
+    new OpenstackAdapter(adapterInstance, adapterModel, new OpenstackClient());
   }
   
   private OpenstackAdapter(Resource adapterInstance, Model adapterModel, IOpenstackClient openstackClient){
