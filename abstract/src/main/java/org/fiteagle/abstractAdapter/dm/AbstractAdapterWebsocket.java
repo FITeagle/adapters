@@ -145,7 +145,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
     try{
       requestModel = MessageUtil.parseSerializedModel(message, IMessageBus.SERIALIZATION_TURTLE);
     } catch(RiotException e){
-      throw new InvalidRequestException("Input must be a turtle-serialized RDF model");
+      throw new InvalidRequestException("Input must be a turtle-serialized RDF model: "+e.getMessage());
     }
     return requestModel;
   }
