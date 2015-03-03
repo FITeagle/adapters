@@ -28,7 +28,6 @@ public final class MotorAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   private static Resource adapter;
-  private static List<Resource> resources = new ArrayList<>();
   
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
@@ -47,7 +46,6 @@ public final class MotorAdapter extends AbstractAdapter {
     StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
       Resource resource = resourceIterator.next().getObject().asResource();
-      resources.add(resource);
       
       ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
       while (propertiesIterator.hasNext()) {
@@ -94,7 +92,7 @@ public final class MotorAdapter extends AbstractAdapter {
   
   protected Model parseToModel(Motor motor) {
     Resource resource = ModelFactory.createDefaultModel().createResource(motor.getInstanceName());
-    resource.addProperty(RDF.type, MotorAdapter.resources.get(0));
+    resource.addProperty(RDF.type, getAdapterManagedResources().get(0));
     resource.addProperty(RDF.type, Omn.Resource);
     resource.addProperty(RDFS.label, resource.getLocalName());
     resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Ready);
@@ -142,11 +140,6 @@ public final class MotorAdapter extends AbstractAdapter {
   
   public Motor getInstanceByName(String instanceURI) {
     return (Motor) instanceList.get(instanceURI);
-  }
-  
-  @Override
-  public List<Resource> getAdapterManagedResources() {
-    return resources;
   }
   
   @Override

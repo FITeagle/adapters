@@ -14,7 +14,6 @@ import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +45,6 @@ public final class ToscaAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   private static Resource adapter;
-  
-  private static List<Resource> resources = new ArrayList<>();
   
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
@@ -139,11 +136,6 @@ public final class ToscaAdapter extends AbstractAdapter {
   public Model getAllInstances() throws InstanceNotFoundException, ProcessingException {
     Definitions definitions = client.getAllDefinitions();
     return parseToModel(definitions);
-  }
-  
-  @Override
-  public List<Resource> getAdapterManagedResources() {
-    return resources;
   }
   
   @Override

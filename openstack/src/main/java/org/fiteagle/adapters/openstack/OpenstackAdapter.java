@@ -35,7 +35,6 @@ public class OpenstackAdapter extends AbstractAdapter {
   private OpenstackParser openstackParser;
   
   private static Resource adapter;
-  private static List<Resource> resources = new ArrayList<>();
   public static List<Property> resourceInstanceProperties = new ArrayList<Property>();
   
   private Model adapterModel;
@@ -61,7 +60,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
     if (resourceIterator.hasNext()) {
       Resource resource = resourceIterator.next().getObject().asResource();
-      resources.add(resource);
       
       ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
       while (propertiesIterator.hasNext()) {
@@ -106,7 +104,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   @Override
   public void deleteInstance(String instanceURI) throws InstanceNotFoundException {
     Model model = getInstance(instanceURI);
-    ResIterator iter = model.listSubjectsWithProperty(RDF.type, resources.get(0));
+    ResIterator iter = model.listSubjectsWithProperty(RDF.type, getAdapterManagedResources().get(0));
     if (iter.hasNext()) {
       Resource instance = iter.next();
       String id = instance.getRequiredProperty(openstackParser.getPROPERTY_ID()).getLiteral().getString();
@@ -130,11 +128,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     return null;
   }
 
-  @Override
-  public List<Resource> getAdapterManagedResources() {
-    return resources;
-  }
-  
   public Resource getImageResource(){
     return adapterModel.getResource(getAdapterManagedResources().get(0).getNameSpace()+"OpenstackImage");
   }

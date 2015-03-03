@@ -116,6 +116,15 @@ public abstract class AbstractAdapter {
     return updatedInstancesModel;
   }
   
+  public List<Resource> getAdapterManagedResources(){
+    List<Resource> managedResources = new ArrayList<>();
+    StmtIterator iter = getAdapterInstance().listProperties(Omn_lifecycle.parentTo);
+    while(iter.hasNext()){
+      managedResources.add(iter.next().getResource());
+    }
+    return managedResources;
+  }
+  
   public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
     for (AdapterEventListener listener : listeners) {
       listener.publishModelUpdate(eventRDF, requestID, methodType, methodTarget);
@@ -125,8 +134,6 @@ public abstract class AbstractAdapter {
   public void addListener(AdapterEventListener newListener) {
     listeners.add(newListener);
   }
-  
-  public abstract List<Resource> getAdapterManagedResources();
   
   public abstract Resource getAdapterInstance();
   
