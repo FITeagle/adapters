@@ -3,6 +3,7 @@ package org.fiteagle.abstractAdapter.dm;
 import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 
@@ -36,7 +37,7 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
   }
   
   @Override
-  public Model configureInstances(Model configureModel) throws InvalidRequestException, ProcessingException  {
+  public Model configureInstances(Model configureModel) throws InvalidRequestException, ProcessingException, InstanceNotFoundException  {
     Model resultModel = ModelFactory.createDefaultModel();
     for(AbstractAdapter adapter : getAdapterInstances().values()){
       if(adapter.isRecipient(configureModel)){

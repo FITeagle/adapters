@@ -96,6 +96,61 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
+  public Model deleteInstances(Model model) throws InvalidRequestException, ProcessingException {
+    Model deletedInstancesModel = super.deleteInstances(model);
+    
+    ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Topology);
+    while(resourceInstanceIterator.hasNext()){
+      String instanceURI = resourceInstanceIterator.next().getURI();
+      LOGGER.log(Level.INFO, "Deleting instance: " + instanceURI);
+      deleteInstance(instanceURI);
+      Resource deletedInstance = deletedInstancesModel.createResource(instanceURI);
+      deletedInstance.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Removing);
+    }
+    
+    return deletedInstancesModel;
+  }
+  
+  @Override
+  public Model getInstances(Model model) throws ProcessingException, InvalidRequestException, InstanceNotFoundException {
+    Model instancesModel = null;
+    try{
+      instancesModel = super.getInstances(model);
+    } catch(InstanceNotFoundException e){
+      LOGGER.log(Level.INFO, "No resource instances found, looking for topologies..");
+    }
+    
+    ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Topology);
+    while(resourceInstanceIterator.hasNext()){
+      String instanceURI = resourceInstanceIterator.next().getURI();
+      Model createdInstance = getInstance(instanceURI);
+      instancesModel.add(createdInstance);
+    }
+    
+    return instancesModel;
+  }
+
+  public Model updateInstances(Model model) throws InvalidRequestException, ProcessingException {
+    Model updatedInstancesModel = null;
+    try{
+      updatedInstancesModel = super.updateInstances(model);
+    } catch(InstanceNotFoundException e){
+      LOGGER.log(Level.INFO, "No resource instances found, looking for topologies..");
+    }
+    
+    ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Topology);
+    while(resourceInstanceIterator.hasNext()){
+      Resource resourceInstance = resourceInstanceIterator.next();
+      LOGGER.log(Level.INFO, "Updating instance: " + resourceInstance);
+      
+      Model updatedModel = updateInstance(resourceInstance.getURI(), model);
+      updatedInstancesModel.add(updatedModel);
+    }
+    
+    return updatedInstancesModel;
+  }
+  
+  @Override
   public Model updateInstance(String instanceURI, Model udpateModel) throws InvalidRequestException, ProcessingException {
     String id = getLocalname(instanceURI);
     String definitions = parseToDefinitions(udpateModel);

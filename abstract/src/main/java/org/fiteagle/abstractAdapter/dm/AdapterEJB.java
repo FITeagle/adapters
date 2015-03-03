@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 
@@ -11,6 +12,6 @@ public interface AdapterEJB {
   
   Model deleteInstances(Model deleteModel) throws ProcessingException, InvalidRequestException;
   
-  Model configureInstances(Model configureModel) throws ProcessingException, InvalidRequestException;
+  Model configureInstances(Model configureModel) throws ProcessingException, InvalidRequestException, InstanceNotFoundException;
   
 }

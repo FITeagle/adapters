@@ -92,13 +92,13 @@ public abstract class AbstractAdapter {
     return deletedInstancesModel;
   }
   
-  public Model updateInstances(Model model) throws InvalidRequestException, ProcessingException {
+  public Model updateInstances(Model model) throws InvalidRequestException, ProcessingException, InstanceNotFoundException {
     Model updatedInstancesModel = ModelFactory.createDefaultModel();  
     for(Resource resource : getAdapterManagedResources()){
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
       while (resourceInstanceIterator.hasNext()) {
         Resource resourceInstance = resourceInstanceIterator.next();
-        LOGGER.log(Level.INFO, "Configuring instance: " + resourceInstance);
+        LOGGER.log(Level.INFO, "Updating instance: " + resourceInstance);
         
         StmtIterator propertiesIterator = model.listStatements(resourceInstance, null, (RDFNode) null);
         Model updateModel = ModelFactory.createDefaultModel();
@@ -109,8 +109,8 @@ public abstract class AbstractAdapter {
         updatedInstancesModel.add(updatedModel);
       }
       if (updatedInstancesModel.isEmpty()) {
-        LOGGER.log(Level.INFO, "Could not find any instances to configure");
-        throw new ProcessingException(Response.Status.NOT_FOUND.name());
+        LOGGER.log(Level.INFO, "Could not find any instances to update");
+        throw new InstanceNotFoundException("Could not find any instances to update");
       }
     }
     return updatedInstancesModel;
