@@ -62,7 +62,7 @@ public final class MotorAdapter extends AbstractAdapter {
   private static void createDefaultAdapterInstance(Model model){
     Resource adapterInstance = model.createResource(OntologyModelUtil.getLocalNamespace()+"MotorGarage-1");
     adapterInstance.addProperty(RDF.type, adapter);
-    adapterInstance.addProperty(Omn_lifecycle.parentTo,"http://open-multinet.info/ontology/resource/motor#Motor" );
+    adapterInstance.addProperty(Omn_lifecycle.parentTo,model.createResource("http://open-multinet.info/ontology/resource/motor#Motor"));
     adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
     adapterInstance.addProperty(RDFS.comment, "A motor garage adapter that can simulate different dynamic motor resources.");
     adapterInstance.addLiteral(MessageBusOntologyModel.maxInstances, 10);
