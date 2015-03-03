@@ -34,7 +34,7 @@ public abstract class AbstractAdapter {
     return messageModel.containsResource(getAdapterInstance());
   }
   
-  public Model getInstances(Model model) throws ProcessingException, InvalidRequestException {
+  public Model getInstances(Model model) throws ProcessingException, InvalidRequestException, InstanceNotFoundException {
     Model instancesModel = ModelFactory.createDefaultModel();
     for (Resource resource : getAdapterManagedResources()) {
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
@@ -47,6 +47,9 @@ public abstract class AbstractAdapter {
           LOGGER.log(Level.WARNING, "Could not find instance: " + instanceURI);
         }
       }
+    }
+    if(instancesModel.isEmpty()){
+      throw new InstanceNotFoundException("None of the requested instances could be found");
     }
     return instancesModel;
   }

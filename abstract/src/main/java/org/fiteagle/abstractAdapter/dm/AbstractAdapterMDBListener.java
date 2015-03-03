@@ -11,6 +11,7 @@ import javax.jms.MessageListener;
 import javax.jms.Topic;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.api.core.IMessageBus;
@@ -57,7 +58,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
               Model resultModel = adapter.getInstances(messageModel);
               adapter.notifyListeners(resultModel, MessageUtil.getJMSCorrelationID(message), IMessageBus.TYPE_INFORM, null);
             }
-          } catch(ProcessingException | InvalidRequestException e){
+          } catch(ProcessingException | InvalidRequestException | InstanceNotFoundException e){
             Message errorMessage = MessageUtil.createErrorMessage(e.getMessage(), MessageUtil.getJMSCorrelationID(message), context);
             context.createProducer().send(topic, errorMessage);
           }
