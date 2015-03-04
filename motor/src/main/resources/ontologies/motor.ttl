@@ -5,6 +5,8 @@
 @prefix motorgarage:   <http://open-multinet.info/ontology/resource/motorgarage#> .
 @prefix motor:         <http://open-multinet.info/ontology/resource/motor#> .
 @prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
+@prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
 motorgarage:MotorGarage
         a                          owl:Class ;
