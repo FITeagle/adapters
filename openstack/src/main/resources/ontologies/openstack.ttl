@@ -4,13 +4,13 @@
 @prefix omn:   <http://open-multinet.info/ontology/omn#> .
 @prefix openstack:    <http://open-multinet.info/ontology/resource/openstack#> .
 @prefix openstackvm:  <http://open-multinet.info/ontology/resource/openstackvm#> .
-@prefix omnLifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
 
 openstack:Openstack
         a                owl:Class ;
         rdfs:label       "Openstack VM Server Type "@en ;
         rdfs:subClassOf  omn:Adapter ;
-        omnLifecycle:implements   openstackvm:OpenstackVM .
+        omn-lifecycle:implements   openstackvm:OpenstackVM .
         
 openstack:images
         a      owl:AsymmetricProperty ,
@@ -26,7 +26,7 @@ openstackvm:OpenstackVM
         a                  owl:Class ;
         rdfs:label         "OpenstackVM"@en ;
         rdfs:subClassOf    omn:Resource ;
-        omnLifecycle:implementedBy  openstack:Openstack .
+        omn-lifecycle:implementedBy  openstack:Openstack .
         
 openstackvm:OpenstackImage
         a                  owl:Class ;
