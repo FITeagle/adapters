@@ -1,0 +1,13 @@
+@prefix http: <http://www.w3.org/2006/http#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tosca: <http://docs.oasis-open.org/tosca/TOSCA/v1.0/ontology/> .
+
+_:request rdf:type http:DeleteRequest .
+
+ <http://open-multinet.info/ontology/examples/topology-2888882690>
+         a       <http://open-multinet.info/ontology/omn#Topology> , <http://www.w3.org/2002/07/owl#NamedIndividual> .
+
+
+<http://localhost/resource/Tosca-1> a tosca:Tosca .
+
+

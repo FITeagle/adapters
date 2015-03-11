@@ -1,0 +1,15 @@
+@prefix http: <http://www.w3.org/2006/http#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix tosca: <http://docs.oasis-open.org/tosca/TOSCA/v1.0/ontology/> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+
+_:request rdf:type http:GetRequest .
+
+ <http://open-multinet.info/ontology/examples/ssh-360779249>
+         a        <http://opensdncore.org/ontology/ssh> ;
+         omn-lifecycle:implementedBy <http://localhost/resource/Tosca-1> .
+         
+
+<http://localhost/resource/Tosca-1> a tosca:Tosca .
+
+
