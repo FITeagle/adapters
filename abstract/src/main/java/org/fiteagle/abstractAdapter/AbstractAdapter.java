@@ -27,7 +27,8 @@ public abstract class AbstractAdapter {
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
   
   public AbstractAdapter(String adapterInstanceName){
-    Config.getInstance(adapterInstanceName);
+    Config config = new Config(adapterInstanceName);
+    config.creatPropertiesFile();
   }
   
   public boolean isRecipient(Model messageModel) {

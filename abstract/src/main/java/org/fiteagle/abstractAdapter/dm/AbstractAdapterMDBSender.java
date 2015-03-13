@@ -75,7 +75,8 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       Model messageModel = ModelFactory.createDefaultModel();
       messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
       String fileName = adapter.getAdapterInstance().getLocalName();
-      Config.getInstance(fileName).deletePropertiesFile();
+      Config config = new Config(fileName);
+      config.deletePropertiesFile();
       adapter.notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
     }
   }
