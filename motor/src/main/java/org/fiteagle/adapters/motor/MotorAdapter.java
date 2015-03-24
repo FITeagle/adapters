@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.motor;
 
+import com.hp.hpl.jena.vocabulary.OWL;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
@@ -95,7 +96,9 @@ public final class MotorAdapter extends AbstractAdapter {
     resource.addProperty(RDF.type, getAdapterManagedResources().get(0));
     resource.addProperty(RDF.type, Omn.Resource);
     resource.addProperty(RDFS.label, resource.getLocalName());
-    resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Ready);
+    Property property = resource.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
+      property.addProperty(RDF.type, OWL.FunctionalProperty);
+    resource.addProperty(property, Omn_lifecycle.Ready);
     for (Property p : motorControlProperties) {
       switch (p.getLocalName()) {
         case "rpm":
