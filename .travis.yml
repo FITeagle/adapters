@@ -14,7 +14,7 @@ cache:
   - $HOME/.m2
 after_success:
 - mvn clean test jacoco:report coveralls:report
-- find /home/travis/.m2/repository/org/fiteagle/adapters/ -name \*.war -exec curl -X POST -u $HTTP_USER:$HTTP_PASS -F "fileToUpload=@{}" https://services.av.tu-berlin.de/travis-upload/upload.php\;
+- find /home/travis/.m2/repository/org/fiteagle/adapters/ -name \*.war -exec curl -X POST -u $HTTP_USER:$HTTP_PASS -F "fileToUpload=@{}" https://services.av.tu-berlin.de/travis-upload/upload.php \;
 env:
   global:
   - secure: M9k3LnbR/aDGiRnTTlCvlVHzV/xoCJK7kiZ/XSVBVu4a58KheLwnR9y7ikM/eI47qFh5amVSolQx43IZCc017ueBMKHcTWSt0PjBwvu6JbHVt2yIsZcuFuWiWf9XXE3NVCOtdqr1LGwU+GopAeWHVyKryVyOwHCi+02EpJpo9Ic=
