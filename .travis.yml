@@ -1,15 +1,21 @@
 language: java
 jdk:
-  - oraclejdk7
+- oraclejdk7
 script:
-  - travis_retry mvn clean install site
+- travis_retry mvn clean install site
 notifications:
-  slack: av-fitt:FmLx2wj2Td3cNfmrjaQXUXBO
+  slack:
+    secure: Y5/yHI96zBI2+ab1TePfKjXkFHsQQW9v2stnD7ljzyaZmS2pZGLGYnM0FpTRVCLnHF5bdeoPWTCLBB80fdZ0dPU2Mxby7ASrs1wgagIqTlS0HiH3wEcPyIGvw5tNUtqnQLpjUc8ext3sKuedd35giM9uo1ahUWYBy1+GBtxXmGs=
   email:
-    - alexander.willner@tu-berlin.de
-    - fiteagle.dev@av.tu-berlin.de
+  - alexander.willner@tu-berlin.de
+  - fiteagle.dev@av.tu-berlin.de
 cache:
   directories:
   - $HOME/.m2
 after_success:
-  - mvn clean test jacoco:report coveralls:report
+- mvn clean test jacoco:report coveralls:report
+- find /home/travis/.m2/repository/org/fiteagle/adapters/ -name \*.war -exec curl -X POST -u $HTTP_USER:$HTTP_PASS -F "fileToUpload=@{}" https://services.av.tu-berlin.de/travis-upload/upload.php\;
+env:
+  global:
+  - secure: M9k3LnbR/aDGiRnTTlCvlVHzV/xoCJK7kiZ/XSVBVu4a58KheLwnR9y7ikM/eI47qFh5amVSolQx43IZCc017ueBMKHcTWSt0PjBwvu6JbHVt2yIsZcuFuWiWf9XXE3NVCOtdqr1LGwU+GopAeWHVyKryVyOwHCi+02EpJpo9Ic=
+  - secure: dLvp9VxMnceLRt56h1V1pHwnekyyWyjR6f/DfHZHsdCkQKAu3atu7+hJ+jjEy4pg9947KIlRZtC7hbWkIyyNdmDDOEvscLlotmUFhHLBWv+5nNZP3NTz5v1tggtiU8DrksJiHRXcXvaHq5mkgC0XJgdUJyJ8VrDcRv2kaHN6EE0=
