@@ -14,8 +14,13 @@ cache:
   - $HOME/.m2
 after_success:
 - mvn clean test jacoco:report coveralls:report
-- find /home/travis/.m2/repository/org/fiteagle/adapters/ -name \*.war -exec curl -X POST -u $HTTP_USER:$HTTP_PASS -F "fileToUpload=@{}" https://services.av.tu-berlin.de/travis-upload/upload.php \;
+- mvn deploy --settings .travis/settings.xml
+- find /home/travis/.m2/repository/org/fiteagle/adapters/ -name \*.war -exec curl
+  -X POST -u $HTTP_USER:$HTTP_PASS -F "fileToUpload=@{}" https://services.av.tu-berlin.de/travis-upload/upload.php
+  \;
 env:
   global:
   - secure: M9k3LnbR/aDGiRnTTlCvlVHzV/xoCJK7kiZ/XSVBVu4a58KheLwnR9y7ikM/eI47qFh5amVSolQx43IZCc017ueBMKHcTWSt0PjBwvu6JbHVt2yIsZcuFuWiWf9XXE3NVCOtdqr1LGwU+GopAeWHVyKryVyOwHCi+02EpJpo9Ic=
   - secure: dLvp9VxMnceLRt56h1V1pHwnekyyWyjR6f/DfHZHsdCkQKAu3atu7+hJ+jjEy4pg9947KIlRZtC7hbWkIyyNdmDDOEvscLlotmUFhHLBWv+5nNZP3NTz5v1tggtiU8DrksJiHRXcXvaHq5mkgC0XJgdUJyJ8VrDcRv2kaHN6EE0=
+  - secure: U15V6c+3whT78zNx+4hBveSI4eq2B9dCfEVl5t78izOwiaw8w7fpeLaC1/4vvp3Nl9bx/lo0ilx2uMuqVnGFrwsHu6wxWVBfx2t7DZnPxSSEcIV7+O8slnO9yOz7iPLzUcVvWMEdQMCsuxR3qVGpGeyxN16TJnvQYm+y/JjESFY=
+  - secure: u9at8zC9Y65WH/zbZFNF9B6Q+O55VULmgYWEr8EAeEhlihbvEtunvEBcFv2M+tbc/KVs80D0thHoFledovSzunn0RtkkUwH9V4/GqxbQWaITh6Kt7UI/cUjd5MTgTlmYThg4wLw1Ez7V09t21RFeZBd1p22MiVlt8WOVvWyfGqk=
