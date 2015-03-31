@@ -82,15 +82,15 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			    adapterInstances.put(adapterInstance.getURI(), this);
 				
 			    
-			    try {
-					createInstance("SSH-Adapter", testModel());
-				} catch (ProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvalidRequestException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//			    try {
+//					createInstance("SSH-Adapter", testModel());
+//				} catch (ProcessingException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (InvalidRequestException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 		}
 	  
 	  public Model testModel(){
