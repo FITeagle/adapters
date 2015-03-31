@@ -1,0 +1,11 @@
+@prefix ssh:    <http://open-multinet.info/ontology/resource/ssh#> .
+@prefix ssh-adapter:  <http://open-multinet.info/ontology/resource/ssh-adapter#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+av:SshService a ssh:SSH .
+
+av:SSHService a ssh:SSH ;
+          ssh:SSH-PubKey "PUBLIC-KEY"^^xsd:string ;
+          ssh:SSH-IP "IP-ADRESSE"^^xsd:string ;
+          
