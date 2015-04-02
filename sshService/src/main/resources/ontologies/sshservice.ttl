@@ -1,0 +1,42 @@
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+@prefix omn:           <http://open-multinet.info/ontology/omn#> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
+@prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix ssh:    <http://open-multinet.info/ontology/resource/ssh#> .
+@prefix ssh-adapter:  <http://open-multinet.info/ontology/resource/ssh-adapter#> .
+
+        
+ssh-adapter:SshAdapter
+        a      owl:AsymmetricProperty ,
+               owl:IrreflexiveProperty ,
+               owl:FunctionalProperty ,
+               owl:ObjectProperty ;
+        rdfs:range owl:Thing ;
+        rdfs:label   "Ssh-Adapter"@en ;
+        rdfs:comment "the explicit ssh adapter"@en ;
+        omn-lifecycle:implements   ssh:SSH-Access ;
+        rdfs:subClassOf  omn:Adapter .
+        
+        
+ssh:SSH-Access
+        a                owl:Class ;
+        rdfs:label       "SSH Access"@en ;
+        rdfs:domain  ssh-adapter:SshAdapter .
+        
+        
+ssh:SSH-IP
+        a      owl:DatatypeProperty ;
+        a      owl:FunctionalProperty ;
+        rdfs:label   "The IP of a server where we can get an SSH-Access"@en ;
+        rdfs:domain  ssh:SSH-Access ;
+        rdfs:range   xsd:string .
+        
+ssh:SSH-PubKey
+        a      owl:DatatypeProperty ;
+        a      owl:FunctionalProperty ;
+        rdfs:label   "The Public Key of the client"@en ;
+        rdfs:domain  ssh:SSH-Access ;
+        rdfs:range   xsd:string .
