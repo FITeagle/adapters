@@ -50,7 +50,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		  }
 		  
 		  private static void createDefaultAdapterInstance(Model adapterModel){
-		    Resource adapterInstance = adapterModel.createResource(OntologyModelUtil.getResourceNamespace()+"SshService");
+		    Resource adapterInstance = adapterModel.createResource(OntologyModelUtil.getResourceNamespace()+"PhysicalNodeAdapter-1");
 		    adapterInstance.addProperty(RDF.type, adapter);
 		    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
 		    adapterInstance.addProperty(RDFS.comment, "A SSH Adapter that can create and manage SSH-Accesses.");
@@ -80,6 +80,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			    this.adapterModel = adapterModel;
 			    this.sshService = sshService;
 			    adapterInstances.put(adapterInstance.getURI(), this);
+			    Log.fatal("NAME", OntologyModelUtil.getResourceNamespace()+"PhysicalNodeAdapter-1");
 				
 			    
 //			    try {
@@ -96,7 +97,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	  public Model testModel(){
 		  Model model = ModelFactory.createDefaultModel();
 		  Resource resource = ModelFactory.createDefaultModel().createResource("TEST-Resource");
-		  model.add(resource, model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-IP>"), "TESt-IP");
+		  model.add(resource, model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"), "TEST-USER");
 		  model.add(resource, model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"), "TESt-KEY");
 
 		  return model;
@@ -120,6 +121,11 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	
 	@Override
 	public Resource getAdapterInstance() {
+		Log.fatal("BLA", adapterInstance.toString());
+		Log.fatal("BLA", adapter.toString());
+		Log.fatal("BLA", adapterModel.toString());
+
+
 		return adapterInstance;
 	}
 
@@ -159,9 +165,9 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			pubKey = resource.getProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>")).getLiteral().getString();
 		}
 		
-		ResIterator resIteratorIP= newInstanceModel.listResourcesWithProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-IP>"));
+		ResIterator resIteratorIP= newInstanceModel.listResourcesWithProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"));
 		if(!resIteratorIP.hasNext())
-			throw new InvalidRequestException("IP address is missing");
+			throw new InvalidRequestException("Username is missing");
 		while(resIteratorIP.hasNext()){
 			Resource resource = resIteratorIP.nextResource();
 			String ip = resource.getProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-IP>")).getLiteral().getString();
