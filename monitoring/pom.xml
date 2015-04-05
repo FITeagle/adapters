@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <name>FITeagle :: Adapters :: Monitoring</name>
+  <groupId>org.fiteagle.adapters</groupId>
+  <artifactId>monitoring</artifactId>
+  <packaging>war</packaging>
+  <version>0.1-SNAPSHOT</version>
+  <parent>
+    <groupId>org.fiteagle</groupId>
+    <artifactId>adapters</artifactId>
+    <version>0.1-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.fiteagle.adapters</groupId>
+      <artifactId>abstract</artifactId>
+      <version>0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.woorea</groupId>
+      <artifactId>nova-client</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.woorea</groupId>
+      <artifactId>nova-model</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.woorea</groupId>
+      <artifactId>jersey-connector</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>com.woorea</groupId>
+      <artifactId>keystone-client</artifactId>
+      <version>3.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>3.8.7</version>
+    </dependency>
+    <dependency>
+    <groupId>com.googlecode.json-simple</groupId>
+    <artifactId>json-simple</artifactId>
+    <version>1.1.1</version>
+</dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.wildfly.plugins</groupId>
+        <artifactId>wildfly-maven-plugin</artifactId>
+        <version>${wildfly.version}</version>
+        <configuration>
+          <skip>false</skip>
+          <filename>${project.build.finalName}.war</filename>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
