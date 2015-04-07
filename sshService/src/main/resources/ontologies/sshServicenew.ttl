@@ -1,0 +1,44 @@
+
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix omn:   <http://open-multinet.info/ontology/omn#> .
+@prefix geo:   <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix omn-resource: <http://open-multinet.info/ontology/omn-resource#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<http://open-multinet.info/example#request>
+        a                omn-lifecycle:Request ;
+        omn:hasResource  <http://open-multinet.info/example#my-raw-pc-1> .
+
+<http://open-multinet.info/example#my-raw-pc-1>
+        a                            <http://open-multinet.info/ontology/omn-domain-pc#PC> , omn-resource:Node ;
+        omn:hasService               [ a       <http://open-multinet.info/ontology/omn-service#InstallService> ;
+                                       <http://open-multinet.info/ontology/omn-service#installPath>
+                                               "~/logos" ;
+                                       <http://open-multinet.info/ontology/omn-service#url>
+                                               "http://www.fed4fire.eu/wp-content/uploads/2014/11/fed4fire-logo.jpg"
+                                     ] ;
+        omn:hasService               [ a       <http://open-multinet.info/ontology/omn-service#InstallService> ;
+                                       <http://open-multinet.info/ontology/omn-service#installPath>
+                                               "~/logos" ;
+                                       <http://open-multinet.info/ontology/omn-service#url>
+                                               "http://fiteagle.org/images/logo_fiteagle.png"
+                                     ] ;
+        omn:hasService               [ a       <http://open-multinet.info/ontology/omn-service#ExecuteService> ;
+                                       <http://open-multinet.info/ontology/omn-service#command>
+                                               "time" ;
+                                       <http://open-multinet.info/ontology/omn-service#shell>
+                                               "sh"
+                                     ] ;
+        omn:hasService               [ a       <http://open-multinet.info/ontology/omn-service#ExecuteService> ;
+                                       <http://open-multinet.info/ontology/omn-service#command>
+                                               "df -h ~/logos" ;
+                                       <http://open-multinet.info/ontology/omn-service#shell>
+                                               "sh"
+                                     ] ;
+        omn:isResourceOf             <http://open-multinet.info/example#request> ;
+        omn-lifecycle:hasID          "my-raw-pc-1" ;
+        omn-lifecycle:implementedBy  <https://localhost:8443/resource/physicalnode-1> ;
+        omn-resource:isExclusive     true .

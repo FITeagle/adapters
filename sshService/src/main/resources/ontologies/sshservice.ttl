@@ -25,7 +25,14 @@ ssh:SSH-Access
         a                owl:Class ;
         rdfs:label       "SSH Access"@en ;
         rdfs:domain  ssh-adapter:SshAdapter .
-        
+     
+     
+ssh:SSH-Username
+        a      owl:DatatypeProperty ;
+        a      owl:FunctionalProperty ;
+        rdfs:label   "The Username of the future SSH-Account"@en ;
+        rdfs:domain  ssh:SSH-Access ;
+        rdfs:range   xsd:string .        
         
 ssh:SSH-IP
         a      owl:DatatypeProperty ;
