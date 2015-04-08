@@ -13,6 +13,7 @@ import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.adapters.sshService.*;
+import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
@@ -75,30 +76,34 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		  
 		  private SshServiceAdapter(Resource adapterInstance, Model adapterModel,SshService sshService) {
 			  super(adapterInstance.getLocalName());
-
+			  
+				Config config = new Config("PhysicalNodeAdapter-1");
+				String password= "123456";
+				config.setNewProperty("password", password);
+				
 			    this.adapterInstance = adapterInstance;
 			    this.adapterModel = adapterModel;
 			    this.sshService = sshService;
 			    adapterInstances.put(adapterInstance.getURI(), this);
-			    Log.fatal("NAME", OntologyModelUtil.getResourceNamespace()+"PhysicalNodeAdapter-1");
+//			    Log.fatal("NAME", OntologyModelUtil.getResourceNamespace()+"PhysicalNodeAdapter-1");
 				
 			    
-//			    try {
-//					createInstance("SSH-Adapter", testModel());
-//				} catch (ProcessingException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				} catch (InvalidRequestException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
+			    try {
+					createInstance("SSH-Adapter", testModel());
+				} catch (ProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvalidRequestException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 	  
 	  public Model testModel(){
 		  Model model = ModelFactory.createDefaultModel();
 		  Resource resource = ModelFactory.createDefaultModel().createResource("TEST-Resource");
-		  model.add(resource, model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"), "TEST-USER");
-		  model.add(resource, model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"), "TESt-KEY");
+		  model.add(resource, model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"), "testuseralaa");
+		  model.add(resource, model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"), "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDa6JqlE8UOyTagtS91f2Z5DtamUgyMnRZdyliZDXoL6O3jdoVPnernYvrzaRlW1YBPiuPxmv/S7Q7fvXL8CY3ntxGpOHER6EZIUOdHVp/Nu3BFhjJ40Zk/y5geQeJy6NXMqzATkmGGGV9QlGzirC5z2aUHY1UQhWmsE+3zUbw0P6Ic5tH0TcO/zDLY9L5MQwjx5537Q7mskeNaiTLjDZ2jD5wFEQAfNmYJydyyNzwvTNovEgkk2R8usaxH2qtBmmvkkrWdzgOQYsaCGEeHCmSP3FNKyxzymdQnPQetu/BpyBT3YU7zE04HA44Uua4+AjbhDBofPjK89uI1gxQ7a5rh alaa.alloush@air");
 
 		  return model;
 	  }
@@ -121,11 +126,11 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	
 	@Override
 	public Resource getAdapterInstance() {
-		Log.fatal("BLA", adapterInstance.toString());
-		Log.fatal("BLA", adapter.toString());
-		Log.fatal("BLA", adapterModel.toString());
+//		Log.fatal("BLA", adapterInstance.toString());
+//		Log.fatal("BLA", adapter.toString());
+//		Log.fatal("BLA", adapterModel.toString());
 
-
+		Log.fatal("AdapterName", adapterInstance.getURI());
 		return adapterInstance;
 	}
 
@@ -154,12 +159,12 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 	@Override
 	public Model createInstance(String instanceURI, Model newInstanceModel)throws ProcessingException, InvalidRequestException {
-		Log.fatal("MODEL",newInstanceModel.toString());
+//		Log.fatal("MODEL",newInstanceModel.toString());
 		String pubKey = null;
 		
 		ResIterator resIteratorKey= newInstanceModel.listResourcesWithProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"));
 		if(!resIteratorKey.hasNext())
-			throw new InvalidRequestException("Public Key is missing");
+			throw new InvalidRequestException("Public Key is missing ");
 		while(resIteratorKey.hasNext()){
 			Resource resource = resIteratorKey.nextResource();
 			pubKey = resource.getProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>")).getLiteral().getString();
@@ -170,7 +175,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			throw new InvalidRequestException("Username is missing");
 		while(resIteratorIP.hasNext()){
 			Resource resource = resIteratorIP.nextResource();
-			String ip = resource.getProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-IP>")).getLiteral().getString();
+			String ip = resource.getProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>")).getLiteral().getString();
 		sshService.addSshAccess(ip, pubKey);
 		}
 
