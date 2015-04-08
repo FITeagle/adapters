@@ -17,7 +17,6 @@ public class SshServiceAdapterREST extends AbstractAdapterREST {
   
   @Override
   protected Map<String, AbstractAdapter> getAdapterInstances() {
-	  Log.fatal("Instances", SshServiceAdapter.adapterInstances.toString());
     return SshServiceAdapter.adapterInstances;
   }
   

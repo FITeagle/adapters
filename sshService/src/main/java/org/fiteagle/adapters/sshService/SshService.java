@@ -109,15 +109,13 @@ private String setNewUser(String newUsername){
 	Process p;
 	try {
 		String setPWString = "echo '" + password + "' | sudo -kS passwd "+newUsername;
-		String addUserString ="echo '" + password + "' | sudo -kS adduser "+newUsername;
-		String [] addUserCMD ={"/bin/sh","-c",addUserString,"123456","123456","","","","","","j"};
+		String addUserString ="echo '" + password + "' | sudo -kS adduser --disabled-password --gecos \"\" " + newUsername;
+		String [] addUserCMD ={"/bin/sh","-c",addUserString};
 		String[] setPWCMD = {"/bin/sh","-c",setPWString,newUsername,newUsername};
 		
 		p = Runtime.getRuntime().exec(addUserCMD);
 		p.waitFor();
 		
-		p = Runtime.getRuntime().exec(setPWCMD);
-
 		BufferedReader reader = 
 	            new BufferedReader(new InputStreamReader(p.getInputStream()));
 
@@ -146,10 +144,6 @@ private String setNewUser(String newUsername){
 		
 		String [] serverCMD ={"/bin/sh","-c","dpkg -s openssh-server | grep -c installed"};
 		
-//		String addUserString ="echo '" + password + "' | sudo -kS adduser "+newUser;
-//		String [] addUserCMD ={"/bin/sh","-c",addUserString,"123456","123456","","","","","","j"};
-//		// TODO Check if User can login via SSH allthough user-account has now PW, if not, set via $passwd
-		
 		
 		String addSshString = "echo '" + password + "' | sudo -kS mkdir -pm 0777 /home/"+newUser+"/.ssh";
 		String [] addSshCMD ={"/bin/sh","-c",addSshString};
@@ -166,19 +160,25 @@ private String setNewUser(String newUsername){
 		String chOwnString = "echo '" + password + "' | sudo -kS chown -R "+ newUser +" /home/"+newUser+"/.ssh";
 		String [] chOwnStringCMD ={"/bin/sh","-c",chOwnString};
 		
-//		String setPWString = "echo '" + password + "' | sudo -kS passwd "+newUser;
-//		String [] setPWCMD ={"/bin/sh","-c",setPWString};
-		
-		Log.fatal("OPEN-SSH", executeCommand(serverCMD));
+		Log.info("OPEN-SSH","Checking if OpenSSH-Server is installed" );
+		executeCommand(serverCMD);
 		if(executeCommand(serverCMD).contains("1")){
-//			Log.fatal("ADD-USER", executeCommand(addUserCMD));
-			Log.fatal("ADD-KEY", setNewUser(newUser));
-			Log.fatal("ADD-KEY", executeCommand(addSshCMD));
-			Log.fatal("ADD-SSH", executeCommand(addSshKeyCMD));
-			Log.fatal("ADD-SSH", executeCommand(chMod600CMD));
-			Log.fatal("ADD-SSH", executeCommand(chMod700CMD));
-			Log.fatal("ADD-SSH", executeCommand(chOwnStringCMD));
-//			Log.fatal("ADD-SSH", executeCommand(setPWCMD));
+			Log.info("SSH","Creating new User for SSH");
+			setNewUser(newUser);
+			
+			Log.info("SSH","Creating .ssh folder" );
+			executeCommand(addSshCMD);
+			
+			Log.info("SSH","Adding Public Key to 'authorized_keys'" );
+			executeCommand(addSshKeyCMD);
+			
+			Log.info("SSH", "Changing file and directory rights");
+			executeCommand(chMod600CMD);
+			executeCommand(chMod700CMD);
+			executeCommand(chOwnStringCMD);
+		}else {
+			Log.fatal("SSH", "No OpenSSH-Server installed, pls install it with:");
+			Log.fatal("SSH", "$sudo apt-get install openssh-server");
 		}
 	
 		

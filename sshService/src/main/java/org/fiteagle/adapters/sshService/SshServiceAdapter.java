@@ -3,6 +3,7 @@ package org.fiteagle.adapters.sshService;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -84,19 +85,17 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			    this.adapterInstance = adapterInstance;
 			    this.adapterModel = adapterModel;
 			    this.sshService = sshService;
-			    adapterInstances.put(adapterInstance.getURI(), this);
-//			    Log.fatal("NAME", OntologyModelUtil.getResourceNamespace()+"PhysicalNodeAdapter-1");
-				
+			    adapterInstances.put(adapterInstance.getURI(), this);				
 			    
-			    try {
-					createInstance("SSH-Adapter", testModel());
-				} catch (ProcessingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvalidRequestException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//			    try {
+//					createInstance("SSH-Adapter", testModel());
+//				} catch (ProcessingException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (InvalidRequestException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 		}
 	  
 	  public Model testModel(){
@@ -126,11 +125,6 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	
 	@Override
 	public Resource getAdapterInstance() {
-//		Log.fatal("BLA", adapterInstance.toString());
-//		Log.fatal("BLA", adapter.toString());
-//		Log.fatal("BLA", adapterModel.toString());
-
-		Log.fatal("AdapterName", adapterInstance.getURI());
 		return adapterInstance;
 	}
 
@@ -159,27 +153,31 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 	@Override
 	public Model createInstance(String instanceURI, Model newInstanceModel)throws ProcessingException, InvalidRequestException {
-//		Log.fatal("MODEL",newInstanceModel.toString());
-		String pubKey = null;
-		
-		ResIterator resIteratorKey= newInstanceModel.listResourcesWithProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"));
-		if(!resIteratorKey.hasNext())
-			throw new InvalidRequestException("Public Key is missing ");
-		while(resIteratorKey.hasNext()){
-			Resource resource = resIteratorKey.nextResource();
-			pubKey = resource.getProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>")).getLiteral().getString();
-		}
-		
-		ResIterator resIteratorIP= newInstanceModel.listResourcesWithProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"));
-		if(!resIteratorIP.hasNext())
-			throw new InvalidRequestException("Username is missing");
-		while(resIteratorIP.hasNext()){
-			Resource resource = resIteratorIP.nextResource();
-			String ip = resource.getProperty(newInstanceModel.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>")).getLiteral().getString();
-		sshService.addSshAccess(ip, pubKey);
-		}
+		String pubKey = "";
+		String userName = "";
+		  Model model = ModelFactory.createDefaultModel();
 
-		return null;
+		
+		ResIterator resIteratorKey= newInstanceModel.listSubjects();
+		if(!resIteratorKey.hasNext())
+			throw new InvalidRequestException("statements are missing ");
+		while(resIteratorKey.hasNext()){
+			
+			Resource resource = resIteratorKey.nextResource();
+			if(!resource.hasProperty(MessageBusOntologyModel.hasPublicKey))
+				throw new InvalidRequestException("public key is missing ");
+			else {
+				pubKey = resource.getProperty(MessageBusOntologyModel.hasPublicKey).getLiteral().getString();
+			}
+			if(!resource.hasProperty(MessageBusOntologyModel.hasUserName))
+				throw new InvalidRequestException("user name is missing ");
+			else {
+				userName = resource.getProperty(MessageBusOntologyModel.hasUserName).getLiteral().getString();
+			}
+		}
+		sshService.addSshAccess(userName, pubKey);
+
+		return model;
 	}
 
 	@Override
