@@ -13,7 +13,7 @@ import javax.jms.Topic;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
-import org.fiteagle.adapters.monitoring.MonitoringAdapter;
+import org.fiteagle.adapters.monitoring.MonitoringService;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
@@ -34,19 +34,19 @@ import com.hp.hpl.jena.vocabulary.RDF;
     @ActivationConfigProperty(propertyName = "messageSelector", propertyValue = IMessageBus.METHOD_TYPE+" = '"+IMessageBus.TYPE_INFORM+"'"),
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 
-public class MonitoringAdapterMDBListener extends AbstractAdapterMDBListener {
+public class MonitoringServiceMDBListener extends AbstractAdapterMDBListener {
 	@Inject
 	private JMSContext context;
 	@javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
     private Topic topic;
-	private MonitoringAdapter adapter = MonitoringAdapter.getInstance() ; 
+	private MonitoringService adapter = MonitoringService.getInstance() ; 
 	
-	private static Logger LOGGER = Logger.getLogger(MonitoringAdapterMDBListener.class.toString());
+	private static Logger LOGGER = Logger.getLogger(MonitoringServiceMDBListener.class.toString());
 	
 	@Override
 	protected Map<String, AbstractAdapter> getAdapterInstances() {
 		// TODO Auto-generated method stub
-		return MonitoringAdapter.adapterInstances;
+		return MonitoringService.adapterInstances;
 	}
 	
 	@Override

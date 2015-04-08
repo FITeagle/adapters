@@ -2,6 +2,7 @@ package org.fiteagle.adapters.monitoring;
 
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_component;
+import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle_v2;
@@ -34,26 +35,22 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import org.fiteagle.adapters.monitoring.openstack.OpenstackClient;
 import org.fiteagle.adapters.monitoring.sql.SQLite;
 
-public final class MonitoringAdapter {
+public final class MonitoringService {
 	
   public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
-  private static Logger LOGGER = Logger.getLogger(MonitoringAdapter.class.toString());  
-  private static MonitoringAdapter monitoringAdapterSingleton ;
+  private static Logger LOGGER = Logger.getLogger(MonitoringService.class.toString());  
+  private static MonitoringService monitoringAdapterSingleton ;
 
-  private String prop_vmid = "http://open-multinet.info/ontology/omn-domain-pc#hasVMID" ;
-  private String type_vm = "http://open-multinet.info/ontology/omn-domain-pc#VM" ;
-  private String type_omsp = "http://open-multinet.info/ontology/omn-monitoring#OMSPService" ;
-  private String prop_usesService = "http://open-multinet.info/ontology/omn-lifecycle#usesService" ;
   
   private String vm_id = null ;
   private String oml_uri = null ;
   private String host = null ;
  
-  public static MonitoringAdapter getInstance() {
+  public static MonitoringService getInstance() {
 		if (monitoringAdapterSingleton != null){
 			return monitoringAdapterSingleton;
 		}
-		else return new MonitoringAdapter();
+		else return new MonitoringService();
   }
 
   public void handleInform(Model model){
@@ -62,9 +59,8 @@ public final class MonitoringAdapter {
 	while(resIterator.hasNext()){
 		boolean createOk = false, deleteOk = false ;
 		Resource r = resIterator.nextResource();
-		System.out.println("In handleInform(): Resource: " + r.toString()) ;
 		
-		if(r.hasProperty(RDF.type, type_vm) && r.hasProperty(model.getProperty(prop_vmid))){	// if resource is vm
+		if(r.hasProperty(RDF.type, Omn_domain_pc.VM) && r.hasProperty(Omn_domain_pc.hasVMID)){	// if resource is vm
 			if(r.hasProperty(Omn_lifecycle.hasState, Omn_lifecycle.Started)){
 				createOk = handleCreate(model, r) ;
 			}
@@ -80,23 +76,25 @@ public final class MonitoringAdapter {
 		
 		if(createOk && !deleteOk ){
 			SQLite sql = new SQLite() ;
-			sql.insert(vm_id, host, oml_uri) ;
-			System.out.println("Data successfully added to database.") ;
+			if(sql.insert(vm_id, host, oml_uri)) System.out.println("Data successfully added to database.") ;
 		}else if(!createOk && deleteOk){
 			SQLite sql = new SQLite() ;
-			sql.delete(vm_id) ;
-			System.out.println("Data successfully deleted to database.") ;
+			if(sql.delete(vm_id)) System.out.println("Data successfully deleted to database.") ;
 		}
 	}
   }
   
   private boolean handleCreate(Model model, Resource r){
-	  vm_id = r.getProperty(model.getProperty(prop_vmid)).getLiteral().getString() ;
-	  if(r.hasProperty((model.getProperty(prop_usesService)))){
-		  Resource service = r.getProperty(model.getProperty(prop_usesService)).getResource() ;
-		  if(service.hasProperty(RDF.type, type_omsp) && service.hasProperty(Omn.hasEndpoint)){
+	  vm_id = r.getProperty(Omn_domain_pc.hasVMID).getLiteral().getString() ;
+	  if(r.hasProperty(Omn_lifecycle.usesService)){
+		  Resource service = r.getProperty(Omn_lifecycle.usesService).getResource() ;
+		  if(service.hasProperty(RDF.type, Omn_monitoring.OMSPService) && service.hasProperty(Omn.hasEndpoint)){
 			  oml_uri = service.getProperty(Omn.hasEndpoint).getLiteral().getString() ;
 			  host = new OpenstackClient().getHostName(vm_id) ; 
+			  if(host == null){
+				  LOGGER.log(Level.INFO, "Host not found. Ignoring...") ;
+				  return false ;
+			  }
 		  }else{
 //			  LOGGER.log(Level.INFO, "Not monitoring-related resource: OML Collector URI not found. Ignoring...") ;
 			  return false ;
@@ -110,7 +108,7 @@ public final class MonitoringAdapter {
   }
   
   private boolean handleDelete(Model model, Resource r){
-	  vm_id = r.getProperty(model.getProperty(prop_vmid)).getLiteral().getString() ;
+	  vm_id = r.getProperty(Omn_domain_pc.hasVMID).getLiteral().getString() ;
 	  if (vm_id != null) return true ; else return false ;
   }
 }
