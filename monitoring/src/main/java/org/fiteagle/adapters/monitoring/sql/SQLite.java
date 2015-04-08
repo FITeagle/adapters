@@ -94,22 +94,27 @@ public class SQLite {
     	}
 	}
 	
-	public void insert(String vm_id, String host, String oml_uri){
+	public boolean insert(String vm_id, String host, String oml_uri){
 		try{
 			 if(createTable()){
 				 executeStmt("insert into virtual_physical_map (resource_id, host_name, collector_uri) values (\"" + vm_id + "\",\"" + host + "\",\"" + oml_uri + "\")");
-			 }   
+			 }
+			 return true ;
 		 }catch(SQLException e){
+			 e.getStackTrace();
 			 LOGGER.log(Level.WARNING, "Error inserting to database.");
+			 return false ;
 		 } 
 	}
 	
-	public void delete(String vm_id){
+	public boolean delete(String vm_id){
 		try{
-			executeStmt("delete from virtual_physical_map where vm_id = \"" + vm_id);
-		
+			executeStmt("delete from virtual_physical_map where resource_id = \"" + vm_id + "\"");
+			return true ;
 		 }catch(SQLException e){
+			 e.getStackTrace();
 			 LOGGER.log(Level.WARNING, "Error deleting from database.");
+			 return false ;
 		 } 
 	}
 	
