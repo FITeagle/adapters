@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 
+import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
@@ -194,7 +195,7 @@ public abstract class AbstractAdapterREST {
   }
 
   private AbstractAdapter getAdapterInstance(String adapterName) {
-    AbstractAdapter adapter = getAdapterInstances().get(OntologyModelUtil.getLocalNamespace()+adapterName);
+    AbstractAdapter adapter = getAdapterInstances().get(OntologyModelUtil.getResourceNamespace()+adapterName);
     if(adapter == null){
       throw new AdapterWebApplicationException(Status.NOT_FOUND, "The adapter instance "+adapterName+" could not be found");
     }
