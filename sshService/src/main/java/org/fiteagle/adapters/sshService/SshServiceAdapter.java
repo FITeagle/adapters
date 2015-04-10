@@ -3,6 +3,7 @@ package org.fiteagle.adapters.sshService;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -89,32 +90,23 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		this.sshService = sshService;
 		adapterInstances.put(adapterInstance.getURI(), this);
 
-		// try {
-		// createInstance("SSH-Adapter", testModel());
-		// } catch (ProcessingException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (InvalidRequestException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
 	}
 
-	public Model testModel() {
-		Model model = ModelFactory.createDefaultModel();
-		Resource resource = ModelFactory.createDefaultModel().createResource(
-				"TEST-Resource");
-		model.add(
-				resource,
-				model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"),
-				"testuseralaa");
-		model.add(
-				resource,
-				model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"),
-				"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDa6JqlE8UOyTagtS91f2Z5DtamUgyMnRZdyliZDXoL6O3jdoVPnernYvrzaRlW1YBPiuPxmv/S7Q7fvXL8CY3ntxGpOHER6EZIUOdHVp/Nu3BFhjJ40Zk/y5geQeJy6NXMqzATkmGGGV9QlGzirC5z2aUHY1UQhWmsE+3zUbw0P6Ic5tH0TcO/zDLY9L5MQwjx5537Q7mskeNaiTLjDZ2jD5wFEQAfNmYJydyyNzwvTNovEgkk2R8usaxH2qtBmmvkkrWdzgOQYsaCGEeHCmSP3FNKyxzymdQnPQetu/BpyBT3YU7zE04HA44Uua4+AjbhDBofPjK89uI1gxQ7a5rh alaa.alloush@air");
-
-		return model;
-	}
+//	public Model testModel() {
+//		Model model = ModelFactory.createDefaultModel();
+//		Resource resource = ModelFactory.createDefaultModel().createResource(
+//				"TEST-Resource");
+//		model.add(
+//				resource,
+//				model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"),
+//				"testuseralaa");
+//		model.add(
+//				resource,
+//				model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"),
+//				"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDa6JqlE8UOyTagtS91f2Z5DtamUgyMnRZdyliZDXoL6O3jdoVPnernYvrzaRlW1YBPiuPxmv/S7Q7fvXL8CY3ntxGpOHER6EZIUOdHVp/Nu3BFhjJ40Zk/y5geQeJy6NXMqzATkmGGGV9QlGzirC5z2aUHY1UQhWmsE+3zUbw0P6Ic5tH0TcO/zDLY9L5MQwjx5537Q7mskeNaiTLjDZ2jD5wFEQAfNmYJydyyNzwvTNovEgkk2R8usaxH2qtBmmvkkrWdzgOQYsaCGEeHCmSP3FNKyxzymdQnPQetu/BpyBT3YU7zE04HA44Uua4+AjbhDBofPjK89uI1gxQ7a5rh alaa.alloush@air");
+//
+//		return model;
+//	}
 
 	public SshServiceAdapter(String adapterInstanceName) {
 		super(adapterInstanceName);
@@ -173,18 +165,18 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		while (resIteratorKey.hasNext()) {
 
 			Resource resource = resIteratorKey.nextResource();
-			if (!resource.hasProperty(MessageBusOntologyModel.hasPublicKey))
+			if (!resource.hasProperty(Omn_service.publickey))
 				throw new InvalidRequestException("public key is missing ");
 			else {
 				pubKey = resource
-						.getProperty(MessageBusOntologyModel.hasPublicKey)
+						.getProperty(Omn_service.publickey)
 						.getLiteral().getString();
 			}
-			if (!resource.hasProperty(MessageBusOntologyModel.hasUserName))
+			if (!resource.hasProperty(Omn_service.username))
 				throw new InvalidRequestException("user name is missing ");
 			else {
 				userName = resource
-						.getProperty(MessageBusOntologyModel.hasUserName)
+						.getProperty(Omn_service.username)
 						.getLiteral().getString();
 			}
 		}
