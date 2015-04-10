@@ -152,19 +152,27 @@ public class SshService {
 				+ newUser + " ~/../" + newUser + "/.ssh";
 		String[] chOwnStringCMD = { "/bin/sh", "-c", chOwnString };
 
-		Log.info("SSH", "Creating new User for SSH");
-		setNewUser(newUser);
+		Log.fatal("Linux-Test", "test");
+		if(executeCommand("uname -s").contains("Linux")){
+			Log.info("SSH", "Creating new User for SSH");
+			setNewUser(newUser);
 
-		Log.info("SSH", "Creating .ssh folder");
-		executeCommand(addSshCMD);
+			Log.info("SSH", "Creating .ssh folder");
+			executeCommand(addSshCMD);
 
-		Log.info("SSH", "Adding Public Key to 'authorized_keys'");
-		executeCommand(addSshKeyCMD);
+			Log.info("SSH", "Adding Public Key to 'authorized_keys'");
+			executeCommand(addSshKeyCMD);
 
-		Log.info("SSH", "Changing file and directory rights");
-		executeCommand(chMod600CMD);
-		executeCommand(chMod700CMD);
-		executeCommand(chOwnStringCMD);
+			Log.info("SSH", "Changing file and directory rights");
+			executeCommand(chMod600CMD);
+			executeCommand(chMod700CMD);
+			executeCommand(chOwnStringCMD);
+			
+			
+		}if (executeCommand("uname -s").contains("Darwin")) {
+			Log.fatal("MAC", "Mac is not supported by now");
+		}
+
 
 		// String rootstring = "echo '" + password + "' | sudo -kSs";
 		// String [] rootCMD ={"/bin/sh","-c",rootstring};
