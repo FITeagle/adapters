@@ -15,7 +15,7 @@ cache:
 after_success:
 - mvn clean test jacoco:report coveralls:report
 - mvn deploy --settings .travis/settings.xml
-- http://trescimo.av.tu-berlin.de/static/trigger.php?c=fiteagle
+- curl http://trescimo.av.tu-berlin.de/static/trigger.php?c=fiteagle
 env:
   global:
   - secure: P88CX0ze2VuMDe7HZYeMdMbiqtWlTN1ackf12SRFO8zFY6S1/uRuR2PnaKq4egyVh0get8Igi+3zAGwPGLGz3eVCpZlRxbNkNUi7eS1EhLQN3gJJNuf906zCfKNMeNJEh0X2/d2lWaxJlvvUDnjcOp8XWZ3kn5OSIC2Kq/J7y7U=
