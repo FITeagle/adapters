@@ -126,6 +126,65 @@ public class SshService {
 
 		return output.toString();
 	}
+	
+	private String setNewUserMac(String newUsername) {
+
+		if (password == null) {
+			password = config.getProperty("password");
+		}
+		String mypassword = password;
+		String fullname = "John Smith3";
+		String userpwd = "password3";
+		String username = "johnsmith3";
+		String output = "";
+		
+		Log.info("SSH", "Find out next UniqueID");
+		String cmd1String = "MAXID=$(dscl . -list /Users UniqueID | awk \'{print $2}\' | sort -ug | tail -1)";
+		String[] cmd1 = { "/bin/sh", "-c", cmd1String };
+		output += executeCommand(cmd1);
+		
+		Log.info("SSH", "Get next UniqueID");
+		String cmd2String = "USERID=$((MAXID+1))";
+		String[] cmd2 = { "/bin/sh", "-c", cmd2String };
+		output += executeCommand(cmd2);
+		
+		Log.info("SSH", "Create new user entry");
+		String cmd3String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username;
+		String[] cmd3 = { "/bin/sh", "-c", cmd3String };
+		output += executeCommand(cmd3);
+		
+		Log.info("SSH", "Set shell property to bash");
+		String cmd4String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/"+ username +" UserShell /bin/bash";
+		String[] cmd4 = { "/bin/sh", "-c", cmd4String };
+		output += executeCommand(cmd4);
+		
+		Log.info("SSH", "Set users full name");
+		String cmd5String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " RealName \"" + fullname + "\"";
+		String[] cmd5 = { "/bin/sh", "-c", cmd5String };
+		output += executeCommand(cmd5);
+		
+		Log.info("SSH", "Set users UniqueID");
+		String cmd6String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " UniqueID \"$USERID\"";
+		String[] cmd6 = { "/bin/sh", "-c", cmd6String };
+		output += executeCommand(cmd6);
+		
+		Log.info("SSH", "Set users primary group");
+		String cmd7String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " PrimaryGroupID 1000";
+		String[] cmd7 = { "/bin/sh", "-c", cmd7String };
+		output += executeCommand(cmd7);
+		
+		Log.info("SSH", "Set users home directory");
+		String cmd8String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " NFSHomeDirectory /Local/Users/"+username;
+		String[] cmd8 = { "/bin/sh", "-c", cmd8String };
+		output += executeCommand(cmd8);
+		
+		Log.info("SSH", "Set users password");
+		String cmd9String = "echo "+ mypassword +" | sudo -kS dscl . -passwd /Users/" + username + " " + userpwd;
+		String[] cmd9 = { "/bin/sh", "-c", cmd9String };
+		output += executeCommand(cmd9);
+		
+		return output;
+	}
 
 	public void addSshAccess(String newUser, String publicKey) {
 		if (password == null) {
@@ -170,7 +229,20 @@ public class SshService {
 			
 			
 		}if (executeCommand("uname -s").contains("Darwin")) {
-			Log.fatal("MAC", "Mac is not supported by now");
+			// Log.fatal("MAC", "Mac is not supported by now");
+			Log.info("SSH", "Creating new User for SSH");
+			setNewUserMac(newUser);
+
+			Log.info("SSH", "Creating .ssh folder");
+			executeCommand(addSshCMD);
+
+			Log.info("SSH", "Adding Public Key to 'authorized_keys'");
+			executeCommand(addSshKeyCMD);
+
+			Log.info("SSH", "Changing file and directory rights");
+			executeCommand(chMod600CMD);
+			executeCommand(chMod700CMD);
+			executeCommand(chOwnStringCMD);
 		}
 
 
