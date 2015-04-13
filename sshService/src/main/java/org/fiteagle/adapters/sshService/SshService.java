@@ -133,20 +133,10 @@ public class SshService {
 			password = config.getProperty("password");
 		}
 		String mypassword = password;
-		String fullname = "John Smith3";
-		String userpwd = "password3";
-		String username = "johnsmith3";
+		String fullname = "Alex Neu";
+		String userpwd = "password";
+		String username = newUsername;
 		String output = "";
-		
-		Log.info("SSH", "Find out next UniqueID");
-		String cmd1String = "MAXID=$(dscl . -list /Users UniqueID | awk \'{print $2}\' | sort -ug | tail -1)";
-		String[] cmd1 = { "/bin/sh", "-c", cmd1String };
-		output += executeCommand(cmd1);
-		
-		Log.info("SSH", "Get next UniqueID");
-		String cmd2String = "USERID=$((MAXID+1))";
-		String[] cmd2 = { "/bin/sh", "-c", cmd2String };
-		output += executeCommand(cmd2);
 		
 		Log.info("SSH", "Create new user entry");
 		String cmd3String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username;
@@ -164,7 +154,7 @@ public class SshService {
 		output += executeCommand(cmd5);
 		
 		Log.info("SSH", "Set users UniqueID");
-		String cmd6String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " UniqueID \"$USERID\"";
+		String cmd6String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " UniqueID \"$(($(dscl . -list /Users UniqueID | awk '{print $2}' | sort -ug | tail -1)+1))\"";
 		String[] cmd6 = { "/bin/sh", "-c", cmd6String };
 		output += executeCommand(cmd6);
 		
