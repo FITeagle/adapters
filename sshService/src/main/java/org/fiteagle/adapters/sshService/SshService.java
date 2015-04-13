@@ -211,7 +211,10 @@ public class SshService {
 				+ newUser + " ~/../" + newUser + "/.ssh";
 		String[] chOwnStringCMD = { "/bin/sh", "-c", chOwnString };
 
-		Log.fatal("Linux-Test", "test");
+		String chOwnStringMac = "echo '" + password + "' | sudo -kS chown -Rv "
+				+ newUser + " ~/../" + newUser + "/.ssh";
+		String[] chOwnStringMacCMD = { "/bin/sh", "-c", chOwnString };
+		
 		if(executeCommand("uname -s").contains("Linux")){
 			Log.info("SSH", "Creating new User for SSH");
 			setNewUser(newUser);
@@ -228,7 +231,7 @@ public class SshService {
 			executeCommand(chOwnStringCMD);
 			
 			
-		}if (executeCommand("uname -s").contains("Darwin")) {
+		}else if (executeCommand("uname -s").contains("Darwin")) {
 			// Log.fatal("MAC", "Mac is not supported by now");
 			Log.info("SSH", "Creating new User for SSH");
 			setNewUserMac(newUser);
@@ -242,7 +245,9 @@ public class SshService {
 			Log.info("SSH", "Changing file and directory rights");
 			executeCommand(chMod600CMD);
 			executeCommand(chMod700CMD);
-			executeCommand(chOwnStringCMD);
+			executeCommand(chOwnStringMacCMD);
+		}else{
+			Log.fatal("SSH", "Your OS is not supported yet");
 		}
 
 
