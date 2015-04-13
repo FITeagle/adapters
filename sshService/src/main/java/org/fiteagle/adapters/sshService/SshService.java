@@ -213,7 +213,7 @@ public class SshService {
 
 		String chOwnStringMac = "echo '" + password + "' | sudo -kS chown -Rv "
 				+ newUser + " ~/../" + newUser + "/.ssh";
-		String[] chOwnStringMacCMD = { "/bin/sh", "-c", chOwnString };
+		String[] chOwnStringMacCMD = { "/bin/sh", "-c", chOwnStringMac };
 		
 		if(executeCommand("uname -s").contains("Linux")){
 			Log.info("SSH", "Creating new User for SSH");
