@@ -10,16 +10,11 @@
 
         
 ssh-adapter:SshAdapter
-        a      owl:AsymmetricProperty ,
-               owl:IrreflexiveProperty ,
-               owl:FunctionalProperty ,
-               owl:ObjectProperty ,
-               owl:Class ;
-        rdfs:range owl:Thing ;
-        rdfs:label   "Ssh-Adapter"@en ;
-        rdfs:comment "the explicit ssh adapter"@en ;
+        a                          owl:Class ;
+        rdfs:label                 "Ssh-Adapter"@en ;
+        rdfs:comment               "the explicit ssh adapter"@en ;
         omn-lifecycle:implements   ssh:SshService ;
-        rdfs:subClassOf  omn:Adapter .
+        rdfs:subClassOf            omn:Adapter .
         
         
 ssh:SshService
