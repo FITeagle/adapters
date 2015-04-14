@@ -139,37 +139,37 @@ public class SshService {
 		String output = "";
 		
 		Log.info("SSH", "Create new user entry");
-		String cmd3String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username;
+		String cmd3String = "echo "+ mypassword +" | sudo -kS dscl . create /Users/" + username;
 		String[] cmd3 = { "/bin/sh", "-c", cmd3String };
 		output += executeCommand(cmd3);
 		
 		Log.info("SSH", "Set shell property to bash");
-		String cmd4String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/"+ username +" UserShell /bin/bash";
+		String cmd4String = "echo "+ mypassword +" | sudo -kS dscl . create /Users/"+ username +" UserShell /bin/bash";
 		String[] cmd4 = { "/bin/sh", "-c", cmd4String };
 		output += executeCommand(cmd4);
 		
 		Log.info("SSH", "Set users full name");
-		String cmd5String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " RealName \"" + fullname + "\"";
+		String cmd5String = "echo "+ mypassword +" | sudo -kS dscl . create /Users/" + username + " RealName \"" + fullname + "\"";
 		String[] cmd5 = { "/bin/sh", "-c", cmd5String };
 		output += executeCommand(cmd5);
 		
 		Log.info("SSH", "Set users UniqueID");
-		String cmd6String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " UniqueID \"$(($(dscl . -list /Users UniqueID | awk '{print $2}' | sort -ug | tail -1)+1))\"";
+		String cmd6String = "echo "+ mypassword +" | sudo -kS dscl . create /Users/" + username + " UniqueID \"$(($(dscl . -list /Users UniqueID | awk '{print $2}' | sort -ug | tail -1)+1))\"";
 		String[] cmd6 = { "/bin/sh", "-c", cmd6String };
 		output += executeCommand(cmd6);
 		
 		Log.info("SSH", "Set users primary group");
-		String cmd7String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " PrimaryGroupID 1000";
+		String cmd7String = "echo "+ mypassword +" | sudo -kS dscl . create /Users/" + username + " PrimaryGroupID 1000";
 		String[] cmd7 = { "/bin/sh", "-c", cmd7String };
 		output += executeCommand(cmd7);
 		
 		Log.info("SSH", "Set users home directory");
-		String cmd8String = "echo "+ mypassword +" | sudo -kS dscl . -create /Users/" + username + " NFSHomeDirectory /Local/Users/"+username;
+		String cmd8String = "echo "+ mypassword +" | sudo -kS dscl . create /Users/" + username + " NFSHomeDirectory /Users/"+username;
 		String[] cmd8 = { "/bin/sh", "-c", cmd8String };
 		output += executeCommand(cmd8);
 		
 		Log.info("SSH", "Set users password");
-		String cmd9String = "echo "+ mypassword +" | sudo -kS dscl . -passwd /Users/" + username + " " + userpwd;
+		String cmd9String = "echo "+ mypassword +" | sudo -kS dscl . passwd /Users/" + username + " " + userpwd;
 		String[] cmd9 = { "/bin/sh", "-c", cmd9String };
 		output += executeCommand(cmd9);
 		
