@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.schmizz.sshj.SSHClient;
+//import net.schmizz.sshj.SSHClient;
 
 import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -19,7 +19,7 @@ public class SshService {
 	private String instanceName;
 	private List<String> ipStrings = new ArrayList<>();
 
-	private SSHClient client;
+//	private SSHClient client;
 	private Config config;
 	private String password;
 
@@ -133,7 +133,7 @@ public class SshService {
 			password = config.getProperty("password");
 		}
 		String mypassword = password;
-		String fullname = "Alex Neu";
+		String fullname = "AlexNeu";
 		String userpwd = "password";
 		String username = newUsername;
 		String output = "";

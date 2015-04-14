@@ -82,7 +82,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		super(adapterInstance.getLocalName());
 
 		Config config = new Config("PhysicalNodeAdapter-1");
-		String password = "123456";
+		String password = "aA21!7&8*";
 		config.setNewProperty("password", password);
 
 		this.adapterInstance = adapterInstance;

@@ -13,37 +13,39 @@ ssh-adapter:SshAdapter
         a      owl:AsymmetricProperty ,
                owl:IrreflexiveProperty ,
                owl:FunctionalProperty ,
-               owl:ObjectProperty ;
+               owl:ObjectProperty ,
+               owl:Class ;
         rdfs:range owl:Thing ;
         rdfs:label   "Ssh-Adapter"@en ;
         rdfs:comment "the explicit ssh adapter"@en ;
-        omn-lifecycle:implements   ssh:SSH-Access ;
+        omn-lifecycle:implements   ssh:SshService ;
         rdfs:subClassOf  omn:Adapter .
         
         
-ssh:SSH-Access
+ssh:SshService
         a                owl:Class ;
+        rdfs:subClassOf              omn:Resource ;
         rdfs:label       "SSH Access"@en ;
-        rdfs:domain  ssh-adapter:SshAdapter .
+        omn-lifecycle:implementedBy  ssh-adapter:SshAdapter .
      
      
 ssh:SSH-Username
         a      owl:DatatypeProperty ;
         a      owl:FunctionalProperty ;
         rdfs:label   "The Username of the future SSH-Account"@en ;
-        rdfs:domain  ssh:SSH-Access ;
+        rdfs:domain  ssh:SshService ;
         rdfs:range   xsd:string .        
         
 ssh:SSH-IP
         a      owl:DatatypeProperty ;
         a      owl:FunctionalProperty ;
         rdfs:label   "The IP of a server where we can get an SSH-Access"@en ;
-        rdfs:domain  ssh:SSH-Access ;
+        rdfs:domain  ssh:SshService ;
         rdfs:range   xsd:string .
         
 ssh:SSH-PubKey
         a      owl:DatatypeProperty ;
         a      owl:FunctionalProperty ;
         rdfs:label   "The Public Key of the client"@en ;
-        rdfs:domain  ssh:SSH-Access ;
+        rdfs:domain  ssh:SshService ;
         rdfs:range   xsd:string .
