@@ -13,7 +13,7 @@ import org.fiteagle.api.core.IMessageBus;
 @MessageDriven(activationConfig = {
 	    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
 	    @ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
-	    @ActivationConfigProperty(propertyName = "messageSelector", propertyValue = IMessageBus.METHOD_TARGET + " = '" + "http://open-multinet.info/ontology/resource/test#TEST" + "'"
+	    @ActivationConfigProperty(propertyName = "messageSelector", propertyValue = IMessageBus.METHOD_TARGET + " = '" + "http://open-multinet.info/ontology/resource/ssh-adapter#SshAdapter" + "'"
 	            + "AND ("+IMessageBus.METHOD_TYPE+" = '"+IMessageBus.TYPE_CREATE+"' "
 	            + "OR "+IMessageBus.METHOD_TYPE+" = '"+IMessageBus.TYPE_CONFIGURE+"' "
 	            + "OR "+IMessageBus.METHOD_TYPE+" = '"+IMessageBus.TYPE_GET+"' "
@@ -23,7 +23,7 @@ import org.fiteagle.api.core.IMessageBus;
 	  
 	  @Override
 	  protected Map<String, AbstractAdapter> getAdapterInstances() {
-	    return SshService.adapterInstances;
+	    return SshServiceAdapter.adapterInstances;
 	  }
 	  
 	}

@@ -159,7 +159,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		String userName = "";
 		Model result = ModelFactory.createDefaultModel();
 
-		ResIterator resIteratorKey = newInstanceModel.listSubjects();
+		ResIterator resIteratorKey = newInstanceModel.listSubjectsWithProperty(Omn_lifecycle.implementedBy);
 		if (!resIteratorKey.hasNext())
 			throw new InvalidRequestException("statements are missing ");
 		while (resIteratorKey.hasNext()) {
