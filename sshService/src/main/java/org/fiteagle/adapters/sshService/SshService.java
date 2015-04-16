@@ -258,7 +258,6 @@ public class SshService {
 		}else{
 			Log.fatal("SSH", "Your OS is not supported yet");
 		}
-		deleteSshAccess();
 
 	}
 	public void deleteUserAccount (String username){
