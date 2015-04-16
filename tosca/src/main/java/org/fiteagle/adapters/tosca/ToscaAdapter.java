@@ -70,7 +70,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   private ToscaAdapter(Resource adapterInstance, Model adapterModel, IToscaClient client) {
-    super(adapterInstance.getLocalName());
+    createDefaultConfiguration(adapterInstance.getLocalName());
     
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;

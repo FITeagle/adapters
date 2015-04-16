@@ -79,7 +79,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 	private SshServiceAdapter(Resource adapterInstance, Model adapterModel,
 			SshService sshService) {
-		super(adapterInstance.getLocalName());
+		createDefaultConfiguration(adapterInstance.getLocalName());
 
 		Config config = new Config("PhysicalNodeAdapter-1");
 		String password = "aA21!7&8*";
@@ -109,7 +109,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 //	}
 
 	public SshServiceAdapter(String adapterInstanceName) {
-		super(adapterInstanceName);
+		createDefaultConfiguration(adapterInstanceName);
 		// TODO Auto-generated constructor stub
 	}
 

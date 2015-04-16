@@ -84,7 +84,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   private OpenstackAdapter(Resource adapterInstance, Model adapterModel, IOpenstackClient openstackClient){
-    super(adapterInstance.getLocalName());
+    //super(adapterInstance.getLocalName());
     
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterModel;

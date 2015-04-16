@@ -26,7 +26,11 @@ public abstract class AbstractAdapter {
   
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
   
-  public AbstractAdapter(String adapterInstanceName){
+  public AbstractAdapter(){
+
+  }
+
+  public void createDefaultConfiguration(String adapterInstanceName){
     Config config = new Config(adapterInstanceName);
     config.creatPropertiesFile();
   }
