@@ -258,23 +258,40 @@ public class SshService {
 		}else{
 			Log.fatal("SSH", "Your OS is not supported yet");
 		}
+		deleteSshAccess();
 
+	}
+	public void deleteUserAccount (String username){
+		  
+		  if(executeCommand("uname -s").contains("Linux")){
+				String deleteUserLinux = "echo '" + password + "' | sudo -kS deluser --remove-home "+username;
+				String[] deleteUserLinuxCMD = { "/bin/sh", "-c", deleteUserLinux };
+				
+				
+				Log.info("SSH Delete User",executeCommand(deleteUserLinuxCMD) );		
+			}else if (executeCommand("uname -s").contains("Linux")) {
+				Log.info("SSH Delete User",executeCommand("/usr/bin/dscl . -search /Users name " +username));
+				
+				String deleteUserMac = "echo '" + password + "' | sudo -kS /usr/bin/dscl . -delete \"/Users/"+username+"\"";
+				String[] deleteUserMacCMD = { "/bin/sh", "-c", deleteUserMac };			
+				Log.info("SSH Delete User",executeCommand(deleteUserMacCMD));
+			}else {
+				Log.fatal("SSH", "Can't delete User on this OS");
+			}	
 	}
 
 	public void deleteSshAccess() {
-	  
 	  if (this.password == null) {
       password = config.getProperty("password");
     }
 	  
 	  for(String username : this.getUsernames()){
-	    String deleteSshString = "echo '" + password
-          + "' | sudo rm -r ~/../" + username;
-      String[] deleteSshCMD = { "/bin/sh", "-c", deleteSshString };
-      executeCommand(deleteSshCMD);
-	  }
-	   
-	  
+//		    String deleteSshString = "echo '" + password
+//	          + "' | sudo rm -r ~/../" + username;
+//	      String[] deleteSshCMD = { "/bin/sh", "-c", deleteSshString };
+//	      executeCommand(deleteSshCMD);
+		  deleteUserAccount(username);
+		  }  
 	}
 
 
