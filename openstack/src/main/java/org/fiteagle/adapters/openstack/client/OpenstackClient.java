@@ -37,6 +37,7 @@ import com.woorea.openstack.nova.model.ServerAction;
 import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
+import org.fiteagle.api.core.Config;
 
 public class OpenstackClient implements IOpenstackClient{
 
@@ -62,55 +63,54 @@ public class OpenstackClient implements IOpenstackClient{
 	private boolean PREFERENCES_INITIALIZED = false;
 	
 	private void loadPreferences() {
-		Preferences preferences = Preferences.userNodeForPackage(getClass());
-
-		if (preferences.get("floating_ip_pool_name", null) != null){
-		  FLOATINGIP_POOL_NAME = preferences.get("floating_ip_pool_name",	null);
+		Config preferences = new Config("Openstack-1");
+		if (preferences.getProperty("floating_ip_pool_name") != null){
+		  FLOATINGIP_POOL_NAME = preferences.getProperty("floating_ip_pool_name");
 		}
-		if (preferences.get("keystone_auth_URL", null) != null){
-		  KEYSTONE_AUTH_URL = preferences.get("keystone_auth_URL", null);
+		if (preferences.getProperty("keystone_auth_URL") != null){
+		  KEYSTONE_AUTH_URL = preferences.getProperty("keystone_auth_URL");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_auth_URL");
 		}
-		if (preferences.get("keystone_endpoint", null) != null){
-		  KEYSTONE_ENDPOINT = preferences.get("keystone_endpoint", null);
+		if (preferences.getProperty("keystone_endpoint") != null){
+		  KEYSTONE_ENDPOINT = preferences.getProperty("keystone_endpoint");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_endpoint");
 		}
-		if (preferences.get("keystone_password", null) != null){
-		  KEYSTONE_PASSWORD = preferences.get("keystone_password", null);
+		if (preferences.getProperty("keystone_password") != null){
+		  KEYSTONE_PASSWORD = preferences.getProperty("keystone_password");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_password");
 		}
-		if (preferences.get("keystone_username", null) != null){
-		  KEYSTONE_USERNAME = preferences.get("keystone_username", null);
+		if (preferences.getProperty("keystone_username") != null){
+		  KEYSTONE_USERNAME = preferences.getProperty("keystone_username");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_username");
 		}
-		if (preferences.get("net_endpoint", null) != null){
-		  NET_ENDPOINT = preferences.get("net_endpoint", null);
+		if (preferences.getProperty("net_endpoint") != null){
+		  NET_ENDPOINT = preferences.getProperty("net_endpoint");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("net_endpoint");
 		}
-		if (preferences.get("net_name", null) != null){
-		  NET_NAME = preferences.get("net_name", null);
+		if (preferences.getProperty("net_name") != null){
+		  NET_NAME = preferences.getProperty("net_name");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("net_name");
 		}
-		if (preferences.get("nova_endpoint", null) != null){
-		  NOVA_ENDPOINT = preferences.get("nova_endpoint", null);
+		if (preferences.getProperty("nova_endpoint") != null){
+		  NOVA_ENDPOINT = preferences.getProperty("nova_endpoint");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("nova_endpoint");
 		}
-		if (preferences.get("tenant_name", null) != null){
-		  TENANT_NAME = preferences.get("tenant_name", null);
+		if (preferences.getProperty("tenant_name") != null){
+		  TENANT_NAME = preferences.getProperty("tenant_name");
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("tenant_name");

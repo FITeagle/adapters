@@ -50,6 +50,7 @@
 		<module>openstack</module>
 		<module>openMTC</module>
 		<module>tosca</module>
+		<module>sshService</module>
 
     </modules>
 </project>
