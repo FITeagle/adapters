@@ -1,8 +1,10 @@
 package org.fiteagle.adapters.sshService;
 
 import info.openmultinet.ontology.vocabulary.Omn;
+import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_resource;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.util.HashMap;
@@ -85,7 +87,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 		Config config = new Config(adapterInstance.getLocalName());
     
-		String password = "root password";
+		String password = "aA21!7&8*";
 		config.setNewProperty("password", password);
 
 		this.adapterInstance = adapterInstance;
@@ -141,7 +143,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	  while (resIteratorKey.hasNext()) {
 
       Resource resource = resIteratorKey.nextResource();
-      model.add(createResponse(resource));
+      model.add(createResponse(resource, instanceList.get(instanceURI)));
 	  }
 	  
 		return model;
@@ -186,10 +188,10 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 		instanceList.put(instanceURI, sshService);
 		
-		return createResponse(resource);
+		return createResponse(resource, sshService);
 	}
 	
-	private Model createResponse(Resource resource){
+	private Model createResponse(Resource resource, SshService sshservice){
 	  Model result = ModelFactory.createDefaultModel();
 	  Resource res = result.createResource(resource.getURI());
 	  res.addProperty(RDF.type, Omn.Resource);
@@ -198,6 +200,13 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	  property.addProperty(RDF.type, OWL.FunctionalProperty);
 	  res.addProperty(property, Omn_lifecycle.Ready);
 	  
+	  for (String username : sshservice.getUsernames()){
+	    res.addProperty(Omn_service.username, username);
+	  }
+	  Property ip = res.getModel().createProperty("http://open-multinet.info/ontology/omn-service#", "ip");
+	  ip.addProperty(RDF.type, OWL.DatatypeProperty);
+	  res.addProperty(ip, "127.0.0.1");
+	  
 	  return result;
 	}
 
@@ -205,7 +214,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	public void deleteInstance(String instanceURI)
 			throws InstanceNotFoundException, InvalidRequestException,
 			ProcessingException {
-		
+	  
 	  instanceList.get(instanceURI).deleteSshAccess();
 	  instanceList.remove(instanceURI);
 	  
