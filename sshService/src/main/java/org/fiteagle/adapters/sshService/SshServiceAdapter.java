@@ -6,6 +6,7 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -80,10 +81,12 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 	private SshServiceAdapter(Resource adapterInstance, Model adapterModel,
 			SshService sshService) {
+
 		super(adapterInstance.getLocalName());
 
 		Config config = new Config("PhysicalNodeAdapter-1");
-		String password = "ROOT PASSWORD";
+    
+		String password = "aA21!7&8*";
 		config.setNewProperty("password", password);
 
 		this.adapterInstance = adapterInstance;
@@ -164,6 +167,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	@Override
 	public Model createInstance(String instanceURI, Model newInstanceModel)
 			throws ProcessingException, InvalidRequestException {
+	  
 		String pubKey = "";
 		String userName = "";
 		Model result = ModelFactory.createDefaultModel();
@@ -190,8 +194,10 @@ public final class SshServiceAdapter extends AbstractAdapter {
 						.getProperty(Omn_service.username)
 						.getLiteral().getString();
 			}
+			sshService.addSshAccess(userName, pubKey);
+			instanceList.put(instanceURI, sshService);
 		}
-		sshService.addSshAccess(userName, pubKey);
+//		sshService.addSshAccess(userName, pubKey);
 		
 		
 		
@@ -214,8 +220,10 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	public void deleteInstance(String instanceURI)
 			throws InstanceNotFoundException, InvalidRequestException,
 			ProcessingException {
-		// TODO Auto-generated method stub
-
+		
+	  instanceList.get(instanceURI).deleteSshAccess();
+//	  instanceList.remove(instanceURI);
+	  
 	}
 
 	@Override

@@ -18,15 +18,18 @@ public class SshService {
 	protected SshServiceAdapter owningAdapter;
 	private String instanceName;
 	private List<String> ipStrings = new ArrayList<>();
+	private List<String> username;
 
 //	private SSHClient client;
 	private Config config;
 	private String password;
+	
 
 	public static Map<String, AbstractAdapter> adapterInstances;
 
 	public SshService() {
 		config = new Config("PhysicalNodeAdapter-1");
+		this.username = new ArrayList<>();
 	}
 
 	public String getInstanceName() {
@@ -34,11 +37,23 @@ public class SshService {
 		return instanceName;
 	}
 
+	public List<String> getUsernames() {
+	  return this.username;
+	}
+	
+	private void setUsername(String username){
+	  this.username.add(username);
+	}
+	
 	public List<String> getPossibleAccesses() {
 		if (ipStrings.isEmpty()) {
 			return null;
 		}
 		return ipStrings;
+	}
+	
+	private void setPossibleAccesses(String publickey){
+	  this.ipStrings.add(publickey);
 	}
 
 	private String executeCommand(String[] command) {
@@ -180,7 +195,10 @@ public class SshService {
 		if (password == null) {
 			password = config.getProperty("password");
 		}
-
+		
+		this.setUsername(newUser);
+		this.setPossibleAccesses(publicKey);
+		
 		String addSshString = "echo '" + password
 				+ "' | sudo -kS mkdir -pm 0777 ~/../" + newUser + "/.ssh";
 		String[] addSshCMD = { "/bin/sh", "-c", addSshString };
@@ -240,93 +258,23 @@ public class SshService {
 			Log.fatal("SSH", "Your OS is not supported yet");
 		}
 
-
-		// String rootstring = "echo '" + password + "' | sudo -kSs";
-		// String [] rootCMD ={"/bin/sh","-c",rootstring};
-
-		// try {
-		// p =
-		// Runtime.getRuntime().exec("dpkg -s openssh-server | grep -c installed");
-		// p.waitFor();
-		// BufferedReader reader =
-		// new BufferedReader(new InputStreamReader(p.getInputStream()));
-		//
-		// String line = "";
-		// while ((line = reader.readLine())!= null) {
-		// output.append(line + "\n");
-		// }
-		//
-		// Log.fatal("OPENSSH-Server",output.toString());
-		//
-		// if(output.toString().equals("1")){
-		//
-		// p = Runtime.getRuntime().exec("echo '" + password +
-		// "' | sudo -kS adduser "+newUser);
-		// p.waitFor();
-		// BufferedReader reader2 =
-		// new BufferedReader(new InputStreamReader(p.getInputStream()));
-		//
-		// String line2 = "";
-		// while ((line = reader.readLine())!= null) {
-		// output2.append(line + "\n");
-		// }
-		// System.out.print(output.toString());
-		//
-		//
-		// p = Runtime.getRuntime().exec("echo '" + password +
-		// "' | sudo -kS mkdir -p /home/"+newUser+"/.ssh | sudo bash -c 'echo "
-		// + publicKey + " >> /home/"
-		// + newUser + "/.ssh/authorized_keys'");
-		// p.waitFor();
-		// BufferedReader reader3 =
-		// new BufferedReader(new InputStreamReader(p.getInputStream()));
-		//
-		// String line3 = "";
-		// while ((line = reader.readLine())!= null) {
-		// output2.append(line + "\n");
-		// }
-		// System.out.print(output.toString());
-		// }else{
-		// Log.fatal("SSH",
-		// "No OpenSSH-Server found. Please install it first, with:");
-		// Log.fatal("SSH", "$sudo apt-get install openssh-server");
-		// }
-
-		// Command com2 =
-		// session.exec("dpkg -s openssh-server | grep -c installed");
-		//
-		// if(IOUtils.readFully(com2.getInputStream())
-		// .toString().equals("1")){
-		//
-		// Command com3 = session.exec("echo '" + password +
-		// "' | sudo -kS adduser "+newUser);
-		// System.out.println(IOUtils.readFully(com3.getInputStream())
-		// .toString());
-		// System.out.println("\n **exit status: " + com3.getExitStatus());
-		//
-		// Command com4 = session.exec("echo '" + password +
-		// "' | sudo -kS mkdir -p /home/"+newUser+"/.ssh |sudo bash -c 'echo " +
-		// publicKey + " >> /home/"
-		// + newUser + "/.ssh/authorized_keys'");
-		// System.out.println(IOUtils.readFully(com4.getInputStream())
-		// .toString());
-		// com4.join(5, TimeUnit.SECONDS);
-		// System.out.println("\n **exit status: " + com4.getExitStatus());
-		//
-		// }else{
-		// Log.fatal("SSH",
-		// "No OpenSSH-Server found. Please install it first, with:");
-		// Log.fatal("SSH", "$sudo apt-get install openssh-server");
-		// }
-
 	}
 
-	public void deleteSshAccess(String ip, PublicKey publicKey) {
-
+	public void deleteSshAccess() {
+	  
+	  if (this.password == null) {
+      password = config.getProperty("password");
+    }
+	  
+	  for(String username : this.getUsernames()){
+	    String deleteSshString = "echo '" + password
+          + "' | sudo rm -r ~/../" + username;
+      String[] deleteSshCMD = { "/bin/sh", "-c", deleteSshString };
+      executeCommand(deleteSshCMD);
+	  }
+	   
+	  
 	}
 
-	public void configureSshAccess() {
-
-	}
 
 }
