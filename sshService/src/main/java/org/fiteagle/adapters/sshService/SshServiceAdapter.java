@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -82,7 +83,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		createDefaultConfiguration(adapterInstance.getLocalName());
 
 		Config config = new Config("PhysicalNodeAdapter-1");
-		String password = "aA21!7&8*";
+		String password = "ROOT PASSWORD";
 		config.setNewProperty("password", password);
 
 		this.adapterInstance = adapterInstance;
@@ -148,8 +149,16 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	@Override
 	public Model updateInstance(String instanceURI, Model configureModel)
 			throws InvalidRequestException, ProcessingException {
-		// TODO Auto-generated method stub
-		return null;
+		
+	  Model model = ModelFactory.createDefaultModel();
+	  ResIterator resIteratorKey = configureModel.listSubjectsWithProperty(Omn_lifecycle.implementedBy);
+	  while (resIteratorKey.hasNext()) {
+
+      Resource resource = resIteratorKey.nextResource();
+      model.add(createResponse(resource));
+	  }
+	  
+		return model;
 	}
 
 	@Override
@@ -158,13 +167,15 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		String pubKey = "";
 		String userName = "";
 		Model result = ModelFactory.createDefaultModel();
-
+		
+		Resource resource = null;
+		
 		ResIterator resIteratorKey = newInstanceModel.listSubjectsWithProperty(Omn_lifecycle.implementedBy);
 		if (!resIteratorKey.hasNext())
 			throw new InvalidRequestException("statements are missing ");
 		while (resIteratorKey.hasNext()) {
 
-			Resource resource = resIteratorKey.nextResource();
+			resource = resIteratorKey.nextResource();
 			if (!resource.hasProperty(Omn_service.publickey))
 				throw new InvalidRequestException("public key is missing ");
 			else {
@@ -181,8 +192,22 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			}
 		}
 		sshService.addSshAccess(userName, pubKey);
-
-		return result;
+		
+		
+		
+		return createResponse(resource);
+	}
+	
+	private Model createResponse(Resource resource){
+	  Model result = ModelFactory.createDefaultModel();
+	  Resource res = result.createResource(resource.getURI());
+	  res.addProperty(RDF.type, Omn.Resource);
+	  res.addProperty(RDF.type, getAdapterManagedResources().get(0));
+	  Property property = res.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
+	  property.addProperty(RDF.type, OWL.FunctionalProperty);
+	  res.addProperty(property, Omn_lifecycle.Ready);
+	  
+	  return result;
 	}
 
 	@Override
