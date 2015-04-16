@@ -27,9 +27,10 @@ public class SshService {
 
 	public static Map<String, AbstractAdapter> adapterInstances;
 
-	public SshService() {
+	public SshService(SshServiceAdapter owningAdapter) {
 		config = new Config("PhysicalNodeAdapter-1");
 		this.username = new ArrayList<>();
+		this.owningAdapter = owningAdapter;
 	}
 
 	public String getInstanceName() {

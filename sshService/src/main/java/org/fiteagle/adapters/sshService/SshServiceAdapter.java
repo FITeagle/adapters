@@ -30,7 +30,6 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	private Model adapterModel;
 	private Resource adapterInstance;
 	private static Resource adapter;
-	private SshService sshService;
 
 	public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
 
@@ -76,42 +75,25 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			}
 		}
 
-		new SshServiceAdapter(adapterInstance, adapterModel, new SshService());
+		new SshServiceAdapter(adapterInstance, adapterModel);
 	}
 
-	private SshServiceAdapter(Resource adapterInstance, Model adapterModel,
-			SshService sshService) {
+	private SshServiceAdapter(Resource adapterInstance, Model adapterModel) {
 
 		createDefaultConfiguration(adapterInstance.getLocalName());
 
 
-		Config config = new Config("PhysicalNodeAdapter-1");
+		Config config = new Config(adapterInstance.getLocalName());
     
 		String password = "root password";
 		config.setNewProperty("password", password);
 
 		this.adapterInstance = adapterInstance;
 		this.adapterModel = adapterModel;
-		this.sshService = sshService;
 		adapterInstances.put(adapterInstance.getURI(), this);
 
 	}
 
-//	public Model testModel() {
-//		Model model = ModelFactory.createDefaultModel();
-//		Resource resource = ModelFactory.createDefaultModel().createResource(
-//				"TEST-Resource");
-//		model.add(
-//				resource,
-//				model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-Username>"),
-//				"testuseralaa");
-//		model.add(
-//				resource,
-//				model.createProperty("<http://open-multinet.info/ontology/resource/ssh#SSH-PubKey>"),
-//				"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDa6JqlE8UOyTagtS91f2Z5DtamUgyMnRZdyliZDXoL6O3jdoVPnernYvrzaRlW1YBPiuPxmv/S7Q7fvXL8CY3ntxGpOHER6EZIUOdHVp/Nu3BFhjJ40Zk/y5geQeJy6NXMqzATkmGGGV9QlGzirC5z2aUHY1UQhWmsE+3zUbw0P6Ic5tH0TcO/zDLY9L5MQwjx5537Q7mskeNaiTLjDZ2jD5wFEQAfNmYJydyyNzwvTNovEgkk2R8usaxH2qtBmmvkkrWdzgOQYsaCGEeHCmSP3FNKyxzymdQnPQetu/BpyBT3YU7zE04HA44Uua4+AjbhDBofPjK89uI1gxQ7a5rh alaa.alloush@air");
-//
-//		return model;
-//	}
 
 	public SshServiceAdapter(String adapterInstanceName) {
 		createDefaultConfiguration(adapterInstanceName);
@@ -169,6 +151,8 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	public Model createInstance(String instanceURI, Model newInstanceModel)
 			throws ProcessingException, InvalidRequestException {
 	  
+	  SshService sshService = new SshService(this);
+	  
 		String pubKey = "";
 		String userName = "";
 		Model result = ModelFactory.createDefaultModel();
@@ -195,12 +179,12 @@ public final class SshServiceAdapter extends AbstractAdapter {
 						.getProperty(Omn_service.username)
 						.getLiteral().getString();
 			}
+			
 			sshService.addSshAccess(userName, pubKey);
-			instanceList.put(instanceURI, sshService);
+			
 		}
-//		sshService.addSshAccess(userName, pubKey);
-		
-		
+
+		instanceList.put(instanceURI, sshService);
 		
 		return createResponse(resource);
 	}
@@ -223,7 +207,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			ProcessingException {
 		
 	  instanceList.get(instanceURI).deleteSshAccess();
-//	  instanceList.remove(instanceURI);
+	  instanceList.remove(instanceURI);
 	  
 	}
 
