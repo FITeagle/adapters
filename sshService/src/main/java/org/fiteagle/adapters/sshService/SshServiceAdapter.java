@@ -10,6 +10,8 @@ import info.openmultinet.ontology.vocabulary.Omn_service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
@@ -200,12 +202,26 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	  property.addProperty(RDF.type, OWL.FunctionalProperty);
 	  res.addProperty(property, Omn_lifecycle.Ready);
 	  
+	  UUID randomGenerator = UUID.randomUUID();
+	  
+	  String uuid = randomGenerator.toString();
+	 
+	  Resource login = result.createResource( OntologyModelUtil.getResourceNamespace() + "LoginService"+ uuid);
+	  res.addProperty(Omn.hasService, login);
+	  login.addProperty(RDF.type, Omn_service.LoginService);
+	  login.addProperty(Omn_service.port, "22");
+	  login.addProperty(Omn_service.hostname, "127.0.0.1");
+	  
 	  for (String username : sshservice.getUsernames()){
-	    res.addProperty(Omn_service.username, username);
+	    login.addProperty(Omn_service.username, username);
 	  }
-	  Property ip = res.getModel().createProperty("http://open-multinet.info/ontology/omn-service#", "ip");
-	  ip.addProperty(RDF.type, OWL.DatatypeProperty);
-	  res.addProperty(ip, "127.0.0.1");
+	  login.addProperty(Omn_service.authentication, "ssh-keys");
+//	  for(String publickey : sshservice.getPossibleAccesses()){
+//	    login.addProperty(Omn_service.authentication, publickey);
+//	  }
+//	  Property ip = res.getModel().createProperty("http://open-multinet.info/ontology/omn-service#", "ip");
+//	  ip.addProperty(RDF.type, OWL.DatatypeProperty);
+//	  res.addProperty(ip, "127.0.0.1");
 	  
 	  return result;
 	}
