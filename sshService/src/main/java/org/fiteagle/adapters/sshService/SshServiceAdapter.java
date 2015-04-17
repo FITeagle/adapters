@@ -90,6 +90,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		Config config = new Config(adapterInstance.getLocalName());
     
 		String password = "aA21!7&8*";
+
 		config.setNewProperty("password", password);
 
 		this.adapterInstance = adapterInstance;
