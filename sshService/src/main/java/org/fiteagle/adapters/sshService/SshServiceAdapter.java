@@ -92,6 +92,9 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 		if (!file.exists()) {
 			createDefaultConfiguration(adapterInstance.getLocalName());
+			Config config = new Config("PhysicalNodeAdapter-1");
+			config.deleteProperty("password");
+			config.setNewProperty("password", "");
 		}
 		this.adapterInstance = adapterInstance;
 		this.adapterModel = adapterModel;
