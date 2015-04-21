@@ -270,7 +270,7 @@ public class SshService {
 			String[] deleteUserLinuxCMD = { "/bin/sh", "-c", deleteUserLinux };
 
 			Log.info("SSH Delete User", executeCommand(deleteUserLinuxCMD));
-		} else if (executeCommand("uname -s").contains("Linux")) {
+		} else if (executeCommand("uname -s").contains("Darwin")) {
 			Log.info("SSH Delete User",
 					executeCommand("/usr/bin/dscl . -search /Users name "
 							+ username));
