@@ -64,7 +64,7 @@ public final class MotorAdapter extends AbstractAdapter {
     if (resourceIterator.hasNext()) {
       Resource resource = resourceIterator.next().getObject().asResource();
       
-      adapterInstance.addProperty(Omn_lifecycle.parentTo, resource);
+      adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
       ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
       while (propertiesIterator.hasNext()) {
         Property p = adapterModel.getProperty(propertiesIterator.next().getURI());

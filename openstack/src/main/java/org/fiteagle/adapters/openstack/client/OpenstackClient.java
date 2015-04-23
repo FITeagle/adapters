@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import com.woorea.openstack.nova.model.*;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
@@ -29,11 +30,7 @@ import com.woorea.openstack.keystone.model.authentication.TokenAuthentication;
 import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
 import com.woorea.openstack.nova.Nova;
 import com.woorea.openstack.nova.api.ServersResource.AssociateFloatingIp;
-import com.woorea.openstack.nova.model.Flavors;
-import com.woorea.openstack.nova.model.FloatingIp;
-import com.woorea.openstack.nova.model.FloatingIpPools;
 import com.woorea.openstack.nova.model.FloatingIpPools.FloatingIpPool;
-import com.woorea.openstack.nova.model.ServerAction;
 import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
@@ -41,7 +38,10 @@ import org.fiteagle.api.core.Config;
 
 public class OpenstackClient implements IOpenstackClient{
 
-  private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
+	private String DEFAULT_KEYPAIR_ID ;
+	private String DEFAULT_FLAVOR_ID  ;
+	private String DEFAULT_IMAGE_ID ;
+	private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
   
 	private String KEYSTONE_AUTH_URL;
 	private String KEYSTONE_USERNAME;
@@ -115,6 +115,25 @@ public class OpenstackClient implements IOpenstackClient{
 		else{
 		  throw new InsufficientOpenstackPreferences("tenant_name");
 		}
+
+		if(preferences.getProperty("default_image_id")!= null){
+			DEFAULT_IMAGE_ID = preferences.getProperty("default_image_id");
+		}else{
+			throw new InsufficientOpenstackPreferences("default_image_id");
+		}
+
+		if(preferences.getProperty("default_flavor_id")!= null){
+			DEFAULT_FLAVOR_ID = preferences.getProperty("default_flavor_id");
+		}else{
+			throw new InsufficientOpenstackPreferences("default_flavor_id");
+		}
+
+		if(preferences.getProperty("default_keypair_id")!= null){
+			DEFAULT_KEYPAIR_ID = preferences.getProperty("default_keypair_id");
+		}else{
+			throw new InsufficientOpenstackPreferences("default_keypair_id");
+		}
+
 	}
 
 	@Override
@@ -243,6 +262,7 @@ public class OpenstackClient implements IOpenstackClient{
 		ServerForCreate.Network net_demo = new ServerForCreate.Network();
 		net_demo.setUuid(this.getNetworkId());
 		networkList.add(net_demo);
+		setDefaultValues(serverForCreate);
 
 		OpenStackRequest<Server> createServerRequest = new OpenStackRequest<Server>(
 				novaClient,
@@ -253,6 +273,18 @@ public class OpenstackClient implements IOpenstackClient{
 		
 		String serverID = novaClient.execute(createServerRequest).getId();
 		return getServerDetails(serverID);
+	}
+
+	private void setDefaultValues(ServerForCreate serverForCreate) {
+		if(serverForCreate.getImageRef()==null){
+			serverForCreate.setImageRef(DEFAULT_IMAGE_ID);
+		}
+		if(serverForCreate.getFlavorRef()==null){
+			serverForCreate.setFlavorRef(DEFAULT_FLAVOR_ID);
+		}
+		if(serverForCreate.getImageRef()==null){
+			serverForCreate.setKeyName(DEFAULT_KEYPAIR_ID);
+		}
 	}
 
 	@Override
@@ -339,7 +371,27 @@ public class OpenstackClient implements IOpenstackClient{
 		FloatingIp floatingIp = novaClient.execute(request);
 		return floatingIp;
 	}
-	
+
+	@Override
+	public FloatingIps listFreeFloatingIps() {
+		FloatingIps floatingIps = null;
+		Access access = getAccessWithTenantId();
+		Nova novaClient = new Nova(NOVA_ENDPOINT.concat("/").concat(TENANT_ID));
+		novaClient.token(access.getToken().getId());
+
+		try {
+			OpenStackRequest<FloatingIps> request = new OpenStackRequest<FloatingIps>(
+					novaClient, HttpMethod.GET, "os-floating-ips",null ,
+					FloatingIps.class);
+			floatingIps = novaClient.execute(request);
+		} catch (Exception e){
+
+		}
+
+
+		return floatingIps;
+	}
+
 	@Override
 	public void addKeyPair(String name, String publicKey){
 		Access access = getAccessWithTenantId();
@@ -361,7 +413,8 @@ public class OpenstackClient implements IOpenstackClient{
 
 		novaClient.keyPairs().delete(name).execute();
 	}
-	
+
+
 	@Override
 	public void deleteServer(String id){
 		Access access = getAccessWithTenantId();

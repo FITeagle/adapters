@@ -1,3 +1,4 @@
+/*
 package org.fiteagle.adapters.openstack.client;
 
 import java.util.ArrayList;
@@ -102,3 +103,4 @@ public class OpenstackTestClient implements IOpenstackClient {
   }
 
 }
+*/

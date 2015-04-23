@@ -70,7 +70,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			Resource resource = resourceIterator.next().getObject()
 					.asResource();
 
-			adapterInstance.addProperty(Omn_lifecycle.parentTo, resource);
+			adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
 			ResIterator propertiesIterator = adapterModel
 					.listSubjectsWithProperty(RDFS.domain, resource);
 			while (propertiesIterator.hasNext()) {

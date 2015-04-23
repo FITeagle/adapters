@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.openstack.client;
 
+import com.woorea.openstack.nova.model.FloatingIps;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
@@ -26,6 +27,7 @@ public interface IOpenstackClient {
   public abstract FloatingIpPools getFloatingIpPools();
   
   public abstract FloatingIp addFloatingIp();
+  public abstract FloatingIps listFreeFloatingIps();
   
   public abstract void addKeyPair(String name, String publicKey);
   

@@ -123,7 +123,7 @@ public abstract class AbstractAdapter {
   
   public List<Resource> getAdapterManagedResources(){
     List<Resource> managedResources = new ArrayList<>();
-    StmtIterator iter = getAdapterInstance().listProperties(Omn_lifecycle.parentTo);
+    StmtIterator iter = getAdapterInstance().listProperties(Omn_lifecycle.canImplement);
     while(iter.hasNext()){
       managedResources.add(iter.next().getResource());
     }

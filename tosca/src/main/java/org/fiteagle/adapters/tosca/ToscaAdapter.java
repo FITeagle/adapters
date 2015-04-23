@@ -224,7 +224,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     }
     for(Resource resource : resources){
       LOGGER.log(Level.INFO, "Found resource: "+resource.getURI());
-      adapterInstance.addProperty(Omn_lifecycle.parentTo, resource);
+      adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
     }
     adapterModel.add(model);
     adapterModel.setNsPrefixes(model.getNsPrefixMap());
