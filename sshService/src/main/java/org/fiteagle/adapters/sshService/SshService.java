@@ -280,6 +280,11 @@ public class SshService {
 					+ username + "\"";
 			String[] deleteUserMacCMD = { "/bin/sh", "-c", deleteUserMac };
 			Log.info("SSH Delete User", executeCommand(deleteUserMacCMD));
+			
+			String deleteUserMacHomedirectory = "echo '" + password
+					+ "' | sudo -kS /bin/rm -rf \"/Users/"+username+"\"";
+			String[] deleteUserMacHomedirectoryCMD = { "/bin/sh", "-c", deleteUserMacHomedirectory };
+			Log.info("SSH Delete Homedirectory", executeCommand(deleteUserMacHomedirectoryCMD));
 		} else {
 			Log.fatal("SSH", "Can't delete User on this OS");
 		}
