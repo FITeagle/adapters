@@ -3,12 +3,9 @@ package org.fiteagle.adapters.sshService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-//import net.schmizz.sshj.SSHClient;
 
 import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -20,10 +17,8 @@ public class SshService {
 	private List<String> ipStrings = new ArrayList<>();
 	private List<String> username;
 
-//	private SSHClient client;
 	private Config config;
 	private String password;
-	
 
 	public static Map<String, AbstractAdapter> adapterInstances;
 
@@ -34,29 +29,28 @@ public class SshService {
 	}
 
 	public String getInstanceName() {
-		// TODO Auto-generated method stub
 		return instanceName;
 	}
 
 	public List<String> getUsernames() {
-	  return this.username;
+		return this.username;
 	}
-	
-	private void setUsername(String username){
-	  this.username.add(username);
+
+	private void setUsername(String username) {
+		this.username.add(username);
 	}
-	
+
 	public List<String> getPossibleAccesses() {
 		if (ipStrings.isEmpty()) {
 			return null;
 		}
 		return ipStrings;
 	}
-	
-	private void setPossibleAccesses(String publickey){
-	  this.ipStrings.add(publickey);
+
+	private void setPossibleAccesses(String publickey) {
+		this.ipStrings.add(publickey);
 	}
-	
+
 	private String executeCommand(String[] command) {
 		StringBuffer output = new StringBuffer();
 		Process p;
@@ -71,10 +65,8 @@ public class SshService {
 				output.append(line + "\n");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -95,17 +87,15 @@ public class SshService {
 				output.append(line + "\n");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return output.toString();
 	}
 
-	private String setNewUser(String newUsername) {
+	private String setNewUserLinux(String newUsername) {
 		if (password == null) {
 			password = config.getProperty("password");
 		}
@@ -133,16 +123,14 @@ public class SshService {
 				output.append(line + "\n");
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		return output.toString();
 	}
-	
+
 	private String setNewUserMac(String newUsername) {
 
 		if (password == null) {
@@ -153,42 +141,57 @@ public class SshService {
 		String userpwd = "password";
 		String username = newUsername;
 		String output = "";
-		
+
 		Log.info("SSH", "Create new user entry");
-		String cmd3String = "echo '"+ mypassword +"' | sudo -kS dscl . create /Users/" + username;
+		String cmd3String = "echo '" + mypassword
+				+ "' | sudo -kS dscl . create /Users/" + username;
 		String[] cmd3 = { "/bin/sh", "-c", cmd3String };
-    Log.info("SSH-USERENTRY", executeCommand(cmd3));
-		
+		Log.info("SSH-USERENTRY", executeCommand(cmd3));
+
 		Log.info("SSH", "Set shell property to bash");
-		String cmd4String = "echo '"+ mypassword +"' | sudo -kS dscl . create /Users/"+ username +" UserShell /bin/bash";
+		String cmd4String = "echo '" + mypassword
+				+ "' | sudo -kS dscl . create /Users/" + username
+				+ " UserShell /bin/bash";
 		String[] cmd4 = { "/bin/sh", "-c", cmd4String };
-    Log.info("SSH-SHELL", executeCommand(cmd4));
-		
+		Log.info("SSH-SHELL", executeCommand(cmd4));
+
 		Log.info("SSH", "Set users full name");
-		String cmd5String = "echo '"+ mypassword +"' | sudo -kS dscl . create /Users/" + username + " RealName \"" + fullname + "\"";
+		String cmd5String = "echo '" + mypassword
+				+ "' | sudo -kS dscl . create /Users/" + username
+				+ " RealName \"" + fullname + "\"";
 		String[] cmd5 = { "/bin/sh", "-c", cmd5String };
-    Log.info("SSH-FULLNAME", executeCommand(cmd5));
-		
+		Log.info("SSH-FULLNAME", executeCommand(cmd5));
+
 		Log.info("SSH", "Set users UniqueID");
-		String cmd6String = "echo '"+ mypassword +"' | sudo -kS dscl . create /Users/" + username + " UniqueID \"$(($(dscl . -list /Users UniqueID | awk '{print $2}' | sort -ug | tail -1)+1))\"";
+		String cmd6String = "echo '"
+				+ mypassword
+				+ "' | sudo -kS dscl . create /Users/"
+				+ username
+				+ " UniqueID \"$(($(dscl . -list /Users UniqueID | awk '{print $2}' | sort -ug | tail -1)+1))\"";
 		String[] cmd6 = { "/bin/sh", "-c", cmd6String };
 		Log.info("SSH-UNIQUEID", executeCommand(cmd6));
-		
+
 		Log.info("SSH", "Set users primary group");
-		String cmd7String = "echo '"+ mypassword +"' | sudo -kS dscl . create /Users/" + username + " PrimaryGroupID 1000";
+		String cmd7String = "echo '" + mypassword
+				+ "' | sudo -kS dscl . create /Users/" + username
+				+ " PrimaryGroupID 1000";
 		String[] cmd7 = { "/bin/sh", "-c", cmd7String };
-    Log.info("SSH-GROUP", executeCommand(cmd7));
-		
+		Log.info("SSH-GROUP", executeCommand(cmd7));
+
 		Log.info("SSH", "Set users home directory");
-		String cmd8String = "echo '"+ mypassword +"' | sudo -kS dscl . create /Users/" + username + " NFSHomeDirectory /Users/"+username;
+		String cmd8String = "echo '" + mypassword
+				+ "' | sudo -kS dscl . create /Users/" + username
+				+ " NFSHomeDirectory /Users/" + username;
 		String[] cmd8 = { "/bin/sh", "-c", cmd8String };
-    Log.info("SSH-HOMEDIRECTORY", executeCommand(cmd8));
-		
+		Log.info("SSH-HOMEDIRECTORY", executeCommand(cmd8));
+
 		Log.info("SSH", "Set users password");
-		String cmd9String = "echo '"+ mypassword +"' | sudo -kS dscl . passwd /Users/" + username + " " + userpwd;
+		String cmd9String = "echo '" + mypassword
+				+ "' | sudo -kS dscl . passwd /Users/" + username + " "
+				+ userpwd;
 		String[] cmd9 = { "/bin/sh", "-c", cmd9String };
-    Log.info("SSH-USERPW", executeCommand(cmd9));
-		
+		Log.info("SSH-USERPW", executeCommand(cmd9));
+
 		return output;
 	}
 
@@ -196,10 +199,10 @@ public class SshService {
 		if (password == null) {
 			password = config.getProperty("password");
 		}
-		
+
 		this.setUsername(newUser);
 		this.setPossibleAccesses(publicKey);
-		
+
 		String addSshString = "echo '" + password
 				+ "' | sudo -kS mkdir -pm 0777 ~/../" + newUser + "/.ssh";
 		String[] addSshCMD = { "/bin/sh", "-c", addSshString };
@@ -223,10 +226,10 @@ public class SshService {
 		String chOwnStringMac = "echo '" + password + "' | sudo -kS chown -Rv "
 				+ newUser + " ~/../" + newUser + "/.ssh";
 		String[] chOwnStringMacCMD = { "/bin/sh", "-c", chOwnStringMac };
-		
-		if(executeCommand("uname -s").contains("Linux")){
+
+		if (executeCommand("uname -s").contains("Linux")) {
 			Log.info("SSH", "Creating new User for SSH");
-			setNewUser(newUser);
+			setNewUserLinux(newUser);
 
 			Log.info("SSH", "Creating .ssh folder");
 			executeCommand(addSshCMD);
@@ -238,10 +241,8 @@ public class SshService {
 			executeCommand(chMod600CMD);
 			executeCommand(chMod700CMD);
 			executeCommand(chOwnStringCMD);
-			
-			
-		}else if (executeCommand("uname -s").contains("Darwin")) {
-			// Log.fatal("MAC", "Mac is not supported by now");
+
+		} else if (executeCommand("uname -s").contains("Darwin")) {
 			Log.info("SSH", "Creating new User for SSH");
 			setNewUserMac(newUser);
 
@@ -255,43 +256,48 @@ public class SshService {
 			executeCommand(chMod600CMD);
 			executeCommand(chMod700CMD);
 			executeCommand(chOwnStringMacCMD);
-		}else{
+		} else {
 			Log.fatal("SSH", "Your OS is not supported yet");
 		}
 
 	}
-	public void deleteUserAccount (String username){
-		  
-		  if(executeCommand("uname -s").contains("Linux")){
-				String deleteUserLinux = "echo '" + password + "' | sudo -kS deluser --remove-home "+username;
-				String[] deleteUserLinuxCMD = { "/bin/sh", "-c", deleteUserLinux };
-				
-				
-				Log.info("SSH Delete User",executeCommand(deleteUserLinuxCMD) );		
-			}else if (executeCommand("uname -s").contains("Linux")) {
-				Log.info("SSH Delete User",executeCommand("/usr/bin/dscl . -search /Users name " +username));
-				
-				String deleteUserMac = "echo '" + password + "' | sudo -kS /usr/bin/dscl . -delete \"/Users/"+username+"\"";
-				String[] deleteUserMacCMD = { "/bin/sh", "-c", deleteUserMac };			
-				Log.info("SSH Delete User",executeCommand(deleteUserMacCMD));
-			}else {
-				Log.fatal("SSH", "Can't delete User on this OS");
-			}	
+
+	public void deleteUserAccount(String username) {
+
+		if (executeCommand("uname -s").contains("Linux")) {
+			String deleteUserLinux = "echo '" + password
+					+ "' | sudo -kS deluser --remove-home " + username;
+			String[] deleteUserLinuxCMD = { "/bin/sh", "-c", deleteUserLinux };
+
+			Log.info("SSH Delete User", executeCommand(deleteUserLinuxCMD));
+		} else if (executeCommand("uname -s").contains("Darwin")) {
+			Log.info("SSH Delete User",
+					executeCommand("/usr/bin/dscl . -search /Users name "
+							+ username));
+
+			String deleteUserMac = "echo '" + password
+					+ "' | sudo -kS /usr/bin/dscl . -delete \"/Users/"
+					+ username + "\"";
+			String[] deleteUserMacCMD = { "/bin/sh", "-c", deleteUserMac };
+			Log.info("SSH Delete User", executeCommand(deleteUserMacCMD));
+			
+			String deleteUserMacHomedirectory = "echo '" + password
+					+ "' | sudo -kS /bin/rm -rf \"/Users/"+username+"\"";
+			String[] deleteUserMacHomedirectoryCMD = { "/bin/sh", "-c", deleteUserMacHomedirectory };
+			Log.info("SSH Delete Homedirectory", executeCommand(deleteUserMacHomedirectoryCMD));
+		} else {
+			Log.fatal("SSH", "Can't delete User on this OS");
+		}
 	}
 
 	public void deleteSshAccess() {
-	  if (this.password == null) {
-      password = config.getProperty("password");
-    }
-	  
-	  for(String username : this.getUsernames()){
-//		    String deleteSshString = "echo '" + password
-//	          + "' | sudo rm -r ~/../" + username;
-//	      String[] deleteSshCMD = { "/bin/sh", "-c", deleteSshString };
-//	      executeCommand(deleteSshCMD);
-		  deleteUserAccount(username);
-		  }  
-	}
+		if (this.password == null) {
+			password = config.getProperty("password");
+		}
 
+		for (String username : this.getUsernames()) {
+			deleteUserAccount(username);
+		}
+	}
 
 }
