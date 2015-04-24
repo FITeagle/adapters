@@ -126,48 +126,71 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   @Override
   public Model createInstance(String instanceURI, Model newInstanceModel) {
-    //ServerForCreate serverForCreate = openstackParser.parseToServerForCreate(instanceURI, newInstanceModel);
 
     Resource requestedVM = newInstanceModel.getResource(instanceURI);
 
     String typeURI = getRequestedTypeURI(requestedVM);
     String flavorId = getFlavorId(typeURI);
     String diskImageURI = getDiskImageId(requestedVM);
+    String username = getUsername(requestedVM);
+    String publicKey = getPublicKey(requestedVM);
 
-    String keypair = getKeypairId(requestedVM);
+    ServerForCreate serverForCreate = new ServerForCreate(instanceURI,flavorId,diskImageURI,null);
 
-    ServerForCreate serverForCreate = new ServerForCreate(instanceURI,flavorId,diskImageURI,keypair);
+    if(username != null && publicKey != null) {
+      String userdata_not_encoded = "#cloud-config\n" +
+              "users:\n" +
+              "  - name: " + username + "\n" +
+              "    sudo: ALL=(ALL) NOPASSWD:ALL\n" +
+              "    shell: /bin/bash\n" +
+              "    ssh-authorized-keys:\n" +
+              "      - " + publicKey + "\n";
 
-    CreateVM createVM = new CreateVM(serverForCreate);
+      String userdata_encoded = Base64.getEncoder().encodeToString(userdata_not_encoded.getBytes());
+
+      serverForCreate.setUserData(userdata_encoded);
+    }
+
+    CreateVM createVM = new CreateVM(serverForCreate, this);
     Thread createVMThread = new Thread(createVM);
     createVMThread.start();
 
-//    Property property = newInstanceModel.createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
-//    property.addProperty(RDF.type, OWL.FunctionalProperty);
-//    requestedVM.addProperty(property, Omn_lifecycle.Un);
+     Property property = newInstanceModel.createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
+     property.addProperty(RDF.type, OWL.FunctionalProperty);
+     requestedVM.addProperty(property, Omn_lifecycle.Uncompleted);
     return newInstanceModel;
   }
 
-  private String getKeypairId(Resource requestedVM) {
+  private String addKeypairId(String username, String publicKey ) {
     String keyPairId = null;
 
-
-    Statement usernameStatement = requestedVM.getProperty(Omn_service.username);
-
-
-    if(usernameStatement != null){
-
-      Statement publicKeyStatement = requestedVM.getProperty(Omn_service.publickey);
-      String userName = usernameStatement.getObject().toString();
-      String publicKey = publicKeyStatement.getObject().toString();
-      keyPairId = userName + UUID.randomUUID();
-      openstackClient.addKeyPair(keyPairId,publicKey);
+    if (username != null && publicKey != null) {
+        keyPairId = username + UUID.randomUUID();
+        openstackClient.addKeyPair(keyPairId, publicKey);
     }
-
 
 
     return keyPairId;
   }
+
+  private String getPublicKey(Resource requestedVM) {
+    Statement publicKeyStatement = requestedVM.getProperty(Omn_service.publickey);
+    return publicKeyStatement.getObject().toString();
+  }
+
+  private String getUsername(Resource requestedVM) {
+    Statement usernameStatement = requestedVM.getProperty(Omn_service.username);
+
+
+    if(usernameStatement != null) {
+
+
+      String userName = usernameStatement.getObject().toString();
+      return userName;
+    }
+    return null;
+  }
+
 
   private String getFlavorId(String typeURI) {
     String flavorId = null;
@@ -193,7 +216,9 @@ public class OpenstackAdapter extends AbstractAdapter {
     String requestedType = null;
     while (stmtIterator.hasNext()){
       Statement statement = stmtIterator.nextStatement();
-      if(!statement.getObject().equals(Omn_resource.Node) || !statement.getObject().equals(Omn_domain_pc.VM)){
+      RDFNode one = statement.getObject();
+      boolean isNode =  one.equals(Omn_resource.Node);
+      if(!isNode){
         requestedType = statement.getObject().asResource().getURI();
         break;
       }
@@ -275,8 +300,10 @@ public class OpenstackAdapter extends AbstractAdapter {
   private class CreateVM implements Runnable {
 
     private final ServerForCreate serverForCreate;
+    private final OpenstackAdapter parent;
 
-    public CreateVM(ServerForCreate serverForCreate){
+    public CreateVM(ServerForCreate serverForCreate, OpenstackAdapter parent){
+      this.parent =  parent;
       this.serverForCreate = serverForCreate;
     }
 
@@ -296,64 +323,36 @@ public class OpenstackAdapter extends AbstractAdapter {
           }
         }
       }
+      try {
       if(floatingIp == null) {
-        try {
+
           floatingIp = openstackClient.addFloatingIp();
-        }catch (Exception e){
-          throw  new RuntimeException();
+
         }
+        openstackClient.allocateFloatingIpForServer(server.getId(),floatingIp.getIp());
+      }catch (Exception e){
+        throw  new RuntimeException();
       }
-      openstackClient.allocateFloatingIpForServer(server.getId(),floatingIp.getIp());
-     // Model model = parseToModel(server);
+
+      Model model = parseToModel(server);
+      parent.notifyListeners(model, UUID.randomUUID().toString(),IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
+
+
 
     }
 
 
-//    private Model parseToModel(Server server){
-//      //TODO: better check whether it's already an URI
-//      if(!(server.getName().startsWith("http://") || server.getName().startsWith("urn:"))){
-//        server.setName(adapter.getAdapterInstance().getNameSpace()+server.getName());
-//      }
-//      Resource resource = ModelFactory.createDefaultModel().createResource(server.getName());
-//      resource.addProperty(RDF.type, adapter.getAdapterManagedResources().get(0));
-//      resource.addProperty(RDFS.label, resource.getLocalName());
-//      for(Property p : OpenstackAdapter.resourceInstanceProperties){
-//        switch(p.getLocalName()){
-//          case "id":
-//            if(server.getId() != null){
-//              resource.addLiteral(p, server.getId());
-//            }
-//            break;
-//          case "status":
-//            if(server.getStatus() != null){
-//              resource.addLiteral(p, server.getStatus());
-//            }
-//            break;
-//          case "created":
-//            if(server.getCreated() != null){
-//              resource.addLiteral(p, server.getCreated());
-//            }
-//            break;
-//          case "image":
-//            if(server.getImage() != null && server.getImage().getId() != null){
-//              Resource image = getImage(server.getImage());
-//              resource.addProperty(p, image);
-//            }
-//            break;
-//          case "keypairname":
-//            if(server.getKeyName() != null){
-//              resource.addLiteral(p, server.getKeyName());
-//            }
-//            break;
-//          case "flavor":
-//            if(server.getFlavor() != null && server.getFlavor().getId() != null){
-//              resource.addLiteral(p, server.getFlavor().getId());
-//            }
-//            break;
-//        }
-//      }
-//      return resource.getModel();
-//    }
+    private Model parseToModel(Server server){
+      //TODO: better check whether it's already an URI
+
+      Resource resource = ModelFactory.createDefaultModel().createResource(server.getName());
+      Server.Addresses addresses = server.getAddresses();
+      boolean hasFloatingIP = false;
+      //for(Server.Addresses.Address address:addresses.getAddresses())
+
+
+      return resource.getModel();
+    }
 
   }
 

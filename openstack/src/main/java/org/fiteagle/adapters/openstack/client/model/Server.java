@@ -173,7 +173,18 @@ public class Server implements Serializable {
 		
 		
 	}
-		
+
+	public String getUser_data() {
+		return user_data;
+	}
+
+	public void setUser_data(String user_data) {
+		this.user_data = user_data;
+	}
+
+	private String user_data;
+
+
 
 	private String id;
 	
