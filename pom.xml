@@ -51,6 +51,7 @@
 		<module>openMTC</module>
 		<module>tosca</module>
 		<module>sshService</module>
+		<module>monitoring</module>
 
     </modules>
 </project>
