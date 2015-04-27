@@ -69,11 +69,12 @@ public abstract class AbstractAdapter {
         Model createdInstance = createInstance(instanceURI, model);
         createdInstancesModel.add(createdInstance);
       }
+    }
       if (createdInstancesModel.isEmpty()) {
         LOGGER.log(Level.INFO, "Could not find any new instances to create");
         throw new ProcessingException(Response.Status.CONFLICT.name());
       }
-    }
+
     return createdInstancesModel;
   }
   

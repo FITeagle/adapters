@@ -90,8 +90,8 @@ public final class MonitoringService {
 	  vm_id = r.getProperty(Omn_domain_pc.hasVMID).getLiteral().getString() ;
 	  if(r.hasProperty(Omn_lifecycle.usesService)){
 		  Resource service = r.getProperty(Omn_lifecycle.usesService).getResource() ;
-		  if(service.hasProperty(RDF.type, Omn_monitoring.OMSPService) && service.hasProperty(Omn.hasEndpoint)){
-			  oml_uri = service.getProperty(Omn.hasEndpoint).getLiteral().getString() ;
+		  if(service.hasProperty(RDF.type, Omn_monitoring.OMSPService) && service.hasProperty(Omn_service.hasURI)){
+			  oml_uri = service.getProperty(Omn_service.hasURI).getLiteral().getString() ;
 			  host = new OpenstackClient().getHostName(vm_id) ; 
 			  if(host == null){
 				  LOGGER.log(Level.INFO, "Host not found. Ignoring...") ;
