@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import org.fiteagle.api.core.Config;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
@@ -26,50 +27,101 @@ import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
 import com.woorea.openstack.nova.Nova;
 
 public class OpenstackClient {
+
+
+	private String DEFAULT_KEYPAIR_ID ;
+	private String DEFAULT_FLAVOR_ID  ;
+	private String DEFAULT_IMAGE_ID ;
 	private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
-	  
+
 	private String KEYSTONE_AUTH_URL;
 	private String KEYSTONE_USERNAME;
 	private String KEYSTONE_PASSWORD;
+	private String KEYSTONE_ENDPOINT;
 	private String TENANT_NAME;
 	private String NOVA_ENDPOINT;
+	private String GLANCE_ENDPOINT;
+	private String NET_ENDPOINT;
+	private String FLOATINGIP_POOL_NAME;
+	private String NET_NAME;
 	private String TENANT_ID = "";
+
+	private String networkId = "";
 		
 private boolean PREFERENCES_INITIALIZED = false;
-	
-	private void loadPreferences() {
-		Preferences preferences = Preferences.userNodeForPackage(getClass());
 
-		if (preferences.get("keystone_auth_URL", null) != null){
-		  KEYSTONE_AUTH_URL = preferences.get("keystone_auth_URL", null);
+	private void loadPreferences() {
+		Config preferences = new Config("Openstack-2");
+		if (preferences.getProperty("floating_ip_pool_name") != null){
+			FLOATINGIP_POOL_NAME = preferences.getProperty("floating_ip_pool_name");
+		}
+		if (preferences.getProperty("keystone_auth_URL") != null){
+			KEYSTONE_AUTH_URL = preferences.getProperty("keystone_auth_URL");
 		}
 		else{
-		  throw new InsufficientOpenstackPreferences("keystone_auth_URL");
+			throw new InsufficientOpenstackPreferences("keystone_auth_URL");
 		}
-		if (preferences.get("keystone_password", null) != null){
-		  KEYSTONE_PASSWORD = preferences.get("keystone_password", null);
-		}
-		else{
-		  throw new InsufficientOpenstackPreferences("keystone_password");
-		}
-		if (preferences.get("keystone_username", null) != null){
-		  KEYSTONE_USERNAME = preferences.get("keystone_username", null);
+		if (preferences.getProperty("keystone_endpoint") != null){
+			KEYSTONE_ENDPOINT = preferences.getProperty("keystone_endpoint");
 		}
 		else{
-		  throw new InsufficientOpenstackPreferences("keystone_username");
+			throw new InsufficientOpenstackPreferences("keystone_endpoint");
 		}
-		if (preferences.get("nova_endpoint", null) != null){
-		  NOVA_ENDPOINT = preferences.get("nova_endpoint", null);
-		}
-		else{
-		  throw new InsufficientOpenstackPreferences("nova_endpoint");
-		}
-		if (preferences.get("tenant_name", null) != null){
-		  TENANT_NAME = preferences.get("tenant_name", null);
+		if (preferences.getProperty("keystone_password") != null){
+			KEYSTONE_PASSWORD = preferences.getProperty("keystone_password");
 		}
 		else{
-		  throw new InsufficientOpenstackPreferences("tenant_name");
+			throw new InsufficientOpenstackPreferences("keystone_password");
 		}
+		if (preferences.getProperty("keystone_username") != null){
+			KEYSTONE_USERNAME = preferences.getProperty("keystone_username");
+		}
+		else{
+			throw new InsufficientOpenstackPreferences("keystone_username");
+		}
+		if (preferences.getProperty("net_endpoint") != null){
+			NET_ENDPOINT = preferences.getProperty("net_endpoint");
+		}
+		else{
+			throw new InsufficientOpenstackPreferences("net_endpoint");
+		}
+		if (preferences.getProperty("net_name") != null){
+			NET_NAME = preferences.getProperty("net_name");
+		}
+		else{
+			throw new InsufficientOpenstackPreferences("net_name");
+		}
+		if (preferences.getProperty("nova_endpoint") != null){
+			NOVA_ENDPOINT = preferences.getProperty("nova_endpoint");
+		}
+		else{
+			throw new InsufficientOpenstackPreferences("nova_endpoint");
+		}
+		if (preferences.getProperty("tenant_name") != null){
+			TENANT_NAME = preferences.getProperty("tenant_name");
+		}
+		else{
+			throw new InsufficientOpenstackPreferences("tenant_name");
+		}
+
+		if(preferences.getProperty("default_image_id")!= null){
+			DEFAULT_IMAGE_ID = preferences.getProperty("default_image_id");
+		}else{
+			throw new InsufficientOpenstackPreferences("default_image_id");
+		}
+
+		if(preferences.getProperty("default_flavor_id")!= null){
+			DEFAULT_FLAVOR_ID = preferences.getProperty("default_flavor_id");
+		}else{
+			throw new InsufficientOpenstackPreferences("default_flavor_id");
+		}
+
+		if(preferences.getProperty("default_keypair_id")!= null){
+			DEFAULT_KEYPAIR_ID = preferences.getProperty("default_keypair_id");
+		}else{
+			throw new InsufficientOpenstackPreferences("default_keypair_id");
+		}
+
 	}
 	
 	private Access getAccessWithTenantId() throws InsufficientOpenstackPreferences{

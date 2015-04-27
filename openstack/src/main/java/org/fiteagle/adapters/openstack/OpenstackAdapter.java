@@ -145,6 +145,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     String diskImageURI = getDiskImageId(requestedVM);
     String username = getUsername(requestedVM);
     String publicKey = getPublicKey(requestedVM);
+    Resource monitoringService =  getMonitoringService(newInstanceModel);
 
     ServerForCreate serverForCreate = new ServerForCreate(instanceURI,flavorId,diskImageURI,null);
 
@@ -164,8 +165,9 @@ public class OpenstackAdapter extends AbstractAdapter {
 
     try {
       CreateVM createVM = new CreateVM(serverForCreate, this.listener, username);
-
-
+      if(monitoringService != null){
+        createVM.setMonitoringService(monitoringService);
+      }
       ManagedThreadFactory threadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
       Thread  createVMThread = threadFactory .newThread(createVM);
       createVMThread.start();
@@ -183,6 +185,16 @@ public class OpenstackAdapter extends AbstractAdapter {
      property.addProperty(RDF.type, OWL.FunctionalProperty);
      resource.addProperty(property, Omn_lifecycle.Uncompleted);
     return returnModel;
+  }
+
+  private Resource getMonitoringService(Model newInstanceModel) {
+    ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type,Omn_monitoring.OMSPService.getURI());
+    Resource omsp_service = null;
+    while (resIterator.hasNext()){
+      omsp_service = resIterator.nextResource();
+    }
+
+    return omsp_service;
   }
 
   private String addKeypairId(String username, String publicKey ) {
@@ -223,7 +235,15 @@ public class OpenstackAdapter extends AbstractAdapter {
     String flavorId = null;
 
     Resource requestedFlavor = this.adapterModel.getResource(typeURI);
-    return requestedFlavor.getProperty(Omn_lifecycle.hasID).getObject().asLiteral().getString();
+    if(requestedFlavor != null){
+      Statement statement = requestedFlavor.getProperty(Omn_lifecycle.hasID);
+      if(statement != null){
+        RDFNode node = statement.getObject();
+        flavorId = node.asLiteral().getString();
+      }
+
+    }
+    return flavorId;
   }
 
   private String getDiskImageId(Resource requestedVM) {
@@ -341,10 +361,23 @@ public class OpenstackAdapter extends AbstractAdapter {
     private final OpenstackAdapterMDBSender parent;
     private final String username;
 
+    public Resource getMonitoringService() {
+      return monitoringService;
+    }
+
+    public void setMonitoringService(Resource monitoringService) {
+      this.monitoringService = monitoringService;
+    }
+
+    private Resource monitoringService;
+
+
+
     public CreateVM(ServerForCreate serverForCreate, OpenstackAdapterMDBSender parent, String username){
       this.parent =  parent;
       this.serverForCreate = serverForCreate;
       this.username = username;
+
     }
 
 
@@ -417,8 +450,14 @@ public class OpenstackAdapter extends AbstractAdapter {
        loginService.addProperty(Omn_service.authentication,"ssh-keys");
        loginService.addProperty(Omn_service.username, username);
        loginService.addProperty(Omn_service.hostname, floatingIp.getIp());
+       parsedServer.addProperty(Omn.hasService, loginService);
 
      }
+      if(monitoringService != null){
+        parsedServer.addProperty(Omn_lifecycle.usesService,monitoringService);
+        parsedServer.getModel().add(monitoringService.listProperties());
+      }
+
       return parsedServer.getModel();
     }
 
