@@ -443,7 +443,9 @@ public class OpenstackAdapter extends AbstractAdapter {
 
      if(floatingIp != null){
 
-       Resource loginService = parsedServerModel.createResource();
+
+       Resource loginService = parsedServerModel.createResource(OntologyModelUtil
+               .getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
        loginService.addProperty(RDF.type, Omn_service.LoginService);
        loginService.addProperty(Omn_service.authentication,"ssh-keys");
        loginService.addProperty(Omn_service.username, username);
