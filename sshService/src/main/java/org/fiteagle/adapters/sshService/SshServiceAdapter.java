@@ -102,7 +102,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 	}
 
-	public SshServiceAdapter(String adapterInstanceName) {
+	public SshServiceAdapter() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -261,6 +261,20 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			model.add(getInstance(uri));
 		}
 		return model;
+	}
+	
+	public void testCreateAccess(String pubKey,String username){
+		SshService sshService = new SshService(this);
+		sshService.addSshAccess(username, pubKey);
+		instanceList.put(username, sshService);
+
+	}
+	
+	public void testDeleteAccess(){
+		SshService sshService = instanceList.get("deploytestuser");
+		sshService.deleteSshAccess();
+		instanceList.remove("deploytestuser");
+
 	}
 
 }
