@@ -45,6 +45,7 @@ public final class MonitoringService {
   private String vm_id = null ;
   private String oml_uri = null ;
   private String host = null ;
+  private String vm_uri = null ;
  
   public static MonitoringService getInstance() {
 		if (monitoringAdapterSingleton != null){
@@ -61,6 +62,7 @@ public final class MonitoringService {
 		Resource r = resIterator.nextResource();
 		
 		if(r.hasProperty(RDF.type, Omn_domain_pc.VM) && r.hasProperty(Omn_domain_pc.hasVMID)){	// if resource is vm
+			vm_uri = r.toString() ;
 			if(r.hasProperty(Omn_lifecycle.hasState, Omn_lifecycle.Started)){
 				createOk = handleCreate(model, r) ;
 			}
@@ -76,7 +78,7 @@ public final class MonitoringService {
 		
 		if(createOk && !deleteOk ){
 			SQLite sql = new SQLite() ;
-			if(sql.insert(vm_id, host, oml_uri)) System.out.println("Data successfully added to database.") ;
+			if(sql.insert(vm_id, host, oml_uri,vm_uri)) System.out.println("Data successfully added to database.") ;
 		}else if(!createOk && deleteOk){
 			SQLite sql = new SQLite() ;
 			if(sql.delete(vm_id)) System.out.println("Data successfully deleted to database.") ;

@@ -86,7 +86,7 @@ public class SQLite {
     
     public boolean createTable(){
     	try{
-    		executeStmt("create table IF NOT EXISTS virtual_physical_map (resource_id text primary key, host_name text, collector_uri text)");
+    		executeStmt("create table IF NOT EXISTS virtual_physical_map (resource_id text primary key, host_name text, collector_uri text, vm_uri text)");
     		return true ;	
     	}catch(SQLException e){
     		LOGGER.log(Level.WARNING, "Creating table failed.");
@@ -94,10 +94,10 @@ public class SQLite {
     	}
 	}
 	
-	public boolean insert(String vm_id, String host, String oml_uri){
+	public boolean insert(String vm_id, String host, String oml_uri, String vm_uri){
 		try{
 			 if(createTable()){
-				 executeStmt("insert into virtual_physical_map (resource_id, host_name, collector_uri) values (\"" + vm_id + "\",\"" + host + "\",\"" + oml_uri + "\")");
+				 executeStmt("insert into virtual_physical_map (resource_id, host_name, collector_uri, vm_uri) values (\"" + vm_id + "\",\"" + host + "\",\"" + oml_uri + "\",\"" + vm_uri + "\")");
 			 }
 			 return true ;
 		 }catch(SQLException e){

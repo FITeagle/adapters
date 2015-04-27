@@ -164,8 +164,8 @@ class OMLBase:
             target = "_experiment_metadata"
         else:
             # changed by Mingyuan Wu.
-            target = self.domain + "_" + mpname
-            #target = mpname
+            #target = self.domain + "_" + mpname
+            target = mpname
         str_schema = str(self.streams) + " " + target + " " + schema
         self.schema += "schema: " + str_schema
         self.nextseq[mpname] = 0
