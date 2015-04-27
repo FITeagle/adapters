@@ -185,7 +185,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
   private Resource getMonitoringService(Model newInstanceModel) {
-    ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type,Omn_monitoring.OMSPService);
+    ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type,Omn_monitoring.OMSPService.getURI());
     Resource omsp_service = null;
     while (resIterator.hasNext()){
       omsp_service = resIterator.nextResource();
@@ -452,6 +452,7 @@ public class OpenstackAdapter extends AbstractAdapter {
      }
       if(monitoringService != null){
         parsedServer.addProperty(Omn_lifecycle.usesService,monitoringService);
+        parsedServer.getModel().add(monitoringService.listProperties());
       }
 
       return parsedServer.getModel();
