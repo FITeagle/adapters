@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.decorator.Decorator;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.Message;

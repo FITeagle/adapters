@@ -9,6 +9,7 @@ import info.openmultinet.ontology.vocabulary.*;
 import java.util.*;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
 import org.fiteagle.adapters.openstack.client.IOpenstackClient;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
 import org.fiteagle.adapters.openstack.client.OpenstackParser;
@@ -17,12 +18,18 @@ import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.Servers;
+import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+
+import javax.enterprise.concurrent.ManagedThreadFactory;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 
 public class OpenstackAdapter extends AbstractAdapter {
 
@@ -35,8 +42,10 @@ public class OpenstackAdapter extends AbstractAdapter {
   private Model adapterModel;
   private Resource adapterInstance;
   
-  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
-  
+  public static Map<String, OpenstackAdapter> adapterInstances = new HashMap<>();
+//  private List<AdapterEventListener> myListeners = new ArrayList<AdapterEventListener>();;
+  private OpenstackAdapterMDBSender listener;
+
   public static OpenstackAdapter getTestInstance(IOpenstackClient openstackClient){
     OpenstackAdapter instance = (OpenstackAdapter) adapterInstances.values().iterator().next();
     OpenstackAdapter testInstance = new OpenstackAdapter(instance.getAdapterInstance(), openstackClient);
@@ -91,7 +100,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   private OpenstackAdapter(Resource adapterInstance, IOpenstackClient openstackClient){
     //super(adapterInstance.getLocalName());
-    
+    adapterInstances.put(adapterInstance.getURI(), this);
     this.adapterInstance = adapterInstance;
     this.adapterModel = adapterInstance.getModel();
     
@@ -121,11 +130,11 @@ public class OpenstackAdapter extends AbstractAdapter {
 
     }
     adapterInstance.addProperty(Omn_lifecycle.canImplement, Omn_domain_pc.VM);
-    adapterInstances.put(adapterInstance.getURI(), this);
+
   }
   
   @Override
-  public Model createInstance(String instanceURI, Model newInstanceModel) {
+  public Model createInstance(String instanceURI, Model newInstanceModel)  {
 
     Resource requestedVM = newInstanceModel.getResource(instanceURI);
 
@@ -151,14 +160,26 @@ public class OpenstackAdapter extends AbstractAdapter {
       serverForCreate.setUserData(userdata_encoded);
     }
 
-    CreateVM createVM = new CreateVM(serverForCreate, this);
-    Thread createVMThread = new Thread(createVM);
-    createVMThread.start();
+    try {
+      CreateVM createVM = new CreateVM(serverForCreate, this.listener, username);
 
-     Property property = newInstanceModel.createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
+
+      ManagedThreadFactory threadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+      Thread  createVMThread = threadFactory .newThread(createVM);
+      createVMThread.start();
+    } catch (NamingException e) {
+      e.printStackTrace();
+    }
+
+
+    Model returnModel = ModelFactory.createDefaultModel();
+    Resource resource =  returnModel.createResource(requestedVM.getURI());
+    resource.addProperty(RDF.type, Omn_domain_pc.VM);
+
+     Property property = returnModel.createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
      property.addProperty(RDF.type, OWL.FunctionalProperty);
-     requestedVM.addProperty(property, Omn_lifecycle.Uncompleted);
-    return newInstanceModel;
+     resource.addProperty(property, Omn_lifecycle.Uncompleted);
+    return returnModel;
   }
 
   private String addKeypairId(String username, String publicKey ) {
@@ -192,6 +213,9 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
 
+//  public void addListener(OpenstackAdapterMDBSender newListener) {
+//    myListeners.add(newListener);
+//  }
   private String getFlavorId(String typeURI) {
     String flavorId = null;
 
@@ -297,14 +321,27 @@ public class OpenstackAdapter extends AbstractAdapter {
     return model;
   }
 
+  @Override
+  public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
+   // for (AdapterEventListener listener : myListeners) {
+    this.listener.publishModelUpdate(eventRDF, requestID, methodType, methodTarget);
+    //}
+  }
+
+  public void setListener(OpenstackAdapterMDBSender listener) {
+    this.listener = listener;
+  }
+
   private class CreateVM implements Runnable {
 
     private final ServerForCreate serverForCreate;
-    private final OpenstackAdapter parent;
+    private final OpenstackAdapterMDBSender parent;
+    private final String username;
 
-    public CreateVM(ServerForCreate serverForCreate, OpenstackAdapter parent){
+    public CreateVM(ServerForCreate serverForCreate, OpenstackAdapterMDBSender parent, String username){
       this.parent =  parent;
       this.serverForCreate = serverForCreate;
+      this.username = username;
     }
 
 
@@ -334,24 +371,52 @@ public class OpenstackAdapter extends AbstractAdapter {
         throw  new RuntimeException();
       }
 
-      Model model = parseToModel(server);
-      parent.notifyListeners(model, UUID.randomUUID().toString(),IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
+      Model model = parseToModel(server, floatingIp);
+      parent.publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
 
 
 
     }
 
 
-    private Model parseToModel(Server server){
+    private Model parseToModel(Server server, FloatingIp floatingIp){
       //TODO: better check whether it's already an URI
 
-      Resource resource = ModelFactory.createDefaultModel().createResource(server.getName());
-      Server.Addresses addresses = server.getAddresses();
-      boolean hasFloatingIP = false;
-      //for(Server.Addresses.Address address:addresses.getAddresses())
+      Model parsedServerModel =  ModelFactory.createDefaultModel();
+      Resource parsedServer = parsedServerModel.createResource(server.getName());
+      server = openstackClient.getServerDetails(server.getId());
+
+      int retryCounter = 0;
+      while(retryCounter < 10){
+        if(!"ACTIVE".equalsIgnoreCase(server.getStatus())){
+          try {
+            Thread.sleep(1000);
+            server = openstackClient.getServerDetails(server.getId());
+          } catch (InterruptedException e) {
+            throw  new RuntimeException();
+          }
+      }else {
+          break;
+        }
+      }
+      parsedServer.addProperty(Omn_domain_pc.hasVMID,server.getId());
+
+      parsedServer.addProperty(RDF.type, Omn_domain_pc.VM);
+      Property property = parsedServer.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
+      property.addProperty(RDF.type, OWL.FunctionalProperty);
+      parsedServer.addProperty(property, Omn_lifecycle.Started);
 
 
-      return resource.getModel();
+     if(floatingIp != null){
+
+       Resource loginService = parsedServerModel.createResource();
+       loginService.addProperty(RDF.type, Omn_service.LoginService);
+       loginService.addProperty(Omn_service.authentication,"ssh-keys");
+       loginService.addProperty(Omn_service.username, username);
+       loginService.addProperty(Omn_service.hostname, floatingIp.getIp());
+
+     }
+      return parsedServer.getModel();
     }
 
   }
