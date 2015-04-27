@@ -211,9 +211,14 @@ public class SshService {
 		try {
 			if (password == null) {
 				password = config.getProperty("password");
+				if(password.equals("")){
+				  Log.fatal("SSH", "Could not find Sudo-Passwort");
+				  Log.fatal("SSH",
+		          "Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
+				}
 			}
 		} catch (IllegalArgumentException e) {
-			Log.fatal("SSH", "Could not find Sudo-Passwort");
+		  Log.fatal("SSH", "Could not find Sudo-Passwort");
 			Log.fatal("SSH",
 					"Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
 		}
