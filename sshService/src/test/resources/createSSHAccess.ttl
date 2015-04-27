@@ -4,10 +4,11 @@
 @prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
 @prefix local: <http://localhost/resource#> .
 @prefix omn:   <http://open-multinet.info/ontology/omn#> .
-@prefix omn-service: <http://open-multinet.info/ontology/omn-service#> .
+@prefix omn-service: <http://open-multinet.info/ontology/omn-service#> 
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
 
 
 ssh:PhysicalNodeAdapter-1 a ssh:SshService ;
           omn-service:publickey "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDa6JqlE8UOyTagtS91f2Z5DtamUgyMnRZdyliZDXoL6O3jdoVPnernYvrzaRlW1YBPiuPxmv/S7Q7fvXL8CY3ntxGpOHER6EZIUOdHVp/Nu3BFhjJ40Zk/y5geQeJy6NXMqzATkmGGGV9QlGzirC5z2aUHY1UQhWmsE+3zUbw0P6Ic5tH0TcO/zDLY9L5MQwjx5537Q7mskeNaiTLjDZ2jD5wFEQAfNmYJydyyNzwvTNovEgkk2R8usaxH2qtBmmvkkrWdzgOQYsaCGEeHCmSP3FNKyxzymdQnPQetu/BpyBT3YU7zE04HA44Uua4+AjbhDBofPjK89uI1gxQ7a5rh alaa.alloush@air "^^xsd:string ;
-          omn-service:username "alexneu"^^xsd:string .
-          
+          omn-service:username "alexneu"^^xsd:string ;
+          omn-lifecycle:implementedBy ssh-adapter:SshAdapter.

@@ -96,8 +96,14 @@ public class SshService {
 	}
 
 	private String setNewUserLinux(String newUsername) {
-		if (password == null) {
-			password = config.getProperty("password");
+		try {
+			if (password == null) {
+				password = config.getProperty("password");
+			}
+		} catch (IllegalArgumentException e) {
+			Log.fatal("SSH", "Could not find Sudo-Passwort");
+			Log.fatal("SSH",
+					"Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
 		}
 
 		StringBuffer output = new StringBuffer();
@@ -132,10 +138,16 @@ public class SshService {
 	}
 
 	private String setNewUserMac(String newUsername) {
-
-		if (password == null) {
-			password = config.getProperty("password");
+		try {
+			if (password == null) {
+				password = config.getProperty("password");
+			}
+		} catch (IllegalArgumentException e) {
+			Log.fatal("SSH", "Could not find Sudo-Passwort");
+			Log.fatal("SSH",
+					"Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
 		}
+
 		String mypassword = password;
 		String fullname = "AlexNeu";
 		String userpwd = "password";
@@ -196,40 +208,54 @@ public class SshService {
 	}
 
 	public void addSshAccess(String newUser, String publicKey) {
-		if (password == null) {
-			password = config.getProperty("password");
+		try {
+			if (password == null) {
+				password = config.getProperty("password");
+				if(password.equals("")){
+				  Log.fatal("SSH", "Could not find Sudo-Passwort");
+				  Log.fatal("SSH",
+		          "Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
+				}
+			}
+		} catch (IllegalArgumentException e) {
+		  Log.fatal("SSH", "Could not find Sudo-Passwort");
+			Log.fatal("SSH",
+					"Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
 		}
 
-		this.setUsername(newUser);
+		this.setUsername(newUser.toLowerCase());
 		this.setPossibleAccesses(publicKey);
 
 		String addSshString = "echo '" + password
-				+ "' | sudo -kS mkdir -pm 0777 ~/../" + newUser + "/.ssh";
+				+ "' | sudo -kS mkdir -pm 0777 ~/../" + newUser.toLowerCase()
+				+ "/.ssh";
 		String[] addSshCMD = { "/bin/sh", "-c", addSshString };
 
-		String addKeysString = "echo " + publicKey + " >> ~/../" + newUser
-				+ "/.ssh/authorized_keys";
+		String addKeysString = "echo " + publicKey + " >> ~/../"
+				+ newUser.toLowerCase() + "/.ssh/authorized_keys";
 		String[] addSshKeyCMD = { "/bin/sh", "-c", addKeysString };
 
 		String chMod600 = "echo '" + password + "' | sudo -kS chmod 600 ~/../"
-				+ newUser + "/.ssh/authorized_keys";
+				+ newUser.toLowerCase() + "/.ssh/authorized_keys";
 		String[] chMod600CMD = { "/bin/sh", "-c", chMod600 };
 
 		String chMod700 = "echo '" + password + "' | sudo -kS chmod 700 ~/../"
-				+ newUser + "/.ssh";
+				+ newUser.toLowerCase() + "/.ssh";
 		String[] chMod700CMD = { "/bin/sh", "-c", chMod700 };
 
 		String chOwnString = "echo '" + password + "' | sudo -kS chown -R "
-				+ newUser + " ~/../" + newUser + "/.ssh";
+				+ newUser.toLowerCase() + " ~/../" + newUser.toLowerCase()
+				+ "/.ssh";
 		String[] chOwnStringCMD = { "/bin/sh", "-c", chOwnString };
 
 		String chOwnStringMac = "echo '" + password + "' | sudo -kS chown -Rv "
-				+ newUser + " ~/../" + newUser + "/.ssh";
+				+ newUser.toLowerCase() + " ~/../" + newUser.toLowerCase()
+				+ "/.ssh";
 		String[] chOwnStringMacCMD = { "/bin/sh", "-c", chOwnStringMac };
 
 		if (executeCommand("uname -s").contains("Linux")) {
 			Log.info("SSH", "Creating new User for SSH");
-			setNewUserLinux(newUser);
+			setNewUserLinux(newUser.toLowerCase());
 
 			Log.info("SSH", "Creating .ssh folder");
 			executeCommand(addSshCMD);
@@ -244,7 +270,7 @@ public class SshService {
 
 		} else if (executeCommand("uname -s").contains("Darwin")) {
 			Log.info("SSH", "Creating new User for SSH");
-			setNewUserMac(newUser);
+			setNewUserMac(newUser.toLowerCase());
 
 			Log.info("SSH", "Creating .ssh folder");
 			executeCommand(addSshCMD);
@@ -262,41 +288,51 @@ public class SshService {
 
 	}
 
-	public void deleteUserAccount(String username) {
+	private void deleteUserAccount(String username) {
 
 		if (executeCommand("uname -s").contains("Linux")) {
 			String deleteUserLinux = "echo '" + password
-					+ "' | sudo -kS deluser --remove-home " + username;
+					+ "' | sudo -kS deluser --remove-home "
+					+ username.toLowerCase();
 			String[] deleteUserLinuxCMD = { "/bin/sh", "-c", deleteUserLinux };
 
 			Log.info("SSH Delete User", executeCommand(deleteUserLinuxCMD));
 		} else if (executeCommand("uname -s").contains("Darwin")) {
 			Log.info("SSH Delete User",
 					executeCommand("/usr/bin/dscl . -search /Users name "
-							+ username));
+							+ username.toLowerCase()));
 
 			String deleteUserMac = "echo '" + password
 					+ "' | sudo -kS /usr/bin/dscl . -delete \"/Users/"
-					+ username + "\"";
+					+ username.toLowerCase() + "\"";
 			String[] deleteUserMacCMD = { "/bin/sh", "-c", deleteUserMac };
 			Log.info("SSH Delete User", executeCommand(deleteUserMacCMD));
-			
+
 			String deleteUserMacHomedirectory = "echo '" + password
-					+ "' | sudo -kS /bin/rm -rf \"/Users/"+username+"\"";
-			String[] deleteUserMacHomedirectoryCMD = { "/bin/sh", "-c", deleteUserMacHomedirectory };
-			Log.info("SSH Delete Homedirectory", executeCommand(deleteUserMacHomedirectoryCMD));
+					+ "' | sudo -kS /bin/rm -rf \"/Users/"
+					+ username.toLowerCase() + "\"";
+			String[] deleteUserMacHomedirectoryCMD = { "/bin/sh", "-c",
+					deleteUserMacHomedirectory };
+			Log.info("SSH Delete Homedirectory",
+					executeCommand(deleteUserMacHomedirectoryCMD));
 		} else {
 			Log.fatal("SSH", "Can't delete User on this OS");
 		}
 	}
 
 	public void deleteSshAccess() {
-		if (this.password == null) {
-			password = config.getProperty("password");
+		try {
+			if (password == null) {
+				password = config.getProperty("password");
+			}
+		} catch (IllegalArgumentException e) {
+			Log.fatal("SSH", "Could not find Sudo-Passwort");
+			Log.fatal("SSH",
+					"Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
 		}
 
 		for (String username : this.getUsernames()) {
-			deleteUserAccount(username);
+			deleteUserAccount(username.toLowerCase());
 		}
 	}
 

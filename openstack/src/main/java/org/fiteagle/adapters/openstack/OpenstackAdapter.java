@@ -4,6 +4,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.OWL2;
 import com.woorea.openstack.nova.model.*;
+
 import info.openmultinet.ontology.vocabulary.*;
 
 import java.util.*;
@@ -178,7 +179,8 @@ public class OpenstackAdapter extends AbstractAdapter {
     Model returnModel = ModelFactory.createDefaultModel();
     Resource resource =  returnModel.createResource(requestedVM.getURI());
     resource.addProperty(RDF.type, Omn_domain_pc.VM);
-
+//    resource.addProperty(Omn_domain_pc.hasVMID, )
+    
      Property property = returnModel.createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
      property.addProperty(RDF.type, OWL.FunctionalProperty);
      resource.addProperty(property, Omn_lifecycle.Uncompleted);
