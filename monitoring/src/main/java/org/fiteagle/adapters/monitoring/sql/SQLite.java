@@ -18,13 +18,13 @@ public class SQLite {
     private	 String tableName = "virtual_physical_map" ;
     
     public SQLite(){
-        try{
-            sUrlKey = "jdbc:sqlite:" + preferences.get("sqliteDB_path", null) ;
-            
-        }catch(Exception e){
+        if (preferences.get("sqliteDB_path", null) == null)
+        {
             LOGGER.log(Level.WARNING, "cant load 'sqliteDB_path' from prefs!!!!");
             sUrlKey = "jdbc:sqlite:/root/.fiteagle/monitoring_sqliteDB.db";
-        }
+        }else
+            sUrlKey = "jdbc:sqlite:"+preferences.get("sqliteDB_path", null);
+
 
     	try{
 		    init(sDriverKey, sUrlKey);
