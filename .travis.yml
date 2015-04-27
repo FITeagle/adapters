@@ -18,5 +18,5 @@ after_success:
 - curl http://trescimo.av.tu-berlin.de/static/trigger.php?c=fiteagle
 env:
   global:
-  - secure: P88CX0ze2VuMDe7HZYeMdMbiqtWlTN1ackf12SRFO8zFY6S1/uRuR2PnaKq4egyVh0get8Igi+3zAGwPGLGz3eVCpZlRxbNkNUi7eS1EhLQN3gJJNuf906zCfKNMeNJEh0X2/d2lWaxJlvvUDnjcOp8XWZ3kn5OSIC2Kq/J7y7U=
-  - secure: RUYrRaxTu7jc0TQyqihNqTNS/WOMgFxAw3gzU+Ft/6w2JxrdKhhK06sLV8lF8RNTlcgOFnCNUvAbkRUOP0cowrrEC16iPtoDSvtWssXOiBvmE5WvReQvrW06tCBeRWbfuxnasGxYKSpZ++szJeYNz8lH/0psET7s+TQ6iYHD8cM=
+  - secure: AQilgBzjAD7igfHXsZlLs8w4bJIvKlKUGvbGi+aGb3yDm4W1RMZMPjGbeBzRclzxuhpV39QKqTDKvchA0+de2iQv472n9q5nGQmQW7h9aFqQdV1WMSvfYMOF2UisXxt3RhIkOyHfJbPT6IHd3cGeN7gwbZJQeJC7Y7WqDMSeavc=
+  - secure: KQ6MkMdCrNw0JyJ7fO1EIwMLsRb6/owJydH+ufvpXVXgJpVmlRGcRzQMsuuGCGmT8N3OcIKCNjT8zqp+cTsNT3nxqrj2/rbOPwthUYqzd9ndZsk7dIPHWtql4vyJ4UhKmIsP1NPi/Klg7vrUHyF5QHh7nqlCg6BsLJbbbeh2pbc=
