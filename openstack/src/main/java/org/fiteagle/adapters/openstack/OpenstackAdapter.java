@@ -71,6 +71,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapter = adapterModel.createResource(Omn_domain_pc.VMServer);
     adapter.addProperty(RDFS.subClassOf,MessageBusOntologyModel.classAdapter);
     adapter.addProperty(Omn_lifecycle.implements_,Omn_domain_pc.VM);
+    adapter.addProperty(Omn_lifecycle.childOf, ModelFactory.createDefaultModel().createResource("http://openstack.av.tu-berlin.de"));
 
     Resource adapterInstance = ModelFactory.createDefaultModel().createResource(OntologyModelUtil.getResourceNamespace()+"VMServer-1");
     adapterInstance.addProperty(RDF.type, Omn_domain_pc.VMServer);
