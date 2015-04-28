@@ -332,7 +332,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     return adapterModel;
   }
   
- 
+
 
   @Override
   public Model getInstance(String instanceURI) throws InstanceNotFoundException {
