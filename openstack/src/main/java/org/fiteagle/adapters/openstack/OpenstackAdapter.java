@@ -212,7 +212,13 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   private String getPublicKey(Resource requestedVM) {
     Statement publicKeyStatement = requestedVM.getProperty(Omn_service.publickey);
-    return publicKeyStatement.getObject().toString();
+    final RDFNode keyObject = publicKeyStatement.getObject();
+    if (null == keyObject) {
+    	System.err.println("Warning: no public key found!");
+    	return "";
+    } else {
+    	return keyObject.toString();
+    }
   }
 
   private String getUsername(Resource requestedVM) {
