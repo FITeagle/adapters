@@ -8,6 +8,8 @@ import com.woorea.openstack.nova.model.*;
 import info.openmultinet.ontology.vocabulary.*;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
@@ -35,7 +37,6 @@ import javax.naming.NamingException;
 public class OpenstackAdapter extends AbstractAdapter {
 
   private IOpenstackClient openstackClient;
-  private OpenstackParser openstackParser;
 
   private static Resource adapter;
   public static List<Property> resourceInstanceProperties = new ArrayList<Property>();
@@ -274,18 +275,30 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
   @Override
-  public void deleteInstance(String instanceURI) throws InstanceNotFoundException {
-    Model model = getInstance(instanceURI);
-    ResIterator iter = model.listSubjectsWithProperty(RDF.type, getAdapterManagedResources().get(0));
-    if (iter.hasNext()) {
-      Resource instance = iter.next();
-      String id = instance.getRequiredProperty(openstackParser.getPROPERTY_ID()).getLiteral().getString();
-      openstackClient.deleteServer(id);
-      return;
+  public void deleteInstance(String instanceURI) {
+
+    Server instance = null;
+    try {
+      instance = getServerWithName(instanceURI);
+    } catch (InstanceNotFoundException e) {
+      Logger.getAnonymousLogger().log(Level.SEVERE, "Resource could not be deleted");
     }
-    throw new InstanceNotFoundException("Instance "+instanceURI+" not found");
+    String id = instance.getId();
+    openstackClient.deleteServer(id);
+      return;
   }
-  
+
+  private Server getServerWithName(String instanceURI) throws InstanceNotFoundException {
+    Servers servers = openstackClient.listServers();
+    for(Server server : servers.getList()){
+      if(server.getName().equals(instanceURI)){
+        return server;
+      }
+    }
+    throw new InstanceNotFoundException(instanceURI + " not found");
+  }
+
+
   @Override
   public void updateAdapterDescription(){
     Images images = openstackClient.listImages();
@@ -319,16 +332,14 @@ public class OpenstackAdapter extends AbstractAdapter {
     return adapterModel;
   }
   
-  public OpenstackParser getOpenstackParser(){
-    return openstackParser;
-  }
+ 
 
   @Override
   public Model getInstance(String instanceURI) throws InstanceNotFoundException {
     Servers servers = openstackClient.listServers();
     for(Server server : servers.getList()){
       if(server.getName().equals(instanceURI)){
-        return openstackParser.parseToModel(server);
+        return ModelFactory.createDefaultModel();
       }
     }
     throw new InstanceNotFoundException("Instance "+instanceURI+" not found");
