@@ -212,6 +212,10 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   private String getPublicKey(Resource requestedVM) {
     Statement publicKeyStatement = requestedVM.getProperty(Omn_service.publickey);
+    if(publicKeyStatement == null){
+      System.err.println("Warning: no public key found!");
+      return "";
+    }
     final RDFNode keyObject = publicKeyStatement.getObject();
     if (null == keyObject) {
     	System.err.println("Warning: no public key found!");
@@ -315,8 +319,8 @@ public class OpenstackAdapter extends AbstractAdapter {
   
   @Override
   public Model updateInstance(String instanceURI, Model configureModel) {
-    // TODO Auto-generated method stub
-    return null;
+    return  configureModel;
+
   }
 
   public Resource getImageResource(){
@@ -469,6 +473,7 @@ public class OpenstackAdapter extends AbstractAdapter {
        loginService.addProperty(Omn_service.authentication,"ssh-keys");
        loginService.addProperty(Omn_service.username, username);
        loginService.addProperty(Omn_service.hostname, floatingIp.getIp());
+       loginService.addProperty(Omn_service.port,"22");
        parsedServer.addProperty(Omn.hasService, loginService);
 
      }
