@@ -15,7 +15,7 @@ cache:
   - $HOME/.m2
 after_success:
 - mvn clean test jacoco:report coveralls:report
-- curl http://trescimo.av.tu-berlin.de/static/trigger.php?c=fiteagle
+- curl http://demo.fiteagle.org/trigger.php?c=fiteagle
 env:
   global:
   - secure: AQilgBzjAD7igfHXsZlLs8w4bJIvKlKUGvbGi+aGb3yDm4W1RMZMPjGbeBzRclzxuhpV39QKqTDKvchA0+de2iQv472n9q5nGQmQW7h9aFqQdV1WMSvfYMOF2UisXxt3RhIkOyHfJbPT6IHd3cGeN7gwbZJQeJC7Y7WqDMSeavc=
