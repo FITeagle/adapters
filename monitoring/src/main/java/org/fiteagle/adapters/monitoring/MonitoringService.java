@@ -5,7 +5,6 @@ import info.openmultinet.ontology.vocabulary.Omn_component;
 import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
-import info.openmultinet.ontology.vocabulary.Omn_lifecycle_v2;
 import info.openmultinet.ontology.vocabulary.Omn_monitoring;
 import info.openmultinet.ontology.vocabulary.Omn_resource;
 import info.openmultinet.ontology.vocabulary.Omn_service;
