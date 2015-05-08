@@ -22,7 +22,7 @@
 //
 //	@BeforeClass
 //	public static void setup(){
-//		  adapter = new SshServiceAdapter();
+//		adapter = new SshServiceAdapter();
 //	}
 //	
 //	@Test

@@ -60,11 +60,18 @@ public class SshService {
 			p.waitFor();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
+			
+			BufferedReader stdError = new BufferedReader(new
+	                 InputStreamReader(p.getErrorStream()));
 
 			String line = "";
-			while ((line = reader.readLine()) != null) {
+			while ((line =reader.readLine()) != null) {
 				output.append(line + "\n");
 			}
+			
+            while ((line = stdError.readLine()) != null) {
+                output.append(line);
+            }
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -82,11 +89,17 @@ public class SshService {
 			p.waitFor();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
+			
+			BufferedReader stdError = new BufferedReader(new
+	                 InputStreamReader(p.getErrorStream()));
 
 			String line = "";
 			while ((line = reader.readLine()) != null) {
 				output.append(line + "\n");
 			}
+			while ((line = stdError.readLine()) != null) {
+                output.append(line);
+            }
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
@@ -445,6 +458,7 @@ public class SshService {
 		  Log.fatal("SSH",
 					"Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
 		}
+		Log.info("PW", password);
 	}
 
 }
