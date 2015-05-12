@@ -32,6 +32,10 @@ public class SshService {
 	public String getInstanceName() {
 		return instanceName;
 	}
+	
+	private void refreshConfig(){
+		config = new Config("PhysicalNodeAdapter-1");
+	}
 
 	public List<String> getUsernames() {
 		return this.username;
@@ -148,6 +152,7 @@ public class SshService {
 	}
 
 	private void setNewUserMac(String newUsername) {
+		
 		checkSudoPW();
 
 		String mypassword = password;
@@ -440,6 +445,7 @@ public class SshService {
 	}
 	
 	private void checkSudoPW(){
+		refreshConfig();
 		try {
 			if (executeCommand("sudo -n echo 'ok'").contains("sudo")){
 					sudoPW = true;
