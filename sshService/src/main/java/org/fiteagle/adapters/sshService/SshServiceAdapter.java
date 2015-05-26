@@ -9,6 +9,7 @@ import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +37,6 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-//@Startup
-//@Singleton
 public final class SshServiceAdapter extends AbstractAdapter {
 
 	private Model adapterModel;
@@ -45,8 +44,10 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	private static Resource adapter;
 
 	public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
+	
 
 	protected HashMap<String, SshService> instanceList = new HashMap<String, SshService>();
+	protected List physicalNodeList = new ArrayList();
 
 
 	static{
@@ -62,6 +63,11 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		}
 
 		createDefaultAdapterInstance(adapterModel);
+	}
+	
+	private static String checkNodeName(){
+		
+		return "1";
 	}
 
 	private static void createDefaultAdapterInstance(Model adapterModel) {

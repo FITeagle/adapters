@@ -45,6 +45,10 @@ public class SshService {
 	public String getInstanceName() {
 		return instanceName;
 	}
+	
+	private void refreshConfig(){
+		config = new Config("PhysicalNodeAdapter-1");
+	}
 
 	public List<String> getUsernames() {
 		return this.username;
@@ -161,7 +165,9 @@ public class SshService {
 	}
 
 	private void setNewUserMac(String newUsername) {
+
 		checkSudoPW(null);
+
 
 		String mypassword = password;
 		String fullname = "AlexNeu";
@@ -538,14 +544,6 @@ public class SshService {
 	      deleteRemoteUser(username.toLowerCase());
 	    }
 	  }
-
-	  
-	  
-//		checkSudoPW(null);
-//
-//		for (String username : this.getUsernames()) {
-//			deleteUserAccount(username.toLowerCase());
-//		}
 	}
 	
 	  private void deleteRemoteUser(String username){
@@ -585,7 +583,6 @@ public class SshService {
       }
 	  }
 	  
-
 	}
 
 	private void setPassword(){

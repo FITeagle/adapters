@@ -32,7 +32,7 @@ public abstract class AbstractAdapter {
 
   public void createDefaultConfiguration(String adapterInstanceName){
     Config config = new Config(adapterInstanceName);
-    config.creatPropertiesFile();
+    config.createPropertiesFile();
   }
   
   public boolean isRecipient(Model messageModel) {

@@ -10,6 +10,7 @@ import info.openmultinet.ontology.vocabulary.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Base64;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
