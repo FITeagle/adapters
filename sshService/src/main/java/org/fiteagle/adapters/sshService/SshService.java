@@ -6,25 +6,38 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import javax.batch.api.chunk.CheckpointAlgorithm;
+
+import net.schmizz.sshj.SSHClient;
+import net.schmizz.sshj.connection.ConnectionException;
+import net.schmizz.sshj.connection.channel.direct.Session;
+import net.schmizz.sshj.connection.channel.direct.Session.Command;
+import net.schmizz.sshj.transport.TransportException;
 
 import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class SshService {
 	protected SshServiceAdapter owningAdapter;
 	private String instanceName;
-	private List<String> ipStrings = new ArrayList<>();
+	private List<String> publicKeys = new ArrayList<>();
 	private List<String> username;
 
 	private Config config;
 	private String password;
 	private static Boolean sudoPW;
+	
+	private int componentID_index;
+	private String ip;
 
 	public static Map<String, AbstractAdapter> adapterInstances;
 
 	public SshService(SshServiceAdapter owningAdapter) {
-		config = new Config("PhysicalNodeAdapter-1");
+		config = new Config("SshServiveAdapter");
 		this.username = new ArrayList<>();
 		this.owningAdapter = owningAdapter;
 	}
@@ -42,14 +55,14 @@ public class SshService {
 	}
 
 	public List<String> getPossibleAccesses() {
-		if (ipStrings.isEmpty()) {
+		if (publicKeys.isEmpty()) {
 			return null;
 		}
-		return ipStrings;
+		return publicKeys;
 	}
 
 	private void setPossibleAccesses(String publickey) {
-		this.ipStrings.add(publickey);
+		this.publicKeys.add(publickey);
 	}
 
 	private String executeCommand(String[] command) {
@@ -110,7 +123,7 @@ public class SshService {
 	}
 
 	private String setNewUserLinux(String newUsername) {
-		checkSudoPW();
+		checkSudoPW(null);
 
 		StringBuffer output = new StringBuffer();
 		Process p;
@@ -148,7 +161,7 @@ public class SshService {
 	}
 
 	private void setNewUserMac(String newUsername) {
-		checkSudoPW();
+		checkSudoPW(null);
 
 		String mypassword = password;
 		String fullname = "AlexNeu";
@@ -250,11 +263,91 @@ public class SshService {
 			Log.info("SSH-USERPW", executeCommand(cmd9));
 		}
 	}
+	
+	private void setComponentIDIndex(String adapterInstance){
+	  
+	  String componentIDs = config.getProperty("componentID");
+    if(componentIDs.contains(",")){
+      String[] componentID_array = componentIDs.split("\\,");
+      for(int counter = 0; counter < componentID_array.length; counter++){
+       if(adapterInstance.equals(componentID_array[counter])){
+         this.componentID_index = counter;
+         break;
+         }
+       }
+      } else this.componentID_index = 0;
+    
+    System.out.println("INDEX IS " + componentID_index);
+	}
+	
+	private void setIP(){
+	  
+	  String IPs = config.getProperty("ip");
+	  if(IPs.contains(",")){
+	    String[] IP_array = IPs.split("\\,");
+	    this.ip = IP_array[this.componentID_index];
+	  }
+	  else {
+	    this.ip = IPs;
+	  }
+	  System.out.println("IP IS " + ip);
+	}
 
-	public void addSshAccess(String newUser, String publicKey) {
-		sudoPW = true;
-		checkSudoPW();
+	private void createRemoteUser(String newUser, String publicKey){
+	  
+	  this.setUsername(newUser.toLowerCase());
+    this.setPossibleAccesses(publicKey);
+	  
+    SSHConnector connector = new SSHConnector(ip);
+    connector.connect();
+    SSHClient client = connector.getSSHClient();
+    
+    try {
+      Session session = client.startSession();
+      try{
+        
+        checkSudoPW(session);
 
+      }
+      finally {
+        session.close();
+      }
+    } catch (ConnectionException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (TransportException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    
+    connector.createUserAccount(newUser, password);
+    connector.createUserSSHDirectory(newUser, password);
+    connector.createAuthorizedKeysFile(newUser, password);
+    connector.changeOwnerOfUserHome(newUser, password);
+    connector.addSSHKey(publicKey, newUser, password);
+    connector.disconnect();
+    
+    
+	}
+	
+	public void addSshAccess(String newUser, String publicKey, String adapterInstance) {
+	  
+	  setComponentIDIndex(adapterInstance);
+	  setIP();
+	  
+	  if("localhost".equals(this.ip) || "127.0.0.1".equals(this.ip)){
+	    createLocalUser(newUser, publicKey, null);	    
+	  } else {
+      createRemoteUser(newUser, publicKey);
+	  }
+	  
+	}
+   
+	private void createLocalUser(String newUser, String publicKey, Session session){
+		
 		this.setUsername(newUser.toLowerCase());
 		this.setPossibleAccesses(publicKey);
 
@@ -265,6 +358,9 @@ public class SshService {
 		String[] chOwnStringCMD;
 		String[] chOwnStringMacCMD;
 		
+		sudoPW = true;
+    checkSudoPW(session);
+    
 		if(sudoPW){
 			String addSshString = "echo '" + password
 					+ "' | sudo -kS mkdir -pm 0777 ~/../" + newUser.toLowerCase()
@@ -338,6 +434,7 @@ public class SshService {
 		}
 		
 
+
 		if (executeCommand("uname -s").contains("Linux")) {
 			
 			
@@ -372,11 +469,11 @@ public class SshService {
 		} else {
 			Log.fatal("SSH", "Your OS is not supported yet");
 		}
-
+	  
 	}
 
-	private void deleteUserAccount(String username) {
-		checkSudoPW();	
+	private void deleteLocalUser(String username) {
+		checkSudoPW(null);	
 		
 		if (executeCommand("uname -s").contains("Linux")) {
 			String[] deleteUserLinuxCMD ;
@@ -432,33 +529,88 @@ public class SshService {
 	}
 
 	public void deleteSshAccess() {
-		checkSudoPW();
+	  
+	  for (String username : this.getUsernames()) {
+	    if("localhost".equals(this.ip) || "127.0.0.1".equals(this.ip)){
+	      deleteLocalUser(username.toLowerCase());
+	    }
+	    else {
+	      deleteRemoteUser(username.toLowerCase());
+	    }
+	  }
 
-		for (String username : this.getUsernames()) {
-			deleteUserAccount(username.toLowerCase());
-		}
+	  
+	  
+//		checkSudoPW(null);
+//
+//		for (String username : this.getUsernames()) {
+//			deleteUserAccount(username.toLowerCase());
+//		}
 	}
 	
-	private void checkSudoPW(){
-		try {
-			if (executeCommand("sudo -n echo 'ok'").contains("sudo")){
-					sudoPW = true;
-					if (password == null) {
-					password = config.getProperty("password");
-					if(password.equals("")){
-					  Log.fatal("SSH", "Could not find Sudo-Passwort");
-					  Log.fatal("SSH",
-			          "Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
-					}	
-				}
-			}else sudoPW = false;
-			
-		} catch (IllegalArgumentException e) {
-		  Log.fatal("SSH", "Could not find Sudo-Passwort");
-		  Log.fatal("SSH",
-					"Please add password in ~/.fiteagle/PhysicalNodeAdapter-1.properties");
-		}
-		Log.info("PW", password);
+	  private void deleteRemoteUser(String username){
+	    SSHConnector connector = new SSHConnector(ip);
+	    connector.connect();
+	    connector.lockAccount(username, password);
+	    connector.killAllUserProcesses(username, password);
+	    connector.deleteUser(username, password);
+	    connector.deleteUserDirectory(username, password);
+	    connector.disconnect();
+	  }
+
+	  
+	private void checkSudoPW(Session session){
+	  
+	  if(session == null){
+	    if (executeCommand("sudo -n echo 'ok'").contains("sudo")){
+	      setPassword();
+	    } else { 
+	      sudoPW = false;
+	    }
+	    
+	  } 
+	  else {
+	    // TODO: remote check for password
+	    try {
+        Command command = session.exec("sudo -n echo 'ok'");
+        command.join(5, TimeUnit.SECONDS);
+        if(command.getOutputStream().toString().contains("sudo")){
+          setPassword();
+        } else {
+          sudoPW = false;
+        }
+      } catch (ConnectionException | TransportException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+	  }
+	  
+
 	}
 
+	private void setPassword(){
+	  try {
+	    
+	    sudoPW = true;
+      if (password == null) {
+      String passwordProperty = config.getProperty("password");
+      if(passwordProperty.isEmpty() || passwordProperty == null){
+        Log.fatal("SSH", "Could not find Sudo-Passwort");
+        Log.fatal("SSH",
+            "Please add password in ~/.fiteagle/SshServiceAdapter.properties");
+      }
+      else if (passwordProperty.contains(",")){
+        String[] password_array = passwordProperty.split("\\,");
+        this.password = password_array[this.componentID_index];
+      }
+      else this.password = passwordProperty;
+    }
+	    
+	  } catch (IllegalArgumentException e) {
+      Log.fatal("SSH", "Could not find Sudo-Passwort");
+      Log.fatal("SSH",
+          "Please add password in ~/.fiteagle/SshServiceAdapter.properties");
+    }
+	}
+	
 }

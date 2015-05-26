@@ -11,7 +11,8 @@ Conditions for deploying the Adapter
 
 Because of some commands we use due to the creation of new Users and the SSH-Credentials we sometimes need sudo rights on the machine.
 Therefore we need you to change the root-variable in the Property-File to your correct root-password.
-You can find the file under ~/.fiteagle/PhysicalNodeAdapter-1.properties
+You can find the file under ~/.fiteagle/SshServiceAdapter.properties
+If you want to add additional adapter instances, you have to update properties file. In particular, adapter instances should be separated by "," in componentID property. You need to set an IP address for the new SSH machine and a root-password if it is required. Don't forget to deploy the adapter to activate new changes.
 
 
 Build and Deploy the Adapter

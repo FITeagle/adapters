@@ -33,9 +33,24 @@
 			<dependency>
 			<groupId>net.schmizz</groupId>
 			<artifactId>sshj</artifactId>
-			<version>0.8.1</version>
+			<version>0.10.0</version>
 			<type>jar</type>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-ext-jdk15on</artifactId>
+			<version>1.51</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.51</version>
+			<type>jar</type>
+		</dependency>
+
+		
   </dependencies>
   
   	<build>

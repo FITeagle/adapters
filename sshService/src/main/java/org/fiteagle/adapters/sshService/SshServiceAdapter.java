@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.ejb.Singleton;
+import javax.ejb.Startup;
+
 import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
@@ -33,6 +36,8 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+//@Startup
+//@Singleton
 public final class SshServiceAdapter extends AbstractAdapter {
 
 	private Model adapterModel;
@@ -43,7 +48,10 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 	protected HashMap<String, SshService> instanceList = new HashMap<String, SshService>();
 
-	static {
+
+	static{
+	  
+
 		Model adapterModel = OntologyModelUtil.loadModel(
 				"ontologies/sshservice.ttl", IMessageBus.SERIALIZATION_TURTLE);
 
@@ -57,45 +65,80 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	}
 
 	private static void createDefaultAdapterInstance(Model adapterModel) {
-		Resource adapterInstance = adapterModel
-				.createResource(OntologyModelUtil.getResourceNamespace()
-						+ "PhysicalNodeAdapter-1");
-		adapterInstance.addProperty(RDF.type, adapter);
-		adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
-		adapterInstance.addProperty(RDFS.comment,
-				"A SSH Adapter that can create and manage SSH-Accesses.");
-		Resource testbed = adapterModel
-				.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-		adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
+	  
+	  createPropertiesFile();
+	  Config config = new Config("SshServiveAdapter");
+	  
+	  for(Map.Entry<Object, Object> entry : config.readProperties().entrySet()){
+	    if(entry.getKey().toString().equals("componentID")){
+	      
+        String componentIdProperty = (String) entry.getValue();
+	      if(componentIdProperty.contains(",")){
+	        String[] compIds = componentIdProperty.split("\\,");
 
-		StmtIterator resourceIterator = adapter
-				.listProperties(Omn_lifecycle.implements_);
-		if (resourceIterator.hasNext()) {
-			Resource resource = resourceIterator.next().getObject()
-					.asResource();
+	        for(int counter = 0; counter < compIds.length; counter++){
+	          String component_id = compIds[counter];
+	          System.out.println("counter is " + counter + " component_id " + component_id);
+	          createAdapterInstance(component_id, adapterModel);
 
-			adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
-			ResIterator propertiesIterator = adapterModel
-					.listSubjectsWithProperty(RDFS.domain, resource);
-			while (propertiesIterator.hasNext()) {
-				Property p = adapterModel.getProperty(propertiesIterator.next()
-						.getURI());
-			}
-		}
+	        }
+	       
+        } else {
+          createAdapterInstance(componentIdProperty, adapterModel);
+        }
+	        
+	      
+	    }
+	  }
+	  
 
-		new SshServiceAdapter(adapterInstance, adapterModel);
 	}
 
-	private SshServiceAdapter(Resource adapterInstance, Model adapterModel) {
+	private static void createAdapterInstance(String component_id, Model adapterModel){
+	  Resource adapterInstancee = adapterModel.createResource(component_id);
+    adapterInstancee.addProperty(RDF.type, adapter);
+    adapterInstancee.addProperty(RDFS.label, adapterInstancee.getLocalName());
+    adapterInstancee.addProperty(RDFS.comment,
+        "A SSH Adapter that can create and manage SSH-Accesses.");
+    Resource testbed = adapterModel
+        .createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+    adapterInstancee.addProperty(Omn_federation.partOfFederation, testbed);
+
+    StmtIterator resourceIterator = adapter
+        .listProperties(Omn_lifecycle.implements_);
+    if (resourceIterator.hasNext()) {
+      Resource resource = resourceIterator.next().getObject()
+          .asResource();
+
+      adapterInstancee.addProperty(Omn_lifecycle.canImplement, resource);
+      ResIterator propertiesIterator = adapterModel
+          .listSubjectsWithProperty(RDFS.domain, resource);
+      while (propertiesIterator.hasNext()) {
+        Property p = adapterModel.getProperty(propertiesIterator.next()
+            .getURI());
+      }
+    }
+ 
+    new SshServiceAdapter(adapterInstancee, adapterModel);
+    
+	}
+	
+	private static void createPropertiesFile() {
 		File file = new File(IConfig.PROPERTIES_DIRECTORY
-				+ "/PhysicalNodeAdapter-1.properties");
+				+ "/SshServiveAdapter.properties");
 
 		if (!file.exists()) {
-			createDefaultConfiguration(adapterInstance.getLocalName());
-			Config config = new Config("PhysicalNodeAdapter-1");
+//			createDefaultConfiguration("SshServiveAdapter");
+			Config config = new Config("SshServiveAdapter");
+			config.createPropertiesFile();
 			config.deleteProperty("password");
 			config.setNewProperty("password", "");
+			config.setNewProperty("ip", "127.0.0.1");
+			config.setNewProperty("componentID", OntologyModelUtil.getResourceNamespace()+ "PhysicalNodeAdapter-1");
 		}
+	}
+	
+	private SshServiceAdapter(Resource adapterInstance, Model adapterModel){
 		this.adapterInstance = adapterInstance;
 		this.adapterModel = adapterModel;
 		adapterInstances.put(adapterInstance.getURI(), this);
@@ -162,6 +205,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 		String pubKey = "";
 		String userName = "";
+		String adapterInstance = "";
 		Model result = ModelFactory.createDefaultModel();
 
 		Resource resource = null;
@@ -178,6 +222,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			else {
 				pubKey = resource.getProperty(Omn_service.publickey)
 						.getLiteral().getString();
+				System.out.println("public key is " + pubKey);
 			}
 			if (!resource.hasProperty(Omn_service.username))
 				throw new InvalidRequestException("user name is missing ");
@@ -185,8 +230,9 @@ public final class SshServiceAdapter extends AbstractAdapter {
 				userName = resource.getProperty(Omn_service.username)
 						.getLiteral().getString();
 			}
+			adapterInstance = resource.getProperty(Omn_lifecycle.implementedBy).getObject().asResource().getURI();
 
-			sshService.addSshAccess(userName, pubKey);
+			sshService.addSshAccess(userName, pubKey, adapterInstance);
 
 		}
 
@@ -263,9 +309,9 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		return model;
 	}
 	
-	public void testCreateAccess(String pubKey,String username){
+	public void testCreateAccess(String pubKey,String username, String adapterInstance){
 		SshService sshService = new SshService(this);
-		sshService.addSshAccess(username, pubKey);
+		sshService.addSshAccess(username, pubKey, adapterInstance);
 		instanceList.put(username, sshService);
 
 	}
