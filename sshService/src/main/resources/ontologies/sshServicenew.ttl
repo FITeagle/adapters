@@ -42,3 +42,5 @@
         omn-lifecycle:hasID          "my-raw-pc-1" ;
         omn-lifecycle:implementedBy  <https://localhost:8443/resource/physicalnode-1> ;
         omn-resource:isExclusive     true .
+
+

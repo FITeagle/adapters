@@ -26,15 +26,15 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 public final class MotorAdapter extends AbstractAdapter {
   
-  private Model adapterModel;
-  private Resource adapterInstance;
+  private final Model adapterModel;
+  private final Resource adapterInstance;
   private static Resource adapter;
   
-  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
+  public static final Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
   
-  private static List<Property> motorControlProperties = new ArrayList<Property>();
+  private static final List<Property> motorControlProperties = new ArrayList<Property>();
   
-  protected HashMap<String, Motor> instanceList = new HashMap<String, Motor>();
+  private final HashMap<String, Motor> instanceList = new HashMap<String, Motor>();
   
   static {
     Model adapterModel = OntologyModelUtil.loadModel("ontologies/motor.ttl", IMessageBus.SERIALIZATION_TURTLE);
@@ -91,7 +91,7 @@ public final class MotorAdapter extends AbstractAdapter {
     return parseToModel(motor);
   }
   
-  protected Model parseToModel(Motor motor) {
+  Model parseToModel(Motor motor) {
     Resource resource = ModelFactory.createDefaultModel().createResource(motor.getInstanceName());
     resource.addProperty(RDF.type, getAdapterManagedResources().get(0));
     resource.addProperty(RDF.type, Omn.Resource);
@@ -124,7 +124,7 @@ public final class MotorAdapter extends AbstractAdapter {
   @Override
   public Model updateInstance(String instanceURI, Model configureModel) {
     if (instanceList.containsKey(instanceURI)) {
-      Motor currentMotor = (Motor) instanceList.get(instanceURI);
+      Motor currentMotor =  instanceList.get(instanceURI);
       StmtIterator iter = configureModel.listStatements();
       while(iter.hasNext()){
         currentMotor.updateProperty(iter.next());
@@ -141,8 +141,8 @@ public final class MotorAdapter extends AbstractAdapter {
     instanceList.remove(instanceURI);
   }
   
-  public Motor getInstanceByName(String instanceURI) {
-    return (Motor) instanceList.get(instanceURI);
+  private Motor getInstanceByName(String instanceURI) {
+    return instanceList.get(instanceURI);
   }
   
   @Override

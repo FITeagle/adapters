@@ -20,11 +20,11 @@ public class Motor {
   private int rpm;
   private int maxRpm;
   private int throttle;
-  protected MotorAdapter owningAdapter;
-  private String instanceName;
+  private final MotorAdapter owningAdapter;
+  private final String instanceName;
   private boolean isDynamic;
   
-  private static Logger LOGGER = Logger.getLogger(Motor.class.toString());  
+  private static final Logger LOGGER = Logger.getLogger(Motor.class.toString());
   
   public Motor(MotorAdapter owningAdapter, String instanceName) {
     this.isDynamic = false;
@@ -37,7 +37,7 @@ public class Motor {
     this.instanceName = instanceName;
   }
   
-  public void setIsDynamic(boolean state) {
+  private void setIsDynamic(boolean state) {
     isDynamic = state;
     
     if (isDynamic && !threadIsRunning()) {
@@ -47,7 +47,7 @@ public class Motor {
     }
   }
   
-  public void setRpmWithNotify(int rpm) {
+  private void setRpmWithNotify(int rpm) {
     this.rpm = rpm;
     Model resourceModel = owningAdapter.parseToModel(this);
     owningAdapter.notifyListeners(resourceModel, null, IMessageBus.TYPE_INFORM, null);
@@ -57,7 +57,7 @@ public class Motor {
     return manufacturer;
   }
   
-  public void setManufacturer(String manufacturer) {
+  private void setManufacturer(String manufacturer) {
     this.manufacturer = manufacturer;
   }
   
@@ -65,7 +65,7 @@ public class Motor {
     return rpm;
   }
   
-  public void setRpm(int rpm) {
+  private void setRpm(int rpm) {
     this.rpm = rpm;
   }
   
@@ -73,7 +73,7 @@ public class Motor {
     return maxRpm;
   }
   
-  public void setMaxRpm(int maxRpm) {
+  private void setMaxRpm(int maxRpm) {
     this.maxRpm = maxRpm;
   }
   
@@ -143,17 +143,14 @@ public class Motor {
   }
   
   private boolean threadIsRunning() {
-    if (thread != null && thread.isAlive()) {
-      return true;
-    }
-    return false;
+    return thread != null && thread.isAlive();
   }
   
   public class RPMCreator implements Runnable {
     
     private static final int SLEEP_TIME = 5000;
     
-    private Random randomRPMGenerator = new Random();
+    private final Random randomRPMGenerator = new Random();
     
     public void run() {
       while (!Thread.currentThread().isInterrupted()) {

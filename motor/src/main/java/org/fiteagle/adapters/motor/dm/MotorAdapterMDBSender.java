@@ -12,7 +12,7 @@ import org.fiteagle.adapters.motor.MotorAdapter;
 
 @Singleton
 @Startup
-public class MotorAdapterMDBSender extends AbstractAdapterMDBSender {
+class MotorAdapterMDBSender extends AbstractAdapterMDBSender {
 
   @Override
   protected Map<String, AbstractAdapter> getAdapterInstances() {

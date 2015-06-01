@@ -19,7 +19,7 @@ import org.fiteagle.api.core.IMessageBus;
             + "OR "+IMessageBus.METHOD_TYPE+" = '"+IMessageBus.TYPE_GET+"' "
             + "OR "+IMessageBus.METHOD_TYPE+" = '"+IMessageBus.TYPE_DELETE+"')"),
     @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
-public class MotorAdapterMDBListener extends AbstractAdapterMDBListener {
+class MotorAdapterMDBListener extends AbstractAdapterMDBListener {
   
   @Override
   protected Map<String, AbstractAdapter> getAdapterInstances() {

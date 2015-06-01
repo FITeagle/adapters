@@ -12,7 +12,7 @@ import org.fiteagle.adapters.motor.MotorAdapter;
 
 @Singleton
 @Remote(AdapterEJB.class)
-public class MotorAdapterEJB extends AbstractAdapterEJB {
+class MotorAdapterEJB extends AbstractAdapterEJB {
   
   @Override
   protected Map<String, AbstractAdapter> getAdapterInstances() {

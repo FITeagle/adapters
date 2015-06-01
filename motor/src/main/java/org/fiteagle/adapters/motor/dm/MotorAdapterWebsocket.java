@@ -9,7 +9,7 @@ import org.fiteagle.abstractAdapter.dm.AbstractAdapterWebsocket;
 import org.fiteagle.adapters.motor.MotorAdapter;
 
 @ServerEndpoint("/websocket")
-public class MotorAdapterWebsocket extends AbstractAdapterWebsocket {
+class MotorAdapterWebsocket extends AbstractAdapterWebsocket {
   
   @Override
   protected Map<String, AbstractAdapter> getAdapterInstances() {
