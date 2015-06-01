@@ -10,6 +10,7 @@ import info.openmultinet.ontology.vocabulary.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Base64;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
@@ -79,6 +80,11 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapterInstance.addProperty(RDF.type, OWL2.NamedIndividual);
     adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
     adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");
+    
+    Resource testbed = adapterModel
+        .createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
+    
     adapterInstance.addProperty(Geo.lat,"52.5258083");
     adapterInstance.addProperty(Geo.long_,"13.3172764");
     adapterInstance.addProperty(Omn_resource.isExclusive,"false");

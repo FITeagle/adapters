@@ -26,7 +26,7 @@ import com.woorea.openstack.nova.model.FloatingIp;
 
 public class OpenstackParser {
 
-  private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
+  private static Logger LOGGER = Logger.getLogger(OpenstackParser.class.toString());
   
 	private static ObjectMapper mapper = new ObjectMapper();
 
