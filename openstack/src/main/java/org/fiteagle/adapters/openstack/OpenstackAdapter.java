@@ -493,6 +493,12 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   }
 
+@Override
+public void refreshConfig() throws ProcessingException {
+	// TODO Auto-generated method stub
+	
+}
+
 
 
 }

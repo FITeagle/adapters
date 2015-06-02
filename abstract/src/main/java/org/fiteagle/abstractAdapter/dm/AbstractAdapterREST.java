@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
@@ -104,6 +105,24 @@ public abstract class AbstractAdapterREST {
       processInvalidRequestException(e);
     }
     return null;
+  }
+  
+  @POST
+  @Path("/{adapterName}/config")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces("text/html")
+  public Response updateConfig(@PathParam("adapterName") String adapterName, String configInput) {
+    AbstractAdapter adapter = getAdapterInstance(adapterName);
+    try {
+    	adapter.updateConfig(adapterName,configInput);
+    	return Response.status(Response.Status.OK.getStatusCode()).build();
+    } catch (ProcessingException e) {
+        processProcessingRequestException(e);
+      } catch (IOException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+    return Response.status(Response.Status.CONFLICT.getStatusCode()).build();
   }
 
   @PUT
