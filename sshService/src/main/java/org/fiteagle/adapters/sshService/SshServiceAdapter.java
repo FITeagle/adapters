@@ -73,7 +73,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	private static void createDefaultAdapterInstance(Model adapterModel) {
 	  
 	  createPropertiesFile();
-	  Config config = new Config("SshServiveAdapter");
+	  Config config = new Config("SshServiceAdapter");
 	  
 	  for(Map.Entry<Object, Object> entry : config.readProperties().entrySet()){
 	    if(entry.getKey().toString().equals(ISshService.COMPONENT_ID)){
@@ -131,10 +131,12 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	
 	private static void createPropertiesFile() {
 		File file = new File(IConfig.PROPERTIES_DIRECTORY
-				+ "/SshServiveAdapter.properties");
+				+ "/SshServiceAdapter.properties");
 
 		if (!file.exists()) {
-			Config config = new Config("SshServiveAdapter");
+//			createDefaultConfiguration("SshServiveAdapter");
+			Config config = new Config("SshServiceAdapter");
+
 			config.createPropertiesFile();
 			config.deleteProperty(ISshService.PASSWORD);
 			config.setNewProperty(ISshService.PASSWORD, "");
@@ -144,7 +146,9 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			config.setNewProperty(ISshService.USERNAME, "");
 			config.setNewProperty(ISshService.COMPONENT_ID, OntologyModelUtil.getResourceNamespace()+ ISshService.DEFAULT_ADAPTER_INSTANCE);
 		}
-	}
+
+			}
+
 	
 	private SshServiceAdapter(Resource adapterInstance, Model adapterModel){
 		this.adapterInstance = adapterInstance;
@@ -322,6 +326,14 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		sshService.deleteSshAccess();
 		instanceList.remove("deploytestuser");
 
+	}
+
+	@Override
+	public void refreshConfig() throws ProcessingException {
+		// TODO Auto-generated method stub
+		for (String key : instanceList.keySet()){
+			instanceList.get(key).refreshConfig();
+		}
 	}
 
 }

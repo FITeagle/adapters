@@ -38,7 +38,7 @@ public class SshService {
 	public static Map<String, AbstractAdapter> adapterInstances;
 
 	public SshService(SshServiceAdapter owningAdapter) {
-		config = new Config("SshServiveAdapter");
+		config = new Config("SshServiceAdapter");
 		this.username = new ArrayList<>();
 		this.owningAdapter = owningAdapter;
 	}
@@ -47,8 +47,8 @@ public class SshService {
 		return instanceName;
 	}
 	
-	private void refreshConfig(){
-		config = new Config("PhysicalNodeAdapter-1");
+	public void refreshConfig(){
+		config = new Config("SshServiceAdapter");
 	}
 
 	public List<String> getUsernames() {
