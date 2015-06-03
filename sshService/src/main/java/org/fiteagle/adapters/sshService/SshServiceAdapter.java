@@ -76,7 +76,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	  Config config = new Config("SshServiveAdapter");
 	  
 	  for(Map.Entry<Object, Object> entry : config.readProperties().entrySet()){
-	    if(entry.getKey().toString().equals("componentID")){
+	    if(entry.getKey().toString().equals(ISshService.COMPONENT_ID)){
 	      
         String componentIdProperty = (String) entry.getValue();
 	      if(componentIdProperty.contains(",")){
@@ -134,13 +134,15 @@ public final class SshServiceAdapter extends AbstractAdapter {
 				+ "/SshServiveAdapter.properties");
 
 		if (!file.exists()) {
-//			createDefaultConfiguration("SshServiveAdapter");
 			Config config = new Config("SshServiveAdapter");
 			config.createPropertiesFile();
-			config.deleteProperty("password");
-			config.setNewProperty("password", "");
-			config.setNewProperty("ip", "127.0.0.1");
-			config.setNewProperty("componentID", OntologyModelUtil.getResourceNamespace()+ "PhysicalNodeAdapter-1");
+			config.deleteProperty(ISshService.PASSWORD);
+			config.setNewProperty(ISshService.PASSWORD, "");
+			config.setNewProperty(ISshService.IP, ISshService.LOCALHOST_IP);
+			config.setNewProperty(ISshService.PRIVATE_KEY_PATH, "");
+			config.setNewProperty(ISshService.PRIVATE_KEY_PASSWORD, "");
+			config.setNewProperty(ISshService.USERNAME, "");
+			config.setNewProperty(ISshService.COMPONENT_ID, OntologyModelUtil.getResourceNamespace()+ ISshService.DEFAULT_ADAPTER_INSTANCE);
 		}
 	}
 	
@@ -197,7 +199,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		while (resIteratorKey.hasNext()) {
 
 			Resource resource = resIteratorKey.nextResource();
-			model.add(createResponse(resource, instanceList.get(instanceURI)));
+			model.add(createResponse(resource, instanceList.get(instanceURI), instanceList.get(instanceURI).getSshParameter().getIP()));
 		}
 
 		return model;
@@ -212,6 +214,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		String pubKey = "";
 		String userName = "";
 		String adapterInstance = "";
+		String ip = "";
 		Model result = ModelFactory.createDefaultModel();
 
 		Resource resource = null;
@@ -238,16 +241,16 @@ public final class SshServiceAdapter extends AbstractAdapter {
 			}
 			adapterInstance = resource.getProperty(Omn_lifecycle.implementedBy).getObject().asResource().getURI();
 
-			sshService.addSshAccess(userName, pubKey, adapterInstance);
+			ip = sshService.addSshAccess(userName, pubKey, adapterInstance);
 
 		}
 
 		instanceList.put(instanceURI, sshService);
 
-		return createResponse(resource, sshService);
+		return createResponse(resource, sshService, ip);
 	}
 
-	private Model createResponse(Resource resource, SshService sshservice) {
+	private Model createResponse(Resource resource, SshService sshservice, String ip) {
 		Model result = ModelFactory.createDefaultModel();
 		Resource res = result.createResource(resource.getURI());
 		res.addProperty(RDF.type, Omn.Resource);
@@ -266,21 +269,13 @@ public final class SshServiceAdapter extends AbstractAdapter {
 				.getResourceNamespace() + "LoginService" + uuid);
 		res.addProperty(Omn.hasService, login);
 		login.addProperty(RDF.type, Omn_service.LoginService);
-		login.addProperty(Omn_service.port, "22");
-		login.addProperty(Omn_service.hostname, "127.0.0.1");
+		login.addProperty(Omn_service.port, ISshService.SSH_PORT);
+		login.addProperty(Omn_service.hostname, ip);
 
 		for (String username : sshservice.getUsernames()) {
 			login.addProperty(Omn_service.username, username);
 		}
-		login.addProperty(Omn_service.authentication, "ssh-keys");
-		// for(String publickey : sshservice.getPossibleAccesses()){
-		// login.addProperty(Omn_service.authentication, publickey);
-		// }
-		// Property ip =
-		// res.getModel().createProperty("http://open-multinet.info/ontology/omn-service#",
-		// "ip");
-		// ip.addProperty(RDF.type, OWL.DatatypeProperty);
-		// res.addProperty(ip, "127.0.0.1");
+		login.addProperty(Omn_service.authentication, ISshService.SSH_KEYS);
 
 		return result;
 	}

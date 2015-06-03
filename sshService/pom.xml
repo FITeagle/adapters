@@ -30,12 +30,7 @@
 			<artifactId>abstract</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
-			<dependency>
-			<groupId>net.schmizz</groupId>
-			<artifactId>sshj</artifactId>
-			<version>0.10.0</version>
-			<type>jar</type>
-		</dependency>
+
 		
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -49,6 +44,11 @@
 			<version>1.51</version>
 			<type>jar</type>
 		</dependency>
+<dependency>
+	<groupId>com.jcraft</groupId>
+	<artifactId>jsch</artifactId>
+	<version>0.1.51</version>
+</dependency>
 
 		
   </dependencies>
