@@ -182,10 +182,10 @@ public final class MotorAdapter extends AbstractAdapter {
     return model;
   }
 
-//@Override
-//public void refreshConfig() throws ProcessingException {
-//	// TODO Auto-generated method stub
-//	
-//}
+@Override
+public void refreshConfig() throws ProcessingException {
+	// TODO Auto-generated method stub
+	
+}
   
 }

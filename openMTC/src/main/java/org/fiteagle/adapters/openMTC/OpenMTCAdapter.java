@@ -129,4 +129,10 @@ public class OpenMTCAdapter extends AbstractAdapter {
     return null;
   }
 
+@Override
+public void refreshConfig() throws ProcessingException {
+	// TODO Auto-generated method stub
+	
+}
+
 }
