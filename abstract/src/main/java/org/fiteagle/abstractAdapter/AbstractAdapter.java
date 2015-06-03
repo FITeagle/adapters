@@ -48,7 +48,7 @@ public abstract class AbstractAdapter {
 		try{
 	    Properties property = gson.fromJson(configInput, Properties.class);
 		config.writeProperties(property);
-		refreshConfig();
+//		refreshConfig();
 		}catch(Exception e){
 		LOGGER.log(Level.SEVERE, "Could not read the JSON serialized Config-File from REST-Interface");
 		}
@@ -185,7 +185,7 @@ public abstract class AbstractAdapter {
   
   public abstract Model getAllInstances() throws InstanceNotFoundException, ProcessingException;
   
-  public abstract void refreshConfig() throws ProcessingException;
+//  public abstract void refreshConfig() throws ProcessingException;
 
   
   public static class InstanceNotFoundException extends Exception {
