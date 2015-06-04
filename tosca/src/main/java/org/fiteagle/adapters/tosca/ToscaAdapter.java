@@ -270,5 +270,11 @@ public final class ToscaAdapter extends AbstractAdapter {
     Parser parser = new Parser(model);
     return parser.getInfModel();
   }
+
+@Override
+public void refreshConfig() throws ProcessingException {
+	// TODO Auto-generated method stub
+	
+}
   
 }

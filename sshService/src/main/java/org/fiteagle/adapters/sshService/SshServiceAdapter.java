@@ -342,9 +342,9 @@ public final class SshServiceAdapter extends AbstractAdapter {
 
 	}
 
+
 	@Override
 	public void refreshConfig() throws ProcessingException {
-		// TODO Auto-generated method stub
 		for (String key : instanceList.keySet()){
 			instanceList.get(key).refreshConfig();
 		}
