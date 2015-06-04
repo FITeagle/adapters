@@ -516,15 +516,11 @@ public class SshService {
 	    
 	    sudoPW = true;
       if (password == null) {
-      String passwordProperty = config.getProperty(ISshService.PASSWORD);
+      String passwordProperty = sshParameter.getPassword();
       if(passwordProperty.isEmpty() || passwordProperty == null){
         Log.fatal("SSH", "Could not find Sudo-Passwort");
         Log.fatal("SSH",
             "Please add password in ~/.fiteagle/SshServiceAdapter.properties");
-      }
-      else if (passwordProperty.contains(",")){
-        String[] password_array = passwordProperty.split("\\,");
-        this.password = password_array[sshParameter.getComponentIDIndex()];
       }
       else this.password = passwordProperty;
     }

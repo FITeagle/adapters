@@ -1,5 +1,10 @@
 package org.fiteagle.adapters.sshService;
 
+/**
+ * 
+ * @author AlaaAlloush
+ *
+ */
 public interface ISshService {
   
   String PASSWORD = "password";
@@ -13,5 +18,5 @@ public interface ISshService {
   String SSH_PORT = "22";
   String USERNAME = "username";
   String SSH_KEYS = "ssh-keys";
-  
+  String ADAPTER_INSTANCES = "adapterInstances";
 }

@@ -11,10 +11,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -26,6 +30,9 @@ import org.fiteagle.api.core.IConfig;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
+import org.hornetq.utils.json.JSONArray;
+import org.hornetq.utils.json.JSONException;
+import org.hornetq.utils.json.JSONObject;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -49,6 +56,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	protected HashMap<String, SshService> instanceList = new HashMap<String, SshService>();
 	protected List physicalNodeList = new ArrayList();
 
+	private static Logger LOGGER  = Logger.getLogger(SshServiceAdapter.class.toString());
 
 	static{
 	  
@@ -63,6 +71,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		}
 
 		createDefaultAdapterInstance(adapterModel);
+		
 	}
 	
 	private static String checkNodeName(){
@@ -70,33 +79,26 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		return "1";
 	}
 
-	private static void createDefaultAdapterInstance(Model adapterModel) {
+	private static void createDefaultAdapterInstance(Model adapterModel){
 	  
 	  createPropertiesFile();
 	  Config config = new Config("SshServiceAdapter");
 	  
-	  for(Map.Entry<Object, Object> entry : config.readProperties().entrySet()){
-	    if(entry.getKey().toString().equals(ISshService.COMPONENT_ID)){
-	      
-        String componentIdProperty = (String) entry.getValue();
-	      if(componentIdProperty.contains(",")){
-	        String[] compIds = componentIdProperty.split("\\,");
-
-	        for(int counter = 0; counter < compIds.length; counter++){
-	          String component_id = compIds[counter];
-	          System.out.println("counter is " + counter + " component_id " + component_id);
-	          createAdapterInstance(component_id, adapterModel);
-
-	        }
-	       
-        } else {
-          createAdapterInstance(componentIdProperty, adapterModel);
+    try {
+      String jsonProperties = config.readJsonProperties();
+      JSONObject jsonObject = new JSONObject(jsonProperties);
+      
+      JSONArray adapterInstances = jsonObject.getJSONArray(ISshService.ADAPTER_INSTANCES);
+      
+      for (int i = 0; i < adapterInstances.length(); i++) {
+        JSONObject adapterInstanceObject = adapterInstances.getJSONObject(i);
+        String adapterInstance = adapterInstanceObject.getString(ISshService.COMPONENT_ID);
+        createAdapterInstance(adapterInstance, adapterModel);
         }
-	        
-	      
-	    }
-	  }
-	  
+      
+      } catch (JSONException e) {
+      LOGGER.log(Level.SEVERE, " Error by parsing properties file ", e);
+      }
 
 	}
 
@@ -134,20 +136,32 @@ public final class SshServiceAdapter extends AbstractAdapter {
 				+ "/SshServiceAdapter.properties");
 
 		if (!file.exists()) {
-//			createDefaultConfiguration("SshServiveAdapter");
 			Config config = new Config("SshServiceAdapter");
 
-			config.createPropertiesFile();
-			config.deleteProperty(ISshService.PASSWORD);
-			config.setNewProperty(ISshService.PASSWORD, "");
-			config.setNewProperty(ISshService.IP, ISshService.LOCALHOST_IP);
-			config.setNewProperty(ISshService.PRIVATE_KEY_PATH, "");
-			config.setNewProperty(ISshService.PRIVATE_KEY_PASSWORD, "");
-			config.setNewProperty(ISshService.USERNAME, "");
-			config.setNewProperty(ISshService.COMPONENT_ID, OntologyModelUtil.getResourceNamespace()+ ISshService.DEFAULT_ADAPTER_INSTANCE);
+			Map<String, Object> propertiesMap = new HashMap<String, Object>();
+	    propertiesMap.put(IConfig.KEY_HOSTNAME, IConfig.DEFAULT_HOSTNAME);
+	    propertiesMap.put(IConfig.LOCAL_NAMESPACE, IConfig.LOCAL_NAMESPACE_VALUE);
+	    propertiesMap.put(IConfig.RESOURCE_NAMESPACE,IConfig.RESOURCE_NAMESPACE_VALUE);
+	    
+	    List<Map<String, String>> adapterInstancesList = new LinkedList<Map<String, String>>();
+	    Map<String, String> adapterInstanceMap = new HashMap<String, String>();
+	    adapterInstanceMap.put(ISshService.COMPONENT_ID, OntologyModelUtil.getResourceNamespace()+ ISshService.DEFAULT_ADAPTER_INSTANCE);
+	    adapterInstanceMap.put(ISshService.USERNAME, "");
+	    adapterInstanceMap.put(ISshService.PASSWORD, "");
+	    adapterInstanceMap.put(ISshService.IP, ISshService.LOCALHOST_IP);
+	    adapterInstanceMap.put(ISshService.PRIVATE_KEY_PATH, "");
+	    adapterInstanceMap.put(ISshService.PRIVATE_KEY_PASSWORD, "");
+	    
+	    adapterInstancesList.add(adapterInstanceMap);
+	    
+	    propertiesMap.put(ISshService.ADAPTER_INSTANCES, adapterInstancesList);
+	    
+	    Properties property = new Properties();
+	    property.putAll(propertiesMap);
+	    config.writeProperties(property);
+	    }
+		
 		}
-
-			}
 
 	
 	private SshServiceAdapter(Resource adapterInstance, Model adapterModel){

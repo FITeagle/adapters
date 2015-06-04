@@ -1,7 +1,19 @@
 package org.fiteagle.adapters.sshService;
 
-import org.fiteagle.api.core.Config;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.fiteagle.api.core.Config;
+import org.hornetq.utils.json.JSONArray;
+import org.hornetq.utils.json.JSONException;
+import org.hornetq.utils.json.JSONObject;
+
+/**
+ * 
+ * @author AlaaAlloush
+ *
+ */
 public class SshParameter {
   
   private String ip;
@@ -12,102 +24,62 @@ public class SshParameter {
   
   private String privateKeyPassword;
   
+  private String password;
+  
   private Config config;
   
-  private int componentID_index;
+  private static Logger LOGGER  = Logger.getLogger(SshParameter.class.toString());
   
   
   public SshParameter(String adapterInstance, Config config){
     
     this.config = config;
-    setComponentIDIndex(adapterInstance);
-    setIP();
-    setAccessUsername();
-    setPrivateKeyPath();
-    setPrivateKeyPassword();
-    
+    this.parseAdapterInstance(adapterInstance);
+
   }
   
-  private void setComponentIDIndex(String adapterInstance){
-    
-    String componentIDs = config.getProperty(ISshService.COMPONENT_ID);
-    if(componentIDs.contains(",")){
-      String[] componentID_array = componentIDs.split("\\,");
-      for(int counter = 0; counter < componentID_array.length; counter++){
-       if(adapterInstance.equals(componentID_array[counter])){
-         this.componentID_index = counter;
-         break;
-         }
-       }
-      } else this.componentID_index = 0;
-    
-//    System.out.println("INDEX IS " + componentID_index);
-  }
-  
-  public int getComponentIDIndex(){
-    return this.componentID_index;
-  }
-  
-  private void setIP(){
-    
-    String IPs = config.getProperty(ISshService.IP);
-    if(IPs.contains(",")){
-      String[] IP_array = IPs.split("\\,");
-      this.ip = IP_array[this.componentID_index];
+  private void parseAdapterInstance(String adapterInstance){
+    String jsonProperties;
+    try {
+      jsonProperties = config.readJsonProperties();
+      JSONObject jsonObject;
+      jsonObject = new JSONObject(jsonProperties);
+      JSONArray adapterInstances = jsonObject.getJSONArray(ISshService.ADAPTER_INSTANCES);
+      
+      for (int i = 0; i < adapterInstances.length(); i++) {
+        JSONObject adapterInstanceObject = adapterInstances.getJSONObject(i);
+        if(adapterInstance.equals(adapterInstanceObject.getString(ISshService.COMPONENT_ID))){
+          this.accessUsername = adapterInstanceObject.getString(ISshService.USERNAME);
+          this.ip = adapterInstanceObject.getString(ISshService.IP);
+          this.privateKeyPath = adapterInstanceObject.getString(ISshService.PRIVATE_KEY_PATH);
+          this.privateKeyPassword = adapterInstanceObject.getString(ISshService.PRIVATE_KEY_PASSWORD);
+          this.password = adapterInstanceObject.getString(ISshService.PASSWORD);
+          }
+        }
+      } catch (JSONException e) {
+      LOGGER.log(Level.SEVERE, " Error by parsing properties file ", e);
+      }
     }
-    else {
-      this.ip = IPs;
-    }
-    System.out.println("IP IS " + ip);
-  }
+  
   
   public String getIP(){
     return this.ip;
-  }
-  
-  private void setAccessUsername(){
-    String acccessUsernames = config.getProperty(ISshService.USERNAME);
-    if(acccessUsernames.contains(",")){
-      String[] accessUsernames_array = acccessUsernames.split("\\,");
-      this.accessUsername = accessUsernames_array[this.componentID_index];
-    }
-    else {
-      this.accessUsername = acccessUsernames;
-    }
   }
   
   public String getAccessUsername(){
     return this.accessUsername;
   }
   
-  private void setPrivateKeyPath(){
-    String keyPaths = config.getProperty(ISshService.PRIVATE_KEY_PATH);
-    if(keyPaths.contains(",")){
-      String[] paths_array = keyPaths.split("\\,");
-      this.privateKeyPath = paths_array[this.componentID_index];
-    }
-    else {
-      this.privateKeyPath = keyPaths;
-    }
-  }
-  
   public String getPrivateKeyPath(){
     return this.privateKeyPath;
   }
   
-  private void setPrivateKeyPassword(){
-    String keyPasswords = config.getProperty(ISshService.PRIVATE_KEY_PASSWORD);
-    if(keyPasswords.contains(",")){
-      String[] passwords_array = keyPasswords.split("\\,");
-      this.privateKeyPassword = passwords_array[this.componentID_index];
-    }
-    else {
-      this.privateKeyPath = keyPasswords;
-    }
-  }
-  
   public String getPrivateKeyPassword(){
     return this.privateKeyPassword;
+  }
+  
+  public String getPassword(){
+    return this.password;
   }
   
 }

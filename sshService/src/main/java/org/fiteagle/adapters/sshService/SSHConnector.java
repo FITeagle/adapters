@@ -7,6 +7,11 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * 
+ * @author AlaaAlloush
+ *
+ */
 public class SSHConnector {
   
   private static Logger LOGGER  = Logger.getLogger(SSHConnector.class.toString());
@@ -111,7 +116,6 @@ public class SSHConnector {
     session = jsch.getSession(sshParameter.getAccessUsername(), sshParameter.getIP(), 22);
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-    // Avoid asking for key confirmation
     Properties prop = new Properties();
     prop.put("StrictHostKeyChecking", "no");
     session.setConfig(prop);
