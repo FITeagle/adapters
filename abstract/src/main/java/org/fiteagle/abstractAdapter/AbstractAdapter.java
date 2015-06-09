@@ -2,16 +2,26 @@ package org.fiteagle.abstractAdapter;
 
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.print.attribute.standard.Media;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
 import org.fiteagle.api.core.Config;
+import org.fiteagle.api.core.IConfig;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -30,6 +40,22 @@ public abstract class AbstractAdapter {
   public AbstractAdapter(){
 
   }
+  
+  public void updateConfig(String adapterName, String configInput)throws ProcessingException, IOException{
+	  	Config config = new Config(adapterName);
+	    config.deletePropertiesFile();
+	    
+	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		try{
+	    Properties property = gson.fromJson(configInput, Properties.class);
+		config.writeProperties(property);
+		refreshConfig();
+		}catch(Exception e){
+		LOGGER.log(Level.SEVERE, "Could not read the JSON serialized Config-File from REST-Interface");
+		}
+		
+	  }
+ 
 
   /**
    * Creates a default properties file
@@ -221,6 +247,9 @@ public abstract class AbstractAdapter {
   public abstract Model getInstance(String instanceURI) throws InstanceNotFoundException, ProcessingException, InvalidRequestException;
   
   public abstract Model getAllInstances() throws InstanceNotFoundException, ProcessingException;
+  
+  public abstract void refreshConfig() throws ProcessingException;
+
   
   public static class InstanceNotFoundException extends Exception {
 

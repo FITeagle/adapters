@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.openstack.client;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import com.woorea.openstack.nova.model.*;
+
+import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
@@ -34,7 +37,9 @@ import com.woorea.openstack.nova.model.FloatingIpPools.FloatingIpPool;
 import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
+
 import org.fiteagle.api.core.Config;
+import org.fiteagle.api.core.IConfig;
 
 public class OpenstackClient implements IOpenstackClient{
 
@@ -64,6 +69,8 @@ public class OpenstackClient implements IOpenstackClient{
 	
 	private void loadPreferences() {
 		Config preferences = new Config("Openstack-1");
+
+		try{
 		if (preferences.getProperty("floating_ip_pool_name") != null){
 		  FLOATINGIP_POOL_NAME = preferences.getProperty("floating_ip_pool_name");
 		}
@@ -133,7 +140,18 @@ public class OpenstackClient implements IOpenstackClient{
 		}else{
 			throw new InsufficientOpenstackPreferences("default_keypair_id");
 		}
-
+		PREFERENCES_INITIALIZED = true;
+		
+		}catch (IllegalArgumentException e){		
+		LOGGER.log(Level.SEVERE, "Properties File: /home/home/.fiteagle/Openstack-1.properties is NOT found");
+		LOGGER.log(Level.SEVERE, "Dummy File was created but needs to be corrected!");
+		createDefaultConfig();
+		PREFERENCES_INITIALIZED = true;
+		}catch (InsufficientOpenstackPreferences e){
+		e.printStackTrace();
+		createDefaultConfig();
+		PREFERENCES_INITIALIZED = true;
+		}
 	}
 
 	@Override
@@ -220,34 +238,36 @@ public class OpenstackClient implements IOpenstackClient{
 	private Access getAccessWithTenantId() throws InsufficientOpenstackPreferences{
 	  if(PREFERENCES_INITIALIZED == false){
 	    loadPreferences();
-	    PREFERENCES_INITIALIZED = true;
 	  }
-		Keystone keystone = new Keystone(KEYSTONE_AUTH_URL,	new JerseyConnector());
-		TokensResource tokens = keystone.tokens();
-		UsernamePassword credentials = new UsernamePassword(KEYSTONE_USERNAME,  KEYSTONE_PASSWORD);
-		Access access = tokens.authenticate(credentials).withTenantName(TENANT_NAME).execute();
-		keystone.token(access.getToken().getId());
+  
+	  if(PREFERENCES_INITIALIZED == true){
+			Keystone keystone = new Keystone(KEYSTONE_AUTH_URL,	new JerseyConnector());
+			TokensResource tokens = keystone.tokens();
+			UsernamePassword credentials = new UsernamePassword(KEYSTONE_USERNAME,  KEYSTONE_PASSWORD);
+			Access access = tokens.authenticate(credentials).withTenantName(TENANT_NAME).execute();
+			keystone.token(access.getToken().getId());
 
-		Tenants tenants = keystone.tenants().list().execute();
+			Tenants tenants = keystone.tenants().list().execute();
 
-		List<Tenant> tenantsList = tenants.getList();
+			List<Tenant> tenantsList = tenants.getList();
 
-		if (tenants.getList().size() > 0) {
-			for (Iterator<Tenant> iterator = tenantsList.iterator(); iterator.hasNext();) {
-				Tenant tenant = (Tenant) iterator.next();
-				if (tenant.getName().compareTo(TENANT_NAME) == 0) {
-					TENANT_ID = tenant.getId();
-					break;
+			if (tenants.getList().size() > 0) {
+				for (Iterator<Tenant> iterator = tenantsList.iterator(); iterator.hasNext();) {
+					Tenant tenant = (Tenant) iterator.next();
+					if (tenant.getName().compareTo(TENANT_NAME) == 0) {
+						TENANT_ID = tenant.getId();
+						break;
+					}
 				}
+			} else {
+				throw new RuntimeException("No tenants found!");
 			}
-		} else {
-			throw new RuntimeException("No tenants found!");
-		}
 
-		TokenAuthentication tokenAuth = new TokenAuthentication(access.getToken().getId());
-		access = tokens.authenticate(tokenAuth).withTenantId(TENANT_ID).execute();
+			TokenAuthentication tokenAuth = new TokenAuthentication(access.getToken().getId());
+			access = tokens.authenticate(tokenAuth).withTenantId(TENANT_ID).execute();
 
-		return access;
+			return access;
+	  } return null;
 	}
 
 	public Server createServer(ServerForCreate serverForCreate) {
@@ -461,6 +481,24 @@ public class OpenstackClient implements IOpenstackClient{
 
 	public String getGLANCE_ENDPOINT() {
 		return GLANCE_ENDPOINT;
+	}
+	
+	private void createDefaultConfig(){
+		Config preferences = new Config("Openstack-1");
+		preferences.createPropertiesFile();
+		
+		preferences.setNewProperty("floating_ip_pool_name", "ext-net");
+		preferences.setNewProperty("keystone_auth_URL", "http://dummy.adress.com:5000/v2.0");
+		preferences.setNewProperty("keystone_endpoint", "http://dummy.adress.com:5000/v2.0");
+		preferences.setNewProperty("keystone_password", "dummypassword");
+		preferences.setNewProperty("keystone_username", "dummyusername");
+		preferences.setNewProperty("net_endpoint", "http://dummy.adress.com:9696/v2.0");
+		preferences.setNewProperty("net_name", "dummy-net");
+		preferences.setNewProperty("nova_endpoint", "http://dummy.adress.com:8774/v1.1");
+		preferences.setNewProperty("tenant_name", "dummy");
+		preferences.setNewProperty("default_image_id", "37d7f526-916e-4bd3-b15a-18768fc95842");
+		preferences.setNewProperty("default_flavor_id", "6c818f87-6c9b-4a12-87a7-09457c0a2bec");
+		preferences.setNewProperty("default_keypair_id", "dummy");
 	}
 	
   public static class InsufficientOpenstackPreferences extends RuntimeException {

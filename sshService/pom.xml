@@ -30,12 +30,7 @@
 			<artifactId>abstract</artifactId>
 			<version>0.1-SNAPSHOT</version>
 		</dependency>
-			<dependency>
-			<groupId>net.schmizz</groupId>
-			<artifactId>sshj</artifactId>
-			<version>0.10.0</version>
-			<type>jar</type>
-		</dependency>
+
 		
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
@@ -49,8 +44,24 @@
 			<version>1.51</version>
 			<type>jar</type>
 		</dependency>
+<dependency>
+	<groupId>com.jcraft</groupId>
+	<artifactId>jsch</artifactId>
+	<version>0.1.51</version>
+</dependency>
 
+<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
 		
+		<dependency>
+	<groupId>org.hornetq</groupId>
+	<artifactId>hornetq-core</artifactId>
+	<version>2.2.19.Final</version>
+</dependency>
+
   </dependencies>
   
   	<build>

@@ -1,414 +1,177 @@
 package org.fiteagle.adapters.sshService;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.PublicKey;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.jcraft.jsch.*;
 
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.common.IOUtils;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.connection.channel.direct.Session.Command;
-import net.schmizz.sshj.transport.TransportException;
-import net.schmizz.sshj.transport.verification.HostKeyVerifier;
-import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
+import java.io.ByteArrayOutputStream;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-
+/**
+ * 
+ * @author AlaaAlloush
+ *
+ */
 public class SSHConnector {
   
-  private String ip = "";
-
-  private SSHClient client;
-
-
-  public SSHClient getSSHClient(){
-    return this.client;
+  private static Logger LOGGER  = Logger.getLogger(SSHConnector.class.toString());
+  
+  private JSch jsch;
+  
+  private SshParameter sshParameter;
+  
+  private String newUser;
+ 
+  private String sshKey;
+  
+  public SSHConnector(String newUser, String sshKey, SshParameter sshParameter){
+    
+    this.sshParameter = sshParameter;
+    this.jsch = new JSch();
+    
+    setNewUserName(newUser);
+    setSshKey(sshKey);
+    
   }
   
-  public SSHConnector(String ip) {
-    this.ip = ip;
-   
+  
+  private void setNewUserName(String newUser){
+    this.newUser = newUser;
   }
+  
+  private void setSshKey(String sshKey){
+    this.sshKey = sshKey;
+  }
+  
+  
+  public void createUserAccount(){
+    com.jcraft.jsch.Session session = null;
 
-  public void connect() {
+    try { 
+      jsch.addIdentity(sshParameter.getPrivateKeyPath(), sshParameter.getPrivateKeyPassword());
+      session = jsch.getSession(sshParameter.getAccessUsername(), sshParameter.getIP(), 22);
+      ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
-    client = new SSHClient();
-    InetAddress host;
-    try {
-      host = InetAddress.getByName(ip);
+      Properties prop = new Properties();
+      prop.put("StrictHostKeyChecking", "no");
+      session.setConfig(prop);
+      session.connect();
 
-      client.addHostKeyVerifier(new HostKeyVerifier() {
-
-        public boolean verify(String arg0, int arg1, PublicKey arg2) {
-          // TODO Auto-generated method stub
-          return true;
-        }
-      });
-//      client.connect(host);
-      client.connect(ip);
-      //client.connect(host,22);
-//      client.authPassword(username, password);
-//      client.authPublckey("alaafed");
+      // createUserAccount
+      ChannelExec channel_createUserAccount = (ChannelExec)session.openChannel("exec");
+      channel_createUserAccount.setOutputStream(stream);
+      channel_createUserAccount.setCommand("sudo -S adduser -gecos \"" + newUser + " "
+          + newUser + ", test@test.test\" -disabled-password "
+          + newUser + " ");
+      executeCommand(channel_createUserAccount);
 
       
-      KeyProvider keys;
-      try{
-      keys=client.loadKeys("/Users/AlaaAlloush/.ssh/sshkey");
-      } catch (IOException e) {
-        throw new RuntimeException("Cannot read key from private key file ",e);
-      }
+      // createUserSSHDirectory
+      ChannelExec channel_createUserSSHDirectory = (ChannelExec)session.openChannel("exec");
+      channel_createUserSSHDirectory.setOutputStream(stream);
+      channel_createUserSSHDirectory.setCommand("sudo -S mkdir /home/" + newUser + "/.ssh");
+      executeCommand(channel_createUserSSHDirectory);
       
       
-      client.authPublickey("alaafed",keys);
+      // createAuthorizedKeysFile
+      ChannelExec channel_createAuthorizedKeysFile = (ChannelExec)session.openChannel("exec");
+      channel_createAuthorizedKeysFile.setOutputStream(stream);
+      channel_createAuthorizedKeysFile.setCommand("sudo -S touch /home/" + newUser
+          + "/.ssh/authorized_keys");
+      executeCommand(channel_createAuthorizedKeysFile);
+            
+      //changeOwnerOfUserHome
+      ChannelExec channel_changeOwnerOfUserHome = (ChannelExec)session.openChannel("exec");
+      channel_changeOwnerOfUserHome.setOutputStream(stream);
+      channel_changeOwnerOfUserHome.setCommand("sudo -S chown -R " + newUser + ":" + newUser
+          + " /home/" + newUser + "/.ssh");
+      executeCommand(channel_changeOwnerOfUserHome);
+
       
-      this.client = client;
-    } catch (UnknownHostException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      // addSSHKey
+      ChannelExec channel_addSSHKey = (ChannelExec)session.openChannel("exec");
+      channel_addSSHKey.setOutputStream(stream);
+      channel_addSSHKey.setCommand("sudo -S bash -c 'echo " + sshKey + " >> /home/"
+          + newUser + "/.ssh/authorized_keys'");
+      executeCommand(channel_addSSHKey);
+
     }
-
-  }
-
-  public void createUserAccount(String newUser, String password) {
     
-    try {
-      Session session = client.startSession();
-      Command cmd;
-      try {
-        if(password != null){
-        cmd = session.exec("echo " + password
-            + "| sudo -S adduser -gecos \"" + newUser + " "
-            + newUser + ", test@test.test\" -disabled-password "
-            + newUser + " ");
-        }
-        else {
-          cmd = session.exec("echo " + password
-              + "| sudo -S adduser -gecos \"" + newUser + " "
-              + newUser + ", test@test.test\" -disabled-password "
-              + newUser + " ");
-        }
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-
-        System.out.println("\n **exit status: " + cmd.getExitStatus());
-      } finally {
-        session.close();
-      }
-    } catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    catch (JSchException ex) {
+      LOGGER.log(Level.SEVERE, " problem by creating this user ", ex);
     }
-        
-       
-
+    finally {
+      if (session != null)
+        session.disconnect();
+    }
   }
+  
+  
+  public void deleteUserAccount(){
+    
+    com.jcraft.jsch.Session session = null;
 
-  public void disconnect() {
-    try {
-      this.client.disconnect();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
+  try { 
+    jsch.addIdentity(sshParameter.getPrivateKeyPath(), sshParameter.getPrivateKeyPassword());
+    session = jsch.getSession(sshParameter.getAccessUsername(), sshParameter.getIP(), 22);
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
+    Properties prop = new Properties();
+    prop.put("StrictHostKeyChecking", "no");
+    session.setConfig(prop);
+    session.connect();
+
+    // lockAccount
+    ChannelExec channel_lockAccount = (ChannelExec)session.openChannel("exec");
+    channel_lockAccount.setOutputStream(stream);
+    channel_lockAccount.setCommand("sudo -S passwd -l " + newUser + "");
+    executeCommand(channel_lockAccount);
+    
+    
+    // killAllUserProcesses
+    ChannelExec channel_killAllUserProcesses = (ChannelExec)session.openChannel("exec");
+    channel_killAllUserProcesses.setOutputStream(stream);
+    channel_killAllUserProcesses.setCommand("sudo -S killall -KILL -u " + newUser + "");
+    executeCommand(channel_killAllUserProcesses);
+    
+    
+    // deleteUser
+    ChannelExec channel_deleteUser = (ChannelExec)session.openChannel("exec");
+    channel_deleteUser.setOutputStream(stream);
+    channel_deleteUser.setCommand("sudo -S userdel -r " + newUser + "");
+    executeCommand(channel_deleteUser);
+    
+
+    // DeleteUserDirectory
+    ChannelExec channel_deleteUserDirectory = (ChannelExec)session.openChannel("exec");
+    channel_deleteUserDirectory.setOutputStream(stream);
+    channel_deleteUserDirectory.setCommand("sudo -S rm -R /home/" + newUser + "");
+    executeCommand(channel_deleteUserDirectory);
+ 
   }
-
-  public void createUserSSHDirectory(String newUser, String password) {
-
-    try {
-      Session session = client.startSession();
-      try {
-        Command cmd;
-        if(password != null){
-        cmd = session.exec("echo " + password
-            + "| sudo -S mkdir /home/" + newUser + "/.ssh");
-        } else {
-          cmd = session.exec("sudo -S mkdir /home/" + newUser + "/.ssh");
-        }
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        System.out.println("\n **exit status: " + cmd.getExitStatus());
-
-       
-    } finally {
-      session.close();
-    }
-    }
-      catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
+  
+  catch (JSchException ex) {
+    LOGGER.log(Level.SEVERE, " problem by deleting the user ", ex);
   }
-
-  public void createAuthorizedKeysFile(String newUser, String password) {
-
-    try {
-      Session session = client.startSession();
-      try {
-        Command cmd;
-        if(password != null){
-        cmd = session.exec("echo " + password
-            + "| sudo -S touch /home/" + newUser
-            + "/.ssh/authorized_keys");
-        } else {
-          cmd = session.exec("sudo -S touch /home/" + newUser
-              + "/.ssh/authorized_keys");
-        }
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println("\n **exit status: " + cmd.getExitStatus());
-
-    } finally {
-      session.close();
-    }
-    }
-      catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
+  finally {
+    if (session != null)
+      session.disconnect();
   }
-
-  public void changeOwnerOfUserHome(String newUser, String password) {
-
-    try {
-      Session session = client.startSession();
-      try {
-        Command cmd;
-        if(password != null){
-        cmd = session.exec("echo " + password
-            + "| sudo -S chown -R " + newUser + ":" + newUser
-            + " /home/" + newUser + "/.ssh");
-        }
-        else {
-          cmd = session.exec("sudo -S chown -R " + newUser + ":" + newUser
-              + " /home/" + newUser + "/.ssh");
-        }
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println("\n **exit status: " + cmd.getExitStatus());
-
-   
-    } finally {
-      session.close();
-    }
-    }
-      catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
   }
-
-  public void addSSHKey(String sshKey, String newUser, String password) {
-
+  
+  private void executeCommand(ChannelExec channel){
     try {
-      Session session = client.startSession();
-      try {
-        Command cmd;
-        if(password != null){
-          cmd = session.exec("echo " + password
-              + "| sudo -S bash -c 'echo " + sshKey + " >> /home/"
-              + newUser + "/.ssh/authorized_keys'");
-        }
-        else {
-          cmd = session.exec("sudo -S bash -c 'echo " + sshKey + " >> /home/"
-              + newUser + "/.ssh/authorized_keys'");
-        }
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println("\n **exit status: " + cmd.getExitStatus());
-
-     
-    } finally {
-      session.close();
+      channel.connect(1000);
+      java.lang.Thread.sleep(500);
+      channel.disconnect();
+    } catch (JSchException e) {
+      LOGGER.log(Level.SEVERE, " problem by executing this command ", e);
     }
-    }
-      catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
+    catch (InterruptedException e) {
+      LOGGER.log(Level.SEVERE, " problem by executing this command ", e);
+    }   
+    
   }
-
-  public void deleteUser(String username, String password) {
-    try {
-      Session session = client.startSession();
-      try {
-        Command cmd;
-        if(password != null){
-          cmd = session.exec("echo " + password
-              + "| sudo -S userdel -r " + username + "");
-        }
-        else {
-          cmd = session.exec("sudo -S userdel -r " + username + "");
-        }
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println("\n **exit status: "
-            + cmd.getExitStatus());
-
-      } finally {
-        session.close();
-      }
-    } catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-  }
-
-  public void deleteUserDirectory(String username, String password) {
-    try {
-      Session session = client.startSession();
-      try {
-        Command cmd;
-        if(password != null){
-          cmd = session.exec("echo " + password
-              + "| sudo -S rm -R /home/" + username + "");
-        }
-        else {
-          cmd = session.exec("sudo -S rm -R /home/" + username + "");
-        }
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println("\n **exit status: "
-            + cmd.getExitStatus());
-
-      } finally {
-        session.close();
-      }
-    } catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-  }
-
-  public void lockAccount(String username, String password) {
-    try {
-      Session session = client.startSession();
-      try {
-
-        Command cmd; 
-        if(password != null){
-          cmd = session.exec("echo " + password
-              + "| sudo -S passwd -l " + username + "");
-        }
-        else {
-          cmd = session.exec("sudo -S passwd -l " + username + "");
-        }
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println("\n **exit status: "
-            + cmd.getExitStatus());
-
-      } finally {
-        session.close();
-      }
-    } catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-  }
-
-  public void killAllUserProcesses(String username, String password) {
-    try {
-      Session session = client.startSession();
-      try {
-        Command cmd;
-        if(password != null){
-          cmd = session.exec("echo " + password
-              + "| sudo -S killall -KILL -u " + username + "");
-        }
-        else {
-          cmd = session.exec("sudo -S killall -KILL -u " + username + "");
-        }
-        System.out.println(IOUtils.readFully(cmd.getInputStream())
-            .toString());
-        cmd.join(5, TimeUnit.SECONDS);
-        System.out.println("\n **exit status: "
-            + cmd.getExitStatus());
-
-      } finally {
-        session.close();
-      }
-    } catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-
-  }
+  
   
 }

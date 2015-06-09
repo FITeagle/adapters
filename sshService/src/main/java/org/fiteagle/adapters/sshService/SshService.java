@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.sshService;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -10,16 +11,15 @@ import java.util.concurrent.TimeUnit;
 
 import javax.batch.api.chunk.CheckpointAlgorithm;
 
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.connection.ConnectionException;
-import net.schmizz.sshj.connection.channel.direct.Session;
-import net.schmizz.sshj.connection.channel.direct.Session.Command;
-import net.schmizz.sshj.transport.TransportException;
-
 import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import com.jcraft.jsch.*;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Properties;
 
 public class SshService {
 	protected SshServiceAdapter owningAdapter;
@@ -31,13 +31,14 @@ public class SshService {
 	private String password;
 	private static Boolean sudoPW;
 	
-	private int componentID_index;
 	private String ip;
+	
+	private SshParameter sshParameter;
 
 	public static Map<String, AbstractAdapter> adapterInstances;
 
 	public SshService(SshServiceAdapter owningAdapter) {
-		config = new Config("SshServiveAdapter");
+		config = new Config("SshServiceAdapter");
 		this.username = new ArrayList<>();
 		this.owningAdapter = owningAdapter;
 	}
@@ -46,8 +47,8 @@ public class SshService {
 		return instanceName;
 	}
 	
-	private void refreshConfig(){
-		config = new Config("PhysicalNodeAdapter-1");
+	public void refreshConfig(){
+		config = new Config("SshServiceAdapter");
 	}
 
 	public List<String> getUsernames() {
@@ -69,6 +70,10 @@ public class SshService {
 		this.publicKeys.add(publickey);
 	}
 
+	public SshParameter getSshParameter(){
+	  return this.sshParameter;
+	}
+	
 	private String executeCommand(String[] command) {
 		StringBuffer output = new StringBuffer();
 		Process p;
@@ -127,7 +132,7 @@ public class SshService {
 	}
 
 	private String setNewUserLinux(String newUsername) {
-		checkSudoPW(null);
+		checkSudoPW();
 
 		StringBuffer output = new StringBuffer();
 		Process p;
@@ -166,7 +171,7 @@ public class SshService {
 
 	private void setNewUserMac(String newUsername) {
 
-		checkSudoPW(null);
+		checkSudoPW();
 
 
 		String mypassword = password;
@@ -270,89 +275,31 @@ public class SshService {
 		}
 	}
 	
-	private void setComponentIDIndex(String adapterInstance){
-	  
-	  String componentIDs = config.getProperty("componentID");
-    if(componentIDs.contains(",")){
-      String[] componentID_array = componentIDs.split("\\,");
-      for(int counter = 0; counter < componentID_array.length; counter++){
-       if(adapterInstance.equals(componentID_array[counter])){
-         this.componentID_index = counter;
-         break;
-         }
-       }
-      } else this.componentID_index = 0;
-    
-    System.out.println("INDEX IS " + componentID_index);
-	}
-	
-	private void setIP(){
-	  
-	  String IPs = config.getProperty("ip");
-	  if(IPs.contains(",")){
-	    String[] IP_array = IPs.split("\\,");
-	    this.ip = IP_array[this.componentID_index];
-	  }
-	  else {
-	    this.ip = IPs;
-	  }
-	  System.out.println("IP IS " + ip);
-	}
 
 	private void createRemoteUser(String newUser, String publicKey){
 	  
 	  this.setUsername(newUser.toLowerCase());
     this.setPossibleAccesses(publicKey);
 	  
-    SSHConnector connector = new SSHConnector(ip);
-    connector.connect();
-    SSHClient client = connector.getSSHClient();
-    
-    try {
-      Session session = client.startSession();
-      try{
-        
-        checkSudoPW(session);
+    SSHConnector connector = new SSHConnector(newUser, publicKey, sshParameter);
+    connector.createUserAccount();
 
-      }
-      finally {
-        session.close();
-      }
-    } catch (ConnectionException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (TransportException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    
-    connector.createUserAccount(newUser, password);
-    connector.createUserSSHDirectory(newUser, password);
-    connector.createAuthorizedKeysFile(newUser, password);
-    connector.changeOwnerOfUserHome(newUser, password);
-    connector.addSSHKey(publicKey, newUser, password);
-    connector.disconnect();
-    
     
 	}
 	
-	public void addSshAccess(String newUser, String publicKey, String adapterInstance) {
+	public String addSshAccess(String newUser, String publicKey, String adapterInstance) {
 	  
-	  setComponentIDIndex(adapterInstance);
-	  setIP();
+	  sshParameter = new SshParameter(adapterInstance, config);
 	  
-	  if("localhost".equals(this.ip) || "127.0.0.1".equals(this.ip)){
-	    createLocalUser(newUser, publicKey, null);	    
+	  if(ISshService.LOCAL_HOST.equals(sshParameter.getIP()) || ISshService.LOCALHOST_IP.equals(sshParameter.getIP())){
+	    createLocalUser(newUser, publicKey);	    
 	  } else {
       createRemoteUser(newUser, publicKey);
 	  }
-	  
+	  return sshParameter.getIP();
 	}
    
-	private void createLocalUser(String newUser, String publicKey, Session session){
+	private void createLocalUser(String newUser, String publicKey){
 		
 		this.setUsername(newUser.toLowerCase());
 		this.setPossibleAccesses(publicKey);
@@ -365,7 +312,7 @@ public class SshService {
 		String[] chOwnStringMacCMD;
 		
 		sudoPW = true;
-    checkSudoPW(session);
+    checkSudoPW();
     
 		if(sudoPW){
 			String addSshString = "echo '" + password
@@ -479,7 +426,7 @@ public class SshService {
 	}
 
 	private void deleteLocalUser(String username) {
-		checkSudoPW(null);	
+		checkSudoPW();	
 		
 		if (executeCommand("uname -s").contains("Linux")) {
 			String[] deleteUserLinuxCMD ;
@@ -537,7 +484,7 @@ public class SshService {
 	public void deleteSshAccess() {
 	  
 	  for (String username : this.getUsernames()) {
-	    if("localhost".equals(this.ip) || "127.0.0.1".equals(this.ip)){
+	    if(ISshService.LOCAL_HOST.equals(sshParameter.getIP()) || ISshService.LOCALHOST_IP.equals(sshParameter.getIP())){
 	      deleteLocalUser(username.toLowerCase());
 	    }
 	    else {
@@ -547,41 +494,20 @@ public class SshService {
 	}
 	
 	  private void deleteRemoteUser(String username){
-	    SSHConnector connector = new SSHConnector(ip);
-	    connector.connect();
-	    connector.lockAccount(username, password);
-	    connector.killAllUserProcesses(username, password);
-	    connector.deleteUser(username, password);
-	    connector.deleteUserDirectory(username, password);
-	    connector.disconnect();
+	    
+	    SSHConnector connector = new SSHConnector(username, null, sshParameter);
+	    connector.deleteUserAccount();
+
 	  }
 
 	  
-	private void checkSudoPW(Session session){
+	private void checkSudoPW(){
 	  
-	  if(session == null){
 	    if (executeCommand("sudo -n echo 'ok'").contains("sudo")){
 	      setPassword();
 	    } else { 
 	      sudoPW = false;
 	    }
-	    
-	  } 
-	  else {
-	    // TODO: remote check for password
-	    try {
-        Command command = session.exec("sudo -n echo 'ok'");
-        command.join(5, TimeUnit.SECONDS);
-        if(command.getOutputStream().toString().contains("sudo")){
-          setPassword();
-        } else {
-          sudoPW = false;
-        }
-      } catch (ConnectionException | TransportException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-	  }
 	  
 	}
 
@@ -590,15 +516,11 @@ public class SshService {
 	    
 	    sudoPW = true;
       if (password == null) {
-      String passwordProperty = config.getProperty("password");
+      String passwordProperty = sshParameter.getPassword();
       if(passwordProperty.isEmpty() || passwordProperty == null){
         Log.fatal("SSH", "Could not find Sudo-Passwort");
         Log.fatal("SSH",
             "Please add password in ~/.fiteagle/SshServiceAdapter.properties");
-      }
-      else if (passwordProperty.contains(",")){
-        String[] password_array = passwordProperty.split("\\,");
-        this.password = password_array[this.componentID_index];
       }
       else this.password = passwordProperty;
     }
