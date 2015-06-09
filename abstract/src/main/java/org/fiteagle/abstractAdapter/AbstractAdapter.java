@@ -20,6 +20,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+
 public abstract class AbstractAdapter {
   
   private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
@@ -30,15 +31,37 @@ public abstract class AbstractAdapter {
 
   }
 
+  /**
+   * Creates a default properties file
+   *
+   * @param adapterInstanceName
+   */
   public void createDefaultConfiguration(String adapterInstanceName){
     Config config = new Config(adapterInstanceName);
     config.createPropertiesFile();
   }
-  
+
+
+  /**
+   *
+   * Checks if the adapter is the recipent of the given message model
+   * @param messageModel
+   * @return
+   */
   public boolean isRecipient(Model messageModel) {
     return messageModel.containsResource(getAdapterInstance());
   }
-  
+
+
+  /**
+   *
+   *
+   * @param model
+   * @return The currently active instances of the adapter
+   * @throws ProcessingException
+   * @throws InvalidRequestException
+   * @throws InstanceNotFoundException
+   */
   public Model getInstances(Model model) throws ProcessingException, InvalidRequestException, InstanceNotFoundException {
     Model instancesModel = ModelFactory.createDefaultModel();
     for (Resource resource : getAdapterManagedResources()) {
@@ -58,7 +81,16 @@ public abstract class AbstractAdapter {
     }
     return instancesModel;
   }
-  
+
+
+  /**
+   * Creates a new instance of a resource adapter
+   *
+   * @param model Representation of the new adapter instance
+   * @return the newly created adapter instance
+   * @throws ProcessingException
+   * @throws InvalidRequestException
+   */
   public Model createInstances(Model model) throws ProcessingException, InvalidRequestException {
     Model createdInstancesModel = ModelFactory.createDefaultModel();
     for (Resource resource : getAdapterManagedResources()) {
@@ -77,7 +109,14 @@ public abstract class AbstractAdapter {
 
     return createdInstancesModel;
   }
-  
+
+  /**
+   * Deletes an adapter instance defined by the model
+   * @param model
+   * @return
+   * @throws InvalidRequestException
+   * @throws ProcessingException
+   */
   public Model deleteInstances(Model model) throws InvalidRequestException, ProcessingException {
     Model deletedInstancesModel = ModelFactory.createDefaultModel();
     for(Resource resource : getAdapterManagedResources()){
@@ -97,7 +136,15 @@ public abstract class AbstractAdapter {
     }
     return deletedInstancesModel;
   }
-  
+
+  /**
+   *
+   * @param model
+   * @return
+   * @throws InvalidRequestException
+   * @throws ProcessingException
+   * @throws InstanceNotFoundException
+   */
   public Model updateInstances(Model model) throws InvalidRequestException, ProcessingException, InstanceNotFoundException {
     Model updatedInstancesModel = ModelFactory.createDefaultModel();  
     for(Resource resource : getAdapterManagedResources()){
@@ -121,7 +168,11 @@ public abstract class AbstractAdapter {
     }
     return updatedInstancesModel;
   }
-  
+
+  /**
+   *
+   * @return
+   */
   public List<Resource> getAdapterManagedResources(){
     List<Resource> managedResources = new ArrayList<>();
     StmtIterator iter = getAdapterInstance().listProperties(Omn_lifecycle.canImplement);
@@ -130,17 +181,29 @@ public abstract class AbstractAdapter {
     }
     return managedResources;
   }
-  
+
+  /**
+   *
+   * @param eventRDF
+   * @param requestID
+   * @param methodType
+   * @param methodTarget
+   */
   public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
     for (AdapterEventListener listener : listeners) {
       listener.publishModelUpdate(eventRDF, requestID, methodType, methodTarget);
     }
   }
-  
+
+  /**
+   *
+   * @param newListener
+   */
   public void addListener(AdapterEventListener newListener) {
     listeners.add(newListener);
   }
-  
+
+
   public abstract Resource getAdapterInstance();
   
   public abstract Resource getAdapterType();
