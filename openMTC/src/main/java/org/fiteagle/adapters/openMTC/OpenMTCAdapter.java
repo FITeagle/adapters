@@ -56,8 +56,8 @@ public class OpenMTCAdapter extends AbstractAdapter {
     
     Resource adapterInstance = adapterModel.createResource(OntologyModelUtil.getLocalNamespace()+"OpenMTC-1");
     adapterInstance.addProperty(RDF.type, adapter);
-    adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("An OpenMTC Adapter instance"));
-    adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("An OpenMTC Adapter instance that can handle multiple OpenMTC as a Service instances", "en"));
+    adapterInstance.addProperty(RDFS.label, adapterModel.createLiteral("An OpenMTC Adapter adapterABox"));
+    adapterInstance.addProperty(RDFS.comment, adapterModel.createLiteral("An OpenMTC Adapter adapterABox that can handle multiple OpenMTC as a Service instances", "en"));
     adapterInstance.addProperty(Omn_federation.partOfFederation, adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed"));
     
     OpenMTCAdapter openMTCAdapter = new OpenMTCAdapter(adapterInstance, adapterModel);
@@ -108,7 +108,7 @@ public class OpenMTCAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Resource getAdapterType() {
+  public Resource getAdapterABox() {
     return adapter;
   }
 

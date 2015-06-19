@@ -68,7 +68,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
   
   private static void createDefaultAdapterInstance(Model adapterModel){
- //   Resource adapterInstance = adapterModel.createResource(OntologyModelUtil.getResourceNamespace()+"Openstack-1");
+ //   Resource adapterInstance = adapterTBox.createResource(OntologyModelUtil.getResourceNamespace()+"Openstack-1");
 
     adapter = adapterModel.createResource(Omn_domain_pc.VMServer);
     adapter.addProperty(RDFS.subClassOf,MessageBusOntologyModel.classAdapter);
@@ -89,7 +89,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapterInstance.addProperty(Geo.long_,"13.3172764");
     adapterInstance.addProperty(Omn_resource.isExclusive,"false");
 
-//    Resource testbed = adapterModel.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+//    Resource testbed = adapterTBox.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
 //    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
 //
 //    StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
@@ -97,9 +97,9 @@ public class OpenstackAdapter extends AbstractAdapter {
 //      Resource resource = resourceIterator.next().getObject().asResource();
 //
 //      adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
-//      ResIterator propertiesIterator = adapterModel.listSubjectsWithProperty(RDFS.domain, resource);
+//      ResIterator propertiesIterator = adapterTBox.listSubjectsWithProperty(RDFS.domain, resource);
 //      while (propertiesIterator.hasNext()) {
-//        Property p = adapterModel.getProperty(propertiesIterator.next().getURI());
+//        Property p = adapterTBox.getProperty(propertiesIterator.next().getURI());
 //        resourceInstanceProperties.add(p);
 //      }
 //    }
@@ -339,7 +339,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
   @Override
-  public Resource getAdapterType() {
+  public Resource getAdapterABox() {
     return adapter;
   }
 

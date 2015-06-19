@@ -10,7 +10,6 @@ import javax.ejb.Startup;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBSender;
 import org.fiteagle.adapters.sshService.*;
-import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -33,7 +32,7 @@ private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBSender.class.t
 	    for(AbstractAdapter adapter : getAdapterInstances().values()){
 	      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + adapter.getAdapterInstance().getURI());
 	      Model messageModel = ModelFactory.createDefaultModel();
-	      messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
+	      messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterABox());
 	      String fileName = adapter.getAdapterInstance().getLocalName();
 	      adapter.notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
 	    }

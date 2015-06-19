@@ -76,7 +76,7 @@ public class MotorAdapterTest {
     Assert.assertTrue(adapter.getAdapterManagedResources().get(0) instanceof Resource);
     Assert.assertNotNull(adapter.getAdapterInstance());
     Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);
-    Assert.assertNotNull(adapter.getAdapterType());
+    Assert.assertNotNull(adapter.getAdapterABox());
     Assert.assertTrue(adapter.getAdapterInstance() instanceof Resource);
     Assert.assertNotNull(adapter.getAdapterDescriptionModel());
     Assert.assertTrue(adapter.getAdapterDescriptionModel() instanceof Model);

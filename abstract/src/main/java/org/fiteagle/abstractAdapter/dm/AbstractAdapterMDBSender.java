@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.decorator.Decorator;
+import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.Message;
@@ -14,7 +14,7 @@ import javax.jms.Topic;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
-import org.fiteagle.api.core.Config;
+import org.fiteagle.abstractAdapter.AdapterControl;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
@@ -31,13 +31,13 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
   private Topic topic;
   
-  @Inject
-  public AbstractAdapterMDBSender mdbSender;
+  @EJB
+  private AdapterControl adapterControl;
   
   @PostConstruct
   public void initializeAdapters() {
-    for(AbstractAdapter adapter : getAdapterInstances().values()){
-      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Adding MDB-Sender for " + adapter.getAdapterInstance().getURI());
+    for(AbstractAdapter adapter : adapterControl.getAdapterInstances()){
+      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Adding MDB-Sender for " + adapter.getAdapterABox().getURI());
       adapter.addListener(this);
       register(adapter, 1000);
     }
@@ -45,7 +45,7 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   
   public void register(AbstractAdapter adapter, long delay){
     if(delay < 3600000){
-      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Registering " + adapter.getAdapterInstance().getURI());
+      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Registering " + adapter.getAdapterABox().getURI());
       try {
         adapter.updateAdapterDescription();
         adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
@@ -72,10 +72,10 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   @PreDestroy
   public void contextDestroyed() {
     for(AbstractAdapter adapter : getAdapterInstances().values()){
-      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + adapter.getAdapterInstance().getURI());
+      LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + adapter.getAdapterABox().getURI());
       Model messageModel = ModelFactory.createDefaultModel();
-      messageModel.add(adapter.getAdapterInstance(), RDF.type, adapter.getAdapterType());
-      String fileName = adapter.getAdapterInstance().getLocalName();
+      messageModel.add(adapter.getAdapterABox(), RDF.type, adapter.getAdapterABox());
+      String fileName = adapter.getAdapterABox().getLocalName();
       adapter.notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
     }
   }

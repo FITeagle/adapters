@@ -102,7 +102,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Topology);
     while(resourceInstanceIterator.hasNext()){
       String instanceURI = resourceInstanceIterator.next().getURI();
-      LOGGER.log(Level.INFO, "Deleting instance: " + instanceURI);
+      LOGGER.log(Level.INFO, "Deleting adapterABox: " + instanceURI);
       deleteInstance(instanceURI);
       Resource deletedInstance = deletedInstancesModel.createResource(instanceURI);
       deletedInstance.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Removing);
@@ -141,7 +141,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Topology);
     while(resourceInstanceIterator.hasNext()){
       Resource resourceInstance = resourceInstanceIterator.next();
-      LOGGER.log(Level.INFO, "Updating instance: " + resourceInstance);
+      LOGGER.log(Level.INFO, "Updating adapterABox: " + resourceInstance);
       
       Model updatedModel = updateInstance(resourceInstance.getURI(), model);
       updatedInstancesModel.add(updatedModel);
@@ -199,7 +199,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource getAdapterType() {
+  public Resource getAdapterABox() {
     return adapter;
   }
   

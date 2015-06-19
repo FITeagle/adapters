@@ -2,23 +2,17 @@ package org.fiteagle.abstractAdapter;
 
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.print.attribute.standard.Media;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
 import org.fiteagle.api.core.Config;
-import org.fiteagle.api.core.IConfig;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,7 +30,13 @@ public abstract class AbstractAdapter {
   private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
   
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
-  
+
+  //Defines the adapters TBox
+  protected Model adapterTBox;
+  //Defines the adapters ABox
+  protected Resource adapterABox;
+  protected String uuid;
+
   public AbstractAdapter(){
 
   }
@@ -72,10 +72,12 @@ public abstract class AbstractAdapter {
    *
    * Checks if the adapter is the recipent of the given message model
    * @param messageModel
+   * TODO FIX!
    * @return
    */
   public boolean isRecipient(Model messageModel) {
-    return messageModel.containsResource(getAdapterInstance());
+
+    return messageModel.containsResource(this.adapterABox);
   }
 
 
@@ -98,7 +100,7 @@ public abstract class AbstractAdapter {
           Model createdInstance = getInstance(instanceURI);
           instancesModel.add(createdInstance);
         } catch (InstanceNotFoundException e) {
-          LOGGER.log(Level.WARNING, "Could not find instance: " + instanceURI);
+          LOGGER.log(Level.WARNING, "Could not find adapterABox: " + instanceURI);
         }
       }
     }
@@ -110,10 +112,10 @@ public abstract class AbstractAdapter {
 
 
   /**
-   * Creates a new instance of a resource adapter
+   * Creates a new adapterABox of a resource adapter
    *
-   * @param model Representation of the new adapter instance
-   * @return the newly created adapter instance
+   * @param model Representation of the new adapter adapterABox
+   * @return the newly created adapter adapterABox
    * @throws ProcessingException
    * @throws InvalidRequestException
    */
@@ -123,7 +125,7 @@ public abstract class AbstractAdapter {
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
       while (resourceInstanceIterator.hasNext()) {
         String instanceURI = resourceInstanceIterator.next().getURI();
-        LOGGER.log(Level.INFO, "Creating instance: " + instanceURI);
+        LOGGER.log(Level.INFO, "Creating adapterABox: " + instanceURI);
         Model createdInstance = createInstance(instanceURI, model);
         createdInstancesModel.add(createdInstance);
       }
@@ -137,7 +139,7 @@ public abstract class AbstractAdapter {
   }
 
   /**
-   * Deletes an adapter instance defined by the model
+   * Deletes an adapter adapterABox defined by the model
    * @param model
    * @return
    * @throws InvalidRequestException
@@ -149,7 +151,7 @@ public abstract class AbstractAdapter {
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
       while (resourceInstanceIterator.hasNext()) {
         String instanceURI = resourceInstanceIterator.next().getURI();
-        LOGGER.log(Level.INFO, "Deleting instance: " + instanceURI);
+        LOGGER.log(Level.INFO, "Deleting adapterABox: " + instanceURI);
         try {
           deleteInstance(instanceURI);
         } catch (InstanceNotFoundException e) {
@@ -177,7 +179,7 @@ public abstract class AbstractAdapter {
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
       while (resourceInstanceIterator.hasNext()) {
         Resource resourceInstance = resourceInstanceIterator.next();
-        LOGGER.log(Level.INFO, "Updating instance: " + resourceInstance);
+        LOGGER.log(Level.INFO, "Updating adapterABox: " + resourceInstance);
         
         StmtIterator propertiesIterator = model.listStatements(resourceInstance, null, (RDFNode) null);
         Model updateModel = ModelFactory.createDefaultModel();
@@ -201,7 +203,7 @@ public abstract class AbstractAdapter {
    */
   public List<Resource> getAdapterManagedResources(){
     List<Resource> managedResources = new ArrayList<>();
-    StmtIterator iter = getAdapterInstance().listProperties(Omn_lifecycle.canImplement);
+    StmtIterator iter = this.adapterTBox.listStatements(null, Omn_lifecycle.canImplement, (RDFNode) null);
     while(iter.hasNext()){
       managedResources.add(iter.next().getResource());
     }
@@ -230,9 +232,8 @@ public abstract class AbstractAdapter {
   }
 
 
-  public abstract Resource getAdapterInstance();
-  
-  public abstract Resource getAdapterType();
+
+  public abstract Resource getAdapterABox();
   
   public abstract Model getAdapterDescriptionModel();
   
@@ -250,7 +251,20 @@ public abstract class AbstractAdapter {
   
   public abstract void refreshConfig() throws ProcessingException;
 
-  
+  public  String getId(){
+    return this.uuid;
+  }
+
+  protected void setId(String id){
+    this.uuid = id;
+  }
+
+  public abstract void shutdown();
+
+  public abstract void configure(Config configuration);
+
+
+
   public static class InstanceNotFoundException extends Exception {
 
     private static final long serialVersionUID = 2310151290668732710L;

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.apache.jena.atlas.logging.Log;
+import org.fiteagle.adapters.sshService.SshService;
 import org.fiteagle.adapters.sshService.SshServiceAdapter;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IConfig;
@@ -18,7 +19,7 @@ import org.junit.Test;
 import com.fasterxml.jackson.databind.Module.SetupContext;
 
 public class SshTest {
-	  private static SshServiceAdapter adapter;
+/*	  private static SshServiceAdapter adapter;
 
 	@BeforeClass
 	public static void setup(){
@@ -87,4 +88,18 @@ public class SshTest {
 
 		return output.toString();
 	}
+
+	public void testCreateAccess(String pubKey,String username, String adapterInstance){
+		SshService sshService = new SshService(this);
+		sshService.addSshAccess(username, pubKey, adapterInstance);
+		instanceList.put(username, sshService);
+
+	}
+
+	public void testDeleteAccess(){
+		SshService sshService = instanceList.get("deploytestuser");
+		sshService.deleteSshAccess();
+		instanceList.remove("deploytestuser");
+
+	}*/
 }

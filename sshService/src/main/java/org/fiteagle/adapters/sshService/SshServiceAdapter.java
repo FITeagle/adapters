@@ -87,7 +87,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
     try {
       String jsonProperties = config.readJsonProperties();
       JSONObject jsonObject = new JSONObject(jsonProperties);
-      
+
       JSONArray adapterInstances = jsonObject.getJSONArray(ISshService.ADAPTER_INSTANCES);
       
       for (int i = 0; i < adapterInstances.length(); i++) {
@@ -192,7 +192,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	}
 
 	@Override
-	public Resource getAdapterType() {
+	public Resource getAdapterABox() {
 		return adapter;
 	}
 
@@ -328,19 +328,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		return model;
 	}
 	
-	public void testCreateAccess(String pubKey,String username, String adapterInstance){
-		SshService sshService = new SshService(this);
-		sshService.addSshAccess(username, pubKey, adapterInstance);
-		instanceList.put(username, sshService);
 
-	}
-	
-	public void testDeleteAccess(){
-		SshService sshService = instanceList.get("deploytestuser");
-		sshService.deleteSshAccess();
-		instanceList.remove("deploytestuser");
-
-	}
 
 
 	@Override

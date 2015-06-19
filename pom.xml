@@ -52,6 +52,7 @@
 		<module>tosca</module>
 		<module>sshService</module>
 		<module>monitoring</module>
+		<module>testAdapter</module>
 
-    </modules>
+	</modules>
 </project>

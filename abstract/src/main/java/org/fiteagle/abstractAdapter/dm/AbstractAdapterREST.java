@@ -216,7 +216,7 @@ public abstract class AbstractAdapterREST {
   private AbstractAdapter getAdapterInstance(String adapterName) {
     AbstractAdapter adapter = getAdapterInstances().get(OntologyModelUtil.getResourceNamespace()+adapterName);
     if(adapter == null){
-      throw new AdapterWebApplicationException(Status.NOT_FOUND, "The adapter instance "+adapterName+" could not be found");
+      throw new AdapterWebApplicationException(Status.NOT_FOUND, "The adapter adapterABox "+adapterName+" could not be found");
     }
     return adapter;
   }

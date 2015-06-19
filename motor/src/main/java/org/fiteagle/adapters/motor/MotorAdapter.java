@@ -151,7 +151,7 @@ public final class MotorAdapter extends AbstractAdapter {
   }
   
   @Override
-  public Resource getAdapterType() {
+  public Resource getAdapterABox() {
     return adapter;
   }
   

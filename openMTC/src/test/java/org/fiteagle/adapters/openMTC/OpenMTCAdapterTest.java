@@ -29,7 +29,7 @@ public class OpenMTCAdapterTest {
   
   @Test
   public void testAdapterModel() {
-    assertTrue(adapter.getAdapterDescriptionModel().contains(adapter.getAdapterType(), RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
+    assertTrue(adapter.getAdapterDescriptionModel().contains(adapter.getAdapterABox(), RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
   }
   
   @Test
@@ -40,19 +40,19 @@ public class OpenMTCAdapterTest {
   
   @Test
   public void testAdapterResource() {
-    assertTrue(adapter.getAdapterManagedResources().get(0).hasProperty(Omn_lifecycle.implementedBy, adapter.getAdapterType()));
+    assertTrue(adapter.getAdapterManagedResources().get(0).hasProperty(Omn_lifecycle.implementedBy, adapter.getAdapterABox()));
     assertTrue(adapter.getAdapterManagedResources().get(0).hasProperty(RDFS.subClassOf, Omn.Resource));
   }
 
   @Test
   public void testAdapterType() {
-      assertTrue(adapter.getAdapterType().hasProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
-      assertTrue(adapter.getAdapterType().hasProperty(Omn_lifecycle.implements_, adapter.getAdapterManagedResources().get(0)));
+      assertTrue(adapter.getAdapterABox().hasProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter));
+      assertTrue(adapter.getAdapterABox().hasProperty(Omn_lifecycle.implements_, adapter.getAdapterManagedResources().get(0)));
   }
   
   @Test
   public void testAdapterInstance() {
-      assertTrue(adapter.getAdapterInstance().hasProperty(RDF.type, adapter.getAdapterType()));
+      assertTrue(adapter.getAdapterInstance().hasProperty(RDF.type, adapter.getAdapterABox()));
       assertTrue(adapter.getAdapterInstance().hasProperty(RDFS.comment));
       assertTrue(adapter.getAdapterInstance().hasProperty(RDFS.label)); 
   }
