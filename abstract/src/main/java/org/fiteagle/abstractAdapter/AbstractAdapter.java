@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter;
 
+import com.hp.hpl.jena.rdf.model.*;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.io.IOException;
@@ -16,12 +17,6 @@ import org.fiteagle.api.core.Config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 
@@ -77,7 +72,14 @@ public abstract class AbstractAdapter {
    */
   public boolean isRecipient(Model messageModel) {
 
-    return messageModel.containsResource(this.adapterABox);
+    NodeIterator nodeIterator = messageModel.listObjectsOfProperty(Omn_lifecycle.implementedBy);
+    while(nodeIterator.hasNext()){
+      Resource node = nodeIterator.nextNode().asResource();
+      if(node.getURI().equals(this.adapterABox.getURI())){
+        return true;
+      }
+    }
+    return false;
   }
 
 
@@ -203,7 +205,7 @@ public abstract class AbstractAdapter {
    */
   public List<Resource> getAdapterManagedResources(){
     List<Resource> managedResources = new ArrayList<>();
-    StmtIterator iter = this.adapterTBox.listStatements(null, Omn_lifecycle.canImplement, (RDFNode) null);
+    StmtIterator iter = this.adapterABox.getModel().listStatements(null, Omn_lifecycle.canImplement, (RDFNode) null);
     while(iter.hasNext()){
       managedResources.add(iter.next().getResource());
     }

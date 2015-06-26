@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.tosca.dm;
 
-import java.util.Map;
+import java.util.Collection;
 
 import javax.ws.rs.Path;
 
@@ -12,7 +12,7 @@ import org.fiteagle.adapters.tosca.ToscaAdapter;
 public class ToscaAdapterREST extends AbstractAdapterREST {
   
   @Override
-  protected Map<String, AbstractAdapter> getAdapterInstances() {
+  protected Collection<AbstractAdapter> getAdapterInstances() {
     return ToscaAdapter.adapterInstances;
   }
   

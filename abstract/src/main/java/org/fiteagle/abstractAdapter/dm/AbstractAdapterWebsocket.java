@@ -3,10 +3,7 @@ package org.fiteagle.abstractAdapter.dm;
 import info.openmultinet.ontology.vocabulary.Http;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,11 +42,11 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   
   private static Queue<Session> queue = new ConcurrentLinkedQueue<Session>();
   
-  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  protected abstract Collection<AbstractAdapter> getAdapterInstances();
      
   @PostConstruct
   public void setup() {
-    for (AbstractAdapter adapter : getAdapterInstances().values()) {
+    for (AbstractAdapter adapter : getAdapterInstances() ){
       adapter.addListener(this);
     }
   }
@@ -129,7 +126,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
 
   private AbstractAdapter getTargetAdapterInstance(Model requestModel) throws ProcessingException, InvalidRequestException, InstanceNotFoundException {
     AbstractAdapter targetAdapter = null;
-    for(AbstractAdapter adapterInstance : getAdapterInstances().values()){
+    for(AbstractAdapter adapterInstance : getAdapterInstances()){
       if(adapterInstance.isRecipient(requestModel)){
         targetAdapter = adapterInstance;
       }
@@ -180,7 +177,7 @@ public abstract class AbstractAdapterWebsocket implements AdapterEventListener {
   public void onOpen(final Session session, final EndpointConfig config) throws IOException {
     LOGGER.log(Level.INFO, "Opening WebSocket connection with " + session.getId() + "...");
     LOGGER.log(Level.INFO, "Sending adapter description... ");
-    for(AbstractAdapter adapter : getAdapterInstances().values()){
+    for(AbstractAdapter adapter : getAdapterInstances()){
       String description = MessageUtil.serializeModel(adapter.getAdapterDescriptionModel(), IMessageBus.SERIALIZATION_TURTLE);
       session.getBasicRemote().sendText(description);
     }

@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.tosca.dm;
 
-import java.util.Map;
+import java.util.Collection;
 
 import javax.websocket.server.ServerEndpoint;
 
@@ -12,7 +12,7 @@ import org.fiteagle.adapters.tosca.ToscaAdapter;
 public class ToscaWebsocket extends AbstractAdapterWebsocket {
   
   @Override
-  protected Map<String, AbstractAdapter> getAdapterInstances() {
+  protected Collection<AbstractAdapter> getAdapterInstances() {
     return ToscaAdapter.adapterInstances;
   }
 }

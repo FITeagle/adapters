@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.sshService.dm;
 
-import java.util.Map;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +23,7 @@ public class SshServiceAdapterMDBSender extends AbstractAdapterMDBSender {
 private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBSender.class.toString());
 
   @Override
-  protected Map<String, AbstractAdapter> getAdapterInstances() {
+  protected Collection<AbstractAdapter> getAdapterInstances() {
     return SshServiceAdapter.adapterInstances;
   }
   

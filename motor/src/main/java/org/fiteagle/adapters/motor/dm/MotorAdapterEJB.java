@@ -1,21 +1,25 @@
 package org.fiteagle.adapters.motor.dm;
 
-import java.util.Map;
+import java.util.Collection;
 
+import javax.ejb.EJB;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterEJB;
 import org.fiteagle.abstractAdapter.dm.AdapterEJB;
-import org.fiteagle.adapters.motor.MotorAdapter;
+import org.fiteagle.adapters.motor.MotorAdapterControl;
 
 @Singleton
 @Remote(AdapterEJB.class)
 class MotorAdapterEJB extends AbstractAdapterEJB {
-  
+
+  @EJB
+  MotorAdapterControl motorAdapterControl;
+
   @Override
-  protected Map<String, AbstractAdapter> getAdapterInstances() {
-    return MotorAdapter.adapterInstances;
+  protected Collection<AbstractAdapter> getAdapterInstances() {
+    return motorAdapterControl.getAdapterInstances();
   }
 }

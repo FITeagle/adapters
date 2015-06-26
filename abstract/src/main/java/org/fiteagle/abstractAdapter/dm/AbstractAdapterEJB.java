@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -12,12 +13,12 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 public abstract class AbstractAdapterEJB implements AdapterEJB {
   
-  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  protected abstract Collection<AbstractAdapter> getAdapterInstances();
   
   @Override
   public Model createInstance(Model createModel) throws ProcessingException, InvalidRequestException {
     Model resultModel = ModelFactory.createDefaultModel();
-    for(AbstractAdapter adapter : getAdapterInstances().values()){
+    for(AbstractAdapter adapter : getAdapterInstances()){
       if(adapter.isRecipient(createModel)){
         resultModel.add(adapter.createInstances(createModel));
       }
@@ -28,7 +29,7 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
   @Override
   public Model deleteInstances(Model deleteModel) throws InvalidRequestException, ProcessingException  {
 	  Model resultModel = ModelFactory.createDefaultModel();
-    for(AbstractAdapter adapter : getAdapterInstances().values()){
+    for(AbstractAdapter adapter : getAdapterInstances()){
       if(adapter.isRecipient(deleteModel)){
         resultModel.add(adapter.deleteInstances(deleteModel));
       }
@@ -39,7 +40,7 @@ public abstract class AbstractAdapterEJB implements AdapterEJB {
   @Override
   public Model configureInstances(Model configureModel) throws InvalidRequestException, ProcessingException, InstanceNotFoundException  {
     Model resultModel = ModelFactory.createDefaultModel();
-    for(AbstractAdapter adapter : getAdapterInstances().values()){
+    for(AbstractAdapter adapter : getAdapterInstances()){
       if(adapter.isRecipient(configureModel)){
         resultModel.add(adapter.updateInstances(configureModel));
       }

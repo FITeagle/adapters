@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,13 +23,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 public abstract class AbstractAdapterMDBListener implements MessageListener {
   
   @Inject
-  private JMSContext context;
+  protected JMSContext context;
   @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
-  private Topic topic;
+  protected Topic topic;
   
-  private static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBListener.class.toString());
+  protected static Logger LOGGER = Logger.getLogger(AbstractAdapterMDBListener.class.toString());
   
-  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  protected abstract Collection<AbstractAdapter> getAdapterInstances();
   
   public void onMessage(final Message message) {
     String messageType = MessageUtil.getMessageType(message);
@@ -38,7 +39,7 @@ public abstract class AbstractAdapterMDBListener implements MessageListener {
     if (messageType != null && rdfString != null) {
       Model messageModel = MessageUtil.parseSerializedModel(rdfString, serialization);
       
-      for(AbstractAdapter adapter : getAdapterInstances().values()){
+      for(AbstractAdapter adapter : getAdapterInstances()){
         if (adapter.isRecipient(messageModel)) {
           LOGGER.log(Level.INFO, "Received a " + messageType + " message");
           try{

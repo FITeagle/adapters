@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.openMTC.dm;
 
-import java.util.Map;
+import java.util.Collection;
 
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -14,7 +14,7 @@ import org.fiteagle.adapters.openMTC.OpenMTCAdapter;
 public class OpenMTCAdapterMDBSender extends AbstractAdapterMDBSender{
   
   @Override
-  protected Map<String, AbstractAdapter> getAdapterInstances() {
+  protected Collection<AbstractAdapter> getAdapterInstances() {
     return OpenMTCAdapter.adapterInstances;
   }
 

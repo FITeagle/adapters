@@ -1,6 +1,6 @@
 package org.fiteagle.adapters.tosca.dm;
 
-import java.util.Map;
+import java.util.Collection;
 
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -14,7 +14,7 @@ import org.fiteagle.adapters.tosca.ToscaAdapter;
 public class ToscaMDBSender extends AbstractAdapterMDBSender {
   
   @Override
-  protected Map<String, AbstractAdapter> getAdapterInstances() {
+  protected Collection<AbstractAdapter> getAdapterInstances() {
     return ToscaAdapter.adapterInstances;
   }
 }

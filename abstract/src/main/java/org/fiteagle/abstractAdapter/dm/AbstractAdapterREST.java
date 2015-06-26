@@ -3,6 +3,8 @@ package org.fiteagle.abstractAdapter.dm;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
@@ -214,7 +216,16 @@ public abstract class AbstractAdapterREST {
   }
 
   private AbstractAdapter getAdapterInstance(String adapterName) {
-    AbstractAdapter adapter = getAdapterInstances().get(OntologyModelUtil.getResourceNamespace()+adapterName);
+
+    AbstractAdapter adapter = null;
+    Iterator<AbstractAdapter> iterator = getAdapterInstances().iterator();
+    while (iterator.hasNext()){
+      AbstractAdapter it = iterator.next();
+      if(adapterName.equals(it.getId())){
+        adapter =it;
+        break;
+      }
+    }
     if(adapter == null){
       throw new AdapterWebApplicationException(Status.NOT_FOUND, "The adapter adapterABox "+adapterName+" could not be found");
     }
@@ -250,7 +261,7 @@ public abstract class AbstractAdapterREST {
     }
   }
 
-  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+  protected abstract Collection<AbstractAdapter> getAdapterInstances();
   
   public static class AdapterWebApplicationException extends WebApplicationException {
     private static final long serialVersionUID = -9105333519515224562L;
