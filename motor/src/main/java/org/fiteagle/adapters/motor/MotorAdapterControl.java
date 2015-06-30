@@ -44,18 +44,8 @@ public class MotorAdapterControl extends AdapterControl {
         
     }
 
-    private void publishInstances() {
-
-        for(AbstractAdapter adapter : this.getAdapterInstances()){
-            publish(adapter);
-        }
-    }
 
 
-    protected  void publish(AbstractAdapter adapter){
-        adapter.addListener(mdbSender);
-        mdbSender.register(adapter, 1000);
-    }
 
 
     @Override

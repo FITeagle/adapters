@@ -3,10 +3,12 @@ package org.fiteagle.abstractAdapter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBSender;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IConfig;
 
 import javax.ejb.Local;
+import javax.inject.Inject;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,6 +25,8 @@ public abstract class AdapterControl {
     protected Config adapterInstancesConfig;
     protected Map<String, AbstractAdapter> adapterInstances;
 
+    @Inject
+    protected AbstractAdapterMDBSender mdbSender;
 
     public abstract AbstractAdapter createAdapterInstance(Model model, Resource resource);
 
@@ -62,4 +66,16 @@ public abstract class AdapterControl {
         return config;
     }
 
+    protected void publishInstances() {
+
+        for(AbstractAdapter adapter : this.getAdapterInstances()){
+            publish(adapter);
+        }
+    }
+
+
+    protected  void publish(AbstractAdapter adapter){
+        adapter.addListener(this.mdbSender);
+        this.mdbSender.register(adapter, 1000);
+    }
 }
