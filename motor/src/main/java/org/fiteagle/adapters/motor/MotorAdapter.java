@@ -3,7 +3,6 @@ package org.fiteagle.adapters.motor;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.OWL;
 import info.openmultinet.ontology.vocabulary.Omn;
-import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.*;
@@ -53,16 +52,7 @@ public final class MotorAdapter extends AbstractAdapter {
 
     }
 
-    private Resource getAdapterClass() {
-        ResIterator resIterator = adapterTBox.listResourcesWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
-        Resource resourceAdapterClass = null;
-        while (resIterator.hasNext()){
-            resourceAdapterClass = resIterator.nextResource();
-            break;
-        }
 
-        return resourceAdapterClass;
-    }
 
 
 

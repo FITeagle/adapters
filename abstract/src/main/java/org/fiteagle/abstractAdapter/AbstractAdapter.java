@@ -1,6 +1,7 @@
 package org.fiteagle.abstractAdapter;
 
 import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.fiteagle.api.core.Config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hp.hpl.jena.vocabulary.RDF;
+import org.fiteagle.api.core.MessageBusOntologyModel;
 
 
 public abstract class AbstractAdapter {
@@ -301,5 +303,16 @@ public abstract class AbstractAdapter {
       super(cause);
     }
   }
+
+    protected Resource getAdapterClass() {
+        ResIterator resIterator = adapterTBox.listResourcesWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+        Resource resourceAdapterClass = null;
+        while (resIterator.hasNext()){
+            resourceAdapterClass = resIterator.nextResource();
+            break;
+        }
+
+        return resourceAdapterClass;
+    }
   
 }

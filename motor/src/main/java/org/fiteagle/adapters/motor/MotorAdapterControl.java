@@ -61,20 +61,23 @@ public class MotorAdapterControl extends AdapterControl {
 
 
             String jsonProperties = this.adapterInstancesConfig.readJsonProperties();
-            JsonReader jsonReader = Json.createReader(new ByteArrayInputStream(jsonProperties.getBytes()));
+            if(!jsonProperties.isEmpty()){
+                JsonReader jsonReader = Json.createReader(new ByteArrayInputStream(jsonProperties.getBytes()));
 
-            JsonObject jsonObject = jsonReader.readObject();
+                JsonObject jsonObject = jsonReader.readObject();
 
-            JsonArray adapterInstances = jsonObject.getJsonArray("adapterInstances");
+                JsonArray adapterInstances = jsonObject.getJsonArray("adapterInstances");
 
-            for (int i = 0; i < adapterInstances.size(); i++) {
-                JsonObject adapterInstanceObject = adapterInstances.getJsonObject(i);
-                String adapterInstance = adapterInstanceObject.getString("componentID");
-                Model model = ModelFactory.createDefaultModel();
-                Resource resource = model.createResource(adapterInstance);
-                //parse possible additional values from config
+                for (int i = 0; i < adapterInstances.size(); i++) {
+                    JsonObject adapterInstanceObject = adapterInstances.getJsonObject(i);
+                    String adapterInstance = adapterInstanceObject.getString("componentID");
+                    Model model = ModelFactory.createDefaultModel();
+                    Resource resource = model.createResource(adapterInstance);
+                    //parse possible additional values from config
 
-                createAdapterInstance(adapterModel, resource);
+                    createAdapterInstance(adapterModel, resource);
+                }
+
             }
 
 
