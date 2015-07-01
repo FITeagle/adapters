@@ -79,7 +79,10 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       adapter.notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
     }
   }
-  
-  protected abstract Collection<AbstractAdapter> getAdapterInstances();
+
+
+    protected Collection<AbstractAdapter> getAdapterInstances() {
+        return adapterControl.getAdapterInstances();
+    }
   
 }

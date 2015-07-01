@@ -23,6 +23,7 @@ import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
+import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
@@ -56,22 +57,13 @@ public class OpenstackAdapter extends AbstractAdapter {
     return testInstance;
   }
   
-  static {
-    Model adapterModel = OntologyModelUtil.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
-    
-    ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
-    if (adapterIterator.hasNext()) {
-      adapter = adapterIterator.next();
-    }
-    
-    createDefaultAdapterInstance(adapterModel);
-  }
+
   
   private static void createDefaultAdapterInstance(Model adapterModel){
  //   Resource adapterInstance = adapterTBox.createResource(OntologyModelUtil.getResourceNamespace()+"Openstack-1");
 
     adapter = adapterModel.createResource(Omn_domain_pc.VMServer);
-    adapter.addProperty(RDFS.subClassOf,MessageBusOntologyModel.classAdapter);
+    adapter.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
     adapter.addProperty(Omn_lifecycle.implements_,Omn_domain_pc.VM);
 
     Resource adapterInstance = ModelFactory.createDefaultModel().createResource(OntologyModelUtil.getResourceNamespace()+"VMServer-1");
@@ -89,25 +81,11 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapterInstance.addProperty(Geo.long_,"13.3172764");
     adapterInstance.addProperty(Omn_resource.isExclusive,"false");
 
-//    Resource testbed = adapterTBox.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-//    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-//
-//    StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
-//    if (resourceIterator.hasNext()) {
-//      Resource resource = resourceIterator.next().getObject().asResource();
-//
-//      adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
-//      ResIterator propertiesIterator = adapterTBox.listSubjectsWithProperty(RDFS.domain, resource);
-//      while (propertiesIterator.hasNext()) {
-//        Property p = adapterTBox.getProperty(propertiesIterator.next().getURI());
-//        resourceInstanceProperties.add(p);
-//      }
-//    }
-    
+
     new OpenstackAdapter(adapterInstance, new OpenstackClient());
   }
   
-  private OpenstackAdapter(Resource adapterInstance, IOpenstackClient openstackClient){
+  private OpenstackAdapter(Model adapterTBox, Resource adapterABox){
     //super(adapterInstance.getLocalName());
     adapterInstances.put(adapterInstance.getURI(), this);
     this.adapterInstance = adapterInstance;
@@ -333,10 +311,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     return adapterModel.getResource(getAdapterManagedResources().get(0).getNameSpace()+"OpenstackImage");
   }
 
-  @Override
-  public Resource getAdapterInstance() {
-    return adapterInstance;
-  }
 
   @Override
   public Resource getAdapterABox() {
@@ -498,6 +472,16 @@ public void refreshConfig() throws ProcessingException {
 	// TODO Auto-generated method stub
 	
 }
+
+  @Override
+  public void shutdown() {
+
+  }
+
+  @Override
+  public void configure(Config configuration) {
+
+  }
 
 
 }
