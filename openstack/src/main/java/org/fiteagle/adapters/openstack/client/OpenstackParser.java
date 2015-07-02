@@ -1,3 +1,4 @@
+
 package org.fiteagle.adapters.openstack.client;
 
 import java.io.IOException;
@@ -117,7 +118,7 @@ public class OpenstackParser {
     }
     return imageResource;
   }
-	
+	/*
 	public Model parseToModel(Server server){
 	  //TODO: better check whether it's already an URI
 	  if(!(server.getName().startsWith("http://") || server.getName().startsWith("urn:"))){
@@ -163,12 +164,15 @@ public class OpenstackParser {
     }
     return resource.getModel();
 	}
-	
+
+
 	public Model parseToModel(String serverString){
 	  Server server = parseToServer(serverString);
 	  return parseToModel(server);	
 	}
-	
+	*/
+
+    /*
 	private Resource parseToImagesResource(Images images){
 	  Model adapterModel = adapter.getAdapterDescriptionModel();
     Resource imagesResource = adapterModel.createResource(adapter.getAdapterInstance().getURI()+"_images");
@@ -184,10 +188,8 @@ public class OpenstackParser {
     
     return imagesResource;
   }
-	
-	public void addToAdapterInstanceDescription(Images images){
-	  adapter.getAdapterInstance().addProperty(PROPERTY_IMAGES, parseToImagesResource(images));
-	}
+	*/
+
 	
 	private String getStringPropertyValue(String instanceURI, Model model, Property property){
 	  Resource imagesResource = model.getResource(instanceURI);
@@ -234,3 +236,4 @@ public class OpenstackParser {
     return PROPERTY_FLAVOR;
   }
 }
+
