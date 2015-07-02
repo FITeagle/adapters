@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.json.JsonObject;
+
 import org.fiteagle.api.core.Config;
 import org.hornetq.utils.json.JSONArray;
 import org.hornetq.utils.json.JSONException;
@@ -16,6 +18,8 @@ import org.hornetq.utils.json.JSONObject;
  */
 public class SshParameter {
   
+  private String componentID;
+  
   private String ip;
   
   private String accessUsername;
@@ -26,60 +30,60 @@ public class SshParameter {
   
   private String password;
   
-  private Config config;
-  
   private static Logger LOGGER  = Logger.getLogger(SshParameter.class.toString());
   
   
-  public SshParameter(String adapterInstance, Config config){
+  public SshParameter(){
     
-    this.config = config;
-    this.parseAdapterInstance(adapterInstance);
-
   }
   
-  private void parseAdapterInstance(String adapterInstance){
-    String jsonProperties;
-    try {
-      jsonProperties = config.readJsonProperties();
-      JSONObject jsonObject;
-      jsonObject = new JSONObject(jsonProperties);
-      JSONArray adapterInstances = jsonObject.getJSONArray(ISshService.ADAPTER_INSTANCES);
-      
-      for (int i = 0; i < adapterInstances.length(); i++) {
-        JSONObject adapterInstanceObject = adapterInstances.getJSONObject(i);
-        if(adapterInstance.equals(adapterInstanceObject.getString(ISshService.COMPONENT_ID))){
-          this.accessUsername = adapterInstanceObject.getString(ISshService.USERNAME);
-          this.ip = adapterInstanceObject.getString(ISshService.IP);
-          this.privateKeyPath = adapterInstanceObject.getString(ISshService.PRIVATE_KEY_PATH);
-          this.privateKeyPassword = adapterInstanceObject.getString(ISshService.PRIVATE_KEY_PASSWORD);
-          this.password = adapterInstanceObject.getString(ISshService.PASSWORD);
-          }
-        }
-      } catch (JSONException e) {
-      LOGGER.log(Level.SEVERE, " Error by parsing properties file ", e);
-      }
-    }
   
+  public String getComponentID(){
+    return this.componentID;
+  }
+  
+  public void setComponentID(String componentID){
+    this.componentID = componentID;
+  }
   
   public String getIP(){
     return this.ip;
+  }
+  
+  public void setIP(String ip){
+    this.ip = ip;
   }
   
   public String getAccessUsername(){
     return this.accessUsername;
   }
   
+  public void setAccessUsername(String accessUsername){
+    this.accessUsername = accessUsername;
+  }
+  
   public String getPrivateKeyPath(){
     return this.privateKeyPath;
+  }
+  
+  public void setPrivateKeyPath(String privateKeyPath){
+    this.privateKeyPath = privateKeyPath;
   }
   
   public String getPrivateKeyPassword(){
     return this.privateKeyPassword;
   }
   
+  public void setPrivateKeyPassword(String privateKeyPassword){
+    this.privateKeyPassword = privateKeyPassword;
+  }
+  
   public String getPassword(){
     return this.password;
+  }
+  
+  public void setPassword(String password){
+    this.password = password;
   }
   
 }

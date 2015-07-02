@@ -3,6 +3,8 @@ package org.fiteagle.adapters.sshService;
 import com.jcraft.jsch.*;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,27 +22,35 @@ public class SSHConnector {
   
   private SshParameter sshParameter;
   
-  private String newUser;
+  private List<String> usernames = new ArrayList<>();;
  
-  private String sshKey;
+  private List<String> publicKeys = new ArrayList<>();
   
-  public SSHConnector(String newUser, String sshKey, SshParameter sshParameter){
+  public SSHConnector(List<String> usernames, List<String> publicKeys, SshParameter sshParameter){
     
     this.sshParameter = sshParameter;
     this.jsch = new JSch();
     
-    setNewUserName(newUser);
-    setSshKey(sshKey);
+    setUsernames(usernames);
+    setPublicKeys(publicKeys);
     
   }
   
   
-  private void setNewUserName(String newUser){
-    this.newUser = newUser;
+  private void setUsernames(List<String> usernames){
+    this.usernames = usernames;
   }
   
-  private void setSshKey(String sshKey){
-    this.sshKey = sshKey;
+  public List<String> getUsernames(){
+    return this.usernames;
+  }
+  
+  private void setPublicKeys(List<String> publicKeys){
+    this.publicKeys = publicKeys;
+  }
+  
+  public List<String> getPublicKeys(){
+    return this.publicKeys;
   }
   
   
@@ -58,6 +68,7 @@ public class SSHConnector {
       session.connect();
 
       // createUserAccount
+      for(String newUser : this.getUsernames()) {
       ChannelExec channel_createUserAccount = (ChannelExec)session.openChannel("exec");
       channel_createUserAccount.setOutputStream(stream);
       channel_createUserAccount.setCommand("sudo -S adduser -gecos \"" + newUser + " "
@@ -88,13 +99,15 @@ public class SSHConnector {
       executeCommand(channel_changeOwnerOfUserHome);
 
       
-      // addSSHKey
+      // addSSHKeys
+      for(String sshKey : this.getPublicKeys()) {
       ChannelExec channel_addSSHKey = (ChannelExec)session.openChannel("exec");
       channel_addSSHKey.setOutputStream(stream);
       channel_addSSHKey.setCommand("sudo -S bash -c 'echo " + sshKey + " >> /home/"
           + newUser + "/.ssh/authorized_keys'");
       executeCommand(channel_addSSHKey);
-
+      }
+    }
     }
     
     catch (JSchException ex) {
@@ -122,6 +135,7 @@ public class SSHConnector {
     session.connect();
 
     // lockAccount
+    for(String newUser : this.getUsernames()) {
     ChannelExec channel_lockAccount = (ChannelExec)session.openChannel("exec");
     channel_lockAccount.setOutputStream(stream);
     channel_lockAccount.setCommand("sudo -S passwd -l " + newUser + "");
@@ -148,6 +162,7 @@ public class SSHConnector {
     channel_deleteUserDirectory.setCommand("sudo -S rm -R /home/" + newUser + "");
     executeCommand(channel_deleteUserDirectory);
  
+  }
   }
   
   catch (JSchException ex) {

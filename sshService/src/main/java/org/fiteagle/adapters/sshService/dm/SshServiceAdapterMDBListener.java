@@ -1,8 +1,10 @@
 package org.fiteagle.adapters.sshService.dm;
 
+import java.util.Collection;
 import java.util.Map;
 
 import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -21,9 +23,12 @@ import org.fiteagle.api.core.IMessageBus;
 	    @ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 	public class SshServiceAdapterMDBListener extends AbstractAdapterMDBListener {
 	  
-	  @Override
-	  protected Map<String, AbstractAdapter> getAdapterInstances() {
-	    return SshServiceAdapter.adapterInstances;
+  @EJB
+  SshServiceAdapterControl sshServiceAdapterControl;
+  
+  @Override
+  protected Collection<AbstractAdapter> getAdapterInstances() {
+	    return sshServiceAdapterControl.getAdapterInstances();
 	  }
 	  
 	}

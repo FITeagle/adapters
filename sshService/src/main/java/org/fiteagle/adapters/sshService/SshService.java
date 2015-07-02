@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.sshService;
 
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_service;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,10 +19,13 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.jcraft.jsch.*;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Properties;
+
+import info.openmultinet.ontology.vocabulary.Omn_service;
 
 public class SshService {
 	protected SshServiceAdapter owningAdapter;
@@ -33,22 +39,41 @@ public class SshService {
 	
 	private String ip;
 	
-	private SshParameter sshParameter;
 
 	public static Map<String, AbstractAdapter> adapterInstances;
 
-	public SshService(SshServiceAdapter owningAdapter) {
-		config = new Config("SshServiceAdapter");
+	public SshService(SshServiceAdapter owningAdapter, String instanceName) {
+//		config = new Config("SshServiceAdapter");
+	  
 		this.username = new ArrayList<>();
 		this.owningAdapter = owningAdapter;
+		this.instanceName = instanceName;
+		
 	}
 
+  public void updateProperty(Statement configureStatement) {
+    
+    if(configureStatement.getSubject().getURI().equals(instanceName)){
+      
+      if(Omn_service.publickey.getLocalName().equals(configureStatement.getPredicate().getLocalName())){
+        this.setPossibleAccesses(configureStatement.getString());
+      }
+      
+      if(Omn_service.username.getLocalName().equals(configureStatement.getPredicate().getLocalName())){
+        this.setUsername(configureStatement.getString().toLowerCase());
+      }
+      
+    }
+  }
+  
+  
+  
 	public String getInstanceName() {
 		return instanceName;
 	}
 	
 	public void refreshConfig(){
-		config = new Config("SshServiceAdapter");
+		config = new Config("SshService");
 	}
 
 	public List<String> getUsernames() {
@@ -69,10 +94,11 @@ public class SshService {
 	private void setPossibleAccesses(String publickey) {
 		this.publicKeys.add(publickey);
 	}
-
-	public SshParameter getSshParameter(){
-	  return this.sshParameter;
+	
+	public SshServiceAdapter getSshServiceAdapter(){
+	  return this.owningAdapter;
 	}
+
 	
 	private String executeCommand(String[] command) {
 		StringBuffer output = new StringBuffer();
@@ -276,36 +302,29 @@ public class SshService {
 	}
 	
 
-	private void createRemoteUser(String newUser, String publicKey){
+	private void createRemoteUser(){
 	  
-	  this.setUsername(newUser.toLowerCase());
-    this.setPossibleAccesses(publicKey);
-	  
-    SSHConnector connector = new SSHConnector(newUser, publicKey, sshParameter);
+    SSHConnector connector = new SSHConnector(this.getUsernames(), this.getPossibleAccesses(), owningAdapter.getSshParameters());
     connector.createUserAccount();
 
     
 	}
 	
-	public String addSshAccess(String newUser, String publicKey, String adapterInstance) {
+	public void addSshAccess() {
 	  
-	  sshParameter = new SshParameter(adapterInstance, config);
+//	  sshParameter = new SshParameter(adapterInstance, config);
 	  
-	  if(ISshService.LOCAL_HOST.equals(sshParameter.getIP()) || ISshService.LOCALHOST_IP.equals(sshParameter.getIP())){
-	    createLocalUser(newUser, publicKey);	    
+	  if(ISshService.LOCAL_HOST.equals(owningAdapter.getSshParameters().getIP()) || ISshService.LOCALHOST_IP.equals(owningAdapter.getSshParameters().getIP())){
+	    createLocalUser();	    
 	  } else {
-      createRemoteUser(newUser, publicKey);
+      createRemoteUser();
 	  }
-	  return sshParameter.getIP();
+	  
 	}
    
-	private void createLocalUser(String newUser, String publicKey){
-		
-		this.setUsername(newUser.toLowerCase());
-		this.setPossibleAccesses(publicKey);
+	private void createLocalUser(){
 
 		String[] addSshCMD ;
-		String[] addSshKeyCMD;
 		String[] chMod600CMD;
 		String[] chMod700CMD;
 		String[] chOwnStringCMD;
@@ -314,69 +333,63 @@ public class SshService {
 		sudoPW = true;
     checkSudoPW();
     
+    for(String newUser : this.getUsernames()) {
+      
 		if(sudoPW){
 			String addSshString = "echo '" + password
-					+ "' | sudo -kS mkdir -pm 0777 ~/../" + newUser.toLowerCase()
+					+ "' | sudo -kS mkdir -pm 0777 ~/../" + newUser
 					+ "/.ssh";
 			String [] addSshCMDTmp = { "/bin/sh", "-c", addSshString };
 			addSshCMD = addSshCMDTmp;
-
-			String addKeysString = "echo " + publicKey + " >> ~/../"
-					+ newUser.toLowerCase() + "/.ssh/authorized_keys";
-			String [] addSshKeyCMDtmp = { "/bin/sh", "-c", addKeysString };
-			addSshKeyCMD=addSshKeyCMDtmp;
+			
 			
 			String chMod600 = "echo '" + password + "' | sudo -kS chmod 600 ~/../"
-					+ newUser.toLowerCase() + "/.ssh/authorized_keys";
+					+ newUser + "/.ssh/authorized_keys";
 			String [] chMod600CMDtmp = { "/bin/sh", "-c", chMod600 };
 			chMod600CMD=chMod600CMDtmp;
 			
 			String chMod700 = "echo '" + password + "' | sudo -kS chmod 700 ~/../"
-					+ newUser.toLowerCase() + "/.ssh";
+					+ newUser + "/.ssh";
 			String [] chMod700CMDtmp = { "/bin/sh", "-c", chMod700 };
 			chMod700CMD=chMod700CMDtmp;
 			
 			String chOwnString = "echo '" + password + "' | sudo -kS chown -R "
-					+ newUser.toLowerCase() + " ~/../" + newUser.toLowerCase()
+					+ newUser + " ~/../" + newUser
 					+ "/.ssh";
 			String [] chOwnStringCMDtmp = { "/bin/sh", "-c", chOwnString };
 			chOwnStringCMD=chOwnStringCMDtmp;
 			
 			String chOwnStringMac = "echo '" + password + "' | sudo -kS chown -Rv "
-					+ newUser.toLowerCase() + " ~/../" + newUser.toLowerCase()
+					+ newUser + " ~/../" + newUser
 					+ "/.ssh";
 			String [] chOwnStringMacCMDtmp = { "/bin/sh", "-c", chOwnStringMac };
 			chOwnStringMacCMD=chOwnStringMacCMDtmp;
 			
 		}else{
-			String addSshString = "sudo -n mkdir -pm 0777 ~/../" + newUser.toLowerCase()
+			String addSshString = "sudo -n mkdir -pm 0777 ~/../" + newUser
 					+ "/.ssh";
 			String [] addSshCMDTmp = { "/bin/sh", "-c", addSshString };
 			addSshCMD = addSshCMDTmp;
 
-			String addKeysString = "echo " + publicKey + " >> ~/../"
-					+ newUser.toLowerCase() + "/.ssh/authorized_keys";
-			String [] addSshKeyCMDtmp = { "/bin/sh", "-c", addKeysString };
-			addSshKeyCMD=addSshKeyCMDtmp;
 			
 			String chMod600 = "sudo -n chmod 600 ~/../"
-					+ newUser.toLowerCase() + "/.ssh/authorized_keys";
+					+ newUser + "/.ssh/authorized_keys";
 			String [] chMod600CMDtmp = { "/bin/sh", "-c", chMod600 };
 			chMod600CMD=chMod600CMDtmp;
 			
 			String chMod700 = "sudo -n chmod 700 ~/../"
-					+ newUser.toLowerCase() + "/.ssh";
+					+ newUser + "/.ssh";
 			String [] chMod700CMDtmp = { "/bin/sh", "-c", chMod700 };
 			chMod700CMD=chMod700CMDtmp;
 			
 			String chOwnString = "sudo -n chown -R "
-					+ newUser.toLowerCase() + " ~/../" + newUser.toLowerCase()
+					+ newUser + " ~/../" + newUser
 					+ "/.ssh";
 			String [] chOwnStringCMDtmp = { "/bin/sh", "-c", chOwnString };
 			chOwnStringCMD=chOwnStringCMDtmp;
 			
 			String chOwnStringMac = "sudo -n chown -Rv "
-					+ newUser.toLowerCase() + " ~/../" + newUser.toLowerCase()
+					+ newUser + " ~/../" + newUser
 					+ "/.ssh";
 			String [] chOwnStringMacCMDtmp = { "/bin/sh", "-c", chOwnStringMac };
 			chOwnStringMacCMD=chOwnStringMacCMDtmp;
@@ -392,13 +405,12 @@ public class SshService {
 			
 			
 			Log.info("SSH", "Creating new User for SSH");
-			setNewUserLinux(newUser.toLowerCase());
+			setNewUserLinux(newUser);
 				
 			Log.info("SSH", "Creating .ssh folder");
 			executeCommand(addSshCMD);
 
-			Log.info("SSH", "Adding Public Key to 'authorized_keys'");
-			executeCommand(addSshKeyCMD);
+			addSshKeys(newUser);
 
 			Log.info("SSH", "Changing file and directory rights");
 			executeCommand(chMod600CMD);
@@ -407,13 +419,12 @@ public class SshService {
 
 		} else if (executeCommand("uname -s").contains("Darwin")) {
 			Log.info("SSH", "Creating new User for SSH");
-			setNewUserMac(newUser.toLowerCase());
+			setNewUserMac(newUser);
 
 			Log.info("SSH", "Creating .ssh folder");
 			executeCommand(addSshCMD);
 
-			Log.info("SSH", "Adding Public Key to 'authorized_keys'");
-			executeCommand(addSshKeyCMD);
+			addSshKeys(newUser);
 
 			Log.info("SSH", "Changing file and directory rights");
 			executeCommand(chMod600CMD);
@@ -422,9 +433,24 @@ public class SshService {
 		} else {
 			Log.fatal("SSH", "Your OS is not supported yet");
 		}
-	  
+    }
 	}
 
+	private void addSshKeys(String newUser){
+	  
+	  String[] addSshKeyCMD;
+	  Log.info("SSH", "Adding Public Keys to 'authorized_keys'");
+	  
+	  for(String publicKey : this.getPossibleAccesses()){
+	    String addKeysString = "echo " + publicKey + " >> ~/../"
+          + newUser + "/.ssh/authorized_keys";
+      String [] addSshKeyCMDtmp = { "/bin/sh", "-c", addKeysString };
+      addSshKeyCMD=addSshKeyCMDtmp;
+      
+      executeCommand(addSshKeyCMD);
+	  }
+	}
+	
 	private void deleteLocalUser(String username) {
 		checkSudoPW();	
 		
@@ -484,7 +510,7 @@ public class SshService {
 	public void deleteSshAccess() {
 	  
 	  for (String username : this.getUsernames()) {
-	    if(ISshService.LOCAL_HOST.equals(sshParameter.getIP()) || ISshService.LOCALHOST_IP.equals(sshParameter.getIP())){
+	    if(ISshService.LOCAL_HOST.equals(owningAdapter.getSshParameters().getIP()) || ISshService.LOCALHOST_IP.equals(owningAdapter.getSshParameters().getIP())){
 	      deleteLocalUser(username.toLowerCase());
 	    }
 	    else {
@@ -495,7 +521,7 @@ public class SshService {
 	
 	  private void deleteRemoteUser(String username){
 	    
-	    SSHConnector connector = new SSHConnector(username, null, sshParameter);
+	    SSHConnector connector = new SSHConnector(this.getUsernames(), this.getPossibleAccesses(), owningAdapter.getSshParameters());
 	    connector.deleteUserAccount();
 
 	  }
@@ -516,11 +542,11 @@ public class SshService {
 	    
 	    sudoPW = true;
       if (password == null) {
-      String passwordProperty = sshParameter.getPassword();
+      String passwordProperty = owningAdapter.getSshParameters().getPassword();
       if(passwordProperty.isEmpty() || passwordProperty == null){
         Log.fatal("SSH", "Could not find Sudo-Passwort");
         Log.fatal("SSH",
-            "Please add password in ~/.fiteagle/SshServiceAdapter.properties");
+            "Please add password in ~/.fiteagle/SshService.properties");
       }
       else this.password = passwordProperty;
     }
