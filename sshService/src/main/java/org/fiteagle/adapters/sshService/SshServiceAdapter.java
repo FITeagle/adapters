@@ -136,68 +136,6 @@ public final class SshServiceAdapter extends AbstractAdapter {
     return this.sshParameters;
   }
 	
-//	private static void createPropertiesFile() {
-//		File file = new File(IConfig.PROPERTIES_DIRECTORY
-//				+ "/SshServiceAdapter.properties");
-//
-//		if (!file.exists()) {
-//			Config config = new Config("SshServiceAdapter");
-//
-//			Map<String, Object> propertiesMap = new HashMap<String, Object>();
-//	    propertiesMap.put(IConfig.KEY_HOSTNAME, IConfig.DEFAULT_HOSTNAME);
-//	    propertiesMap.put(IConfig.LOCAL_NAMESPACE, IConfig.LOCAL_NAMESPACE_VALUE);
-//	    propertiesMap.put(IConfig.RESOURCE_NAMESPACE,IConfig.RESOURCE_NAMESPACE_VALUE);
-//	    
-//	    List<Map<String, String>> adapterInstancesList = new LinkedList<Map<String, String>>();
-//	    Map<String, String> adapterInstanceMap = new HashMap<String, String>();
-//	    adapterInstanceMap.put(ISshService.COMPONENT_ID, OntologyModelUtil.getResourceNamespace()+ ISshService.DEFAULT_ADAPTER_INSTANCE);
-//	    adapterInstanceMap.put(ISshService.USERNAME, "");
-//	    adapterInstanceMap.put(ISshService.PASSWORD, "");
-//	    adapterInstanceMap.put(ISshService.IP, ISshService.LOCALHOST_IP);
-//	    adapterInstanceMap.put(ISshService.PRIVATE_KEY_PATH, "");
-//	    adapterInstanceMap.put(ISshService.PRIVATE_KEY_PASSWORD, "");
-//	    
-//	    adapterInstancesList.add(adapterInstanceMap);
-//	    
-//	    propertiesMap.put(ISshService.ADAPTER_INSTANCES, adapterInstancesList);
-//	    
-//	    Properties property = new Properties();
-//	    property.putAll(propertiesMap);
-//	    config.writeProperties(property);
-//	    }
-//		
-//		}
-
-
-	
-
-//	protected Model parseToModel(SshService sshService) {
-//		Resource resource = ModelFactory.createDefaultModel().createResource(
-//				sshService.getInstanceName());
-//		resource.addProperty(RDF.type, getAdapterManagedResources().get(0));
-//		resource.addProperty(RDF.type, Omn.Resource);
-//		resource.addProperty(RDFS.label, resource.getLocalName());
-//		resource.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Ready);
-//
-//		return resource.getModel();
-//	}
-
-
-//	@Override
-//	public Model updateInstance(String instanceURI, Model configureModel)
-//			throws InvalidRequestException, ProcessingException {
-//
-//		Model model = ModelFactory.createDefaultModel();
-//		ResIterator resIteratorKey = configureModel
-//				.listSubjectsWithProperty(Omn_lifecycle.implementedBy);
-//		while (resIteratorKey.hasNext()) {
-//
-//			Resource resource = resIteratorKey.nextResource();
-//			model.add(createResponse(resource, instanceList.get(instanceURI), instanceList.get(instanceURI).getSshParameter().getIP()));
-//		}
-//
-//		return model;
-//	}
 	
   @Override
   public Model updateInstance(String instanceURI, Model configureModel) {
@@ -223,41 +161,6 @@ public final class SshServiceAdapter extends AbstractAdapter {
 		return createResponse(sshService);
 		
 		
-		
-//		String pubKey = "";
-//		String userName = "";
-//		String adapterInstance = "";
-//		String ip = "";
-//		Model result = ModelFactory.createDefaultModel();
-//
-//		Resource resource = null;
-//
-//		ResIterator resIteratorKey = modelCreate
-//				.listSubjectsWithProperty(Omn_lifecycle.implementedBy);
-//		if (!resIteratorKey.hasNext())
-//			throw new InvalidRequestException("statements are missing ");
-//		while (resIteratorKey.hasNext()) {
-//
-//			resource = resIteratorKey.nextResource();
-//			if (!resource.hasProperty(Omn_service.publickey))
-//				throw new InvalidRequestException("public key is missing ");
-//			else {
-//				pubKey = resource.getProperty(Omn_service.publickey)
-//						.getLiteral().getString();
-//				System.out.println("public key is " + pubKey);
-//			}
-//			if (!resource.hasProperty(Omn_service.username))
-//				throw new InvalidRequestException("user name is missing ");
-//			else {
-//				userName = resource.getProperty(Omn_service.username)
-//						.getLiteral().getString();
-//			}
-//			adapterInstance = resource.getProperty(Omn_lifecycle.implementedBy).getObject().asResource().getURI();
-//
-//			sshService.addSshAccess(userName, pubKey);
-//
-//		}
-//		return createResponse(sshService);
 	}
 
 	private Model createResponse(SshService sshservice) {
@@ -317,12 +220,6 @@ public final class SshServiceAdapter extends AbstractAdapter {
 	@Override
 	public Model getInstance(String instanceURI)
 			throws InstanceNotFoundException {
-//		SshService sshService = instanceList.get(instanceURI);
-//		if (sshService == null) {
-//			throw new InstanceNotFoundException("Instance " + instanceURI
-//					+ " not found");
-//		}
-//		return parseToModel(sshService);
 	  return ModelFactory.createDefaultModel();
 	}
   

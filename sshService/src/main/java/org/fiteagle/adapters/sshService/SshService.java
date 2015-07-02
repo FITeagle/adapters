@@ -37,13 +37,10 @@ public class SshService {
 	private String password;
 	private static Boolean sudoPW;
 	
-	private String ip;
-	
 
 	public static Map<String, AbstractAdapter> adapterInstances;
 
 	public SshService(SshServiceAdapter owningAdapter, String instanceName) {
-//		config = new Config("SshServiceAdapter");
 	  
 		this.username = new ArrayList<>();
 		this.owningAdapter = owningAdapter;
@@ -311,8 +308,6 @@ public class SshService {
 	}
 	
 	public void addSshAccess() {
-	  
-//	  sshParameter = new SshParameter(adapterInstance, config);
 	  
 	  if(ISshService.LOCAL_HOST.equals(owningAdapter.getSshParameters().getIP()) || ISshService.LOCALHOST_IP.equals(owningAdapter.getSshParameters().getIP())){
 	    createLocalUser();	    
