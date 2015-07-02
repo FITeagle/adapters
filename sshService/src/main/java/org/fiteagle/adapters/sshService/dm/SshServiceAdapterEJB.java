@@ -3,15 +3,18 @@ package org.fiteagle.adapters.sshService.dm;
 import java.util.Collection;
 
 import javax.ejb.EJB;
-import javax.ws.rs.Path;
+import javax.ejb.Remote;
+import javax.ejb.Singleton;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.dm.AbstractAdapterREST;
-import org.fiteagle.adapters.sshService.SshServiceAdapter;
+import org.fiteagle.abstractAdapter.dm.AbstractAdapterEJB;
+import org.fiteagle.abstractAdapter.dm.AdapterEJB;
 import org.fiteagle.adapters.sshService.SshServiceAdapterControl;
 
-@Path("/")
-public class SshServiceAdapterREST extends AbstractAdapterREST {
+
+@Singleton
+@Remote(AdapterEJB.class)
+public class SshServiceAdapterEJB extends AbstractAdapterEJB{
   
   @EJB
   SshServiceAdapterControl sshServiceAdapterControl;
@@ -20,9 +23,5 @@ public class SshServiceAdapterREST extends AbstractAdapterREST {
   protected Collection<AbstractAdapter> getAdapterInstances() {
     return sshServiceAdapterControl.getAdapterInstances();
   }
-  
-  
-  
-  
   
 }

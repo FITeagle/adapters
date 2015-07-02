@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.sshService;
 
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 /**
  * 
  * @author AlaaAlloush
@@ -7,6 +9,8 @@ package org.fiteagle.adapters.sshService;
  */
 public interface ISshService {
   
+  String SSH_SERVICE = "SshService";
+  String SEMANTIC_DESCRIPTION_PATH = "ontologies/sshservice.ttl";
   String PASSWORD = "password";
   String IP = "ip";
   String LOCALHOST_IP = "127.0.0.1";
@@ -19,4 +23,5 @@ public interface ISshService {
   String USERNAME = "username";
   String SSH_KEYS = "ssh-keys";
   String ADAPTER_INSTANCES = "adapterInstances";
+  
 }
