@@ -17,6 +17,7 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.tosca.client.IToscaClient;
 import org.fiteagle.adapters.tosca.client.ToscaClient;
+import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
@@ -41,42 +43,25 @@ public final class ToscaAdapter extends AbstractAdapter {
   private static Logger LOGGER = Logger.getLogger(ToscaAdapter.class.toString());
   
   private IToscaClient client;
+
+
   
-  private Model adapterModel;
-  private Resource adapterInstance;
-  private static Resource adapter;
-  
-  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
-  
-  static {
-    Model adapterModel = OntologyModelUtil.loadModel("ontologies/tosca.ttl", IMessageBus.SERIALIZATION_TURTLE);
-    
-    ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
-    if (adapterIterator.hasNext()) {
-      adapter = adapterIterator.next();
-    }
-    
-    createDefaultAdapterInstance(adapterModel, new ToscaClient("http://localhost:8080/api/rest/tosca/v2/"));
-  }
-  
-  protected static ToscaAdapter createDefaultAdapterInstance(Model model, IToscaClient client){
-    Resource adapterInstance = model.createResource(OntologyModelUtil.getLocalNamespace()+"Tosca-1");
-    adapterInstance.addProperty(RDF.type, adapter);
-    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
-    adapterInstance.addProperty(RDFS.comment, "An adapter for TOSCA-compliant resources");
-    Resource testbed = model.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-    return new ToscaAdapter(adapterInstance, model, client);
-  }
-  
-  private ToscaAdapter(Resource adapterInstance, Model adapterModel, IToscaClient client) {
-    createDefaultConfiguration(adapterInstance.getLocalName());
-    
-    this.adapterInstance = adapterInstance;
-    this.adapterModel = adapterModel;
-    this.client = client;
-    
-    adapterInstances.put(adapterInstance.getURI(), this);
+  public ToscaAdapter( Model adapterTBox, Resource adapterABox) {
+    this.uuid = UUID.randomUUID().toString();
+    this.adapterTBox = adapterTBox;
+    this.adapterABox = adapterABox;
+    Resource adapterType = null;
+      ResIterator adapterIterator = adapterTBox.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+      if (adapterIterator.hasNext()) {
+          adapterType = adapterIterator.next();
+      }
+    this.adapterABox.addProperty(RDF.type, adapterType);
+      this.adapterABox.addProperty(RDFS.label, adapterABox.getLocalName());
+
+      this.adapterABox.addProperty(RDFS.comment, "An adapter for TOSCA-compliant resources");
+      Resource testbed = adapterABox.getModel().createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
+      this.adapterABox.addProperty(Omn_federation.partOfFederation, testbed);
+
   }
   
   @Override
@@ -192,20 +177,15 @@ public final class ToscaAdapter extends AbstractAdapter {
     Definitions definitions = client.getAllDefinitions();
     return parseToModel(definitions);
   }
-  
-  @Override
-  public Resource getAdapterInstance() {
-    return adapterInstance;
-  }
-  
+
   @Override
   public Resource getAdapterABox() {
-    return adapter;
+    return this.adapterABox;
   }
   
   @Override
   public Model getAdapterDescriptionModel() {
-    return adapterModel;
+    return this.adapterABox.getModel();
   }
   
   @Override
@@ -224,10 +204,10 @@ public final class ToscaAdapter extends AbstractAdapter {
     }
     for(Resource resource : resources){
       LOGGER.log(Level.INFO, "Found resource: "+resource.getURI());
-      adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
+      this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
     }
-    adapterModel.add(model);
-    adapterModel.setNsPrefixes(model.getNsPrefixMap());
+    this.adapterABox.getModel().add(model);
+      this.adapterABox.getModel().setNsPrefixes(model.getNsPrefixMap());
   }
 
   protected String parseToDefinitions(Model createModel) throws InvalidRequestException {
@@ -242,7 +222,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   protected Model parseToModel(Definitions definitions) throws ProcessingException {
     try {
       Model resultModel = Tosca2OMN.getModel(definitions);
-      adapterModel.setNsPrefixes(resultModel.getNsPrefixMap());
+        this.adapterABox.getModel().setNsPrefixes(resultModel.getNsPrefixMap());
       return resultModel;
     } catch (UnsupportedException e) {
       throw new ProcessingException(e);
@@ -251,7 +231,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     
   protected String getLocalname(String instanceURI) throws InvalidRequestException {
     try{
-      return OntologyModelUtil.getNamespaceAndLocalname(instanceURI, adapterModel.getNsPrefixMap())[1];
+      return OntologyModelUtil.getNamespaceAndLocalname(instanceURI,  this.adapterABox.getModel().getNsPrefixMap())[1];
     } catch(IllegalArgumentException e){
       throw new InvalidRequestException(e);
     }
@@ -266,7 +246,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   }
   
   protected InfModel createInfModel(Model model) throws InvalidModelException{
-    model.add(adapterModel);
+    model.add( this.adapterABox.getModel());
     Parser parser = new Parser(model);
     return parser.getInfModel();
   }
@@ -276,5 +256,18 @@ public void refreshConfig() throws ProcessingException {
 	// TODO Auto-generated method stub
 	
 }
-  
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    @Override
+    public void configure(Config configuration) {
+
+    }
+
+    public void setToscaClient(String toscaClientURI) {
+    this.client = new ToscaClient(toscaClientURI);
+  }
 }
