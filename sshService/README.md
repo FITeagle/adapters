@@ -11,8 +11,52 @@ Conditions for deploying the Adapter
 
 Because of some commands we use due to the creation of new Users and the SSH-Credentials we sometimes need sudo rights on the machine.
 Therefore we need you to change the root-variable in the Property-File to your correct root-password.
-You can find the file under ~/.fiteagle/SshServiceAdapter.properties
-If you want to add additional adapter instances, you have to update properties file. In particular, adapter instances should be separated by "," in componentID property. You need to set an IP address for the new SSH machine and a root-password if it is required. Don't forget to deploy the adapter to activate new changes.
+You have first to create a configuration file called SshService.properties under ~/.fiteagle/ 
+The following shows an example how to configure the configuration file:
+```
+{
+  "Resource_namespace": "http://localhost/resource/",
+  "hostname": "localhost",
+  "Local_namespace": "http://localhost/",
+  "adapterInstances": [
+    {
+      "privateKeyPath": "the path of your private key",
+      "password": "your sudo passowrd if it's required",
+      "componentID": "http://localhost/resource/PhysicalNodeAdapter-1",
+      "privateKeyPassword": "passord of your private key",
+      "ip": "IP address of the machine where to create ssh service",
+      "username": "username used to connect with the machine where to create ssh service"
+    }
+  ]
+}
+```
+If you want to add additional adapter instances, you have to add a new list to adapterInstances in the properties file. In particular, adapter instances should be separated by ","  as follows: 
+```
+{
+  "Resource_namespace": "http://localhost/resource/",
+  "hostname": "localhost",
+  "Local_namespace": "http://localhost/",
+  "adapterInstances": [
+    {
+      "privateKeyPath": "the path of your private key",
+      "password": "your sudo passowrd if it's required",
+      "componentID": "http://localhost/resource/PhysicalNodeAdapter-1",
+      "privateKeyPassword": "passord of your private key",
+      "ip": "IP address of the machine where to create ssh service",
+      "username": "username used to connect with the machine where to create ssh service"
+    }, 
+    {
+      "privateKeyPath": "",
+      "password": "",
+      "componentID": "",
+      "privateKeyPassword": "",
+      "ip": "",
+      "username": ""
+   }
+  ]
+}
+```
+Don't forget to deploy the adapter to activate new changes.
 
 
 Build and Deploy the Adapter
@@ -35,7 +79,7 @@ NOTE: 	If you just used bootstrap you don't have to do this.
 REST Delivery Mechanism
 ----------------------------
 
-The adapter will be accessable at the following URL via REST: <http://localhost:8080/sshService/PhysicalNodeAdapter-1>
+The adapter will be accessible at the following URL via REST: <http://localhost:8080/sshService/PhysicalNodeAdapter-1>
 
 ## Experimenting via curl REST calls
 If you dont want to write your own ttl-file, you can use our test-file for experimenting under:

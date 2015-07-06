@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.sshService;
 
+import info.openmultinet.ontology.vocabulary.Omn_service;
+
 import java.io.ByteArrayInputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,27 +71,27 @@ public class SshServiceAdapterControl extends AdapterControl{
                
                String adapterInstance_AccessUsername = adapterInstanceObject.getString(ISshService.USERNAME);
                if(adapterInstance_AccessUsername != null){
-                 resource.addProperty(model.createProperty(ISshService.USERNAME), adapterInstance_AccessUsername);
+                 resource.addProperty(model.createProperty(Omn_service.getURI(),ISshService.USERNAME), adapterInstance_AccessUsername);
                }
                
                String adapterIntance_IP = adapterInstanceObject.getString(ISshService.IP);
                if(adapterIntance_IP != null){
-                 resource.addProperty(model.createProperty(ISshService.IP), adapterIntance_IP);
+                 resource.addProperty(model.createProperty(Omn_service.getURI(),ISshService.IP), adapterIntance_IP);
                }
                
                String adapterInstance_PrivateKeyPath = adapterInstanceObject.getString(ISshService.PRIVATE_KEY_PATH);
                if(adapterInstance_PrivateKeyPath != null){
-                 resource.addProperty(model.createProperty(ISshService.PRIVATE_KEY_PATH), adapterInstance_PrivateKeyPath);
+                 resource.addProperty(model.createProperty(Omn_service.getURI(),ISshService.PRIVATE_KEY_PATH), adapterInstance_PrivateKeyPath);
                }
                
                String adapterInstance_PrivateKeyPassword = adapterInstanceObject.getString(ISshService.PRIVATE_KEY_PASSWORD);
                if(adapterInstance_PrivateKeyPassword != null){
-                 resource.addProperty(model.createProperty(ISshService.PRIVATE_KEY_PASSWORD), adapterInstance_PrivateKeyPassword);
+                 resource.addProperty(model.createProperty(Omn_service.getURI(),ISshService.PRIVATE_KEY_PASSWORD), adapterInstance_PrivateKeyPassword);
                }
                
                String adapterInstance_password = adapterInstanceObject.getString(ISshService.PASSWORD);
                if(adapterInstance_password != null){
-                 resource.addProperty(model.createProperty(ISshService.PASSWORD), adapterInstance_password);
+                 resource.addProperty(model.createProperty(Omn_service.getURI(),ISshService.PASSWORD), adapterInstance_password);
                }
                
                createAdapterInstance(adapterModel, resource);
