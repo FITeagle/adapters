@@ -45,14 +45,12 @@
 		<module>abstract</module>
 		<module>motor</module>
 		<module>common</module>
-		<module>epcClient</module>
-		<module>epcMeasurementServer</module>
+	<!--	<module>epcClient</module>
+		<module>epcMeasurementServer</module> -->
 		<module>openstack</module>
-		<module>openMTC</module>
+	<!--	<module>openMTC</module> -->
 		<module>tosca</module>
 		<module>sshService</module>
 		<module>monitoring</module>
-		<module>testAdapter</module>
-
 	</modules>
 </project>
