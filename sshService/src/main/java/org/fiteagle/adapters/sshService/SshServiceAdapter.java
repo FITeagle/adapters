@@ -140,7 +140,10 @@ public final class SshServiceAdapter extends AbstractAdapter {
   @Override
   public Model updateInstance(String instanceURI, Model configureModel) {
    
-      return ModelFactory.createDefaultModel();
+    Model model = ModelFactory.createDefaultModel();
+    model.add(createResponse(instanceList.get(instanceURI)));
+    return model;
+
   }
   
   
