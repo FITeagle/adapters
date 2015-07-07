@@ -3,6 +3,7 @@ package org.fiteagle.adapters.sshService;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,6 +67,8 @@ public class SshServiceAdapterControl extends AdapterControl{
              
                JsonObject adapterInstanceObject = adapterInstances.getJsonObject(i);
                String adapterInstance_componentID = adapterInstanceObject.getString(ISshService.COMPONENT_ID);
+               
+               if(!adapterInstance_componentID.isEmpty()){
                Model model = ModelFactory.createDefaultModel();
                Resource resource = model.createResource(adapterInstance_componentID);
                
@@ -96,6 +99,7 @@ public class SshServiceAdapterControl extends AdapterControl{
                
                createAdapterInstance(adapterModel, resource);
            }
+           }
 
 
    }
@@ -106,6 +110,16 @@ public class SshServiceAdapterControl extends AdapterControl{
        AbstractAdapter adapter =  new SshServiceAdapter(tbox,abox);
        adapterInstances.put(adapter.getId(),adapter);
        return  adapter;
+   }
+   
+   @Override
+   protected void addAdapterProperties(Map<String, String> adapterInstnaceMap){
+     adapterInstnaceMap.put(ISshService.PASSWORD, "");
+     adapterInstnaceMap.put(ISshService.PRIVATE_KEY_PATH, "");
+     adapterInstnaceMap.put(ISshService.PRIVATE_KEY_PASSWORD, "");
+     adapterInstnaceMap.put(ISshService.USERNAME, "");
+     adapterInstnaceMap.put(ISshService.IP, "");
+     
    }
    
 }
