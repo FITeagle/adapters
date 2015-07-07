@@ -4,9 +4,12 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+
 import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
+
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterControl;
+import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
 import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.OntologyModelUtil;
@@ -19,9 +22,11 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,57 +74,79 @@ public class OpenstackAdapterControl extends AdapterControl {
 
             JsonObject jsonObject = jsonReader.readObject();
 
-            JsonArray adapterInstances = jsonObject.getJsonArray("adapterInstances");
+            JsonArray adapterInstances = jsonObject.getJsonArray(IAbstractAdapter.ADAPTER_INSTANCES);
 
             for (int i = 0; i < adapterInstances.size(); i++) {
                 JsonObject adapterInstanceObject = adapterInstances.getJsonObject(i);
-                String adapterInstance = adapterInstanceObject.getString("componentID");
+                String adapterInstance = adapterInstanceObject.getString(IAbstractAdapter.COMPONENT_ID);
+                
+                if(!adapterInstance.isEmpty()){
                 Model model = ModelFactory.createDefaultModel();
                 Resource resource = model.createResource(adapterInstance);
                 //parse possible additional values from config
                 OpenstackAdapter adapter = (OpenstackAdapter)createAdapterInstance(adapterModel, resource);
 
-                String floating_ip_pool  = adapterInstanceObject.getString("floating_ip_pool_name");
+                String floating_ip_pool  = adapterInstanceObject.getString(IOpenStack.FLOATING_IP_POOL_NAME);
                 adapter.setFloatingPool(floating_ip_pool);
 
-                String keystone_auth_URL  = adapterInstanceObject.getString("keystone_auth_URL");
+                String keystone_auth_URL  = adapterInstanceObject.getString(IOpenStack.KEYSTONE_AUTH_URL);
                 adapter.setKeystone_auth_URL(keystone_auth_URL);
 
-                String net_name  = adapterInstanceObject.getString("net_name");
+                String net_name  = adapterInstanceObject.getString(IOpenStack.NET_NAME);
                 adapter.setNet_name(net_name);
 
-                String nova_endpoint  = adapterInstanceObject.getString("nova_endpoint");
+                String nova_endpoint  = adapterInstanceObject.getString(IOpenStack.NOVA_ENDPOINT);
                 adapter.setNova_endpoint(nova_endpoint);
 
-                String keystone_password  = adapterInstanceObject.getString("keystone_password");
+                String keystone_password  = adapterInstanceObject.getString(IOpenStack.KEYSTONE_PASSWORD);
                 adapter.setKeystone_password(keystone_password);
 
-                String keystone_endpoint  = adapterInstanceObject.getString("keystone_endpoint");
+                String keystone_endpoint  = adapterInstanceObject.getString(IOpenStack.KEYSTONE_ENDPOINT);
                 adapter.setKeystone_endpoint(keystone_endpoint);
 
-                String glance_endpoint  = adapterInstanceObject.getString("glance_endpoint");
+                String glance_endpoint  = adapterInstanceObject.getString(IOpenStack.GLANCE_ENDPOINT);
                 adapter.setGlance_endpoint(glance_endpoint);
 
-                String net_endpoint  = adapterInstanceObject.getString("net_endpoint");
+                String net_endpoint  = adapterInstanceObject.getString(IOpenStack.NET_ENDPOINT);
                 adapter.setNet_endpoint(net_endpoint);
 
-                String tenant_name  = adapterInstanceObject.getString("tenant_name");
+                String tenant_name  = adapterInstanceObject.getString(IOpenStack.TENANT_NAME);
                 adapter.setTenant_name(tenant_name);
 
-                String keystone_username  = adapterInstanceObject.getString("keystone_username");
+                String keystone_username  = adapterInstanceObject.getString(IOpenStack.KEYSTONE_USERNAME);
                 adapter.setKeystone_username(keystone_username);
 
-                String default_flavor_id  = adapterInstanceObject.getString("default_flavor_id");
+                String default_flavor_id  = adapterInstanceObject.getString(IOpenStack.DEFAULT_FLAVOR_ID);
                 adapter.setDefault_flavor_id(default_flavor_id);
 
-                String default_image_id  = adapterInstanceObject.getString("default_image_id");
+                String default_image_id  = adapterInstanceObject.getString(IOpenStack.DEFAULT_IMAGE_ID);
                 adapter.setDefault_image_id(default_image_id);
 
 
                 adapter.initFlavors();
                 this.adapterInstances.put(adapter.getId(),adapter);
             }
+            }
 
         }
     }
+    
+    @Override
+    protected void addAdapterProperties(Map<String, String> adapterInstnaceMap){
+      
+      adapterInstnaceMap.put(IOpenStack.FLOATING_IP_POOL_NAME, "");
+      adapterInstnaceMap.put(IOpenStack.KEYSTONE_AUTH_URL, "");
+      adapterInstnaceMap.put(IOpenStack.NET_NAME, "");
+      adapterInstnaceMap.put(IOpenStack.NOVA_ENDPOINT, "");
+      adapterInstnaceMap.put(IOpenStack.KEYSTONE_PASSWORD, "");
+      adapterInstnaceMap.put(IOpenStack.KEYSTONE_ENDPOINT, "");
+      adapterInstnaceMap.put(IOpenStack.GLANCE_ENDPOINT, "");
+      adapterInstnaceMap.put(IOpenStack.NET_ENDPOINT, "");
+      adapterInstnaceMap.put(IOpenStack.TENANT_NAME, "");
+      adapterInstnaceMap.put(IOpenStack.KEYSTONE_USERNAME, "");
+      adapterInstnaceMap.put(IOpenStack.DEFAULT_FLAVOR_ID, "");
+      adapterInstnaceMap.put(IOpenStack.DEFAULT_IMAGE_ID, "");
+      
+    }
+    
 }
