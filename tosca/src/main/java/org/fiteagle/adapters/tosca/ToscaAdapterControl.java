@@ -3,8 +3,10 @@ package org.fiteagle.adapters.tosca;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterControl;
+import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.OntologyModelUtil;
 
@@ -15,7 +17,9 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +31,7 @@ import java.util.logging.Logger;
 @Startup
 public class ToscaAdapterControl extends AdapterControl {
 
+    final String TOSCA_ENDPOINT = "tosca_endpoint";
     Logger LOGGER = Logger.getLogger(this.getClass().getName());
     @PostConstruct
     public void initialize(){
@@ -57,12 +62,14 @@ public class ToscaAdapterControl extends AdapterControl {
 
             JsonObject jsonObject = jsonReader.readObject();
 
-            JsonArray adapterInstances = jsonObject.getJsonArray("adapterInstances");
+            JsonArray adapterInstances = jsonObject.getJsonArray(IAbstractAdapter.ADAPTER_INSTANCES);
 
             for (int i = 0; i < adapterInstances.size(); i++) {
                 JsonObject adapterInstanceObject = adapterInstances.getJsonObject(i);
-                String adapterInstance = adapterInstanceObject.getString("componentID");
-                String toscaEndpoint = adapterInstanceObject.getString("tosca_endpoint");
+                String adapterInstance = adapterInstanceObject.getString(IAbstractAdapter.COMPONENT_ID);
+                
+                if(!adapterInstance.isEmpty()){
+                String toscaEndpoint = adapterInstanceObject.getString(TOSCA_ENDPOINT);
                 Model model = ModelFactory.createDefaultModel();
                 Resource resource = model.createResource(adapterInstance);
                 //parse possible additional values from config
@@ -71,7 +78,13 @@ public class ToscaAdapterControl extends AdapterControl {
                 adapter.setToscaClient(toscaEndpoint);
                 this.adapterInstances.put(adapter.getId(),adapter);
             }
+            }
 
         }
+    }
+    
+    @Override
+    protected void addAdapterProperties(Map<String, String> adapterInstnaceMap){
+      adapterInstnaceMap.put(TOSCA_ENDPOINT, "");
     }
 }
