@@ -10,7 +10,7 @@ import org.fiteagle.abstractAdapter.dm.AbstractAdapterWebsocket;
 import org.fiteagle.adapters.tosca.ToscaAdapter;
 import org.fiteagle.adapters.tosca.ToscaAdapterControl;
 
-@ServerEndpoint("/")
+@ServerEndpoint("/websocket")
 public class ToscaWebsocket extends AbstractAdapterWebsocket {
 
   @EJB

@@ -7,12 +7,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterControl;
 import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
+import org.fiteagle.adapters.tosca.dm.ToscaMDBSender;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.OntologyModelUtil;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -31,8 +33,12 @@ import java.util.logging.Logger;
 @Startup
 public class ToscaAdapterControl extends AdapterControl {
 
+    @Inject
+    protected ToscaMDBSender mdbSender;
+    
     final String TOSCA_ENDPOINT = "tosca_endpoint";
     Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    
     @PostConstruct
     public void initialize(){
         LOGGER.log(Level.SEVERE, "Starting Tosca");
@@ -49,7 +55,9 @@ public class ToscaAdapterControl extends AdapterControl {
 
     @Override
     public AbstractAdapter createAdapterInstance(Model model, Resource resource) {
-      return new ToscaAdapter(model,resource);
+      ToscaAdapter adapter = new ToscaAdapter(model,resource);
+      adapterInstances.put(adapter.getId(),adapter);
+      return adapter;
     }
 
     @Override
