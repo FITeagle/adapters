@@ -212,6 +212,13 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   protected String parseToDefinitions(Model createModel) throws InvalidRequestException {
     try{
+      createModel.removeAll(null, Omn.isResourceOf, null);
+      createModel.removeAll(null, Omn.hasReservation, null);
+      createModel.removeAll(null, Omn_lifecycle.hasState, null);
+      createModel.removeAll(null, Omn_lifecycle.implementedBy, null);
+      
+      System.out.println("CREATE MODEL " + createModel);
+      
       InfModel infModel = createInfModel(createModel);
       return OMN2Tosca.getTopology(infModel);      
     } catch(InvalidModelException | JAXBException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){

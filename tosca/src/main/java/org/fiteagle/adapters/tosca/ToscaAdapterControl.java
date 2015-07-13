@@ -56,7 +56,6 @@ public class ToscaAdapterControl extends AdapterControl {
     @Override
     public AbstractAdapter createAdapterInstance(Model model, Resource resource) {
       ToscaAdapter adapter = new ToscaAdapter(model,resource);
-      adapterInstances.put(adapter.getId(),adapter);
       return adapter;
     }
 
