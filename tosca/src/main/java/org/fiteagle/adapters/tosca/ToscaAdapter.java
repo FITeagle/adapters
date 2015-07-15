@@ -15,10 +15,7 @@ import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -254,8 +251,10 @@ public final class ToscaAdapter extends AbstractAdapter {
       createModel.removeAll(null, Omn_lifecycle.implementedBy, null);
       
       System.out.println("CREATE MODEL " + createModel);
-      
+      Map<String,String> pref = createModel.getNsPrefixMap();
+
       InfModel infModel = createInfModel(createModel);
+      infModel.setNsPrefix("osco","http://opensdncore.org/ontology/");
       return OMN2Tosca.getTopology(infModel);      
     } catch(InvalidModelException | JAXBException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){
       throw new InvalidRequestException(e);
@@ -290,7 +289,9 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   protected InfModel createInfModel(Model model) throws InvalidModelException{
     model.add( this.adapterABox.getModel());
-    Parser parser = new Parser(model);
+    List additionalOntologies = new ArrayList<String>();
+    additionalOntologies.add("/ontologies/osco.ttl");
+    Parser parser = new Parser(model, additionalOntologies);
     return parser.getInfModel();
   }
 
