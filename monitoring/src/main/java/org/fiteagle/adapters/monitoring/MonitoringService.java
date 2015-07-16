@@ -10,10 +10,7 @@ import info.openmultinet.ontology.vocabulary.Omn_resource;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.*;
@@ -36,7 +33,7 @@ import org.fiteagle.adapters.monitoring.sql.SQLite;
 
 public final class MonitoringService {
 	
-  public static Map<String, AbstractAdapter> adapterInstances = new HashMap<String, AbstractAdapter>();
+  public static Collection<AbstractAdapter> adapterInstances = new ArrayList<>();
   private static Logger LOGGER = Logger.getLogger(MonitoringService.class.toString());  
   private static MonitoringService monitoringAdapterSingleton ;
 

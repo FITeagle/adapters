@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.monitoring.dm;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,7 +45,7 @@ public class MonitoringServiceMDBListener extends AbstractAdapterMDBListener {
 	private static Logger LOGGER = Logger.getLogger(MonitoringServiceMDBListener.class.toString());
 	
 	@Override
-	protected Map<String, AbstractAdapter> getAdapterInstances() {
+	protected Collection<AbstractAdapter> getAdapterInstances() {
 		// TODO Auto-generated method stub
 		return MonitoringService.adapterInstances;
 	}
