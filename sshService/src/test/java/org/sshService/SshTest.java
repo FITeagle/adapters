@@ -7,12 +7,21 @@ import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Level;
 
 import org.apache.jena.atlas.logging.Log;
+import org.easymock.EasyMock;
+import org.easymock.EasyMock.*;
+import org.fiteagle.adapters.sshService.SSHConnector;
+import org.fiteagle.adapters.sshService.SshParameter;
 import org.fiteagle.adapters.sshService.SshService;
 import org.fiteagle.adapters.sshService.SshServiceAdapter;
 import org.fiteagle.api.core.Config;
@@ -22,115 +31,68 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-
-
-
+import com.jcraft.jsch.*;
 //import com.fasterxml.jackson.databind.Module.SetupContext;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.jcraft.jsch.JSchException;
 
 public class SshTest {
+  
 	  private static SshServiceAdapter adapter;
-	  private Map<String, SshService> instanceList;
+	  private String adapterInstance;
+	  private SSHConnector sshConnector;
+	  private SshParameter sshParameter;
+	  
 
-	@BeforeClass
-	public static void setup(){
+	@Before
+	public void setup() throws Exception{
 	  Model model = ModelFactory.createDefaultModel();
 	  Resource resource = model.createResource("afdfhad");
 	  resource.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
 		adapter = new SshServiceAdapter(model, resource);
+		adapterInstance = "test_ComponentID";
+		sshConnector = EasyMock.createMock(SSHConnector.class);
+
+		sshParameter = new SshParameter();
+    sshParameter.setAccessUsername("testAccessUserName");
+    sshParameter.setComponentID("test_ComponentID");
+    sshParameter.setIP("xxx.xxx.xxx.xxx");
+    sshParameter.setPassword("test_password");
+    sshParameter.setPrivateKeyPassword("test_privateKeyPassword");
+    sshParameter.setPrivateKeyPath("test_privateKeyPath");
+    
+    List<String> usernames = new LinkedList<String>();
+    usernames.add("testUser");
+    
+    List<String> publicKeys = new LinkedList<String>();
+    publicKeys.add("ssh-rsa jhadhruihjkghljwerhjbnsdje");
+    
+    
+    sshConnector.setParameterTEST(usernames, publicKeys, sshParameter);
+    
+    sshConnector.createUserAccount();
+    EasyMock.expectLastCall();
+    EasyMock.replay(sshConnector);
 	}
 	
-	@Test (expected = NullPointerException.class)
-	public void testWrongPassword() {
-	  
-	  
-		  testCreateAccess("publickey", "deploytestuser", "http://localhost/resource/PhysicalNodeAdapter-1");
-		  
-		  if (executeCommand("uname -s").contains("Linux")){
-			  File userDirectory = new File("/home/deploytestuser/");
-			  assertTrue(!userDirectory.exists());
-			
-		  } else if (executeCommand("uname -s").contains("Darwin")){
-			  File userDirectory = new File("/Users/deploytestuser/");
-			  assertTrue(!userDirectory.exists());
+	
+  @Test
+  public void testCreateRemoteUser(){
+    
+    
+    SshService sshService = new SshService(this.adapter, adapterInstance);
+    
+    sshService.createSSHtest(sshConnector);
+    
 
-		  }else {
-			Log.fatal("SSH-Test", "OS not supported");
-		}
-		  
-//		  testDeleteAccess();
-//		  
-//		  if (executeCommand("uname -s").contains("Linux")){
-//			  File userDirectory = new File("/home/deploytestuser/");
-//					  
-//			assertFalse(userDirectory.exists());
-//		  }else if (executeCommand("uname -s").contains("Darwin")){
-//			  File userDirectory = new File("/Users/deploytestuser/");
-//					  
-//			assertFalse(userDirectory.exists());
-//		  }else {
-//			Log.fatal("SSH-Test", "OS not supported");
-//		}
-//		  
-
-	}
+  }
+	
 	
 
-
-	
-	private String executeCommand(String command) {
-		StringBuffer output = new StringBuffer();
-		Process p;
-		try {
-			p = Runtime.getRuntime().exec(command);
-			p.waitFor();
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
-
-			String line = "";
-			while ((line = reader.readLine()) != null) {
-				output.append(line + "\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		return output.toString();
-	}
-
-	
-	private void testCreateAccess(String pubKey,String username, String adapterInstance){
-		SshService sshService = new SshService(this.adapter, adapterInstance);
-		Model model = ModelFactory.createDefaultModel();
-		Resource resource = model.createResource(adapterInstance);
-		
-		Statement stmt1 = model.createLiteralStatement(resource, Omn_service.publickey, pubKey);
-		sshService.updateProperty(stmt1);
-		
-		Statement stamt2 = model.createLiteralStatement(resource, Omn_service.username, username);
-		sshService.updateProperty(stamt2);
-		
-		sshService.getSshServiceAdapter().getSshParameters().setIP("localhost");
-		if(sshService.getSshServiceAdapter().getSshParameters().getPassword() == null){
-		  sshService.getSshServiceAdapter().getSshParameters().setPassword("wrong password");
-		}
-		sshService.addSshAccess();
-		instanceList.put(username, sshService);
-
-	}
-
-//	private void testDeleteAccess(){
-//		SshService sshService = instanceList.get("deploytestuser");
-//		sshService.deleteSshAccess();
-//		instanceList.remove("deploytestuser");
-//
-//	}
 	
 }
 

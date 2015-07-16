@@ -53,6 +53,15 @@ public class SSHConnector {
     return this.publicKeys;
   }
   
+  public void setParameterTEST(List<String> usernames, List<String> publicKeys, SshParameter sshParameter){
+    
+    this.sshParameter = sshParameter;
+    this.jsch = new JSch();
+    
+    setUsernames(usernames);
+    setPublicKeys(publicKeys);
+    
+  }
   
   public void createUserAccount(){
     com.jcraft.jsch.Session session = null;

@@ -17,9 +17,14 @@ import javax.batch.api.chunk.CheckpointAlgorithm;
 import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
+import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.jcraft.jsch.*;
 
 import java.io.ByteArrayOutputStream;
@@ -316,6 +321,10 @@ public class SshService {
 	  }
 	  
 	}
+	
+	public void createSSHtest(SSHConnector connector){
+	  connector.createUserAccount();
+	}
    
 	private void createLocalUser(){
 
@@ -551,6 +560,11 @@ public class SshService {
       Log.fatal("SSH",
           "Please add password in ~/.fiteagle/SshServiceAdapter.properties");
     }
+	}
+	
+	
+	public SshService(){
+	  
 	}
 	
 }
