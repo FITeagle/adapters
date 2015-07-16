@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -14,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -35,8 +38,8 @@ import com.hp.hpl.jena.rdf.model.Model;
  * 
  * @Path("/") for this to work!
  */
-public abstract class AbstractAdapterREST {
-  
+public abstract class AbstractAdapterREST{
+  	
   @GET
   @Path("/{adapterName}")
   @Produces("text/turtle")
