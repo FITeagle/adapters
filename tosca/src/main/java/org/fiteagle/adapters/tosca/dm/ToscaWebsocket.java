@@ -1,18 +1,22 @@
 package org.fiteagle.adapters.tosca.dm;
 
-import java.util.Map;
+import java.util.Collection;
 
+import javax.ejb.EJB;
 import javax.websocket.server.ServerEndpoint;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterWebsocket;
 import org.fiteagle.adapters.tosca.ToscaAdapter;
+import org.fiteagle.adapters.tosca.ToscaAdapterControl;
 
-@ServerEndpoint("/")
+@ServerEndpoint("/websocket")
 public class ToscaWebsocket extends AbstractAdapterWebsocket {
-  
+
+  @EJB
+  ToscaAdapterControl adapterControl;
   @Override
-  protected Map<String, AbstractAdapter> getAdapterInstances() {
-    return ToscaAdapter.adapterInstances;
+  protected Collection<AbstractAdapter> getAdapterInstances() {
+    return adapterControl.getAdapterInstances();
   }
 }

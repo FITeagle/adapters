@@ -1,5 +1,6 @@
 package org.fiteagle.abstractAdapter.dm;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,10 +32,9 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   @javax.annotation.Resource(mappedName = IMessageBus.TOPIC_CORE_NAME)
   private Topic topic;
   
-  @EJB
-  private AdapterControl adapterControl;
+
+  protected AdapterControl adapterControl;
   
-  @PostConstruct
   public void initializeAdapters() {
     for(AbstractAdapter adapter : adapterControl.getAdapterInstances()){
       LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Adding MDB-Sender for " + adapter.getAdapterABox().getURI());
@@ -48,7 +48,7 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Registering " + adapter.getAdapterABox().getURI());
       try {
         adapter.updateAdapterDescription();
-        adapter.notifyListeners(adapter.getAdapterDescriptionModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
+        adapter.notifyListeners(adapter.getAdapterABox().getModel(), null, IMessageBus.TYPE_CREATE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
       } catch (ProcessingException e) {
         LOGGER.log(Level.WARNING, getClass().getSimpleName() + ": Error while registering: "+e.getMessage());
         delay = delay*2;
@@ -71,7 +71,7 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
   
   @PreDestroy
   public void contextDestroyed() {
-    for(AbstractAdapter adapter : getAdapterInstances().values()){
+    for(AbstractAdapter adapter : getAdapterInstances()){
       LOGGER.log(Level.INFO, getClass().getSimpleName() + ": Deregistering " + adapter.getAdapterABox().getURI());
       Model messageModel = ModelFactory.createDefaultModel();
       messageModel.add(adapter.getAdapterABox(), RDF.type, adapter.getAdapterABox());
@@ -79,7 +79,10 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
       adapter.notifyListeners(messageModel, null, IMessageBus.TYPE_DELETE, IMessageBus.TARGET_RESOURCE_ADAPTER_MANAGER);
     }
   }
-  
-  protected abstract Map<String, AbstractAdapter> getAdapterInstances();
+
+
+    protected Collection<AbstractAdapter> getAdapterInstances() {
+        return adapterControl.getAdapterInstances();
+    }
   
 }

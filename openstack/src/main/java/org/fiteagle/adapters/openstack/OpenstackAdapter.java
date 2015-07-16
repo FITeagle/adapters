@@ -16,13 +16,13 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
 import org.fiteagle.adapters.openstack.client.IOpenstackClient;
 import org.fiteagle.adapters.openstack.client.OpenstackClient;
-import org.fiteagle.adapters.openstack.client.OpenstackParser;
 import org.fiteagle.adapters.openstack.client.model.Image;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
+import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
@@ -39,46 +39,33 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   private IOpenstackClient openstackClient;
 
-  private static Resource adapter;
-  public static List<Property> resourceInstanceProperties = new ArrayList<Property>();
-  
-  private Model adapterModel;
-  private Resource adapterInstance;
-  
-  public static Map<String, OpenstackAdapter> adapterInstances = new HashMap<>();
-//  private List<AdapterEventListener> myListeners = new ArrayList<AdapterEventListener>();;
   private OpenstackAdapterMDBSender listener;
+  private String floatingPool;
+  private String keystone_auth_URL;
+  private String net_name;
+  private String nova_endpoint;
+  private String keystone_password;
+  private String keystone_endpoint;
+  private String glance_endpoint;
+  private String net_endpoint;
+  private String tenant_name;
+  private String keystone_username;
+  private String default_flavor_id;
+  private String default_image_id;
 
-  public static OpenstackAdapter getTestInstance(IOpenstackClient openstackClient){
-    OpenstackAdapter instance = (OpenstackAdapter) adapterInstances.values().iterator().next();
-    OpenstackAdapter testInstance = new OpenstackAdapter(instance.getAdapterInstance(), openstackClient);
-    testInstance.updateAdapterDescription();
-    return testInstance;
-  }
+
   
-  static {
-    Model adapterModel = OntologyModelUtil.loadModel("ontologies/openstack.ttl", IMessageBus.SERIALIZATION_TURTLE);
-    
-    ResIterator adapterIterator = adapterModel.listSubjectsWithProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
-    if (adapterIterator.hasNext()) {
-      adapter = adapterIterator.next();
-    }
-    
-    createDefaultAdapterInstance(adapterModel);
-  }
-  
-  private static void createDefaultAdapterInstance(Model adapterModel){
+/*  private static void createDefaultAdapterInstance(Model adapterModel){
  //   Resource adapterInstance = adapterTBox.createResource(OntologyModelUtil.getResourceNamespace()+"Openstack-1");
 
-    adapter = adapterModel.createResource(Omn_domain_pc.VMServer);
-    adapter.addProperty(RDFS.subClassOf,MessageBusOntologyModel.classAdapter);
-    adapter.addProperty(Omn_lifecycle.implements_,Omn_domain_pc.VM);
+//    adapter = adapterModel.createResource(Omn_domain_pc.VMServer);
+//    adapter.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+//    adapter.addProperty(Omn_lifecycle.implements_,Omn_domain_pc.VM);
 
     Resource adapterInstance = ModelFactory.createDefaultModel().createResource(OntologyModelUtil.getResourceNamespace()+"VMServer-1");
     adapterInstance.addProperty(Omn_lifecycle.childOf, ModelFactory.createDefaultModel().createResource("http://openstack.av.tu-berlin.de"));
     adapterInstance.addProperty(RDF.type, Omn_domain_pc.VMServer);
     adapterInstance.addProperty(RDF.type, OWL2.NamedIndividual);
-    adapterInstance.addProperty(RDFS.label, adapterInstance.getLocalName());
     adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");
     
     Resource testbed = adapterModel
@@ -89,59 +76,56 @@ public class OpenstackAdapter extends AbstractAdapter {
     adapterInstance.addProperty(Geo.long_,"13.3172764");
     adapterInstance.addProperty(Omn_resource.isExclusive,"false");
 
-//    Resource testbed = adapterTBox.createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-//    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-//
-//    StmtIterator resourceIterator = adapter.listProperties(Omn_lifecycle.implements_);
-//    if (resourceIterator.hasNext()) {
-//      Resource resource = resourceIterator.next().getObject().asResource();
-//
-//      adapterInstance.addProperty(Omn_lifecycle.canImplement, resource);
-//      ResIterator propertiesIterator = adapterTBox.listSubjectsWithProperty(RDFS.domain, resource);
-//      while (propertiesIterator.hasNext()) {
-//        Property p = adapterTBox.getProperty(propertiesIterator.next().getURI());
-//        resourceInstanceProperties.add(p);
-//      }
-//    }
-    
-    new OpenstackAdapter(adapterInstance, new OpenstackClient());
-  }
-  
-  private OpenstackAdapter(Resource adapterInstance, IOpenstackClient openstackClient){
-    //super(adapterInstance.getLocalName());
-    adapterInstances.put(adapterInstance.getURI(), this);
-    this.adapterInstance = adapterInstance;
-    this.adapterModel = adapterInstance.getModel();
-    
-    this.openstackClient = openstackClient;
-  //  this.openstackParser = OpenstackParser.getInstance(this);
 
+  }*/
+  
+  public OpenstackAdapter(Model adapterTBox, Resource adapterABox){
+    this.uuid = UUID.randomUUID().toString();
+    this.openstackClient = new OpenstackClient(this);
+    this.adapterTBox = adapterTBox;
+    this.adapterABox = adapterABox;
+    Resource adapterType = Omn_domain_pc.VMServer;
+    this.adapterABox.addProperty(RDF.type,adapterType);
+    this.adapterABox.addProperty(RDFS.label,  this.adapterABox.getLocalName());
+    this.adapterABox.addProperty(RDFS.comment, "Openstack server");
+
+    Property longitude = adapterTBox.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long");
+    Property latitude = adapterTBox.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
+    this.adapterABox.addProperty(latitude, "52.516377");
+    this.adapterABox.addProperty(longitude, "13.323732");
+    this.adapterABox.addProperty(Omn_lifecycle.canImplement, Omn_domain_pc.VM);
+
+  }
+
+  public void initFlavors() {
+    Flavors flavors = openstackClient.listFlavors();
+    for(Flavor flavor: flavors.getList()){
+      Resource vmResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + flavor.getName());
+      vmResource.addProperty(RDFS.subClassOf, Omn_domain_pc.VM);
+      vmResource.addProperty(Omn_domain_pc.hasCPU, flavor.getVcpus());
+      vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
+      for(Resource r: getDiskImages()){
+        vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
+      }
+      adapterABox.addProperty(Omn_lifecycle.canImplement, vmResource);
+
+    }
+  }
+
+  private List<Resource> getDiskImages() {
     List<Resource> diskimages = new ArrayList<>();
     Images images = openstackClient.listImages();
     for(Image image : images.getList()){
-      Resource diskImage = adapterInstance.getModel().createResource(OntologyModelUtil.getResourceNamespace() + "diskImage/" +image.getId() );
+      Resource diskImage = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + "diskImage/" +image.getId() );
       diskImage.addProperty(RDF.type, Omn_domain_pc.DiskImage);
       diskImage.addProperty(Omn_domain_pc.hasDiskimageLabel,image.getName());
       diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, image.getId());
       diskimages.add(diskImage);
 
     }
-    Flavors flavors = openstackClient.listFlavors();
-    for(Flavor flavor: flavors.getList()){
-      Resource vmResource = adapterInstance.getModel().createResource(OntologyModelUtil.getResourceNamespace() + flavor.getName());
-      vmResource.addProperty(RDFS.subClassOf,Omn_domain_pc.VM);
-      vmResource.addProperty(Omn_domain_pc.hasCPU, flavor.getVcpus());
-      vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
-      for(Resource r: diskimages){
-        vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
-      }
-      adapterInstance.addProperty(Omn_lifecycle.canImplement, vmResource);
-
-    }
-    adapterInstance.addProperty(Omn_lifecycle.canImplement, Omn_domain_pc.VM);
-
+    return diskimages;
   }
-  
+
   @Override
   public Model createInstance(String instanceURI, Model newInstanceModel)  {
 
@@ -204,7 +188,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     return omsp_service;
   }
 
-  private String addKeypairId(String username, String publicKey ) {
+/*  private String addKeypairId(String username, String publicKey ) {
     String keyPairId = null;
 
     if (username != null && publicKey != null) {
@@ -214,7 +198,7 @@ public class OpenstackAdapter extends AbstractAdapter {
 
 
     return keyPairId;
-  }
+  }*/
 
   private String getPublicKey(Resource requestedVM) {
     Statement publicKeyStatement = requestedVM.getProperty(Omn_service.publickey);
@@ -251,7 +235,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   private String getFlavorId(String typeURI) {
     String flavorId = null;
 
-    Resource requestedFlavor = this.adapterModel.getResource(typeURI);
+    Resource requestedFlavor = this.adapterABox.getModel().getResource(typeURI);
     if(requestedFlavor != null){
       Statement statement = requestedFlavor.getProperty(Omn_lifecycle.hasID);
       if(statement != null){
@@ -267,7 +251,7 @@ public class OpenstackAdapter extends AbstractAdapter {
     String diskImageURI = null;
     Statement requestedDiskImage = requestedVM.getProperty(Omn_domain_pc.hasDiskImage);
     if(requestedDiskImage != null){
-      Resource diskImage = this.adapterModel.getResource(requestedDiskImage.getObject().asResource().getURI());
+      Resource diskImage = this.adapterABox.getModel().getResource(requestedDiskImage.getObject().asResource().getURI());
 
 
        diskImageURI = diskImage.getProperty(Omn_domain_pc.hasDiskimageURI).getString();
@@ -329,23 +313,19 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   }
 
-  public Resource getImageResource(){
+ /* public Resource getImageResource(){
     return adapterModel.getResource(getAdapterManagedResources().get(0).getNameSpace()+"OpenstackImage");
   }
-
-  @Override
-  public Resource getAdapterInstance() {
-    return adapterInstance;
-  }
+*/
 
   @Override
   public Resource getAdapterABox() {
-    return adapter;
+    return adapterABox;
   }
 
   @Override
   public Model getAdapterDescriptionModel() {
-    return adapterModel;
+    return adapterABox.getModel();
   }
   
 
@@ -371,34 +351,128 @@ public class OpenstackAdapter extends AbstractAdapter {
     return model;
   }
 
-  @Override
-  public void notifyListeners(Model eventRDF, String requestID, String methodType, String methodTarget) {
-   // for (AdapterEventListener listener : myListeners) {
-    this.listener.publishModelUpdate(eventRDF, requestID, methodType, methodTarget);
-    //}
-  }
+    public String getFloatingPool() {
+        return floatingPool;
+    }
 
-  public void setListener(OpenstackAdapterMDBSender listener) {
+  /*public void setListener(OpenstackAdapterMDBSender listener) {
     this.listener = listener;
   }
+*/
+  public void setFloatingPool(String floatingPool) {
+    this.floatingPool = floatingPool;
+  }
 
-  private class CreateVM implements Runnable {
+    public String getKeystone_auth_URL() {
+        return keystone_auth_URL;
+    }
+
+  public void setKeystone_auth_URL(String keystone_auth_URL) {
+    this.keystone_auth_URL = keystone_auth_URL;
+  }
+
+    public String getNet_name() {
+        return net_name;
+    }
+
+  public void setNet_name(String net_name) {
+    this.net_name = net_name;
+  }
+
+    public String getNova_endpoint() {
+        return nova_endpoint;
+    }
+
+  public void setNova_endpoint(String nova_endpoint) {
+    this.nova_endpoint = nova_endpoint;
+  }
+
+    public String getKeystone_password() {
+        return keystone_password;
+    }
+
+  public void setKeystone_password(String keystone_password) {
+    this.keystone_password = keystone_password;
+  }
+
+    public String getKeystone_endpoint() {
+        return keystone_endpoint;
+    }
+
+  public void setKeystone_endpoint(String keystone_endpoint) {
+    this.keystone_endpoint = keystone_endpoint;
+  }
+
+    public String getGlance_endpoint() {
+        return glance_endpoint;
+    }
+
+  public void setGlance_endpoint(String glance_endpoint) {
+    this.glance_endpoint = glance_endpoint;
+  }
+
+    public String getNet_endpoint() {
+        return net_endpoint;
+    }
+
+  public void setNet_endpoint(String net_endpoint) {
+    this.net_endpoint = net_endpoint;
+  }
+
+    public String getTenant_name() {
+        return tenant_name;
+    }
+
+  public void setTenant_name(String tenant_name) {
+    this.tenant_name = tenant_name;
+  }
+
+    public String getKeystone_username() {
+        return keystone_username;
+    }
+
+  public void setKeystone_username(String keystone_username) {
+    this.keystone_username = keystone_username;
+  }
+
+    public String getDefault_flavor_id() {
+        return default_flavor_id;
+    }
+
+  public void setDefault_flavor_id(String default_flavor_id) {
+    this.default_flavor_id = default_flavor_id;
+  }
+
+    public String getDefault_image_id() {
+        return default_image_id;
+    }
+
+  public void setDefault_image_id(String default_image_id) {
+    this.default_image_id = default_image_id;
+  }
+
+@Override
+public void refreshConfig() throws ProcessingException {
+	// TODO Auto-generated method stub
+
+}
+
+  @Override
+  public void shutdown() {
+
+  }
+
+  @Override
+  public void configure(Config configuration) {
+
+  }
+
+    private class CreateVM implements Runnable {
 
     private final ServerForCreate serverForCreate;
     private final OpenstackAdapterMDBSender parent;
     private final String username;
-
-    public Resource getMonitoringService() {
-      return monitoringService;
-    }
-
-    public void setMonitoringService(Resource monitoringService) {
-      this.monitoringService = monitoringService;
-    }
-
     private Resource monitoringService;
-
-
 
     public CreateVM(ServerForCreate serverForCreate, OpenstackAdapterMDBSender parent, String username){
       this.parent =  parent;
@@ -407,6 +481,13 @@ public class OpenstackAdapter extends AbstractAdapter {
 
     }
 
+    public Resource getMonitoringService() {
+      return monitoringService;
+    }
+
+    public void setMonitoringService(Resource monitoringService) {
+      this.monitoringService = monitoringService;
+    }
 
     @Override
     public void run() {
@@ -492,12 +573,6 @@ public class OpenstackAdapter extends AbstractAdapter {
     }
 
   }
-
-@Override
-public void refreshConfig() throws ProcessingException {
-	// TODO Auto-generated method stub
-	
-}
 
 
 }

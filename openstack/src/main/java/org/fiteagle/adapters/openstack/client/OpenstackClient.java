@@ -12,6 +12,7 @@ import java.util.prefs.Preferences;
 import com.woorea.openstack.nova.model.*;
 
 import org.apache.jena.atlas.logging.Log;
+import org.fiteagle.adapters.openstack.OpenstackAdapter;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Server;
 import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
@@ -38,12 +39,14 @@ import com.woorea.openstack.quantum.Quantum;
 import com.woorea.openstack.quantum.model.Network;
 import com.woorea.openstack.quantum.model.Networks;
 
+//import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IConfig;
 
 public class OpenstackClient implements IOpenstackClient{
 
-	private String DEFAULT_KEYPAIR_ID ;
+    private final OpenstackAdapter openStackAdapter;
+    private String DEFAULT_KEYPAIR_ID ;
 	private String DEFAULT_FLAVOR_ID  ;
 	private String DEFAULT_IMAGE_ID ;
 	private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
@@ -62,88 +65,88 @@ public class OpenstackClient implements IOpenstackClient{
 	
 	private String networkId = "";
 
-	public OpenstackClient() {
+	public OpenstackClient(OpenstackAdapter openstackAdapter) {
+        this.openStackAdapter = openstackAdapter;
 	}
 	
 	private boolean PREFERENCES_INITIALIZED = false;
 	
 	private void loadPreferences() {
-		Config preferences = new Config("Openstack-1");
+
 
 		try{
-		if (preferences.getProperty("floating_ip_pool_name") != null){
-		  FLOATINGIP_POOL_NAME = preferences.getProperty("floating_ip_pool_name");
+		if (openStackAdapter.getFloatingPool() != null){
+		  FLOATINGIP_POOL_NAME = openStackAdapter.getFloatingPool() ;
 		}
-		if (preferences.getProperty("keystone_auth_URL") != null){
-		  KEYSTONE_AUTH_URL = preferences.getProperty("keystone_auth_URL");
+		if (openStackAdapter.getKeystone_auth_URL() != null){
+		  KEYSTONE_AUTH_URL = openStackAdapter.getKeystone_auth_URL();
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_auth_URL");
 		}
-		if (preferences.getProperty("keystone_endpoint") != null){
-		  KEYSTONE_ENDPOINT = preferences.getProperty("keystone_endpoint");
+		if (openStackAdapter.getKeystone_endpoint() != null){
+		  KEYSTONE_ENDPOINT = openStackAdapter.getKeystone_endpoint();
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_endpoint");
 		}
-		if (preferences.getProperty("keystone_password") != null){
-		  KEYSTONE_PASSWORD = preferences.getProperty("keystone_password");
+		if (openStackAdapter.getKeystone_password() != null){
+		  KEYSTONE_PASSWORD = openStackAdapter.getKeystone_password();
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_password");
 		}
-		if (preferences.getProperty("keystone_username") != null){
-		  KEYSTONE_USERNAME = preferences.getProperty("keystone_username");
+		if (openStackAdapter.getKeystone_username() != null){
+		  KEYSTONE_USERNAME = openStackAdapter.getKeystone_username() ;
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("keystone_username");
 		}
-		if (preferences.getProperty("net_endpoint") != null){
-		  NET_ENDPOINT = preferences.getProperty("net_endpoint");
+		if (openStackAdapter.getNet_endpoint() != null){
+		  NET_ENDPOINT = openStackAdapter.getNet_endpoint();
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("net_endpoint");
 		}
-		if (preferences.getProperty("net_name") != null){
-		  NET_NAME = preferences.getProperty("net_name");
+		if (openStackAdapter.getNet_name() != null){
+		  NET_NAME = openStackAdapter.getNet_name();
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("net_name");
 		}
-		if (preferences.getProperty("nova_endpoint") != null){
-		  NOVA_ENDPOINT = preferences.getProperty("nova_endpoint");
+		if (openStackAdapter.getNova_endpoint() != null){
+		  NOVA_ENDPOINT = openStackAdapter.getNova_endpoint();
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("nova_endpoint");
 		}
-		if (preferences.getProperty("tenant_name") != null){
-		  TENANT_NAME = preferences.getProperty("tenant_name");
+		if (openStackAdapter.getTenant_name() != null){
+		  TENANT_NAME =openStackAdapter.getTenant_name();
 		}
 		else{
 		  throw new InsufficientOpenstackPreferences("tenant_name");
 		}
 
-		if(preferences.getProperty("default_image_id")!= null){
-			DEFAULT_IMAGE_ID = preferences.getProperty("default_image_id");
+		if(openStackAdapter.getDefault_image_id()!= null){
+			DEFAULT_IMAGE_ID = openStackAdapter.getDefault_image_id();
 		}else{
 			throw new InsufficientOpenstackPreferences("default_image_id");
 		}
 
-		if(preferences.getProperty("default_flavor_id")!= null){
-			DEFAULT_FLAVOR_ID = preferences.getProperty("default_flavor_id");
+		if(openStackAdapter.getDefault_flavor_id()!= null){
+			DEFAULT_FLAVOR_ID = openStackAdapter.getDefault_flavor_id();
 		}else{
 			throw new InsufficientOpenstackPreferences("default_flavor_id");
 		}
 
-		if(preferences.getProperty("default_keypair_id")!= null){
-			DEFAULT_KEYPAIR_ID = preferences.getProperty("default_keypair_id");
-		}else{
-			throw new InsufficientOpenstackPreferences("default_keypair_id");
-		}
+//		if(openStackAdapter.getke("default_keypair_id")!= null){
+//			DEFAULT_KEYPAIR_ID = preferences.getProperty("default_keypair_id");
+//		}else{
+//			throw new InsufficientOpenstackPreferences("default_keypair_id");
+//		}
 		PREFERENCES_INITIALIZED = true;
 		
 		}catch (IllegalArgumentException e){		
-		LOGGER.log(Level.SEVERE, "Properties File: /home/home/.fiteagle/Openstack-1.properties is NOT found");
 		LOGGER.log(Level.SEVERE, "Dummy File was created but needs to be corrected!");
 		createDefaultConfig();
 		PREFERENCES_INITIALIZED = true;

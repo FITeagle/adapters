@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.motor.dm;
+package org.fiteagle.adapters.tosca.dm;
 
 import java.util.Collection;
 
@@ -9,17 +9,17 @@ import javax.ejb.Singleton;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterEJB;
 import org.fiteagle.abstractAdapter.dm.AdapterEJB;
-import org.fiteagle.adapters.motor.MotorAdapterControl;
+import org.fiteagle.adapters.tosca.ToscaAdapterControl;
 
 @Singleton
 @Remote(AdapterEJB.class)
-class MotorAdapterEJB extends AbstractAdapterEJB {
-
+public class ToscaAdapterEJB extends AbstractAdapterEJB{
+  
   @EJB
-  MotorAdapterControl motorAdapterControl;
-
+  ToscaAdapterControl toscaAdapterControl;
+  
   @Override
   protected Collection<AbstractAdapter> getAdapterInstances() {
-    return motorAdapterControl.getAdapterInstances();
+    return toscaAdapterControl.getAdapterInstances();
   }
 }
