@@ -11,6 +11,7 @@ import info.openmultinet.ontology.translators.tosca.Tosca2OMN;
 import info.openmultinet.ontology.translators.tosca.Tosca2OMN.UnsupportedException;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.vocabulary.Omn;
+import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
@@ -18,11 +19,15 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.enterprise.concurrent.ManagedThreadFactory;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.xml.bind.JAXBException;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.tosca.client.IToscaClient;
 import org.fiteagle.adapters.tosca.client.ToscaClient;
+import org.fiteagle.adapters.tosca.dm.ToscaMDBSender;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -30,8 +35,13 @@ import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -40,6 +50,8 @@ public final class ToscaAdapter extends AbstractAdapter {
   private static Logger LOGGER = Logger.getLogger(ToscaAdapter.class.toString());
   
   private IToscaClient client;
+  
+  private ToscaMDBSender sender;
 
 
   
@@ -63,13 +75,37 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public Model createInstances(Model createModel) throws ProcessingException, InvalidRequestException {
-    String definitions = parseToDefinitions(createModel);
-    LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
     
-    Definitions resultDefinitions = client.createDefinitions(definitions);
-    LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
+//    String definitions = parseToDefinitions(createModel);
+//    LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
+//    
+//    Definitions resultDefinitions = client.createDefinitions(definitions);
+//    LOGGER.log(Level.INFO, "Result definitions: \n"+toString(resultDefinitions));
+//    
+//    return parseToModel(resultDefinitions);
     
-    return parseToModel(resultDefinitions);    
+    try {
+      ManagedThreadFactory threadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+      CallOpenSDNcore callOpenSDNcore = new CallOpenSDNcore(createModel, this.sender, this.adapterABox, client);
+      Thread callOpenSDNcoreThread = threadFactory.newThread(callOpenSDNcore);
+      callOpenSDNcoreThread.run();
+    } catch (NamingException e) {
+      LOGGER.log(Level.SEVERE, "REQUIRED VMs counldn't be created ", e);
+    }
+    
+    
+    Model returnModel = ModelFactory.createDefaultModel();
+    ResIterator resIterator = createModel.listSubjectsWithProperty(Omn.isResourceOf);
+    while(resIterator.hasNext()){
+      Resource resource = resIterator.nextResource();
+      Resource res = returnModel.createResource(resource.getURI());
+      Property property = returnModel.createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
+      property.addProperty(RDF.type, OWL.FunctionalProperty);
+      res.addProperty(property, Omn_lifecycle.Uncompleted);
+    }
+    
+     return returnModel;
+     
   }
 
   @Override
@@ -278,4 +314,5 @@ public void refreshConfig() throws ProcessingException {
     public void setToscaClient(String toscaClientURI) {
     this.client = new ToscaClient(toscaClientURI);
   }
+    
 }

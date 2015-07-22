@@ -65,7 +65,7 @@ public class ToscaAdapterTest {
     assertTrue(infModel.contains(dummy1, RDF.type, Omn.Resource));
   }
   
-  @Test
+//  @Test
   public void testCreateInstance() throws ProcessingException, InvalidRequestException{
     ToscaAdapter testAdapter = createAdapterWithDummyClient();
     
