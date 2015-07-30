@@ -55,7 +55,7 @@ public class ToscaAdapterControl extends AdapterControl {
 
     @Override
     public AbstractAdapter createAdapterInstance(Model model, Resource resource) {
-      ToscaAdapter adapter = new ToscaAdapter(model,resource);
+      ToscaAdapter adapter = new ToscaAdapter(model,resource, mdbSender);
       return adapter;
     }
 

@@ -58,7 +58,7 @@ public class ToscaClient implements IToscaClient {
     try{
       result = client.target(URL_TOSCA_NODETYPES).request().get(String.class); 
     } catch(WebApplicationException e){
-      throw new ProcessingException(e);
+      throw new ProcessingException("Adapter couldn't get Definitions from end_point" ,e);
     }
     InputStream input = new ByteArrayInputStream(result.getBytes());
     return convertToDefinitions(input);

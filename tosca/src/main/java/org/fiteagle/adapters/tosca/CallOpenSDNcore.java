@@ -61,6 +61,8 @@ public class CallOpenSDNcore implements Runnable{
      public void run(){
        
        try {
+         LOGGER.log(Level.INFO, "Create model: \n" + createModel);
+         
          String definitions = parseToDefinitions(this.createModel);
          LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
         
@@ -68,6 +70,7 @@ public class CallOpenSDNcore implements Runnable{
          LOGGER.log(Level.INFO, "Result definitions: \n"+ toString(resultDefinitions));
          
          Model model = parseToModel(resultDefinitions);
+         LOGGER.log(Level.INFO, "Result Model: \n" + model);
          sender.publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
 
          } 
@@ -117,6 +120,8 @@ public class CallOpenSDNcore implements Runnable{
      private Model parseToModel(Definitions definitions) throws ProcessingException {
        try {
          Model resultModel = Tosca2OMN.getModel(definitions);
+         LOGGER.log(Level.INFO, "Received model \n" + resultModel);
+         
            this.adapterABox.getModel().setNsPrefixes(resultModel.getNsPrefixMap());
            
            Model returnModel = resultModel;

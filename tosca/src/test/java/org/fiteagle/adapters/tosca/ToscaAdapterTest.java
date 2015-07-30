@@ -11,12 +11,12 @@ import info.openmultinet.ontology.vocabulary.Omn;
 import java.io.InputStream;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
-import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
-import org.fiteagle.adapters.tosca.client.IToscaClient;
-import org.fiteagle.adapters.tosca.client.ToscaClientDummy;
-import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.OntologyModelUtil;
-import org.junit.Test;
+//import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
+//import org.fiteagle.adapters.tosca.client.IToscaClient;
+//import org.fiteagle.adapters.tosca.client.ToscaClientDummy;
+//import org.fiteagle.api.core.IMessageBus;
+//import org.fiteagle.api.core.OntologyModelUtil;
+//import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -66,6 +66,7 @@ public class ToscaAdapterTest {
   }
   
 //  @Test
+/* my test for tosca
   public void testCreateInstance() throws ProcessingException, InvalidRequestException{
     ToscaAdapter testAdapter = createAdapterWithDummyClient();
     
@@ -82,22 +83,23 @@ public class ToscaAdapterTest {
 //    Resource dummy1 = responseModel.listSubjectsWithProperty(RDF.type, dummy).next();
 //    assertTrue(responseModel.contains(dummy1, RDF.type, dummy));
   }
-
-  private ToscaAdapter createAdapterWithDummyClient() throws ProcessingException {
-    Model adapterModel = OntologyModelUtil.loadModel("ontologies/tosca.ttl", IMessageBus.SERIALIZATION_TURTLE);
-//    IToscaClient testClient = new ToscaClientDummy();
-    
-    String adapterInstance = "http://localhost/resource/ToscaAdapter-test";
-    String toscaEndpoint = "http://130.149.247.221:8080/api/rest/tosca/v2/";
-    Model model = ModelFactory.createDefaultModel();
-    Resource resource = model.createResource(adapterInstance);
-    ToscaAdapter adapter = new ToscaAdapter(adapterModel, resource);
-    adapter.setToscaClient(toscaEndpoint);
-    
-//    ToscaAdapter testAdapter = new ToscaAdapter(adapterModel, testClient);
-//    adapter.updateAdapterDescription();
-    return adapter;
-  }
+*/
+  
+//  private ToscaAdapter createAdapterWithDummyClient() throws ProcessingException {
+//    Model adapterModel = OntologyModelUtil.loadModel("ontologies/tosca.ttl", IMessageBus.SERIALIZATION_TURTLE);
+////    IToscaClient testClient = new ToscaClientDummy();
+//    
+//    String adapterInstance = "http://localhost/resource/ToscaAdapter-test";
+//    String toscaEndpoint = "http://130.149.247.221:8080/api/rest/tosca/v2/";
+//    Model model = ModelFactory.createDefaultModel();
+//    Resource resource = model.createResource(adapterInstance);
+//    ToscaAdapter adapter = new ToscaAdapter(adapterModel, resource);
+//    adapter.setToscaClient(toscaEndpoint);
+//    
+////    ToscaAdapter testAdapter = new ToscaAdapter(adapterModel, testClient);
+////    adapter.updateAdapterDescription();
+//    return adapter;
+//  }
   
   private Model getModelFromTurtleFile(String path){
     InputStream input = getClass().getResourceAsStream(path);
