@@ -302,6 +302,10 @@ public abstract class AbstractAdapter {
     public ProcessingException(Throwable cause) {
       super(cause);
     }
+    
+    public ProcessingException(String message, Throwable cause){
+      super(message, cause);
+    }
   }
 
     protected Resource getAdapterClass() {
