@@ -182,6 +182,7 @@ public final class ToscaAdapter extends AbstractAdapter {
       LOGGER.log(Level.INFO, "deleting Topology " + instanceURI + " . Its equivalent URI is " + deleteTopology);
       String id = getLocalname(deleteTopology);
       client.deleteDefinitions(id); 
+      this.topologies.remove(instanceURI);
     
   }
   

@@ -30,6 +30,7 @@ import org.fiteagle.api.core.IMessageBus;
 
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -60,7 +61,7 @@ public class CallOpenSDNcore implements Runnable{
        try {
          LOGGER.log(Level.INFO, "Create model: \n" + createModel);
          
-         String definitions = parseToDefinitions(this.createModel);
+         String definitions = parseToDefinitions();
          LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
         
          Definitions resultDefinitions = this.toscaAdapter.getClient().createDefinitions(definitions);
@@ -79,17 +80,19 @@ public class CallOpenSDNcore implements Runnable{
          }
      }
      
-     private String parseToDefinitions(Model createModel) throws InvalidRequestException {
+     private String parseToDefinitions() throws InvalidRequestException {
        try{
-         createModel.removeAll(null, Omn.isResourceOf, null);
-         createModel.removeAll(null, Omn.hasReservation, null);
-         createModel.removeAll(null, Omn_lifecycle.hasState, null);
-         createModel.removeAll(null, Omn_lifecycle.implementedBy, null);
+         Model model = ModelFactory.createDefaultModel();
+         model = this.createModel;
+         model.removeAll(null, Omn.isResourceOf, null);
+         model.removeAll(null, Omn.hasReservation, null);
+         model.removeAll(null, Omn_lifecycle.hasState, null);
+         model.removeAll(null, Omn_lifecycle.implementedBy, null);
          
-         System.out.println("CREATE MODEL " + createModel);
-         Map<String,String> pref = createModel.getNsPrefixMap();
+         System.out.println("CREATE MODEL " + model);
+         Map<String,String> pref = model.getNsPrefixMap();
 
-         InfModel infModel = createInfModel(createModel);
+         InfModel infModel = createInfModel(model);
          infModel.setNsPrefix("osco","http://opensdncore.org/ontology/");
          return OMN2Tosca.getTopology(infModel);      
        } catch(InvalidModelException | JAXBException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){
@@ -164,23 +167,32 @@ public class CallOpenSDNcore implements Runnable{
        
      }
      
+     
      public void extendResourcesProperties(Model returnModel, Model resultModel){
-       ResIterator resIterator_createModel = createModel.listResourcesWithProperty(Omn.isResourceOf);
-       while(resIterator_createModel.hasNext()){
-         Resource requestedResource = resIterator_createModel.nextResource();
-         String resource_id = requestedResource.getProperty(Omn_lifecycle.hasID).getString();
+       
+       StmtIterator statementIterator_createModel = this.createModel.listStatements(new SimpleSelector((Resource)null, Omn.hasResource, (Object)null));
+       
+       while(statementIterator_createModel.hasNext()){
+         
+         Statement requestedResourceStatement = statementIterator_createModel.nextStatement();
+         Resource requestedResource = requestedResourceStatement.getObject().asResource();
+         String resource_id = this.createModel.getRequiredProperty(requestedResource, Omn_lifecycle.hasID).getString();
+         Resource resourceProperties = this.createModel.getResource(requestedResource.getURI());
          
          StmtIterator stmtIterator = resultModel.listStatements(new SimpleSelector((Resource)null, Omn_lifecycle.hasID, (Object) resource_id));
          while(stmtIterator.hasNext()){
            Statement statement = stmtIterator.nextStatement();
            Resource createdResource = statement.getSubject();
+           
            StmtIterator stmtIter = resultModel.listStatements(new SimpleSelector(createdResource, (Property)null, (RDFNode)null));
+           
            while(stmtIter.hasNext()){
              Statement createdStatement = stmtIter.nextStatement();
-             if(!requestedResource.hasProperty(createdStatement.getPredicate(), createdStatement.getObject())){
+             
+             if(!resourceProperties.hasProperty(createdStatement.getPredicate(), createdStatement.getObject())){
              Statement stmt = new StatementImpl(requestedResource, createdStatement.getPredicate(), createdStatement.getObject());
              returnModel.add(stmt);
-           }
+             }
            }
          }
        } 
