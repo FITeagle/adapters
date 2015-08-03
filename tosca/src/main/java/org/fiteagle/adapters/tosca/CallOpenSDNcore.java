@@ -31,30 +31,27 @@ import org.fiteagle.api.core.IMessageBus;
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 public class CallOpenSDNcore implements Runnable{
   
-     private final ToscaMDBSender sender;
-     
      private final Model createModel;
      
-     private final Resource adapterABox;
-     
-     private IToscaClient client;
+     private ToscaAdapter toscaAdapter;
      
      private static Logger LOGGER = Logger.getLogger(CallOpenSDNcore.class.toString());
-  
-     public CallOpenSDNcore(Model createModel, ToscaMDBSender sender, Resource adapterABox, IToscaClient client){
-       this.sender = sender;
+     
+     public CallOpenSDNcore(Model createModel, ToscaAdapter toscaAdapter){
        this.createModel = createModel;
-       this.adapterABox = adapterABox;
-       this.client = client;
+       this.toscaAdapter = toscaAdapter;
        }
      
      @Override
@@ -66,12 +63,12 @@ public class CallOpenSDNcore implements Runnable{
          String definitions = parseToDefinitions(this.createModel);
          LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
         
-         Definitions resultDefinitions = client.createDefinitions(definitions);
+         Definitions resultDefinitions = this.toscaAdapter.getClient().createDefinitions(definitions);
          LOGGER.log(Level.INFO, "Result definitions: \n"+ toString(resultDefinitions));
          
          Model model = parseToModel(resultDefinitions);
          LOGGER.log(Level.INFO, "Result Model: \n" + model);
-         sender.publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
+         this.toscaAdapter.getSender().publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
 
          } 
        catch (InvalidRequestException e) {
@@ -101,7 +98,7 @@ public class CallOpenSDNcore implements Runnable{
      }
      
      private InfModel createInfModel(Model model) throws InvalidModelException{
-       model.add( this.adapterABox.getModel());
+       model.add( this.toscaAdapter.getAdapterABox().getModel());
        List additionalOntologies = new ArrayList<String>();
        additionalOntologies.add("/ontologies/osco.ttl");
        Parser parser = new Parser(model, additionalOntologies);
@@ -122,21 +119,71 @@ public class CallOpenSDNcore implements Runnable{
          Model resultModel = Tosca2OMN.getModel(definitions);
          LOGGER.log(Level.INFO, "Received model \n" + resultModel);
          
-           this.adapterABox.getModel().setNsPrefixes(resultModel.getNsPrefixMap());
+           this.toscaAdapter.getAdapterABox().getModel().setNsPrefixes(resultModel.getNsPrefixMap());
            
-           Model returnModel = resultModel;
-           ResIterator resIterator = resultModel.listResourcesWithProperty(Omn.hasResource);
-           while(resIterator.hasNext()){
-             Resource resource = resIterator.nextResource();
-             Property property = returnModel.createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
-             property.addProperty(RDF.type, OWL.FunctionalProperty);
-             Statement statement = new StatementImpl(resource, property, Omn_lifecycle.Started);
-             returnModel.add(statement);
-           }
+           Model returnModel = this.createModel;
+           
+           startTopology(returnModel);           
+           addCreatedTopology(resultModel);
+           
+           extendResourcesProperties(returnModel, resultModel);
+         
          return returnModel;
        } catch (UnsupportedException e) {
          throw new ProcessingException(e);
-       }      
+       }     
      }
   
+     public void startTopology(Model returnModel){
+       
+       ResIterator resIterator = this.createModel.listResourcesWithProperty(Omn.hasResource);
+       while(resIterator.hasNext()){
+         Resource resource = resIterator.nextResource();
+         Property property = returnModel.createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
+         property.addProperty(RDF.type, OWL.FunctionalProperty);
+         Statement statement = new StatementImpl(resource, property, Omn_lifecycle.Started);
+         returnModel.add(statement);
+       }
+     }
+     
+     public void addCreatedTopology(Model resultModel){
+       String requestedTopologyURI = null;
+       String createdTopologyURI = null;
+       
+       ResIterator requestedTopologyIterator = this.createModel.listResourcesWithProperty(Omn.hasResource);
+       while(requestedTopologyIterator.hasNext()){
+         requestedTopologyURI = requestedTopologyIterator.nextResource().getURI();
+         LOGGER.log(Level.INFO, "requested topology URI " + requestedTopologyURI);
+       }
+       ResIterator createdTopologyIterator = resultModel.listResourcesWithProperty(RDF.type, Omn.Topology);
+       while(createdTopologyIterator.hasNext()){
+         createdTopologyURI = createdTopologyIterator.nextResource().getURI();
+         LOGGER.log(Level.INFO, "created topology URI " + createdTopologyURI);
+       }
+       toscaAdapter.setTopologies(requestedTopologyURI, createdTopologyURI);
+       
+     }
+     
+     public void extendResourcesProperties(Model returnModel, Model resultModel){
+       ResIterator resIterator_createModel = createModel.listResourcesWithProperty(Omn.isResourceOf);
+       while(resIterator_createModel.hasNext()){
+         Resource requestedResource = resIterator_createModel.nextResource();
+         String resource_id = requestedResource.getProperty(Omn_lifecycle.hasID).getString();
+         
+         StmtIterator stmtIterator = resultModel.listStatements(new SimpleSelector((Resource)null, Omn_lifecycle.hasID, (Object) resource_id));
+         while(stmtIterator.hasNext()){
+           Statement statement = stmtIterator.nextStatement();
+           Resource createdResource = statement.getSubject();
+           StmtIterator stmtIter = resultModel.listStatements(new SimpleSelector(createdResource, (Property)null, (RDFNode)null));
+           while(stmtIter.hasNext()){
+             Statement createdStatement = stmtIter.nextStatement();
+             if(!requestedResource.hasProperty(createdStatement.getPredicate(), createdStatement.getObject())){
+             Statement stmt = new StatementImpl(requestedResource, createdStatement.getPredicate(), createdStatement.getObject());
+             returnModel.add(stmt);
+           }
+           }
+         }
+       } 
+     }
+     
 }

@@ -53,6 +53,7 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   private ToscaMDBSender sender;
 
+  private Map<String, String> topologies = new HashMap<String, String>();
 
   
   public ToscaAdapter( Model adapterTBox, Resource adapterABox, ToscaMDBSender sender) {
@@ -79,7 +80,7 @@ public final class ToscaAdapter extends AbstractAdapter {
     
     try {
       ManagedThreadFactory threadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
-      CallOpenSDNcore callOpenSDNcore = new CallOpenSDNcore(createModel, this.sender, this.adapterABox, client);
+      CallOpenSDNcore callOpenSDNcore = new CallOpenSDNcore(createModel, this);
       Thread callOpenSDNcoreThread = threadFactory.newThread(callOpenSDNcore);
       callOpenSDNcoreThread.start();
     } catch (NamingException e) {
@@ -108,7 +109,8 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public Model deleteInstances(Model model) throws InvalidRequestException, ProcessingException {
-    Model deletedInstancesModel = super.deleteInstances(model);
+    
+    Model deletedInstancesModel = ModelFactory.createDefaultModel();
     
     ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, Omn.Topology);
     while(resourceInstanceIterator.hasNext()){
@@ -175,8 +177,12 @@ public final class ToscaAdapter extends AbstractAdapter {
 
   @Override
   public void deleteInstance(String instanceURI) throws InvalidRequestException, ProcessingException {
-    String id = getLocalname(instanceURI);
-    client.deleteDefinitions(id);
+    
+      String deleteTopology = this.topologies.get(instanceURI);
+      LOGGER.log(Level.INFO, "deleting Topology " + instanceURI + " . Its equivalent URI is " + deleteTopology);
+      String id = getLocalname(deleteTopology);
+      client.deleteDefinitions(id); 
+    
   }
   
   @Override
@@ -308,4 +314,19 @@ public void refreshConfig() throws ProcessingException {
     this.client = new ToscaClient(toscaClientURI);
   }
     
+    public IToscaClient getClient(){
+      return this.client;
+    }
+    
+    public ToscaMDBSender getSender(){
+      return this.sender;
+    }
+    
+    public Map<String, String> getTopologies(){
+      return this.topologies;
+    }
+    
+    public void setTopologies(String requestedTopology, String createdTopology){
+      this.topologies.put(requestedTopology, createdTopology);
+    }
 }
