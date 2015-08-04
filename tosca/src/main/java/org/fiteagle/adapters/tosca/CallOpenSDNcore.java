@@ -61,7 +61,7 @@ public class CallOpenSDNcore implements Runnable{
        try {
          LOGGER.log(Level.INFO, "Create model: \n" + createModel);
          
-         String definitions = parseToDefinitions();
+         String definitions = prepareCreateModel();
          LOGGER.log(Level.INFO, "Input definitions: \n"+definitions);
         
          Definitions resultDefinitions = this.toscaAdapter.getClient().createDefinitions(definitions);
@@ -80,8 +80,7 @@ public class CallOpenSDNcore implements Runnable{
          }
      }
      
-     private String parseToDefinitions() throws InvalidRequestException {
-       try{
+     private String prepareCreateModel() throws InvalidRequestException {
          Model model = ModelFactory.createDefaultModel();
          model = this.createModel;
          model.removeAll(null, Omn.isResourceOf, null);
@@ -90,14 +89,22 @@ public class CallOpenSDNcore implements Runnable{
          model.removeAll(null, Omn_lifecycle.implementedBy, null);
          
          System.out.println("CREATE MODEL " + model);
-         Map<String,String> pref = model.getNsPrefixMap();
+//         Map<String,String> pref = model.getNsPrefixMap();
+         
+        return parseToDefinitions(model);
 
+              
+     }
+     
+     protected String parseToDefinitions(Model model) throws InvalidRequestException {
+       try {
          InfModel infModel = createInfModel(model);
          infModel.setNsPrefix("osco","http://opensdncore.org/ontology/");
-         return OMN2Tosca.getTopology(infModel);      
+         return OMN2Tosca.getTopology(infModel); 
        } catch(InvalidModelException | JAXBException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){
          throw new InvalidRequestException(e);
        }
+       
      }
      
      private InfModel createInfModel(Model model) throws InvalidModelException{
