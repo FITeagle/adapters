@@ -19,6 +19,8 @@ import info.openmultinet.ontology.translators.tosca.Tosca2OMN.UnsupportedExcepti
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_service;
+import info.openmultinet.ontology.vocabulary.Osco;
 
 import javax.xml.bind.JAXBException;
 
@@ -27,6 +29,7 @@ import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.adapters.tosca.client.IToscaClient;
 import org.fiteagle.adapters.tosca.dm.ToscaMDBSender;
 import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageUtil;
 
 import com.hp.hpl.jena.rdf.model.InfModel;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -88,7 +91,9 @@ public class CallOpenSDNcore implements Runnable{
          model.removeAll(null, Omn_lifecycle.hasState, null);
          model.removeAll(null, Omn_lifecycle.implementedBy, null);
          
-         System.out.println("CREATE MODEL " + model);
+         String createModel = MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_TURTLE);
+         LOGGER.log(Level.INFO, "CREATE MODEL at TOSCA ADAPTER \n" + createModel);
+         
 //         Map<String,String> pref = model.getNsPrefixMap();
          
         return parseToDefinitions(model);
