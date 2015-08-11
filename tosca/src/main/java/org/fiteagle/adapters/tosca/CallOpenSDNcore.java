@@ -20,7 +20,7 @@ import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import info.openmultinet.ontology.vocabulary.Omn_service;
-import info.openmultinet.ontology.vocabulary.Osco;
+
 
 import javax.xml.bind.JAXBException;
 
