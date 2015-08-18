@@ -88,7 +88,7 @@ public final class ToscaAdapter extends AbstractAdapter {
       ManagedThreadFactory threadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
       CallOpenSDNcore callOpenSDNcore = new CallOpenSDNcore(createModel, this.sender, this.adapterABox, client);
       Thread callOpenSDNcoreThread = threadFactory.newThread(callOpenSDNcore);
-      callOpenSDNcoreThread.run();
+      callOpenSDNcoreThread.start();
     } catch (NamingException e) {
       LOGGER.log(Level.SEVERE, "REQUIRED VMs counldn't be created ", e);
     }
