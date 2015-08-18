@@ -11,31 +11,54 @@ import info.openmultinet.ontology.vocabulary.Omn;
 import java.io.InputStream;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
+//import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
+//import org.fiteagle.adapters.tosca.client.IToscaClient;
+//import org.fiteagle.adapters.tosca.client.ToscaClientDummy;
+//import org.fiteagle.api.core.IMessageBus;
+//import org.fiteagle.api.core.OntologyModelUtil;
+//import org.junit.Test;
+
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
-import org.fiteagle.adapters.tosca.client.IToscaClient;
-import org.fiteagle.adapters.tosca.client.ToscaClientDummy;
 import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.OntologyModelUtil;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFReader;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class ToscaAdapterTest {
   
   private ToscaAdapter adapter = null;
+  private CallOpenSDNcore  callOpenSDNcore = null;
   
-//  @Test
+  @Before
+  public void initialize(){
+    Model dummyModel = ModelFactory.createDefaultModel();
+    Resource adapterType = dummyModel.createResource("adapter type");
+    Statement dummyStatement = new StatementImpl(adapterType, RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
+    dummyModel.add(dummyStatement);
+    Resource resource = dummyModel.createResource("dummy resource");
+    adapter = new ToscaAdapter(dummyModel, resource, null);
+    callOpenSDNcore = new CallOpenSDNcore(dummyModel, adapter);
+  }
+  
+  @Test
   public void testParseToDefinitions() throws InvalidRequestException {
+   
     Model model = getModelFromTurtleFile("/osco.ttl");
-    String definitions = adapter.parseToDefinitions(model);
+    String definitions = callOpenSDNcore.parseToDefinitions(model);
     assertNotNull(definitions);
   }
   
-//  @Test
+  @Test
   public void testGetLocalname() throws InvalidRequestException {
     Model model = getModelFromTurtleFile("/osco.ttl");
     adapter.updateAdapterDescriptionWithModel(model);
@@ -49,7 +72,7 @@ public class ToscaAdapterTest {
     assertEquals("dummy", localname);
   }
   
-//  @Test
+  @Test
   public void testCreateInfModel() throws InvalidModelException {
     Model ontologyModel = getModelFromTurtleFile("/osco.ttl");
     adapter.updateAdapterDescriptionWithModel(ontologyModel);
@@ -65,37 +88,28 @@ public class ToscaAdapterTest {
     assertTrue(infModel.contains(dummy1, RDF.type, Omn.Resource));
   }
   
-//  @Test
+  @Test
   public void testCreateInstance() throws ProcessingException, InvalidRequestException{
     ToscaAdapter testAdapter = createAdapterWithDummyClient();
     
-//    Model requestModel = getModelFromTurtleFile("/request-dummy.ttl");
     Model requestModel = getModelFromTurtleFile("/request-openmtc.ttl");
-//    Model responseModel = testAdapter.createInstances(requestModel);
-//    assertNotNull(responseModel);
     
-    String definations = testAdapter.parseToDefinitions(requestModel);
-    System.out.println("DEFINITIONS ARE " + definations);
+    String definations = callOpenSDNcore.parseToDefinitions(requestModel);
     assertNotNull(definations);
     
-//    Resource dummy = responseModel.getResource("http://opensdncore.org/ontology/dummy");
-//    Resource dummy1 = responseModel.listSubjectsWithProperty(RDF.type, dummy).next();
-//    assertTrue(responseModel.contains(dummy1, RDF.type, dummy));
   }
 
+  
   private ToscaAdapter createAdapterWithDummyClient() throws ProcessingException {
     Model adapterModel = OntologyModelUtil.loadModel("ontologies/tosca.ttl", IMessageBus.SERIALIZATION_TURTLE);
-//    IToscaClient testClient = new ToscaClientDummy();
     
     String adapterInstance = "http://localhost/resource/ToscaAdapter-test";
-    String toscaEndpoint = "http://130.149.247.221:8080/api/rest/tosca/v2/";
+    String toscaEndpoint = "http://xxx.xxx.xxx.xxx:8080/api/rest/tosca/v2/";
     Model model = ModelFactory.createDefaultModel();
     Resource resource = model.createResource(adapterInstance);
-    ToscaAdapter adapter = new ToscaAdapter(adapterModel, resource);
+    ToscaAdapter adapter = new ToscaAdapter(adapterModel, resource, null);
     adapter.setToscaClient(toscaEndpoint);
     
-//    ToscaAdapter testAdapter = new ToscaAdapter(adapterModel, testClient);
-//    adapter.updateAdapterDescription();
     return adapter;
   }
   
