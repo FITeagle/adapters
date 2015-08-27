@@ -61,7 +61,7 @@ public class OpenstackAdapterControl extends AdapterControl {
     @Override
     public AbstractAdapter createAdapterInstance(Model tbox, Resource abox) {
         OpenstackAdapter adapter =  new OpenstackAdapter(tbox,abox);
-
+        adapter.setListener(mdbSender);
         return  adapter;
     }
 

@@ -179,7 +179,7 @@ public class OpenstackAdapter extends AbstractAdapter {
   }
 
   private Resource getMonitoringService(Model newInstanceModel) {
-    ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type,Omn_monitoring.MonitoringService.getURI());
+    ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type, Omn_monitoring.MonitoringService.getURI());
     Resource omsp_service = null;
     while (resIterator.hasNext()){
       omsp_service = resIterator.nextResource();
@@ -466,6 +466,10 @@ public void refreshConfig() throws ProcessingException {
   public void configure(Config configuration) {
 
   }
+
+    public void setListener(OpenstackAdapterMDBSender listener) {
+        this.listener = listener;
+    }
 
     private class CreateVM implements Runnable {
 
