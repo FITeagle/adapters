@@ -126,6 +126,10 @@ public final class SshServiceAdapter extends AbstractAdapter {
         case ISshService.PASSWORD:
           sshParameters.setPassword(statement.getString());
           break;
+
+        case ISshService.SSH_PORT:
+          sshParameters.setPort(statement.getString());
+          break;
           
       }
     }

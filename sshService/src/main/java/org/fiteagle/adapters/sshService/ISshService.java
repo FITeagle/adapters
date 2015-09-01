@@ -19,7 +19,7 @@ public interface ISshService {
   String PRIVATE_KEY_PASSWORD = "privateKeyPassword";
   String COMPONENT_ID = "componentID";
   String DEFAULT_ADAPTER_INSTANCE = "PhysicalNodeAdapter-1";
-  String SSH_PORT = "22";
+  String SSH_PORT = "port";
   String USERNAME = "username";
   String SSH_KEYS = "ssh-keys";
   String ADAPTER_INSTANCES = "adapterInstances";

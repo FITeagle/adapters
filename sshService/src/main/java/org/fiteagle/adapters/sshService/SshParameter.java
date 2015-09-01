@@ -29,7 +29,17 @@ public class SshParameter {
   private String privateKeyPassword;
   
   private String password;
-  
+
+  public String getPort() {
+    return port;
+  }
+
+  public void setPort(String port) {
+    this.port = port;
+  }
+
+  private String port;
+
   private static Logger LOGGER  = Logger.getLogger(SshParameter.class.toString());
   
   

@@ -68,7 +68,7 @@ public class SSHConnector {
 
     try { 
       jsch.addIdentity(sshParameter.getPrivateKeyPath(), sshParameter.getPrivateKeyPassword());
-      session = jsch.getSession(sshParameter.getAccessUsername(), sshParameter.getIP(), 22);
+      session = jsch.getSession(sshParameter.getAccessUsername(), sshParameter.getIP(), Integer.getInteger(sshParameter.getPort()));
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
       Properties prop = new Properties();
@@ -135,7 +135,7 @@ public class SSHConnector {
 
   try { 
     jsch.addIdentity(sshParameter.getPrivateKeyPath(), sshParameter.getPrivateKeyPassword());
-    session = jsch.getSession(sshParameter.getAccessUsername(), sshParameter.getIP(), 22);
+    session = jsch.getSession(sshParameter.getAccessUsername(), sshParameter.getIP(), Integer.getInteger(sshParameter.getPort()));
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
     Properties prop = new Properties();
