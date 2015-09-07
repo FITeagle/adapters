@@ -32,7 +32,7 @@ import java.util.Properties;
 
 import info.openmultinet.ontology.vocabulary.Omn_service;
 
-public class SshService {
+public class SshService implements Runnable{
 	protected SshServiceAdapter owningAdapter;
 	private String instanceName;
 	private List<String> publicKeys = new ArrayList<>();
@@ -51,6 +51,11 @@ public class SshService {
 		this.owningAdapter = owningAdapter;
 		this.instanceName = instanceName;
 		
+	}
+	
+	@Override
+	public void run(){
+	  addSshAccess();
 	}
 
   public void updateProperty(Statement configureStatement) {

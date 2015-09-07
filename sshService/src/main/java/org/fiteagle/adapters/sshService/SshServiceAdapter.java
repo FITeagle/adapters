@@ -22,6 +22,9 @@ import java.util.logging.Logger;
 
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.enterprise.concurrent.ManagedThreadFactory;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.apache.jena.atlas.logging.Log;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
@@ -164,7 +167,15 @@ public final class SshServiceAdapter extends AbstractAdapter {
     }
 		instanceList.put(instanceURI, sshService);
 		
-		sshService.addSshAccess();
+		try {
+      ManagedThreadFactory managedThreadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+      Thread sshServiceThread = managedThreadFactory.newThread(sshService);
+      sshServiceThread.start();
+    } catch (NamingException e) {
+      LOGGER.log(Level.SEVERE, "User accounts counldn't be created ", e);
+    }
+		
+//		sshService.addSshAccess();
 		return createResponse(sshService);
 		
 		
