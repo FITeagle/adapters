@@ -189,7 +189,7 @@ public final class SshServiceAdapter extends AbstractAdapter {
 				.getResourceNamespace() + "LoginService" + uuid);
 		res.addProperty(Omn.hasService, login);
 		login.addProperty(RDF.type, Omn_service.LoginService);
-		login.addProperty(Omn_service.port, ISshService.SSH_PORT);
+		login.addProperty(Omn_service.port, sshParameters.getPort());
 		login.addProperty(Omn_service.hostname, sshParameters.getIP());
 
 		for (String username : sshservice.getUsernames()) {
