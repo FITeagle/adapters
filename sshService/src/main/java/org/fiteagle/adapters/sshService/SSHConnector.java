@@ -80,8 +80,8 @@ public class SSHConnector {
       for(String newUser : this.getUsernames()) {
       ChannelExec channel_createUserAccount = (ChannelExec)session.openChannel("exec");
       channel_createUserAccount.setOutputStream(stream);
-      channel_createUserAccount.setCommand("sudo -S adduser -gecos \"" + newUser + " "
-          + newUser + ", test@test.test\" -disabled-password "
+      channel_createUserAccount.setCommand("sudo -S adduser -gecos '" + newUser + " "
+          + newUser + ", test@test.test' -disabled-password "
           + newUser + " ");
       executeCommand(channel_createUserAccount);
 
