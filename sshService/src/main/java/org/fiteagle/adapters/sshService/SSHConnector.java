@@ -93,11 +93,13 @@ public class SSHConnector {
       for(String newUser : this.getUsernames()) {
       ChannelExec channel_createUserAccount = (ChannelExec)session.openChannel("exec");
       channel_createUserAccount.setOutputStream(stream);
-
+      String command = "";
       if(password != null){
-        channel_createUserAccount.setCommand("echo " + password + "| sudo -S adduser -gecos \"" + newUser + " "
-            + newUser + ", test@test.test\" -disabled-password "
-            + newUser + " > /tmp/foo");
+         command = "echo " + password + "| sudo -S adduser -gecos \"" + newUser + " "
+                + newUser + ", test@test.test\" -disabled-password "
+                + newUser + "";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_createUserAccount.setCommand(command);
       } else {
         channel_createUserAccount.setCommand("sudo -S adduser -gecos \"" + newUser + " "
             + newUser + ", test@test.test\" -disabled-password "
@@ -106,12 +108,14 @@ public class SSHConnector {
 
       executeCommand(channel_createUserAccount);
 
-      
+
       // createUserSSHDirectory
       ChannelExec channel_createUserSSHDirectory = (ChannelExec)session.openChannel("exec");
       channel_createUserSSHDirectory.setOutputStream(stream);
       if(password != null){
-        channel_createUserSSHDirectory.setCommand("echo " + password + "| sudo -S mkdir /home/" + newUser + "/.ssh ");
+        command = "sleep 1; echo " + password + "| sudo -S mkdir /home/" + newUser + "/.ssh";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_createUserSSHDirectory.setCommand(command);
       }
       else {
         channel_createUserSSHDirectory.setCommand("sudo -S mkdir /home/" + newUser + "/.ssh");
@@ -123,8 +127,10 @@ public class SSHConnector {
       ChannelExec channel_createAuthorizedKeysFile = (ChannelExec)session.openChannel("exec");
       channel_createAuthorizedKeysFile.setOutputStream(stream);
       if(password != null){
-        channel_createAuthorizedKeysFile.setCommand("echo " + password + "| sudo -S touch /home/" + newUser
-            + "/.ssh/authorized_keys");
+        command = "sleep 1; echo " + password + "| sudo -S touch /home/" + newUser
+                + "/.ssh/authorized_keys";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_createAuthorizedKeysFile.setCommand(command);
       }
       else {
         channel_createAuthorizedKeysFile.setCommand("sudo -S touch /home/" + newUser
@@ -137,8 +143,10 @@ public class SSHConnector {
       ChannelExec channel_changeOwnerOfUserHome = (ChannelExec)session.openChannel("exec");
       channel_changeOwnerOfUserHome.setOutputStream(stream);
       if(password != null){
-        channel_changeOwnerOfUserHome.setCommand("echo " + password + "| sudo -S chown -R " + newUser + ":" + newUser
-            + " /home/" + newUser + "/.ssh");
+        command = "sleep 1; echo " + password + "| sudo -S chown -R " + newUser + ":" + newUser
+                + " /home/" + newUser + "/.ssh";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_changeOwnerOfUserHome.setCommand(command);
       }
       else {
         channel_changeOwnerOfUserHome.setCommand("sudo -S chown -R " + newUser + ":" + newUser
@@ -152,8 +160,10 @@ public class SSHConnector {
       ChannelExec channel_addSSHKey = (ChannelExec)session.openChannel("exec");
       channel_addSSHKey.setOutputStream(stream);
       if(password != null){
-        channel_addSSHKey.setCommand("echo " + password + "| sudo -S bash -c 'echo " + sshKey + " >> /home/"
-            + newUser + "/.ssh/authorized_keys'");
+        command = "sleep 1; echo " + password + "| sudo -S bash -c 'echo " + sshKey + " >> /home/"
+                + newUser + "/.ssh/authorized_keys'";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_addSSHKey.setCommand(command);
       }
       else {
         channel_addSSHKey.setCommand("sudo -S bash -c 'echo " + sshKey + " >> /home/"
