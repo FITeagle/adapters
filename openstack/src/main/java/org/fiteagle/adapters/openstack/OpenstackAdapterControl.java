@@ -1,20 +1,17 @@
 package org.fiteagle.adapters.openstack;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-
-import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
-
-import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AdapterControl;
-import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
-import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
-import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.OntologyModelUtil;
+import java.io.ByteArrayInputStream;
+import java.lang.reflect.Array;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.inject.Inject;
@@ -22,13 +19,17 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonValue;
 
-import java.io.ByteArrayInputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AdapterControl;
+import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
+import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
+import org.fiteagle.api.core.Config;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 /**
  * Created by dne on 30.06.15.
@@ -40,6 +41,9 @@ public class OpenstackAdapterControl extends AdapterControl {
 
     @Inject
     protected OpenstackAdapterMDBSender mdbSender;
+    
+    public static Map <String,Map> instancesDefaultFlavours = new HashMap<>();
+    
 
 
     Logger LOGGER = Logger.getLogger(this.getClass().getName());
@@ -58,6 +62,7 @@ public class OpenstackAdapterControl extends AdapterControl {
         publishInstances();
 
     }
+    
     @Override
     public AbstractAdapter createAdapterInstance(Model tbox, Resource abox) {
         OpenstackAdapter adapter =  new OpenstackAdapter(tbox,abox);
@@ -121,14 +126,49 @@ public class OpenstackAdapterControl extends AdapterControl {
 
                 String default_image_id  = adapterInstanceObject.getString(IOpenStack.DEFAULT_IMAGE_ID);
                 adapter.setDefault_image_id(default_image_id);
+   
+                try{
+                    
 
+                	JsonArray adapterInstancesFlavours = adapterInstanceObject.getJsonArray("defaultFlavours");
+                    Map<String,ArrayList<String>> defaultFlavours = new HashMap<>();
+                    
+                        for(String s : adapterInstancesFlavours.getJsonObject(0).keySet()){
+                       	JsonArray tmp = adapterInstancesFlavours.getJsonObject(0).getJsonArray(s);
+                        ArrayList<String> tmpArray = new ArrayList<String>();
+                       	tmpArray.add(tmp.getJsonObject(0).getString("diskImage"));
+                       	tmpArray.add(tmp.getJsonObject(0).getString("flavourName"));
+                       	defaultFlavours.put(s, tmpArray);
+                        }
 
+                        
+                   instancesDefaultFlavours.put(adapter.getId(), defaultFlavours);
+                   
+                }catch(Exception e){
+                    LOGGER.log(Level.SEVERE, "Could not find default Flavours in the Config-File for Instance" + adapterInstance);
+                    e.printStackTrace();
+                }
+                
+                
+                
                 adapter.initFlavors();
                 this.adapterInstances.put(adapter.getId(),adapter);
-            }
-            }
+                LOGGER.log(Level.SEVERE, this.adapterInstances.toString());
+                
 
+            }
+            }
+            
+
+            
+
+  
         }
+
+        
+        
+            
+            
     }
     
     @Override
@@ -147,6 +187,12 @@ public class OpenstackAdapterControl extends AdapterControl {
       adapterInstnaceMap.put(IOpenStack.DEFAULT_FLAVOR_ID, "");
       adapterInstnaceMap.put(IOpenStack.DEFAULT_IMAGE_ID, "");
       
+    }
+
+    
+    @PreDestroy
+    public void preDestroy(){
+    	
     }
     
 }
