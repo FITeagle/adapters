@@ -25,22 +25,35 @@ import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
+import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import javax.ejb.EJB;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 
 public class OpenstackAdapter extends AbstractAdapter {
+	
+  Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
-  private IOpenstackClient openstackClient;
+  protected IOpenstackClient openstackClient;
 
   private OpenstackAdapterMDBSender listener;
-  private String floatingPool;
+
+	@EJB
+	OpenstackAdapterControl openstackAdapterControler;
+	
+	private Map<String,ArrayList<String>> defaultFlavours = openstackAdapterControler.instancesDefaultFlavours.get(this.uuid);
+
+	
+	
+
+private String floatingPool;
   private String keystone_auth_URL;
   private String net_name;
   private String nova_endpoint;
@@ -99,8 +112,10 @@ public class OpenstackAdapter extends AbstractAdapter {
 
   public void initFlavors() {
     Flavors flavors = openstackClient.listFlavors();
+    readDefaultFlavours();
     for(Flavor flavor: flavors.getList()){
-      Resource vmResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + flavor.getName());
+    	
+    Resource vmResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + flavor.getName());
       vmResource.addProperty(RDFS.subClassOf, Omn_domain_pc.VM);
       vmResource.addProperty(Omn_domain_pc.hasCPU, flavor.getVcpus());
       vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
@@ -108,11 +123,30 @@ public class OpenstackAdapter extends AbstractAdapter {
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
       }
       adapterABox.addProperty(Omn_lifecycle.canImplement, vmResource);
-
     }
+    
+  }
+  
+  public void readDefaultFlavours(){
+	  if(openstackAdapterControler.instancesDefaultFlavours.get(this.uuid) != null){
+		  
+		defaultFlavours =openstackAdapterControler.instancesDefaultFlavours.get(this.uuid);
+		  for (String s :  defaultFlavours.keySet()){
+			    Resource flavourResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + s);
+			    flavourResource.addProperty(RDFS.subClassOf, Omn_domain_pc.VM);
+			    flavourResource.addProperty(Omn_domain_pc.hasDiskImage, defaultFlavours.get(s).get(0));
+			    flavourResource.addProperty(Omn_lifecycle.hasID, defaultFlavours.get(s).get(1));
+
+
+	    	  adapterABox.addProperty(Omn_lifecycle.canImplement, flavourResource);
+	      }
+	        
+	    }else {
+	    	LOGGER.log(Level.SEVERE, "Could not find default Flavours in the Config-File - Flavours from Server used instead");
+	    }
   }
 
-  private List<Resource> getDiskImages() {
+  protected List<Resource> getDiskImages() {
     List<Resource> diskimages = new ArrayList<>();
     Images images = openstackClient.listImages();
     for(Image image : images.getList()){
@@ -130,10 +164,24 @@ public class OpenstackAdapter extends AbstractAdapter {
   public Model createInstance(String instanceURI, Model newInstanceModel)  {
 
     Resource requestedVM = newInstanceModel.getResource(instanceURI);
-
+    LOGGER.log(Level.SEVERE, MessageUtil.serializeModel(requestedVM.getModel(), IMessageBus.SERIALIZATION_NTRIPLE));
     String typeURI = getRequestedTypeURI(requestedVM);
     String flavorId = getFlavorId(typeURI);
-    String diskImageURI = getDiskImageId(requestedVM);
+    String diskImageURI = new String("");
+    
+    if(defaultFlavours == null){
+    	defaultFlavours =openstackAdapterControler.instancesDefaultFlavours.get(this.uuid);
+    }
+	  
+    for (String s : defaultFlavours.keySet()){
+		  if (typeURI.equals("http://localhost/resource/"+s)){
+			  diskImageURI = defaultFlavours.get(s).get(0);
+		  }
+	  } 
+
+    if(diskImageURI.isEmpty()){
+    diskImageURI = getDiskImageId(requestedVM);
+    }
     String username = getUsername(requestedVM);
     String publicKey = getPublicKey(requestedVM);
     Resource monitoringService =  getMonitoringService(newInstanceModel);
@@ -177,6 +225,8 @@ public class OpenstackAdapter extends AbstractAdapter {
      resource.addProperty(property, Omn_lifecycle.Uncompleted);
     return returnModel;
   }
+  
+
 
   private Resource getMonitoringService(Model newInstanceModel) {
     ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type, Omn_monitoring.MonitoringService.getURI());
@@ -312,6 +362,19 @@ public class OpenstackAdapter extends AbstractAdapter {
     return  configureModel;
 
   }
+  
+  
+  
+  public String getImageAssociatedFlavor(String diskImageName){
+ 	try{
+	  return (String) openstackAdapterControler.instancesDefaultFlavours.get(this.uuid).get(diskImageName);
+	  
+ 	}catch(Exception e){
+        LOGGER.log(Level.SEVERE, "Could not find default Flavour for "+diskImageName);
+        return null;
+ 	}
+  }
+  
 
  /* public Resource getImageResource(){
     return adapterModel.getResource(getAdapterManagedResources().get(0).getNameSpace()+"OpenstackImage");
@@ -577,6 +640,14 @@ public void refreshConfig() throws ProcessingException {
     }
 
   }
+    
+    public IOpenstackClient getOpenstackClient() {
+    	return openstackClient;
+    }
+
+    protected void setOpenstackClient(IOpenstackClient openstackClient) {
+    	this.openstackClient = openstackClient;
+    }
 
 
 }

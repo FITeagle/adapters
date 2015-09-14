@@ -218,7 +218,7 @@ public abstract class AbstractAdapterREST{
     return MessageUtil.serializeModel(model, IMessageBus.SERIALIZATION_NTRIPLE);
   }
 
-  private AbstractAdapter getAdapterInstance(String adapterName) {
+  protected AbstractAdapter getAdapterInstance(String adapterName) {
 
     AbstractAdapter adapter = null;
     Iterator<AbstractAdapter> iterator = getAdapterInstances().iterator();
