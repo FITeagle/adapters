@@ -139,22 +139,6 @@ public class SSHConnector {
       executeCommand(channel_createAuthorizedKeysFile);
             
       
-      //changeOwnerOfUserHome
-      ChannelExec channel_changeOwnerOfUserHome = (ChannelExec)session.openChannel("exec");
-      channel_changeOwnerOfUserHome.setOutputStream(stream);
-      if(password != null){
-        command = "sleep 1; echo " + password + "| sudo -S chown -R " + newUser + ":" + newUser
-                + " /home/" + newUser + "/.ssh";
-        LOGGER.log(Level.INFO,"executing command: "+ command);
-        channel_changeOwnerOfUserHome.setCommand(command);
-      }
-      else {
-        channel_changeOwnerOfUserHome.setCommand("sudo -S chown -R " + newUser + ":" + newUser
-            + " /home/" + newUser + "/.ssh");
-      }
-      executeCommand(channel_changeOwnerOfUserHome);
-
-      
       // addSSHKeys
       for(String sshKey : this.getPublicKeys()) {
       ChannelExec channel_addSSHKey = (ChannelExec)session.openChannel("exec");
@@ -171,6 +155,52 @@ public class SSHConnector {
       }
       executeCommand(channel_addSSHKey);
       }
+      
+      
+      //changeOwnerOfUserHome
+      ChannelExec channel_changeOwnerOfUserHome = (ChannelExec)session.openChannel("exec");
+      channel_changeOwnerOfUserHome.setOutputStream(stream);
+      if(password != null){
+        command = "sleep 1; echo " + password + "| sudo -S chown -R " + newUser + ":" + newUser
+                + " /home/" + newUser + "/.ssh";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_changeOwnerOfUserHome.setCommand(command);
+      }
+      else {
+        channel_changeOwnerOfUserHome.setCommand("sudo -S chown -R " + newUser + ":" + newUser
+            + " /home/" + newUser + "/.ssh");
+      }
+      executeCommand(channel_changeOwnerOfUserHome);
+
+      
+      //change .ssh Folder Rights
+      ChannelExec channel_changeFolderRights = (ChannelExec)session.openChannel("exec");
+      channel_changeFolderRights.setOutputStream(stream);
+      if(password != null){
+        command = "sleep 1; echo " + password + "| sudo -S chmod 700 /home/" + newUser + "/.ssh";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_changeFolderRights.setCommand(command);
+      }
+      else {
+        channel_changeFolderRights.setCommand("sudo chmod 700 /home/" + newUser + "/.ssh");
+      }
+      executeCommand(channel_changeFolderRights);
+      
+      
+      //change authorized_keys File Rights
+      ChannelExec channel_changeFileRights = (ChannelExec)session.openChannel("exec");
+      channel_changeFileRights.setOutputStream(stream);
+      if(password != null){
+        command = "sleep 1; echo " + password + "| sudo -S chmod 600 /home/" + newUser + "/.ssh/authorized_keys";
+        LOGGER.log(Level.INFO,"executing command: "+ command);
+        channel_changeFileRights.setCommand(command);
+      }
+      else {
+        channel_changeFileRights.setCommand("sudo chmod 600 /home/" + newUser + "/.ssh/authorized_keys");
+      }
+      executeCommand(channel_changeFileRights);
+      
+
     }
     }
     
