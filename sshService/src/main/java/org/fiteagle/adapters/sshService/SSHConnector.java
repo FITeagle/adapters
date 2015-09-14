@@ -63,7 +63,7 @@ public class SSHConnector {
     
   }
   
-  public void createUserAccount(){
+  public void createUserAccount() throws InterruptedException {
     com.jcraft.jsch.Session session = null;
     String password = null;
     try { 
@@ -88,7 +88,7 @@ public class SSHConnector {
       }
       
       session.connect();
-
+      Thread.sleep(1000);
       // createUserAccount
       for(String newUser : this.getUsernames()) {
       ChannelExec channel_createUserAccount = (ChannelExec)session.openChannel("exec");

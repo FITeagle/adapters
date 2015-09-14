@@ -55,7 +55,11 @@ public class SshService implements Runnable{
 	
 	@Override
 	public void run(){
-	  addSshAccess();
+		try {
+			addSshAccess();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
   public void updateProperty(Statement configureStatement) {
@@ -309,7 +313,7 @@ public class SshService implements Runnable{
 	}
 	
 
-	private void createRemoteUser(){
+	private void createRemoteUser() throws InterruptedException {
 	  
     SSHConnector connector = new SSHConnector(this.getUsernames(), this.getPossibleAccesses(), owningAdapter.getSshParameters());
     connector.createUserAccount();
@@ -317,7 +321,7 @@ public class SshService implements Runnable{
     
 	}
 	
-	public void addSshAccess() {
+	public void addSshAccess() throws InterruptedException {
 	  
 	  if(ISshService.LOCAL_HOST.equals(owningAdapter.getSshParameters().getIP()) || ISshService.LOCALHOST_IP.equals(owningAdapter.getSshParameters().getIP())){
 	    createLocalUser();	    
@@ -328,7 +332,11 @@ public class SshService implements Runnable{
 	}
 	
 	public void createSSHtest(SSHConnector connector){
-	  connector.createUserAccount();
+		try {
+			connector.createUserAccount();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
    
 	private void createLocalUser(){
