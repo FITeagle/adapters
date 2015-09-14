@@ -2,9 +2,11 @@ language: java
 jdk:
 - oraclejdk8
 sudo: false
+before_install:
+  - sed -i.bak -e 's|https://nexus.codehaus.org/snapshots/|https://oss.sonatype.org/content/repositories/codehaus-snapshots/|g' ~/.m2/settings.xml
 script:
-- travis_retry mvn clean install site
-- "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} = 'master' ] && mvn clean deploy --settings .travis/settings.xml"
+- travis_retry mvn site
+- "[ ${TRAVIS_PULL_REQUEST} = 'false' ] && [ ${TRAVIS_BRANCH} = 'master' ] && mvn deploy --settings .travis/settings.xml"
 notifications:
   slack:
     secure: Y5/yHI96zBI2+ab1TePfKjXkFHsQQW9v2stnD7ljzyaZmS2pZGLGYnM0FpTRVCLnHF5bdeoPWTCLBB80fdZ0dPU2Mxby7ASrs1wgagIqTlS0HiH3wEcPyIGvw5tNUtqnQLpjUc8ext3sKuedd35giM9uo1ahUWYBy1+GBtxXmGs=
@@ -15,8 +17,8 @@ cache:
   directories:
   - $HOME/.m2
 after_success:
-- mvn clean test jacoco:report coveralls:report
 - curl http://demo.fiteagle.org/trigger.php?c=fiteagle
+- mvn test jacoco:report coveralls:report
 env:
   global:
   - secure: AQilgBzjAD7igfHXsZlLs8w4bJIvKlKUGvbGi+aGb3yDm4W1RMZMPjGbeBzRclzxuhpV39QKqTDKvchA0+de2iQv472n9q5nGQmQW7h9aFqQdV1WMSvfYMOF2UisXxt3RhIkOyHfJbPT6IHd3cGeN7gwbZJQeJC7Y7WqDMSeavc=

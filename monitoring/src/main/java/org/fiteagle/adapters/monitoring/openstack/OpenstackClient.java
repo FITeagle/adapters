@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.monitoring.openstack;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -7,12 +8,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+
+import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
 import org.fiteagle.api.core.Config;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.woorea.openstack.base.client.HttpMethod;
 import com.woorea.openstack.base.client.OpenStackRequest;
 import com.woorea.openstack.base.client.OpenStackResponseException;
@@ -28,10 +38,6 @@ import com.woorea.openstack.nova.Nova;
 
 public class OpenstackClient {
 
-
-	private String DEFAULT_KEYPAIR_ID ;
-	private String DEFAULT_FLAVOR_ID  ;
-	private String DEFAULT_IMAGE_ID ;
 	private static Logger LOGGER = Logger.getLogger(OpenstackClient.class.toString());
 
 	private String KEYSTONE_AUTH_URL;
@@ -40,91 +46,34 @@ public class OpenstackClient {
 	private String KEYSTONE_ENDPOINT;
 	private String TENANT_NAME;
 	private String NOVA_ENDPOINT;
-	private String GLANCE_ENDPOINT;
-	private String NET_ENDPOINT;
-	private String FLOATINGIP_POOL_NAME;
-	private String NET_NAME;
 	private String TENANT_ID = "";
-
-	private String networkId = "";
+	private Config config ;
 		
-private boolean PREFERENCES_INITIALIZED = false;
+	private boolean PREFERENCES_INITIALIZED = false;
 
 	private void loadPreferences() {
-		Config preferences = new Config("Openstack-2");
-		if (preferences.getProperty("floating_ip_pool_name") != null){
-			FLOATINGIP_POOL_NAME = preferences.getProperty("floating_ip_pool_name");
-		}
-		if (preferences.getProperty("keystone_auth_URL") != null){
-			KEYSTONE_AUTH_URL = preferences.getProperty("keystone_auth_URL");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("keystone_auth_URL");
-		}
-		if (preferences.getProperty("keystone_endpoint") != null){
-			KEYSTONE_ENDPOINT = preferences.getProperty("keystone_endpoint");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("keystone_endpoint");
-		}
-		if (preferences.getProperty("keystone_password") != null){
-			KEYSTONE_PASSWORD = preferences.getProperty("keystone_password");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("keystone_password");
-		}
-		if (preferences.getProperty("keystone_username") != null){
-			KEYSTONE_USERNAME = preferences.getProperty("keystone_username");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("keystone_username");
-		}
-		if (preferences.getProperty("net_endpoint") != null){
-			NET_ENDPOINT = preferences.getProperty("net_endpoint");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("net_endpoint");
-		}
-		if (preferences.getProperty("net_name") != null){
-			NET_NAME = preferences.getProperty("net_name");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("net_name");
-		}
-		if (preferences.getProperty("nova_endpoint") != null){
-			NOVA_ENDPOINT = preferences.getProperty("nova_endpoint");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("nova_endpoint");
-		}
-		if (preferences.getProperty("tenant_name") != null){
-			TENANT_NAME = preferences.getProperty("tenant_name");
-		}
-		else{
-			throw new InsufficientOpenstackPreferences("tenant_name");
-		}
+		String jsonProperties = this.config.readJsonProperties();
+        if(!jsonProperties.isEmpty()){
+            JsonReader jsonReader = Json.createReader(new ByteArrayInputStream(jsonProperties.getBytes()));
 
-		if(preferences.getProperty("default_image_id")!= null){
-			DEFAULT_IMAGE_ID = preferences.getProperty("default_image_id");
-		}else{
-			throw new InsufficientOpenstackPreferences("default_image_id");
-		}
+            JsonObject jsonObject = jsonReader.readObject();
 
-		if(preferences.getProperty("default_flavor_id")!= null){
-			DEFAULT_FLAVOR_ID = preferences.getProperty("default_flavor_id");
-		}else{
-			throw new InsufficientOpenstackPreferences("default_flavor_id");
-		}
+            JsonArray adapterInstances = jsonObject.getJsonArray("OPENSTACK");
 
-		if(preferences.getProperty("default_keypair_id")!= null){
-			DEFAULT_KEYPAIR_ID = preferences.getProperty("default_keypair_id");
-		}else{
-			throw new InsufficientOpenstackPreferences("default_keypair_id");
-		}
-
+            for (int i = 0; i < adapterInstances.size(); i++) {
+                JsonObject adapterInstanceObject = adapterInstances.getJsonObject(i);
+                
+                KEYSTONE_AUTH_URL = adapterInstanceObject.getString("keystone_auth_URL");
+                KEYSTONE_USERNAME = adapterInstanceObject.getString("keystone_username");
+                KEYSTONE_PASSWORD = adapterInstanceObject.getString("keystone_password");
+                KEYSTONE_ENDPOINT = adapterInstanceObject.getString("keystone_endpoint");
+                TENANT_NAME = adapterInstanceObject.getString("tenant_name");
+                NOVA_ENDPOINT = adapterInstanceObject.getString("nova_endpoint");       
+            }
+        }
 	}
 	
-	private Access getAccessWithTenantId() throws InsufficientOpenstackPreferences{
+	private Access getAccessWithTenantId(){
 		  if(PREFERENCES_INITIALIZED == false){
 		    loadPreferences();
 		    PREFERENCES_INITIALIZED = true;
@@ -232,13 +181,9 @@ private boolean PREFERENCES_INITIALIZED = false;
 	    return hypervisors_list;
 	}
 	
-	public static class InsufficientOpenstackPreferences extends RuntimeException {
-	    
-	    private static final long serialVersionUID = 6511540487288262809L;
-
-	    public InsufficientOpenstackPreferences(String preferenceName) {
-	      super("Please set the preference: "+preferenceName);
-	    }
-	  }
+	
+	public void setConfig(Config config){
+		this.config = config ;
+	}
 	
 }

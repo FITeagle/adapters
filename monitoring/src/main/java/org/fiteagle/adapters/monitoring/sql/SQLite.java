@@ -1,12 +1,19 @@
 package org.fiteagle.adapters.monitoring.sql;
+import java.io.ByteArrayInputStream;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+
+import org.fiteagle.api.core.Config;
+
 public class SQLite {
 	private static Logger LOGGER = Logger.getLogger(SQLite.class.toString());
-	private Preferences preferences = Preferences.userNodeForPackage(getClass());
 	
     private  String sDriver = ""; 
     private  String sUrl = null;
@@ -16,18 +23,24 @@ public class SQLite {
     private  String sDriverKey = "org.sqlite.JDBC" ;
     private  String sUrlKey;
     private	 String tableName = "virtual_physical_map" ;
+    private String sql_path ;
+    private Config config ;
     
-    public SQLite(){
-        if (preferences.get("sqliteDB_path", null) == null)
+    
+    public void init() throws SQLException{
+    	loadPreferences() ;
+        if (sql_path == null)
         {
-            LOGGER.log(Level.WARNING, "cant load 'sqliteDB_path' from prefs!!!!");
-            sUrlKey = "jdbc:sqlite:/root/.fiteagle/monitoring_sqliteDB.db";
+            LOGGER.log(Level.WARNING, "can't load 'sqliteDB_path' from prefs.");
+            sUrlKey = "jdbc:sqlite:/.fiteagle/monitoring_sqlite.db";
         }else
-            sUrlKey = "jdbc:sqlite:"+preferences.get("sqliteDB_path", null);
-
-
+            sUrlKey = "jdbc:sqlite:"+sql_path;
+        
     	try{
-		    init(sDriverKey, sUrlKey);
+		    setDriver(sDriverKey);
+	        setUrl(sUrlKey);
+	        setConnection();
+	        setStatement();
 		    if(c != null){
 		    	System.out.println("SQLite: Connected OK using " + sDriverKey + " to " + sUrlKey);
 		    }
@@ -37,13 +50,6 @@ public class SQLite {
     	}catch(Exception e){
     		LOGGER.log(Level.WARNING, "Connection failed");
     	}
-    }
-    
-    public void init(String sDriverVar, String sUrlVar) throws Exception{
-        setDriver(sDriverVar);
-        setUrl(sUrlVar);
-        setConnection();
-        setStatement();
     }
     
     public Connection closeConnection(){
@@ -94,6 +100,7 @@ public class SQLite {
     
     public boolean createTable(){
     	try{
+    		if(c == null) init() ;
     		executeStmt("create table IF NOT EXISTS virtual_physical_map (resource_id text primary key, host_name text, collector_uri text, vm_uri text)");
     		return true ;	
     	}catch(SQLException e){
@@ -104,6 +111,7 @@ public class SQLite {
 	
 	public boolean insert(String vm_id, String host, String oml_uri, String vm_uri){
 		try{
+			if(c == null) init() ;
 			 if(createTable()){
 				 executeStmt("insert into virtual_physical_map (resource_id, host_name, collector_uri, vm_uri) values (\"" + vm_id + "\",\"" + host + "\",\"" + oml_uri + "\",\"" + vm_uri + "\")");
 			 }
@@ -117,6 +125,7 @@ public class SQLite {
 	
 	public boolean delete(String vm_id){
 		try{
+			if(c == null) init() ;
 			executeStmt("delete from virtual_physical_map where resource_id = \"" + vm_id + "\"");
 			return true ;
 		 }catch(SQLException e){
@@ -124,6 +133,27 @@ public class SQLite {
 			 LOGGER.log(Level.WARNING, "Error deleting from database.");
 			 return false ;
 		 } 
+	}
+	
+	public void setConfig(Config config){
+		this.config = config ;
+	}
+	
+	private void loadPreferences() {
+		String jsonProperties = this.config.readJsonProperties();
+        if(!jsonProperties.isEmpty()){
+            JsonReader jsonReader = Json.createReader(new ByteArrayInputStream(jsonProperties.getBytes()));
+
+            JsonObject jsonObject = jsonReader.readObject();
+
+            JsonArray adapterInstances = jsonObject.getJsonArray("SQLITE");
+
+            for (int i = 0; i < adapterInstances.size(); i++) {
+                JsonObject adapterInstanceObject = adapterInstances.getJsonObject(i);
+                sql_path = adapterInstanceObject.getString("sqliteDB_path");
+    
+            }
+        }
 	}
 	
 }
