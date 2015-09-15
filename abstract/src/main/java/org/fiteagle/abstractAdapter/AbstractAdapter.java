@@ -193,11 +193,12 @@ public abstract class AbstractAdapter {
         Model updatedModel = updateInstance(resourceInstance.getURI(), updateModel);
         updatedInstancesModel.add(updatedModel);
       }
+    }
       if (updatedInstancesModel.isEmpty()) {
         LOGGER.log(Level.INFO, "Could not find any instances to update");
         throw new InstanceNotFoundException("Could not find any instances to update");
       }
-    }
+
     return updatedInstancesModel;
   }
 
