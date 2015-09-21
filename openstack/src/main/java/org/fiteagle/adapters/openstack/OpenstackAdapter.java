@@ -229,7 +229,7 @@ private String floatingPool;
 
 
   private Resource getMonitoringService(Model newInstanceModel) {
-    ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type, Omn_monitoring.MonitoringService.getURI());
+    ResIterator resIterator = newInstanceModel.listSubjectsWithProperty(RDF.type, Omn_monitoring.MonitoringService);
     Resource omsp_service = null;
     while (resIterator.hasNext()){
       omsp_service = resIterator.nextResource();
