@@ -13,11 +13,11 @@ networkingAdapter:NetworkingAdapter
         a                          owl:Class ;
         rdfs:label                 "NetworkingAdapter"@en ;
         rdfs:subClassOf            omn:Adapter ;
-        omn-lifecycle:implements   omn_resource:Link . 
+        omn-lifecycle:implements   omn_link:lan . 
         
 omn_link:lan
         a                            owl:Class ;
-        rdfs:label                   "Networking link"@en ;
+        rdfs:label                   "LAN link"@en ;
         rdfs:subClassOf              omn:Resource ;
         omn-lifecycle:implementedBy  networkingAdapter:NetworkingAdapter .
         
