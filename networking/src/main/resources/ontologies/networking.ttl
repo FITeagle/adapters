@@ -1,0 +1,27 @@
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+@prefix omn:           <http://open-multinet.info/ontology/omn#> .
+@prefix networkingAdapter:   <http://open-multinet.info/ontology/resource/networkingAdapter#> .
+@prefix networking:         <http://open-multinet.info/ontology/resource#> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
+@prefix omn_resource:   <http://open-multinet.info/ontology/omn-resource#> .
+@prefix omn_link:  <http://open-multinet.info/ontology/resource/link#> .
+
+networkingAdapter:NetworkingAdapter
+        a                          owl:Class ;
+        rdfs:label                 "NetworkingAdapter"@en ;
+        rdfs:subClassOf            omn:Adapter ;
+        omn-lifecycle:implements   omn_resource:Link . 
+        
+omn_link:lan
+        a                            owl:Class ;
+        rdfs:label                   "Networking link"@en ;
+        rdfs:subClassOf              omn:Resource ;
+        omn-lifecycle:implementedBy  networkingAdapter:NetworkingAdapter .
+        
+
+
+
+
