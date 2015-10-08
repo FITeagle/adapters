@@ -1,7 +1,14 @@
 package org.fiteagle.adapters.openstack;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,6 +21,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -31,6 +39,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+import static java.nio.file.StandardWatchEventKinds.*;
+
+
 /**
  * Created by dne on 30.06.15.
  */
@@ -42,6 +53,9 @@ public class OpenstackAdapterControl extends AdapterControl {
     @Inject
     protected OpenstackAdapterMDBSender mdbSender;
     
+    @javax.annotation.Resource
+	private ManagedExecutorService executorService;
+    
     public static Map <String,Map> instancesDefaultFlavours = new HashMap<>();
     
 
@@ -49,18 +63,77 @@ public class OpenstackAdapterControl extends AdapterControl {
     Logger LOGGER = Logger.getLogger(this.getClass().getName());
     @PostConstruct
     public void initialize(){
-        LOGGER.log(Level.SEVERE, "Starting OpenStackAdapter");
+        LOGGER.log(Level.INFO, "Starting OpenStackAdapter");
 
         this.adapterModel = ModelFactory.createDefaultModel();
 
 
+        
+        try {
+        	init();
+			final WatchService watcher = FileSystems.getDefault().newWatchService();
+			final Path filePath = this.adapterInstancesConfig.getFilePath();
+			
+			try {
+			    final WatchKey key = filePath.getParent().register(watcher,
+			                           ENTRY_CREATE,
+			                           ENTRY_DELETE,
+			                           ENTRY_MODIFY);
+			    
+			    
+			    executorService.submit(new Runnable(){
+			    	Path tmpPath = filePath.getFileName();
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						
+						while(true){
+							WatchKey tmpKey = null;
+							try {
+								tmpKey = watcher.take();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							for (WatchEvent<?> event : tmpKey.pollEvents()) {
+								WatchEvent.Kind<?> kind = event.kind();
+								Path eventPath = (Path) event.context();
+								 if (eventPath.endsWith(tmpPath)) {
+									 
+										LOGGER.log(Level.SEVERE, "Property File changed. Will refresh Adapter now");
+										init();
+						            }
+								 key.reset();
+							}
+							
+						} 
+						
+						
+						
+					}
+			    	
+			    });
+			    
+			    
+			} catch (IOException x) {
+			    x.printStackTrace();
+			}
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    public void init(){
         this.adapterInstancesConfig= readConfig("OpenStackAdapter");
 
         createAdapterInstances();
 
 
         publishInstances();
-
     }
     
     @Override
