@@ -1,5 +1,6 @@
 package org.fiteagle.adapters.openstack;
 
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.OWL2;
@@ -35,6 +36,8 @@ import javax.ejb.EJB;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+
+import jena.rdfcat;
 
 
 public class OpenstackAdapter extends AbstractAdapter {
@@ -97,10 +100,12 @@ private String floatingPool;
     this.openstackClient = new OpenstackClient(this);
     this.adapterTBox = adapterTBox;
     this.adapterABox = adapterABox;
-    Resource adapterType = Omn_domain_pc.VMServer;
+    
+    Resource adapterType = Omn_domain_pc.VMServer;  
     this.adapterABox.addProperty(RDF.type,adapterType);
     this.adapterABox.addProperty(RDFS.label,  this.adapterABox.getLocalName());
     this.adapterABox.addProperty(RDFS.comment, "Openstack server");
+
 
     Property longitude = adapterTBox.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#long");
     Property latitude = adapterTBox.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
@@ -131,11 +136,15 @@ private String floatingPool;
 	  if(openstackAdapterControler.instancesDefaultFlavours.get(this.uuid) != null){
 		  
 		defaultFlavours =openstackAdapterControler.instancesDefaultFlavours.get(this.uuid);
-		  for (String s :  defaultFlavours.keySet()){
+
+ 		
+ 		  for (String s :  defaultFlavours.keySet()){
 			    Resource flavourResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + s);
-			    flavourResource.addProperty(RDFS.subClassOf, Omn_domain_pc.VM);
+			    flavourResource.addProperty(RDF.type, Omn_domain_pc.VM);
 			    flavourResource.addProperty(Omn_domain_pc.hasDiskImage, defaultFlavours.get(s).get(0));
 			    flavourResource.addProperty(Omn_lifecycle.hasID, defaultFlavours.get(s).get(1));
+			    flavourResource.addProperty(RDFS.subClassOf, Omn.Resource);
+
 
 
 	    	  adapterABox.addProperty(Omn_lifecycle.canImplement, flavourResource);
