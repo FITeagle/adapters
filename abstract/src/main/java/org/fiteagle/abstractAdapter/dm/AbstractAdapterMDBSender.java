@@ -1,13 +1,11 @@
 package org.fiteagle.abstractAdapter.dm;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.EJB;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.Message;
@@ -82,7 +80,7 @@ public abstract class AbstractAdapterMDBSender implements AdapterEventListener {
 
 
     protected Collection<AbstractAdapter> getAdapterInstances() {
-        return adapterControl.getAdapterInstances();
+        return (null == adapterControl) ? new LinkedList<AbstractAdapter>() : adapterControl.getAdapterInstances();
     }
   
 }
