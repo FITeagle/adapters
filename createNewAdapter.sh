@@ -36,6 +36,8 @@ rtype="${3:-}"
 rspace="${4:-}"
 src_class="Motor"
 src_package="motor"
+src_rtype="MotorGarage"
+src_rspace="motorgarage"
 dir_main="src/main/java/org/fiteagle/adapters/"
 dir_test="src/test/java/org/fiteagle/adapters/"
 
@@ -62,6 +64,7 @@ find src -iname "${src_class}*.java"| xargs -I {} sh -c 'mv {} $(echo {}|sed "s/
 mv src/main/resources/ontologies/${src_package}.ttl src/main/resources/ontologies/${package}.ttl
 sed -i.bak -e "s/${src_class}/${rtype}/g" src/main/resources/ontologies/${package}.ttl
 sed -i.bak -e "s/${src_package}/${rspace}/g" src/main/resources/ontologies/${package}.ttl
+find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_rspace}#${src_rtype}/${rspace}#${rtype}'/g" {}'
 find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_class}/${class}'/g" {}'
 find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_package}/${package}'/g" {}'
 find . -iname "*.bak" -exec rm {} \;
