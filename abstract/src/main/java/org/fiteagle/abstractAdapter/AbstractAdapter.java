@@ -24,7 +24,7 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 
 public abstract class AbstractAdapter {
   
-  private final Logger LOGGER = Logger.getLogger(this.getClass().toString());
+  private final Logger LOGGER = Logger.getLogger(AbstractAdapter.class.getName());
   
   private List<AdapterEventListener> listeners = new ArrayList<AdapterEventListener>();
 
@@ -125,7 +125,10 @@ public abstract class AbstractAdapter {
    */
   public Model createInstances(Model model) throws ProcessingException, InvalidRequestException {
     Model createdInstancesModel = ModelFactory.createDefaultModel();
+    if (getAdapterManagedResources().isEmpty()) 
+		LOGGER.log(Level.WARNING, "To create an instance, I've to manage some :/" );
     for (Resource resource : getAdapterManagedResources()) {
+      LOGGER.log(Level.INFO, "Creating instance for type: " + resource);
       ResIterator resourceInstanceIterator = model.listSubjectsWithProperty(RDF.type, resource);
       while (resourceInstanceIterator.hasNext()) {
         String instanceURI = resourceInstanceIterator.next().getURI();
@@ -135,7 +138,7 @@ public abstract class AbstractAdapter {
       }
     }
       if (createdInstancesModel.isEmpty()) {
-        LOGGER.log(Level.INFO, "Could not find any new instances to create");
+        LOGGER.log(Level.WARNING, "Could not find any new instances to create...");
         throw new ProcessingException(Response.Status.CONFLICT.name());
       }
 
