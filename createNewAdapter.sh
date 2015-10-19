@@ -10,7 +10,7 @@
 #  - Alexander Willner <alexander.willner@tu-berlin.de>
 #
 # Usage example:
-#  ./createNewAdapter CoffeeMachine coffeemachine
+#  ./createNewAdapter CoffeeMachine Coffee
 #
 
 # Enable dubugging
@@ -30,55 +30,58 @@ set -o pipefail
 LOG_LEVEL="${LOG_LEVEL:-6}" # 7 = debug -> 0 = emergency
 __dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 __file="${__dir}/$(basename "${BASH_SOURCE[0]}")"
-class="${1:-}"
-package="${2:-}"
-rtype="${3:-}"
-rspace="${4:-}"
-src_class="Motor"
-src_package="motor"
-src_rtype="MotorGarage"
-src_rspace="motorgarage"
+adapter="${1:-}"
+resource="${2:-}"
+adapter_small=$(echo ${adapter}|tr '[:upper:]' '[:lower:]')
+resource_small=$(echo ${resource}|tr '[:upper:]' '[:lower:]')
+src_adapter="MotorGarage"
+src_resource="Motor"
+src_adapter_small=$(echo ${src_adapter}|tr '[:upper:]' '[:lower:]')
+src_resource_small=$(echo ${src_resource}|tr '[:upper:]' '[:lower:]')
 dir_main="src/main/java/org/fiteagle/adapters/"
 dir_test="src/test/java/org/fiteagle/adapters/"
 
-if [ "" = "${package}" ]; then
-  echo "USAGE: $0 <YourClassName> <yourpackagename> <ResourceType> <resourcenamespace>"
-  echo "Example: $0 CoffeeMachine coffee Coffee coffee"
+if [ "" = "${resource}" ]; then
+  echo "USAGE: $0 <ResourceAdapter> <Resource>"
+  echo "Example: $0 CoffeeMachine Coffee"
   exit 1
 fi
 
-[ -d "${package}" ] && (echo "FAIL: ${package} folder already exist"; exit 2;)
-[[ "${class}" =~ [^a-zA-Z] ]] && (echo "FAIL: ${class} not a valid class name in Java"; exit 3;)
-[[ "${package}" =~ [^a-z] ]] && (echo "FAIL: ${package} not a valid package name in Java"; exit 4;)
+#echo "DEBUG From: ${src_adapter} ${src_adapter_small} ${src_resource} ${src_resource_small}"
+#echo "DEBUG To: ${adapter} ${adapter_small} ${resource} ${resource_small}"
 
-cp -r "${src_package}" "${package}"
-cd "${package}" || (echo "FAIL: could not change dir" ; exit 5;)
+#todo: [[ "${adapter}" =~ [^A-Za-z] ]] && (echo "FAIL: ${adapter} not a valid class name in Java"; exit 2;)
+#todo: [[ "${resource}" =~ [^A-Za-z] ]] && (echo "FAIL: ${resource} not a valid class name in Java"; exit 3;)
+[ -d "${resource_small}" ] && (echo "FAIL: ${resource_small} folder already exist"; exit 4;)
 
-sed -i.bak -e "s/${src_class}/${class}/g" pom.xml
-sed -i.bak -e "s/${src_package}/${package}/g" pom.xml
+cp -r "${src_resource_small}" "${resource_small}"
+cd "${resource_small}" || (echo "FAIL: could not change dir" ; exit 5;)
 
-mv ${dir_main}/${src_package} ${dir_main}/${package}
-mv ${dir_test}/${src_package} ${dir_test}/${package}
+sed -i.bak -e "s/${src_resource}/${resource}/g" pom.xml
+sed -i.bak -e "s/${src_resource_small}/${resource_small}/g" pom.xml
 
-find src -iname "${src_class}*.java"| xargs -I {} sh -c 'mv {} $(echo {}|sed "s/'${src_class}/${class}'/g")'
-mv src/main/resources/ontologies/${src_package}.ttl src/main/resources/ontologies/${package}.ttl
-sed -i.bak -e "s/${src_class}/${rtype}/g" src/main/resources/ontologies/${package}.ttl
-sed -i.bak -e "s/${src_package}/${rspace}/g" src/main/resources/ontologies/${package}.ttl
-find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_rspace}#${src_rtype}/${rspace}#${rtype}'/g" {}'
-find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_class}/${class}'/g" {}'
-find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_package}/${package}'/g" {}'
+mv ${dir_main}/${src_resource_small} ${dir_main}/${resource_small}
+mv ${dir_test}/${src_resource_small} ${dir_test}/${resource_small}
+
+find src -iname "${src_resource}*.java"| xargs -I {} sh -c 'mv {} $(echo {}|sed "s/'${src_resource}/${resource}'/g")'
+
+mv src/main/resources/ontologies/${src_resource_small}.ttl src/main/resources/ontologies/${resource_small}.ttl
+find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_adapter}/${adapter}'/g" {}'
+find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_resource}/${resource}'/g" {}'
+find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_adapter_small}/${adapter_small}'/g" {}'
+find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_resource_small}/${resource_small}'/g" {}'
+
 find . -iname "*.bak" -exec rm {} \;
 
 mkdir -p ~/.fiteagle/
-cat > ~/.fiteagle/${class}Garage.properties << EOL
+cat > ~/.fiteagle/${adapter}.properties << EOL
 {
   "adapterInstances": [
     {
-      "componentID": "http://localhost/resource/CoffeemachineGarage-1"
+      "componentID": "http://localhost/resource/CoffeeMachine-1"
     }
   ]
 }
 EOL
-
 
 exit 0
