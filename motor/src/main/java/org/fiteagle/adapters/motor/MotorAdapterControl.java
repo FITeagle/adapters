@@ -19,7 +19,6 @@ import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AdapterControl;
 import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
 import org.fiteagle.adapters.motor.dm.MotorAdapterMDBSender;
-import org.fiteagle.adapters.motor.MotorAdapter;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.OntologyModelUtil;
 
@@ -89,8 +88,9 @@ public class MotorAdapterControl extends AdapterControl {
     }
 
     @Override
-    protected void addAdapterProperties(Map<String, String> adapterInstanceMap) {
-	LOGGER.warning("Not implemented. Input: " + adapterInstanceMap);
+    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
+    protected void addAdapterProperties(final Map<String, String> adaptInstance) {
+	LOGGER.warning("Not implemented. Input: " + adaptInstance);
     }
 
 }

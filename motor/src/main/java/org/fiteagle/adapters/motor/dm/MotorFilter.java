@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.motor.dm;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,9 +17,11 @@ import javax.servlet.http.HttpServletRequest;
  */
 @WebFilter("/hallo")
 public class MotorFilter implements Filter {
+    private static final Logger LOGGER = Logger.getLogger(MotorFilter.class.toString());
+
     @Override
     public void init(final FilterConfig filterConfig) throws ServletException {
-
+	LOGGER.info("Init not implemented");
     }
 
     @Override
@@ -33,6 +36,6 @@ public class MotorFilter implements Filter {
 
     @Override
     public void destroy() {
-
+	LOGGER.info("Destroy not implemented");
     }
 }

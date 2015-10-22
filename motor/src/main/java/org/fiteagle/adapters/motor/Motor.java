@@ -23,6 +23,7 @@ public class Motor {
     private final transient MotorAdapter owningAdapter;
     private final String instanceName;
     private transient boolean isDynamicMotor;
+    @SuppressWarnings("PMD.DoNotUseThreads")
     private transient Thread thread;
     private final static String THREAD_FACTORY = "java:jboss/ee/concurrency/factory/default";
     private transient ManagedThreadFactory threadFactory;
@@ -96,6 +97,7 @@ public class Motor {
 	return this.isDynamicMotor;
     }
 
+    @SuppressWarnings({ "PMD.GuardLogStatementJavaUtil", "PMD.LongVariable" })
     public void updateProperty(final Statement configureStatement) {
 	if (configureStatement.getSubject().getURI().equals(this.instanceName)) {
 	    final String predicate = configureStatement.getPredicate().getLocalName();
@@ -123,6 +125,7 @@ public class Motor {
     }
 
 
+    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     private void startThread() {
 	final RPMCreator creator = new RPMCreator();
 	if (this.threadFactory == null) {
@@ -148,6 +151,7 @@ public class Motor {
 	return this.thread != null && this.thread.isAlive();
     }
 
+    @SuppressWarnings("PMD.DoNotUseThreads")
     public class RPMCreator implements Runnable {
 
 	private static final int SLEEP_TIME = 5000;

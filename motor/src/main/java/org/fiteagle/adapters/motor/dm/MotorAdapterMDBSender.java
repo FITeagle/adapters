@@ -10,6 +10,7 @@ import org.fiteagle.adapters.motor.MotorAdapterControl;
 public class MotorAdapterMDBSender extends AbstractAdapterMDBSender {
 
     @EJB
+    @SuppressWarnings("PMD.UnusedPrivateField")
     private transient MotorAdapterControl controller;
 
 }
