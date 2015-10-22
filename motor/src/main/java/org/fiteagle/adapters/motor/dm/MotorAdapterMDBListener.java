@@ -21,6 +21,7 @@ import org.fiteagle.api.core.IMessageBus;
 		+ IMessageBus.TYPE_GET + "' " + "OR " + IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_DELETE
 		+ "')"),
 	@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class MotorAdapterMDBListener extends AbstractAdapterMDBListener {
 
     @EJB

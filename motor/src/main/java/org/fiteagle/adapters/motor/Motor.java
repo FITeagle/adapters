@@ -121,6 +121,9 @@ public class Motor {
 		LOGGER.warning("Unknown predicate: " + predicate);
 		break;
 	    }
+	} else {
+	    LOGGER.warning("Unknown URI: " + configureStatement.getSubject().getURI());
+	    LOGGER.warning("Expected URI: " + this.instanceName);
 	}
     }
 

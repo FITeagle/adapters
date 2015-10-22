@@ -71,6 +71,7 @@ public final class MotorAdapter extends AbstractAdapter {
 	return this.parseToModel(motor);
     }
 
+    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     Model parseToModel(final Motor motor) {
 	final Resource resource = ModelFactory.createDefaultModel().createResource(motor.getInstanceName());
 	resource.addProperty(RDF.type, this.getAdapterManagedResources().get(0));
@@ -178,6 +179,7 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
+    @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     public void configure(final Config configuration) {
 	LOGGER.warning("Not implemented. Input: " + configuration);
     }
