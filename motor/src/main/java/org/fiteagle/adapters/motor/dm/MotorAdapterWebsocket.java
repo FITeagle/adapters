@@ -12,13 +12,11 @@ import org.fiteagle.adapters.motor.MotorAdapterControl;
 @ServerEndpoint("/websocket")
 class MotorAdapterWebsocket extends AbstractAdapterWebsocket {
 
+    @EJB
+    private transient MotorAdapterControl controller;
 
-  @EJB
-  MotorAdapterControl motorAdapterControl;
-
-
-  @Override
-  protected Collection<AbstractAdapter> getAdapterInstances() {
-    return motorAdapterControl.getAdapterInstances();
-  }
+    @Override
+    protected Collection<AbstractAdapter> getAdapterInstances() {
+	return this.controller.getAdapterInstances();
+    }
 }

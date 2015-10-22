@@ -6,7 +6,6 @@
 	<groupId>org.fiteagle.adapters</groupId>
 	<artifactId>motor</artifactId>
 	<packaging>war</packaging>
-	<version>0.1-SNAPSHOT</version>
 	<parent>
 		<groupId>org.fiteagle</groupId>
 		<artifactId>adapters</artifactId>
@@ -35,4 +34,19 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.5</version>
+        <configuration>
+          <rulesets>
+            <ruleset>src/test/resources/pmd-ruleset.xml</ruleset>
+          </rulesets>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
