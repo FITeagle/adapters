@@ -15,11 +15,11 @@ import org.fiteagle.adapters.motor.MotorAdapterControl;
 @Remote(AdapterEJB.class)
 class MotorAdapterEJB extends AbstractAdapterEJB {
 
-  @EJB
-  MotorAdapterControl motorAdapterControl;
+    @EJB
+    private transient MotorAdapterControl controller;
 
-  @Override
-  protected Collection<AbstractAdapter> getAdapterInstances() {
-    return motorAdapterControl.getAdapterInstances();
-  }
+    @Override
+    protected Collection<AbstractAdapter> getAdapterInstances() {
+	return this.controller.getAdapterInstances();
+    }
 }

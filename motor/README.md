@@ -1,8 +1,8 @@
 FITeagle :: Adapter :: Motor
 =============================
 - Level: Demonstration
-- Technologies: REST
-- Summary: Test implementation of Motor Adapter with REST in a Wildfly Environment
+- Technologies: REST, Websocket, EJB, JMS
+- Summary: Test implementation of Motor Adapter within a WildFly Environment
 - Target Product: FITeagle
 - Source: <https://github.com/fiteagle/adapters/>
 
@@ -15,7 +15,7 @@ Build and Deploy the Adapter
 
         mvn clean install wildfly:deploy
 
-4. This will deploy `target/AdapterMotor.war` to the running instance of the server. Look at the JBoss Application Server console or Server log and you should see log messages corresponding to the deployment of the message-driven beans and the JMS destinations.
+4. This will deploy `target/motor.war` to the running instance of the server. Look at the WildFly Application Server console or Server log and you should see log messages corresponding to the deployment of the message-driven beans and the JMS destinations.
 
 Access the Adapter
 ------------------
@@ -43,22 +43,22 @@ The example RDF files that are used in some calls can be found in the adapters/m
 * Create a single new motor instance using an attached, detailed RDF description:
   * ```curl -k -v --request PUT --data @createMotor.ttl https://localhost:8443/native/api/resources/MotorGarage-1```
   * Response should be HTTP 201 + New motor instance RDF description
-  
-  
+
+
 * Create four new motor instances at once using an attached, detailed RDF description:
   * ```curl -k -v --request PUT --data @createManyMotors.ttl https://localhost:8443/native/api/resources/MotorGarage-1```
   * Response should be HTTP 201 + New motor instance RDF description
-   
+
 * To get a description of all resources instances managed by the adapter:
   * ```curl -i -X GET http://localhost:8080/native/api/resources/MotorGarage-1```
 
 * To get a description of the properties of a single resource instance managed by the adapter:
   * ```curl -i -X GET http://localhost:8080/native/api/resources/Motor1```
-  
+
 * Release a single motor resource instance (just using the path):
   * ```curl -i -X DELETE http://localhost:8080/native/api/resources/MotorGarage-1/ARunningMotor01```
   * Response should be HTTP 200 + motor instance release RDF description
-  
+
 * Configure a single motor resource instance using attached RDF description:
   * ```curl -i -X POST -d @configureMotor.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1```
   * Response should be HTTP 200 + motor instance updated properties RDF description
@@ -66,13 +66,13 @@ The example RDF files that are used in some calls can be found in the adapters/m
 * Configure a two motor resource instances at the same time using attached RDF description:
   * ```curl -i -X POST -d @configureManyMotors.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1 ```
   * Response should be HTTP 200 + motor instances updated properties RDF description
- 
+
 * Configure "Motor1" instance so it becomes dynamic:
   * ```curl -i -X POST -d @configureDynamicMotorTrue.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1 ```
   * Response should be HTTP 200 + motor instances updated properties RDF description
   * A motor resource instance that is configured with the property isDynamic = true will randomly change its RPM property every 5 seconds and send a corresponding notification (fitealge:inform Message).
   * Open the log viewer to see those notifications. Alternatively keep requesting the motor instances details using GET (see above) to see the updated RPM values. Also keep refreshing the FUSEKI web interface to see the live updates made in the repository.
-  
+
 * Configure "Motor1" instance so it it no longer dynamic:
   * ```curl -i -X POST -d @configureDynamicMotorFalse.ttl http://localhost:8080/native/api/resources/ADeployedMotorAdapter1 ```
 
@@ -99,7 +99,7 @@ av:ADeployedMotorAdapter1 a motorgarage:MotorGarageAdapter .
 
 av:Motor1 a motor:Motor ;
                             motor:rpm 500 .
-                            
+
 ```
 
 
@@ -112,7 +112,7 @@ Access the Adapter as EJB:
 
 
 
-WebSocket Delivery Mechanism 
+WebSocket Delivery Mechanism
 -----------------------------
 
 Connect to WebSocket at:
@@ -126,7 +126,7 @@ Javascript Test Client is located at:
 <http://localhost:8080/AdapterMotor/test.html>
 
  * Describe:
- 
+
 `description.ttl`
 
 `description.rdf`
@@ -135,7 +135,7 @@ Javascript Test Client is located at:
 
 
  * Instances:
- 
+
 `instances.ttl`
 
 `instances.rdf`
@@ -144,7 +144,7 @@ Javascript Test Client is located at:
 
 
  * Monitor, Provision, Control, Terminate
- 
+
 Not implemented so far.
 
 
@@ -200,4 +200,3 @@ Undeploy the Adapter
 3. When you are finished testing, type this command to undeploy the adapter:
 
         mvn wildfly:undeploy
-
