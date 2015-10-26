@@ -1,44 +1,42 @@
 package org.fiteagle.adapters.openstack.client.model;
 
-/**
- * this class is a copy of com.woorea.openstack.nova.model.Images class from woorea client, which has small extensions.
- */
-
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
+import org.jclouds.openstack.nova.v2_0.domain.Image;
 
-@JsonIgnoreProperties(ignoreUnknown = true)//changed
-public class Images implements Iterable<Image>, Serializable {
+public class Images implements Serializable {
 
-  private static final long serialVersionUID = -1945698118256231004L;
+  private static final long serialVersionUID = -1945648978256231004L;
   
   protected Images(){
   }
   
-  public Images(List<Image> imageList){
-    this.list = imageList;
+  public Images(Map<String, List<Image>> imagesMap){
+    this.map = imagesMap;
   }
   
-  @JsonProperty("images")
+  public Images(List<Image> list){
+	    this.list = list;
+	  }
+  
+//  @JsonProperty("images")
+	private Map<String, List<Image>> map;
 	private List<Image> list;
 
-	public List<Image> getList() {
-		return list;
-	}
-	
-	@Override
-	public Iterator<Image> iterator() {
-		return list.iterator();
+	public List<Image> getListForRegion(String region) {
+		return map.get(region);
 	}
 	
 	@Override
 	public String toString() {
-		return "Images [list=" + list + "]";
+		return "Images [map=" + map + "]";
+	}
+
+	public List<Image> getList() {
+		// TODO Auto-generated method stub
+		return list;
 	}
 
 }
-

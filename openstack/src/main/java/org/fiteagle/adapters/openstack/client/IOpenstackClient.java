@@ -1,14 +1,18 @@
 package org.fiteagle.adapters.openstack.client;
 
-import com.woorea.openstack.nova.model.FloatingIps;
-import org.fiteagle.adapters.openstack.client.model.Images;
-import org.fiteagle.adapters.openstack.client.model.Server;
-import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
-import org.fiteagle.adapters.openstack.client.model.Servers;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
-import com.woorea.openstack.nova.model.Flavors;
-import com.woorea.openstack.nova.model.FloatingIp;
-import com.woorea.openstack.nova.model.FloatingIpPools;
+import org.fiteagle.adapters.openstack.client.model.Flavors;
+import org.fiteagle.adapters.openstack.client.model.Images;
+import org.fiteagle.adapters.openstack.client.model.Servers;
+import org.jclouds.openstack.nova.v2_0.domain.FloatingIP;
+import org.jclouds.openstack.nova.v2_0.domain.Server;
+import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
+import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
+
+
 
 public interface IOpenstackClient {
   
@@ -18,21 +22,28 @@ public interface IOpenstackClient {
   
   public abstract Servers listServers();
   
-  public abstract Server createServer(ServerForCreate serverForCreate);
+  public abstract ServerCreated createServer(String name,String imageId,String flavorId,CreateServerOptions options);
   
   public abstract Server getServerDetails(String id);
   
   public abstract void allocateFloatingIpForServer(String serverId, String floatingIp);
   
-  public abstract FloatingIpPools getFloatingIpPools();
+  public abstract void getFloatingIpPools();
   
-  public abstract FloatingIp addFloatingIp();
-  public abstract FloatingIps listFreeFloatingIps();
+  public abstract void addFloatingIp();
+  
+  public abstract List<FloatingIP> listFreeFloatingIps();
+  
+  public abstract void addKeyPair(String name, String publicKey,String tmpRegion);
   
   public abstract void addKeyPair(String name, String publicKey);
+
   
-  public abstract void deleteKeyPair(String name);
+  public abstract void deleteKeyPair(String name,String tmpRegion);
   
   public abstract void deleteServer(String id);
+
+  public abstract void close() throws IOException;
+
   
 }

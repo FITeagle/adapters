@@ -26,6 +26,12 @@
 			<groupId>org.fiteagle</groupId>
 			<artifactId>api</artifactId>
 			<version>0.1-SNAPSHOT</version>
+			<exclusions>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-guava</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 	</dependencies>
 

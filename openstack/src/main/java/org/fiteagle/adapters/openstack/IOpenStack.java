@@ -14,4 +14,5 @@ public interface IOpenStack {
   String KEYSTONE_USERNAME = "keystone_username";
   String DEFAULT_FLAVOR_ID = "default_flavor_id";
   String DEFAULT_IMAGE_ID = "default_image_id";
+  String DEFAULT_REGION = "default_region";
 }

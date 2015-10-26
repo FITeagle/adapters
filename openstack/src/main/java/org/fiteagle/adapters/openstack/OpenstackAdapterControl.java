@@ -35,6 +35,7 @@ import org.fiteagle.adapters.openstack.dm.OpenstackAdapterMDBSender;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 
@@ -195,6 +196,9 @@ public class OpenstackAdapterControl extends AdapterControl {
 
                 String default_image_id  = adapterInstanceObject.getString(IOpenStack.DEFAULT_IMAGE_ID);
                 adapter.setDefault_image_id(default_image_id);
+                
+                String default_region  = adapterInstanceObject.getString(IOpenStack.DEFAULT_REGION);
+                adapter.setDefault_region(default_region);
    
                 try{
                     
@@ -261,6 +265,14 @@ public class OpenstackAdapterControl extends AdapterControl {
     
     @PreDestroy
     public void preDestroy(){
+    for (String adapter : this.adapterInstances.keySet()){
+    	OpenstackAdapter open = (OpenstackAdapter) this.adapterInstances.get(adapter);
+    	try {
+			open.openstackClient.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		}
+    }
     	
     }
     

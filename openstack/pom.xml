@@ -7,6 +7,9 @@
   <artifactId>openstack</artifactId>
   <packaging>war</packaging>
   <version>0.1-SNAPSHOT</version>
+   <properties>
+    <jclouds.version>1.9.1</jclouds.version>
+  </properties>
   <parent>
     <groupId>org.fiteagle</groupId>
     <artifactId>adapters</artifactId>
@@ -19,40 +22,79 @@
       <artifactId>abstract</artifactId>
       <version>0.1-SNAPSHOT</version>
     </dependency>
+        <dependency>
+	<groupId>org.codehaus.jackson</groupId>
+	<artifactId>jackson-mapper-asl</artifactId>
+	<version>1.9.13</version>
+</dependency>
+    <!-- jclouds dependencies -->
     <dependency>
-      <groupId>com.woorea</groupId>
-      <artifactId>nova-client</artifactId>
-      <version>3.0.0</version>
+	<groupId>com.google.guava</groupId>
+	<artifactId>guava</artifactId>
+	<version>16.0.1</version>
+</dependency>
+    
+    <dependency>
+      <groupId>org.apache.jclouds.driver</groupId>
+      <artifactId>jclouds-slf4j</artifactId>
+      <version>${jclouds.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.woorea</groupId>
-      <artifactId>glance-client</artifactId>
-      <version>3.0.0</version>
+      <groupId>org.apache.jclouds.driver</groupId>
+      <artifactId>jclouds-sshj</artifactId>
+      <version>${jclouds.version}</version>
+    </dependency>
+    <!-- jclouds OpenStack dependencies -->
+    <dependency>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>openstack-keystone</artifactId>
+      <version>${jclouds.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.woorea</groupId>
-      <artifactId>swift-client</artifactId>
-      <version>3.0.0</version>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>openstack-nova</artifactId>
+      <version>${jclouds.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.woorea</groupId>
-      <artifactId>nova-model</artifactId>
-      <version>3.0.0</version>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>openstack-swift</artifactId>
+      <version>${jclouds.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.woorea</groupId>
-      <artifactId>quantum-client</artifactId>
-      <version>3.0.0</version>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>openstack-cinder</artifactId>
+      <version>${jclouds.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.woorea</groupId>
-      <artifactId>jersey-connector</artifactId>
-      <version>3.2.1</version>
+      <groupId>org.apache.jclouds.api</groupId>
+      <artifactId>openstack-trove</artifactId>
+      <version>${jclouds.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.woorea</groupId>
-      <artifactId>keystone-client</artifactId>
-      <version>3.0.0</version>
+      <groupId>org.apache.jclouds.labs</groupId>
+      <artifactId>openstack-glance</artifactId>
+      <version>${jclouds.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jclouds.labs</groupId>
+      <artifactId>openstack-marconi</artifactId>
+      <version>${jclouds.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jclouds.labs</groupId>
+      <artifactId>openstack-neutron</artifactId>
+      <version>${jclouds.version}</version>
+    </dependency>
+    <!-- 3rd party dependencies -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.0.13</version>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.25</version>
     </dependency>
   </dependencies>
 

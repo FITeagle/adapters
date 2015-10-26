@@ -6,13 +6,20 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
+
+
+
+
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.fiteagle.adapters.openstack.OpenstackAdapter;
-import org.fiteagle.adapters.openstack.client.model.Image;
+import org.fiteagle.adapters.openstack.client.model.Flavors;
 import org.fiteagle.adapters.openstack.client.model.Images;
-import org.fiteagle.adapters.openstack.client.model.Server;
-import org.fiteagle.adapters.openstack.client.model.ServerForCreate;
 import org.fiteagle.adapters.openstack.client.model.Servers;
+import org.jclouds.openstack.nova.v2_0.domain.FloatingIP;
+import org.jclouds.openstack.nova.v2_0.domain.Image;
+import org.jclouds.openstack.nova.v2_0.domain.Server;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -22,8 +29,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import com.woorea.openstack.nova.model.Flavors;
-import com.woorea.openstack.nova.model.FloatingIp;
 
 public class OpenstackParser {
 
@@ -70,10 +75,10 @@ public class OpenstackParser {
     return images;
 	}
 
-	public static FloatingIp parseToFloatingIp(String floatingIpString) {
-	  FloatingIp ip = null;
+	public static FloatingIP parseToFloatingIp(String floatingIpString) {
+	  FloatingIP ip = null;
 		try {
-      ip = mapper.readValue(floatingIpString, FloatingIp.class);
+      ip = mapper.readValue(floatingIpString, FloatingIP.class);
     } catch (IOException e) {
       LOGGER.log(Level.SEVERE, e.getMessage());
     }
@@ -201,16 +206,16 @@ public class OpenstackParser {
     return imagesResource.getProperty(property).getObject();
   }
 	
-  public ServerForCreate parseToServerForCreate(String instanceURI, Model newInstanceModel) {
-    String imageResourceURI = getResourcePropertyValue(instanceURI, newInstanceModel, PROPERTY_IMAGE).toString();
-    String imageRef = adapter.getAdapterDescriptionModel().getResource(imageResourceURI).getProperty(PROPERTY_IMAGE_ID).getLiteral().getString();
-    String keyName = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_KEYPAIRNAME);
-    String flavorRef = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_FLAVOR);
-    
-    ServerForCreate serverForCreate = new ServerForCreate(instanceURI, flavorRef, imageRef, keyName);
-    
-    return serverForCreate;
-  }
+//  public ServerForCreate parseToServerForCreate(String instanceURI, Model newInstanceModel) {
+//    String imageResourceURI = getResourcePropertyValue(instanceURI, newInstanceModel, PROPERTY_IMAGE).toString();
+//    String imageRef = adapter.getAdapterDescriptionModel().getResource(imageResourceURI).getProperty(PROPERTY_IMAGE_ID).getLiteral().getString();
+//    String keyName = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_KEYPAIRNAME);
+//    String flavorRef = getStringPropertyValue(instanceURI, newInstanceModel, PROPERTY_FLAVOR);
+//    
+//    ServerForCreate serverForCreate = new ServerForCreate(instanceURI, flavorRef, imageRef, keyName);
+//    
+//    return serverForCreate;
+//  }
 
   public Property getPROPERTY_ID() {
     return PROPERTY_ID;
