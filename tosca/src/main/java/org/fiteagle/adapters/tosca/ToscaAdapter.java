@@ -311,10 +311,10 @@ public void refreshConfig() throws ProcessingException {
 
     }
 
-    public void setToscaClient(String toscaClientURI) {
-    this.client = new ToscaClient(toscaClientURI);
+    public void setToscaClient(IToscaClient client) {
+    this.client = client;
   }
-    
+
     public IToscaClient getClient(){
       return this.client;
     }
