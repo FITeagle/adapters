@@ -107,6 +107,7 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
+    @SuppressWarnings({ "PMD.GuardLogStatement", "PMD.GuardLogStatementJavaUtil" })
     public Model updateInstance(final String instanceURI, final Model configureModel) {
 	if (this.instanceList.containsKey(instanceURI)) {
 	    final Motor currentMotor = this.instanceList.get(instanceURI);
@@ -114,8 +115,11 @@ public final class MotorAdapter extends AbstractAdapter {
 	    while (iter.hasNext()) {
 		currentMotor.updateProperty(iter.next());
 	    }
-	    return this.parseToModel(currentMotor);
+	    final Model newModel = this.parseToModel(currentMotor);
+	    LOGGER.info("Returning updated motor: " + newModel);
+	    return newModel;
 	}
+	LOGGER.info("Creating new instance");
 	return ModelFactory.createDefaultModel();
     }
 
