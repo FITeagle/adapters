@@ -8,6 +8,7 @@ import info.openmultinet.ontology.vocabulary.Omn_resource;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,6 +16,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ejb.EJB;
+import javax.enterprise.concurrent.ManagedThreadFactory;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.openstack.client.IOpenstackClient;
@@ -28,6 +32,7 @@ import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
 import org.jclouds.openstack.nova.v2_0.domain.Flavor;
+import org.jclouds.openstack.nova.v2_0.domain.FloatingIP;
 import org.jclouds.openstack.nova.v2_0.domain.Image;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
@@ -75,32 +80,6 @@ private String floatingPool;
   private String default_flavor_id;
   private String default_image_id;
   private String default_region;
-
-
-  
-/*  private static void createDefaultAdapterInstance(Model adapterModel){
- //   Resource adapterInstance = adapterTBox.createResource(OntologyModelUtil.getResourceNamespace()+"Openstack-1");
-
-//    adapter = adapterModel.createResource(Omn_domain_pc.VMServer);
-//    adapter.addProperty(RDFS.subClassOf, MessageBusOntologyModel.classAdapter);
-//    adapter.addProperty(Omn_lifecycle.implements_,Omn_domain_pc.VM);
-
-    Resource adapterInstance = ModelFactory.createDefaultModel().createResource(OntologyModelUtil.getResourceNamespace()+"VMServer-1");
-    adapterInstance.addProperty(Omn_lifecycle.childOf, ModelFactory.createDefaultModel().createResource("http://openstack.av.tu-berlin.de"));
-    adapterInstance.addProperty(RDF.type, Omn_domain_pc.VMServer);
-    adapterInstance.addProperty(RDF.type, OWL2.NamedIndividual);
-    adapterInstance.addProperty(RDFS.comment, "An openstack vm server that can handle different VMs.");
-    
-    Resource testbed = adapterModel
-        .createResource("http://federation.av.tu-berlin.de/about#AV_Smart_Communication_Testbed");
-    adapterInstance.addProperty(Omn_federation.partOfFederation, testbed);
-    
-    adapterInstance.addProperty(Geo.lat,"52.5258083");
-    adapterInstance.addProperty(Geo.long_,"13.3172764");
-    adapterInstance.addProperty(Omn_resource.isExclusive,"false");
-
-
-  }*/
   
   public OpenstackAdapter(Model adapterTBox, Resource adapterABox){
     this.uuid = UUID.randomUUID().toString();
@@ -175,8 +154,6 @@ private String floatingPool;
 
     }
     
-    
-    
     return diskimages;
   }
 
@@ -220,24 +197,24 @@ private String floatingPool;
       options.userData(userdata_not_encoded.getBytes());
 
     }
-    try{
-    	 ServerCreated serverForCreate = openstackClient.createServer(typeURI, diskImageURI, flavorId, options);
-
-    }catch(Exception e){
-    	e.printStackTrace();
-    }
-   
-//    try {
-//      CreateVM createVM = new CreateVM(serverForCreate, this.listener, username);
-//      if(monitoringService != null){
-//        createVM.setMonitoringService(monitoringService);
-//      }
-//      ManagedThreadFactory threadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
-//      Thread  createVMThread = threadFactory .newThread(createVM);
-//      createVMThread.start();
-//    } catch (NamingException e) {
-//      e.printStackTrace();
+//    try{
+//    	 ServerCreated serverForCreate = openstackClient.createServer(requestedVM.getLocalName(), diskImageURI, flavorId, options);
+//
+//    }catch(Exception e){
+//    	e.printStackTrace();
 //    }
+   
+    try {
+      CreateVM createVM = new CreateVM(requestedVM.getLocalName(), diskImageURI, flavorId, options, this.listener, username);
+      if(monitoringService != null){
+        createVM.setMonitoringService(monitoringService);
+      }
+      ManagedThreadFactory threadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+      Thread  createVMThread = threadFactory .newThread(createVM);
+      createVMThread.start();
+    } catch (NamingException e) {
+      e.printStackTrace();
+    }
 
 
     Model returnModel = ModelFactory.createDefaultModel();
@@ -351,7 +328,14 @@ private String floatingPool;
 
   @Override
   public void deleteInstance(String instanceURI) {
-
+	  Server instance = null;
+	    try {
+	      instance = getServerWithName(instanceURI);
+	    } catch (InstanceNotFoundException e) {
+	      Logger.getAnonymousLogger().log(Level.SEVERE, "Resource could not be deleted");
+	    }
+	    String id = instance.getId();
+	    openstackClient.deleteServer(id);
   }
 
   private Server getServerWithName(String instanceURI) throws InstanceNotFoundException {
@@ -558,113 +542,118 @@ public void refreshConfig() throws ProcessingException {
         this.listener = listener;
     }
 
-//    private class CreateVM implements Runnable {
-//
-//    private final Server serverForCreate;
-//    private final OpenstackAdapterMDBSender parent;
-//    private final String username;
-//    private Resource monitoringService;
-//
-//    public CreateVM(Server serverForCreate, OpenstackAdapterMDBSender parent, String username){
-//      this.parent =  parent;
-//      this.serverForCreate = serverForCreate;
-//      this.username = username;
-//
-//    }
-//
-//    public Resource getMonitoringService() {
-//      return monitoringService;
-//    }
-//
-//    public void setMonitoringService(Resource monitoringService) {
-//      this.monitoringService = monitoringService;
-//    }
-//
-//    @Override
-//    public void run() {
-//    	
-//      ServerCreated server = openstackClient.createServer(serverForCreate);
-//      List<FloatingIP> floatingIps = openstackClient.listFreeFloatingIps();
-//      FloatingIP floatingIp = null;
-//      if(floatingIps != null){
-//        Iterator<FloatingIP> floatingIpIterator = floatingIps.iterator();
-//        while(floatingIpIterator.hasNext()) {
-//
-//          FloatingIP tempfloatingIp = floatingIpIterator.next();
-//          if (tempfloatingIp.getInstanceId() == null) {
-//            floatingIp = tempfloatingIp;
-//          }
-//        }
-//      }
-//      try {
-//      if(floatingIp == null) {
-//
-//          floatingIp = openstackClient.addFloatingIp();
-//
-//        }
-//        openstackClient.allocateFloatingIpForServer(server.getId(),floatingIp.getIp());
-//      }catch (Exception e){
-//        throw  new RuntimeException();
-//      }
-//
-//      Model model = parseToModel(server, floatingIp);
-//      parent.publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
-//
-//
-//
-//    }
-//
-//
-//    private Model parseToModel(Server server, FloatingIP floatingIp){
-//      //TODO: better check whether it's already an URI
-//
-//      Model parsedServerModel =  ModelFactory.createDefaultModel();
-//      Resource parsedServer = parsedServerModel.createResource(server.getName());
-//      server = openstackClient.getServerDetails(server.getId());
-//
-//      int retryCounter = 0;
-//      while(retryCounter < 10){
-//        if(!"ACTIVE".equalsIgnoreCase(server.getStatus().value())){
-//          try {
-//            Thread.sleep(1000);
-//            server = openstackClient.getServerDetails(server.getId());
-//          } catch (InterruptedException e) {
-//            throw  new RuntimeException();
-//          }
-//      }else {
-//          break;
-//        }
-//      }
-//      parsedServer.addProperty(Omn_domain_pc.hasVMID,server.getId());
-//
-//      parsedServer.addProperty(RDF.type, Omn_domain_pc.VM);
-//      Property property = parsedServer.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
-//      property.addProperty(RDF.type, OWL.FunctionalProperty);
-//      parsedServer.addProperty(property, Omn_lifecycle.Started);
-//
-//
-//     if(floatingIp != null){
-//
-//
-//       Resource loginService = parsedServerModel.createResource(OntologyModelUtil
-//               .getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
-//       loginService.addProperty(RDF.type, Omn_service.LoginService);
-//       loginService.addProperty(Omn_service.authentication,"ssh-keys");
-//       loginService.addProperty(Omn_service.username, username);
-//       loginService.addProperty(Omn_service.hostname, floatingIp.getIp());
-//       loginService.addProperty(Omn_service.port,"22");
-//       parsedServer.addProperty(Omn.hasService, loginService);
-//
-//     }
-//      if(monitoringService != null){
-//        parsedServer.addProperty(Omn_lifecycle.usesService,monitoringService);
-//        parsedServer.getModel().add(monitoringService.listProperties());
-//      }
-//
-//      return parsedServer.getModel();
-//    }
-//
-//  }
+    private class CreateVM implements Runnable {
+
+    private final OpenstackAdapterMDBSender parent;
+    private final String username;
+    private Resource monitoringService;
+    private String name;
+    private String imageId;
+    private String flavorId;
+    private CreateServerOptions options;
+
+    public CreateVM(String name,String imageId,String flavorID,CreateServerOptions options, OpenstackAdapterMDBSender parent, String username){
+      this.parent =  parent;
+      this.username = username;
+      this.name = name;
+      this.flavorId = flavorID;
+      this.imageId = imageId;
+      this.options = options;
+
+    }
+
+    public Resource getMonitoringService() {
+      return monitoringService;
+    }
+
+    public void setMonitoringService(Resource monitoringService) {
+      this.monitoringService = monitoringService;
+    }
+
+    @Override
+    public void run() {
+      ServerCreated server = openstackClient.createServer(name,imageId,flavorId,options);
+      
+      List<FloatingIP> floatingIps = openstackClient.listFreeFloatingIps();
+      FloatingIP floatingIp = null;
+      if(floatingIps != null){
+        Iterator<FloatingIP> floatingIpIterator = floatingIps.iterator();
+        while(floatingIpIterator.hasNext()) {
+
+          FloatingIP tempfloatingIp = floatingIpIterator.next();
+          if (tempfloatingIp.getInstanceId() == null) {
+            floatingIp = tempfloatingIp;
+            break;
+          }
+        }
+      }
+
+
+      Model model = parseToModel(server, floatingIp);
+      parent.publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
+
+
+
+    }
+
+
+    private Model parseToModel(ServerCreated server, FloatingIP floatingIp){
+      //TODO: better check whether it's already an URI
+
+      Model parsedServerModel =  ModelFactory.createDefaultModel();
+      Resource parsedServer = parsedServerModel.createResource(server.getName());
+      Server tmpServer = openstackClient.getServerDetails(server.getId());
+
+      int retryCounter = 0;
+      while(retryCounter < 10){
+        if(!"ACTIVE".equalsIgnoreCase(tmpServer.getStatus().value())){
+          try {
+            Thread.sleep(1000);
+            tmpServer = openstackClient.getServerDetails(tmpServer.getId());
+          } catch (InterruptedException e) {
+            throw  new RuntimeException();
+          }
+      }else {
+          break;
+        }
+      }
+      
+      try {
+          openstackClient.allocateFloatingIpForServer(tmpServer.getId(),floatingIp.getIp());
+        }catch (Exception e){
+            e.printStackTrace();
+          throw  new RuntimeException();
+        }
+      parsedServer.addProperty(Omn_domain_pc.hasVMID,tmpServer.getId());
+
+      parsedServer.addProperty(RDF.type, Omn_domain_pc.VM);
+      Property property = parsedServer.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(),Omn_lifecycle.hasState.getLocalName());
+      property.addProperty(RDF.type, OWL.FunctionalProperty);
+      parsedServer.addProperty(property, Omn_lifecycle.Started);
+
+
+     if(floatingIp != null){
+
+
+       Resource loginService = parsedServerModel.createResource(OntologyModelUtil
+               .getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+       loginService.addProperty(RDF.type, Omn_service.LoginService);
+       loginService.addProperty(Omn_service.authentication,"ssh-keys");
+       loginService.addProperty(Omn_service.username, username);
+       loginService.addProperty(Omn_service.hostname, floatingIp.getIp());
+       loginService.addProperty(Omn_service.port,"22");
+       parsedServer.addProperty(Omn.hasService, loginService);
+
+     }
+      if(monitoringService != null){
+        parsedServer.addProperty(Omn_lifecycle.usesService,monitoringService);
+        parsedServer.getModel().add(monitoringService.listProperties());
+      }
+
+      return parsedServer.getModel();
+    }
+
+  }
     
     public IOpenstackClient getOpenstackClient() {
     	return openstackClient;

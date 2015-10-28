@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.adapters.openstack.client.model.Flavors;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Servers;
+import org.jclouds.collect.IterableWithMarker;
 import org.jclouds.openstack.nova.v2_0.domain.FloatingIP;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;

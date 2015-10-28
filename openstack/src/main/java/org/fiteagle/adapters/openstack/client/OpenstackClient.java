@@ -20,10 +20,13 @@ import org.jclouds.openstack.neutron.v2.domain.Network;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
 import org.jclouds.openstack.nova.v2_0.domain.Flavor;
 import org.jclouds.openstack.nova.v2_0.domain.FloatingIP;
+import org.jclouds.openstack.nova.v2_0.domain.FloatingIPPool;
 import org.jclouds.openstack.nova.v2_0.domain.Image;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
 import org.jclouds.openstack.nova.v2_0.extensions.FloatingIPApi;
+import org.jclouds.openstack.nova.v2_0.extensions.FloatingIPPoolApi;
+//import org.jclouds.openstack.nova.v2_0.extensions.FloatingIPApi;
 import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
 import org.jclouds.openstack.nova.v2_0.features.FlavorApi;
 import org.jclouds.openstack.nova.v2_0.features.ImageApi;
@@ -65,34 +68,145 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
     
 	public OpenstackClient(OpenstackAdapter openstackAdapter) {
         this.openStackAdapter = openstackAdapter;
-        NET_NAME = "trescimo-net";
+//        NET_NAME = "trescimo-net";
        }	
+	
+	
+	private void loadPreferences() {
+
+
+		try{
+		if (openStackAdapter.getFloatingPool() != null){
+		  FLOATINGIP_POOL_NAME = openStackAdapter.getFloatingPool() ;
+		}
+		if (openStackAdapter.getKeystone_auth_URL() != null){
+		  KEYSTONE_AUTH_URL = openStackAdapter.getKeystone_auth_URL();
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_auth_URL");
+		}
+		if (openStackAdapter.getKeystone_endpoint() != null){
+		  KEYSTONE_ENDPOINT = openStackAdapter.getKeystone_endpoint();
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_endpoint");
+		}
+		if (openStackAdapter.getKeystone_password() != null){
+		  KEYSTONE_PASSWORD = openStackAdapter.getKeystone_password();
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_password");
+		}
+		if (openStackAdapter.getKeystone_username() != null){
+		  KEYSTONE_USERNAME = openStackAdapter.getKeystone_username() ;
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("keystone_username");
+		}
+		if (openStackAdapter.getNet_endpoint() != null){
+		  NET_ENDPOINT = openStackAdapter.getNet_endpoint();
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("net_endpoint");
+		}
+		if (openStackAdapter.getNet_name() != null){
+		  NET_NAME = openStackAdapter.getNet_name();
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("net_name");
+		}
+		if (openStackAdapter.getNova_endpoint() != null){
+		  NOVA_ENDPOINT = openStackAdapter.getNova_endpoint();
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("nova_endpoint");
+		}
+		if (openStackAdapter.getTenant_name() != null){
+		  TENANT_NAME =openStackAdapter.getTenant_name();
+		}
+		else{
+		  throw new InsufficientOpenstackPreferences("tenant_name");
+		}
+
+		if(openStackAdapter.getDefault_image_id()!= null){
+			DEFAULT_IMAGE_ID = openStackAdapter.getDefault_image_id();
+		}else{
+			throw new InsufficientOpenstackPreferences("default_image_id");
+		}
+
+		if(openStackAdapter.getDefault_flavor_id()!= null){
+			DEFAULT_FLAVOR_ID = openStackAdapter.getDefault_flavor_id();
+		}else{
+			throw new InsufficientOpenstackPreferences("default_flavor_id");
+		}
+		
+		if(openStackAdapter.getDefault_region()!= null){
+			DEFAULT_REGION = openStackAdapter.getDefault_region();
+		}else{
+			throw new InsufficientOpenstackPreferences("default_region");
+		}
+		PREFERENCES_INITIALIZED = true;
+		
+		}catch (IllegalArgumentException e){		
+		LOGGER.log(Level.SEVERE, "IllegalArgumentException - Was not able to copy Propertys from Adapter");
+		}catch (InsufficientOpenstackPreferences e){
+		LOGGER.log(Level.SEVERE, "InsufficientOpenstackPreferences - Was not able to copy Propertys from Adapter");
+		}
+	}
 	
 
 	private void init(){
-        
-		Iterable<Module> modules = ImmutableSet.<Module>of(new SLF4JLoggingModule());
-		if(KEYSTONE_AUTH_URL != null){
-			novaApi = ContextBuilder.newBuilder("openstack-nova")
-	                .endpoint(KEYSTONE_AUTH_URL)
-	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
-	                .modules(modules)
-	                .buildApi(NovaApi.class);
-			
-			neutronApi = ContextBuilder.newBuilder("openstack-neutron")
-	                .endpoint(KEYSTONE_AUTH_URL)
-	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
-	                .modules(modules)
-	                .buildApi(NeutronApi.class);
-		}
-		
-		
-		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("")){
-			regions = novaApi.getConfiguredRegions();
-			LOGGER.log(Level.INFO, "Default Region is Empty. Setting first one from "+ regions.toString());
-	        DEFAULT_REGION = regions.iterator().next();
+        if(PREFERENCES_INITIALIZED){
+    		Iterable<Module> modules = ImmutableSet.<Module>of(new SLF4JLoggingModule());
+    		if(KEYSTONE_AUTH_URL != null){
+    			novaApi = ContextBuilder.newBuilder("openstack-nova")
+    	                .endpoint(KEYSTONE_AUTH_URL)
+    	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
+    	                .modules(modules)
+    	                .buildApi(NovaApi.class);
+    			
+    			neutronApi = ContextBuilder.newBuilder("openstack-neutron")
+    	                .endpoint(KEYSTONE_AUTH_URL)
+    	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
+    	                .modules(modules)
+    	                .buildApi(NeutronApi.class);
+    		}
+    		
+    		
+    		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("")){
+    			regions = novaApi.getConfiguredRegions();
+    			LOGGER.log(Level.INFO, "Default Region is Empty. Setting first one from "+ regions.toString());
+    	        DEFAULT_REGION = regions.iterator().next();
 
-		}
+    		}
+        }else{
+        	loadPreferences();
+        	
+        	 if(PREFERENCES_INITIALIZED){
+         		Iterable<Module> modules = ImmutableSet.<Module>of(new SLF4JLoggingModule());
+         		if(KEYSTONE_AUTH_URL != null){
+         			novaApi = ContextBuilder.newBuilder("openstack-nova")
+         	                .endpoint(KEYSTONE_AUTH_URL)
+         	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
+         	                .modules(modules)
+         	                .buildApi(NovaApi.class);
+         			
+         			neutronApi = ContextBuilder.newBuilder("openstack-neutron")
+         	                .endpoint(KEYSTONE_AUTH_URL)
+         	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
+         	                .modules(modules)
+         	                .buildApi(NeutronApi.class);
+         		}
+         		
+         		
+         		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("")){
+         			regions = novaApi.getConfiguredRegions();
+         			LOGGER.log(Level.INFO, "Default Region is Empty. Setting first one from "+ regions.toString());
+         	        DEFAULT_REGION = regions.iterator().next();
+
+         		}
+             }
+        }
 }
 
 	@Override
@@ -106,7 +220,7 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
             	FlavorApi flavorApi = novaApi.getFlavorApi(DEFAULT_REGION);                
                 flavorList= flavorApi.listInDetail().concat().toList();
         }catch(Exception e){
-        e.printStackTrace();	
+    		LOGGER.log(Level.SEVERE, e.getStackTrace().toString());	
         }
 		
 		
@@ -125,7 +239,7 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
             	ImageApi imageApi = novaApi.getImageApi(DEFAULT_REGION);                
                 imagesList =imageApi.listInDetail().concat().toList();
         }catch(Exception e){
-        e.printStackTrace();	
+    		LOGGER.log(Level.SEVERE, e.getStackTrace().toString());	
         }
 		
         return new Images(imagesList);
@@ -149,15 +263,14 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
             	ServerApi serverApi = novaApi.getServerApi(DEFAULT_REGION);                
                 serverList = serverApi.listInDetail().concat().toList();
         }catch(Exception e){
-        e.printStackTrace();	
+    		LOGGER.log(Level.WARNING, "Exception in listServers");
+    		LOGGER.log(Level.SEVERE, e.getStackTrace().toString());	
         }
 		
         return new Servers(serverList);
 	}
 	
 	private void getAccessWithTenantName() throws InsufficientOpenstackPreferences{
-		LOGGER.log(Level.SEVERE, "STARTING INIT");
-        
         String provider ="openstack-nova";
 		
 		Iterable<Module> modules = ImmutableSet.<Module>of(new SLF4JLoggingModule());
@@ -185,12 +298,23 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
     	if(NET_NAME != null){
         options.networks(getNetworkIdByName(NET_NAME));
     }else{
-        options.networks(getNetworkIdByName("trescimo-net"));
-    }
+    	options.networks(getNetworkIdByName(listAllNetworks()));
+		}
     }
     ServerCreated serverCreated = serverApi.create(name, imageId, flavorId, options);
 	return serverCreated;
 }
+
+	private String listAllNetworks() {
+		if(neutronApi == null){
+			init();
+			}
+		String result = neutronApi.getNetworkApi(DEFAULT_REGION).list().get(0).get(0).getName();
+		LOGGER.log(Level.WARNING, "No Network-Name found in Config. Taking the first one from Server instead! -> "+result);
+
+		return result;
+	}
+
 
 	private void setDefaultValues() {
 	}
@@ -221,6 +345,11 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 
 	@Override
 	public void allocateFloatingIpForServer(String serverId, String floatingIp) {
+	if(novaApi==null ){
+		init();
+	}
+	FloatingIPApi api = novaApi.getFloatingIPApi(DEFAULT_REGION).get();
+	api.addToServer(floatingIp, serverId);
 	}
 
 	@Override
@@ -240,13 +369,26 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 		List<FloatingIP> floatingIpList = new ArrayList<>();
 				
         try{
-            	FloatingIPApi floatingApi = novaApi.getFloatingIPApi(DEFAULT_REGION).get();       
-            	floatingIpList = floatingApi.list().toList();
+        	FloatingIPApi floatingApi = novaApi.getFloatingIPApi(DEFAULT_REGION).get();
+        	floatingIpList = floatingApi.list().toList();
+    		List<FloatingIP> resultList = new ArrayList<>();
+
+        	for (FloatingIP floatIp : floatingIpList){
+        		if(floatIp.getFixedIp() == null){
+        			resultList.add(floatIp);
+        		}
+        	}
+        	
+        	if(resultList.isEmpty()){
+        		LOGGER.log(Level.SEVERE, "NO FLOATING IP FOUND");
+            	return null;
+            }
+        	return resultList;
         }catch(Exception e){
-        e.printStackTrace();	
+    		LOGGER.log(Level.SEVERE, e.getStackTrace().toString());	
         }
-		
-        return floatingIpList;
+		LOGGER.log(Level.SEVERE, "EXCEPTION IN FLOATING IP");
+		return null;
 	}
 
 	@Override
@@ -279,6 +421,7 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 
 	@Override
 	public void deleteServer(String id){
+		
 	}
 
 	public String getNetworkId() {
@@ -305,7 +448,7 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 		}
 		}
 		
-		return null;
+		return "NO NETWORK FOUND";
 	}
 
 	public void setNetworkId(String networkId) {
