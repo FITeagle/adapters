@@ -11,6 +11,7 @@ import javax.naming.NamingException;
 
 import org.fiteagle.api.core.IMessageBus;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Statement;
 
@@ -70,6 +71,7 @@ public class Motor {
     }
 
     private void setRpm(final int rpm) {
+	LOGGER.info("Setting RPM: " + rpm);
 	this.rpm = rpm;
     }
 
@@ -103,19 +105,19 @@ public class Motor {
 	    final String predicate = configureStatement.getPredicate().getLocalName();
 	    switch (predicate) {
 	    case "rpm":
-		this.setRpm(configureStatement.getInt());
+		this.setRpm(configureStatement.getObject().asLiteral().getInt());
 		break;
 	    case "maxRpm":
-		this.setMaxRpm(configureStatement.getInt());
+		this.setMaxRpm(configureStatement.getObject().asLiteral().getInt());
 		break;
 	    case "throttle":
-		this.setRpm(configureStatement.getInt());
+		this.setRpm(configureStatement.getObject().asLiteral().getInt());
 		break;
 	    case "manufacturer":
-		this.setManufacturer(configureStatement.getString());
+		this.setManufacturer(configureStatement.getObject().asLiteral().getString());
 		break;
 	    case "isDynamic":
-		this.setIsDynamic(configureStatement.getBoolean());
+		this.setIsDynamic(configureStatement.getObject().asLiteral().getBoolean());
 		break;
 	    default:
 		LOGGER.warning("Unknown predicate: " + predicate);
