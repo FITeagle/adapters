@@ -58,5 +58,6 @@
 		<module>sshService</module>
 		<module>monitoring</module>
     <module>networking</module>
+    <module>ACSclient</module>
   </modules>
 </project>
