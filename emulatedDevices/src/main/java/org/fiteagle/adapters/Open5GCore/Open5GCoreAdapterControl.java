@@ -1,7 +1,10 @@
-package org.fiteagle.adapters.emulatedDevices;
+package org.fiteagle.adapters.Open5GCore;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
@@ -13,8 +16,16 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 @Singleton
 @Startup
-public class EmulatedDevicesAdapterControl extends AdapterControl {
+public class Open5GCoreAdapterControl extends AdapterControl {
 
+    Logger LOGGER = Logger.getLogger(this.getClass().getName());
+
+	@PostConstruct
+	public void init(){
+        LOGGER.log(Level.INFO, "Starting Open5GCoreAdapter");
+
+    	this.propertiesName = "Open5GCoreAdapter";
+	}
 	@Override
 	public AbstractAdapter createAdapterInstance(Model model, Resource resource) {
 		// TODO Auto-generated method stub

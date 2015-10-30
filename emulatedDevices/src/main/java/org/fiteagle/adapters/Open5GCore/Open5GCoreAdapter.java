@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.emulatedDevices;
+package org.fiteagle.adapters.Open5GCore;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
@@ -6,7 +6,7 @@ import org.fiteagle.api.core.Config;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 
-public final class EmulatedDevicesAdapter extends AbstractAdapter {
+public final class Open5GCoreAdapter extends AbstractAdapter {
 
 	@Override
 	public Resource getAdapterABox() {

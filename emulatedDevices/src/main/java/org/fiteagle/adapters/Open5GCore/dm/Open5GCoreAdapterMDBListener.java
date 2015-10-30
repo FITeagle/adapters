@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.emulatedDevices.dm;
+package org.fiteagle.adapters.Open5GCore.dm;
 
 import java.util.Collection;
 
@@ -8,7 +8,7 @@ import javax.ejb.MessageDriven;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
-import org.fiteagle.adapters.emulatedDevices.EmulatedDevicesAdapterControl;
+import org.fiteagle.adapters.Open5GCore.Open5GCoreAdapterControl;
 import org.fiteagle.api.core.IMessageBus;
 
 @MessageDriven(activationConfig = {
@@ -22,10 +22,10 @@ import org.fiteagle.api.core.IMessageBus;
 		+ "')"),
 	@ActivationConfigProperty(propertyName = "acknowledgeMode", propertyValue = "Auto-acknowledge") })
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-public class EmulatedDevicesAdapterMDBListener extends AbstractAdapterMDBListener {
+public class Open5GCoreAdapterMDBListener extends AbstractAdapterMDBListener {
 
     @EJB
-    private transient EmulatedDevicesAdapterControl controller;
+    private transient Open5GCoreAdapterControl controller;
 
     @Override
     protected Collection<AbstractAdapter> getAdapterInstances() {

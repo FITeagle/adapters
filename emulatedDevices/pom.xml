@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<name>FITeagle :: Adapters :: Emulated-Devices</name>
+	<name>FITeagle :: Adapters :: Open5GCore</name>
 	<groupId>org.fiteagle.adapters</groupId>
-	<artifactId>emulatedDevices</artifactId>
+	<artifactId>Open5GCore</artifactId>
 	<packaging>war</packaging>
 	<parent>
 		<groupId>org.fiteagle</groupId>
