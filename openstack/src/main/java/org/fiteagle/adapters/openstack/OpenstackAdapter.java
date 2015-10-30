@@ -205,7 +205,7 @@ private String floatingPool;
 //    }
    
     try {
-      CreateVM createVM = new CreateVM(requestedVM.getLocalName(), diskImageURI, flavorId, options, this.listener, username);
+      CreateVM createVM = new CreateVM(instanceURI, diskImageURI, flavorId, options, this.listener, username);
       if(monitoringService != null){
         createVM.setMonitoringService(monitoringService);
       }
@@ -335,7 +335,12 @@ private String floatingPool;
 	      Logger.getAnonymousLogger().log(Level.SEVERE, "Resource could not be deleted");
 	    }
 	    String id = instance.getId();
-	    openstackClient.deleteServer(id);
+	    if(openstackClient.deleteServer(id)){
+		    LOGGER.log(Level.SEVERE , "Deleted Server with ID: "+id);
+
+	    }else{
+	    LOGGER.log(Level.SEVERE , "Could not delete Server with ID: " + id);
+	    }
   }
 
   private Server getServerWithName(String instanceURI) throws InstanceNotFoundException {

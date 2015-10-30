@@ -43,7 +43,7 @@ public interface IOpenstackClient {
   
   public abstract void deleteKeyPair(String name,String tmpRegion);
   
-  public abstract void deleteServer(String id);
+  public abstract boolean deleteServer(String id);
 
   public abstract void close() throws IOException;
 
