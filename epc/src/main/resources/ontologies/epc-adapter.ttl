@@ -1,0 +1,26 @@
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+@prefix omn:           <http://open-multinet.info/ontology/omn#> .
+@prefix epc-adapter:   <http://open-multinet.info/ontology/resource/epc-adapter#> .
+@prefix epc:         <http://open-multinet.info/ontology/epc#> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
+@prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+epc-adapter:EpcAdapter
+        a                          owl:Class ;
+        rdfs:label                 "EPC Adapter"@en ;
+        rdfs:subClassOf            omn:Adapter ;
+        omn-lifecycle:implements   epc:UserEquipment ;
+        omn-lifecycle:implements   epc:EvolvedPacketCore ;
+        omn-lifecycle:implements   epc:AccessNetwork .
+
+
+
+epc:lteSupport rdf:type owl:DatatypeProperty ;
+                
+                rdfs:domain epc:UserEquipment ;
+                
+                rdfs:range xsd:boolean .
