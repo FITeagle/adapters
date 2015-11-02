@@ -9,18 +9,7 @@
 @prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
-epc-adapter:EpcAdapter
-        a                          owl:Class ;
-        rdfs:label                 "EPC Adapter"@en ;
-        rdfs:subClassOf            omn:Adapter ;
+epc:EpcAdapter
         omn-lifecycle:implements   epc:UserEquipment ;
         omn-lifecycle:implements   epc:EvolvedPacketCore ;
         omn-lifecycle:implements   epc:AccessNetwork .
-
-
-
-epc:lteSupport rdf:type owl:DatatypeProperty ;
-                
-                rdfs:domain epc:UserEquipment ;
-                
-                rdfs:range xsd:boolean .

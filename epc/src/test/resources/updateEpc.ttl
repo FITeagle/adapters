@@ -2,6 +2,11 @@
         a <http://open-multinet.info/ontology/omn#Resource> ;
         <http://open-multinet.info/ontology/omn-lifecycle#implementedBy>
                 <http://localhost/resource/EpcAdapter-1> ;
+        <http://open-multinet.info/ontology/epc#hasUserEquipment>
+                <urn:uuid:de30d6be-ac90-465e-bbab-635aac940242> .
+
+                
+<urn:uuid:de30d6be-ac90-465e-bbab-635aac940242>
+        a       <http://open-multinet.info/ontology/epc#UserEquipmentDetails> ;
         <http://open-multinet.info/ontology/epc#lteSupport>
                 "true"^^<http://www.w3.org/2001/XMLSchema#boolean> .
-

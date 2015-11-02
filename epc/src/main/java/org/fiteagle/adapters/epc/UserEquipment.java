@@ -1,207 +1,140 @@
 package org.fiteagle.adapters.epc;
 
-import java.util.Random;
-import java.util.logging.Level;
+import info.openmultinet.ontology.vocabulary.Epc;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.enterprise.concurrent.ManagedThreadFactory;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.fiteagle.api.core.IMessageBus;
-
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
 
-public class UserEquipment {
+public class UserEquipment extends EpcImplementable {
 
-	// private String manufacturer;
-	// private int rpm;
+	private List<AccessPointName> accessPointNames;
 	private boolean lteSupport;
-	// private int maxRpm;
-	// private int throttle;
-	private final transient EpcAdapter owningAdapter;
-	private final String instanceName;
-	// private transient boolean isDynamicEpc;
-	@SuppressWarnings("PMD.DoNotUseThreads")
-	private transient Thread thread;
-	private final static String THREAD_FACTORY = "java:jboss/ee/concurrency/factory/default";
-	private transient ManagedThreadFactory threadFactory;
+	// private List<HardwareType> hardwareTypes;
+	// private List<DiskImage> diskImages;
+	// private IPAddress controlAddress;
 
-	private static final Logger LOGGER = Logger.getLogger(UserEquipment.class.toString());
+	private static final Logger LOGGER = Logger.getLogger(UserEquipment.class
+			.toString());
 
-	public UserEquipment(final EpcAdapter owningAdapter, final String instanceName) {
-		// this.isDynamicEpc = false;
-		// this.manufacturer = "Fraunhofer FOKUS";
-		// this.rpm = 0;
-		// this.maxRpm = 3000;
-		// this.throttle = 0;
-		this.lteSupport = false;
+	public UserEquipment(final EpcAdapter owningAdapter,
+			final String instanceName) {
 
-		this.owningAdapter = owningAdapter;
-		this.instanceName = instanceName;
+		super(owningAdapter, instanceName);
+
+		this.accessPointNames = new ArrayList<AccessPointName>();
+		this.setLteSupport(false);
 	}
 
-	// private void setIsDynamic(final boolean state) {
-	// this.isDynamicEpc = state;
-	//
-	// if (this.isDynamicEpc && !this.threadIsRunning()) {
-	// this.startThread();
-	// } else if (!this.isDynamicEpc && this.threadIsRunning()) {
-	// this.terminate();
-	// }
-	// }
-	//
-	// private void setRpmWithNotify(final int rpm) {
-	// this.rpm = rpm;
-	// final Model resourceModel = this.owningAdapter.parseToModel(this);
-	// this.owningAdapter.notifyListeners(resourceModel, null,
-	// IMessageBus.TYPE_INFORM, null);
-	// }
-	//
-	// public String getManufacturer() {
-	// return this.manufacturer;
-	// }
-	//
-	// private void setManufacturer(final String manufacturer) {
-	// this.manufacturer = manufacturer;
-	// }
+	@Override
+	public void updateInstance(Resource epcResource) {
 
-	// public int getRpm() {
-	// return this.rpm;
-	// }
-	//
-	// private void setRpm(final int rpm) {
-	// LOGGER.info("Setting RPM: " + rpm);
-	// this.rpm = rpm;
-	// }
+		if (epcResource.hasProperty(Epc.hasUserEquipment)) {
+			Resource ueDetails = epcResource.getProperty(Epc.hasUserEquipment)
+					.getObject().asResource();
+
+			if (ueDetails.hasProperty(Epc.lteSupport)) {
+				this.setLteSupport(ueDetails.getProperty(Epc.lteSupport)
+						.getObject().asLiteral().getBoolean());
+			}
+
+			StmtIterator apns = ueDetails
+					.listProperties(info.openmultinet.ontology.vocabulary.Epc.hasAccessPointName);
+			while (apns.hasNext()) {
+				Statement apnStatement = apns.next();
+				Resource apnResource = apnStatement.getObject().asResource();
+
+				String networkIdentifier = null;
+				if (apnResource
+						.hasProperty(info.openmultinet.ontology.vocabulary.Epc.networkIdentifier)) {
+					networkIdentifier = apnResource
+							.getProperty(
+									info.openmultinet.ontology.vocabulary.Epc.networkIdentifier)
+							.getObject().asLiteral().getString();
+				}
+
+				String operatorIdentifier = null;
+				if (apnResource
+						.hasProperty(info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier)) {
+					operatorIdentifier = apnResource
+							.getProperty(
+									info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier)
+							.getObject().asLiteral().getString();
+				}
+				AccessPointName apn = new AccessPointName(networkIdentifier,
+						operatorIdentifier);
+				this.addApn(apn);
+			}
+
+		}
+
+	}
+
+	@Override
+	public void parseToModel(Resource resource) {
+		resource.addProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Epc.UserEquipment);
+
+		String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+		final Resource ueDetails = resource.getModel().createResource(uuid);
+		ueDetails.addProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Epc.UserEquipmentDetails);
+		resource.addProperty(
+				info.openmultinet.ontology.vocabulary.Epc.hasUserEquipment,
+				ueDetails);
+
+		ueDetails.addLiteral(
+				info.openmultinet.ontology.vocabulary.Epc.lteSupport,
+				this.isLteSupport());
+
+		List<AccessPointName> accessPointNames = this.getApns();
+		for (AccessPointName apn : accessPointNames) {
+
+			String uuidApn = "urn:uuid:" + UUID.randomUUID().toString();
+			Resource apnResource = ueDetails.getModel().createResource(uuidApn);
+			apnResource.addProperty(RDF.type,
+					info.openmultinet.ontology.vocabulary.Epc.AccessPointName);
+			apnResource
+					.addLiteral(
+							info.openmultinet.ontology.vocabulary.Epc.networkIdentifier,
+							apn.getNetworkIdentifier());
+			apnResource
+					.addLiteral(
+							info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier,
+							apn.getOperatorIdentifier());
+			ueDetails
+					.addProperty(
+							info.openmultinet.ontology.vocabulary.Epc.hasAccessPointName,
+							apnResource);
+		}
+	}
+
+	/**
+	 * Getters and setters
+	 * 
+	 * @return
+	 */
+	public List<AccessPointName> getApns() {
+		return accessPointNames;
+	}
+
+	public void addApn(AccessPointName apn) {
+		LOGGER.info("Adding access point name: " + apn);
+		this.accessPointNames.add(apn);
+	}
 
 	public boolean isLteSupport() {
 		return this.lteSupport;
 	}
 
-	private void setLteSupport(final boolean lteSupport) {
+	public void setLteSupport(final boolean lteSupport) {
 		LOGGER.info("Setting LTE Suport: " + lteSupport);
 		this.lteSupport = lteSupport;
 	}
-
-	// public int getMaxRpm() {
-	// return this.maxRpm;
-	// }
-	//
-	// private void setMaxRpm(final int maxRpm) {
-	// this.maxRpm = maxRpm;
-	// }
-	//
-	// public int getThrottle() {
-	// return this.throttle;
-	// }
-	//
-	// public void setThrottle(final int throttle) {
-	// this.throttle = throttle;
-	// }
-
-	public String getInstanceName() {
-		return this.instanceName;
-	}
-
-	// public boolean isDynamic() {
-	// return this.isDynamicEpc;
-	// }
-
-	@SuppressWarnings({ "PMD.GuardLogStatementJavaUtil", "PMD.LongVariable" })
-	public void updateProperty(final Statement configureStatement) {
-		if (configureStatement.getSubject().getURI().equals(this.instanceName)) {
-			final String predicate = configureStatement.getPredicate()
-					.getLocalName();
-			switch (predicate) {
-			case "lteSupport":
-				this.setLteSupport(configureStatement.getObject().asLiteral().getBoolean());
-				break;
-			// case "rpm":
-			// this.setRpm(configureStatement.getObject().asLiteral().getInt());
-			// break;
-			// case "maxRpm":
-			// this.setMaxRpm(configureStatement.getObject().asLiteral()
-			// .getInt());
-			// break;
-			// case "throttle":
-			// this.setRpm(configureStatement.getObject().asLiteral().getInt());
-			// break;
-			// case "manufacturer":
-			// this.setManufacturer(configureStatement.getObject().asLiteral()
-			// .getString());
-			// break;
-			// case "isDynamic":
-			// this.setIsDynamic(configureStatement.getObject().asLiteral()
-			// .getBoolean());
-			// break;
-			default:
-				LOGGER.warning("Unknown predicate: " + predicate);
-				break;
-			}
-		} else {
-			LOGGER.warning("Unknown URI: "
-					+ configureStatement.getSubject().getURI());
-			LOGGER.warning("Expected URI: " + this.instanceName);
-		}
-	}
-
-	// @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
-	// private void startThread() {
-	// final RPMCreator creator = new RPMCreator();
-	// if (this.threadFactory == null) {
-	// Context context;
-	// try {
-	// context = new InitialContext();
-	// this.threadFactory = (ManagedThreadFactory) context
-	// .lookup(Epc.THREAD_FACTORY);
-	// } catch (final NamingException e) {
-	// Epc.LOGGER.log(Level.SEVERE,
-	// "Could not create managed thread factory: "
-	// + Epc.THREAD_FACTORY);
-	// }
-	// }
-	// this.thread = this.threadFactory.newThread(creator);
-	// this.thread.start();
-	// }
-	//
-	// public void terminate() {
-	// if (this.thread != null) {
-	// this.thread.interrupt();
-	// }
-	// }
-	//
-	// private boolean threadIsRunning() {
-	// return this.thread != null && this.thread.isAlive();
-	// }
-
-	// @SuppressWarnings("PMD.DoNotUseThreads")
-	// public class RPMCreator implements Runnable {
-	//
-	// private static final int SLEEP_TIME = 5000;
-	//
-	// private transient final Random rpmGenerator;
-	//
-	// public RPMCreator() {
-	// super();
-	// rpmGenerator = new Random();
-	// }
-	//
-	// @Override
-	// public void run() {
-	// while (!Thread.currentThread().isInterrupted()) {
-	// try {
-	// Thread.sleep(RPMCreator.SLEEP_TIME);
-	// } catch (final InterruptedException e) {
-	// return;
-	// }
-	// Epc.this.setRpmWithNotify(this.rpmGenerator
-	// .nextInt(Epc.this.maxRpm));
-	// }
-	// }
-	// }
-
 }
