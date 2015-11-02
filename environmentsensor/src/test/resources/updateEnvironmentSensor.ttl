@@ -1,0 +1,7 @@
+<urn:environmentsensor-1>
+        a <http://open-multinet.info/ontology/omn#Resource> ;
+        <http://open-multinet.info/ontology/omn-lifecycle#implementedBy>
+                <http://localhost/resource/FS20-1> ;
+        <http://open-multinet.info/ontology/resource/environmentsensor#rpm>
+                "111"^^<http://www.w3.org/2001/XMLSchema#int> .
+

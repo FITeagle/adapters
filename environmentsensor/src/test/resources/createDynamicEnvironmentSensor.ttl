@@ -1,0 +1,9 @@
+@prefix fs20: <http://open-multinet.info/ontology/resource/fs20#> .
+@prefix environmentsensor: <http://open-multinet.info/ontology/resource/environmentsensor#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+
+av:FS20-1 a fs20:FS20 .
+
+av:EnvironmentSensor2251 a environmentsensor:EnvironmentSensor ;
+          environmentsensor:rpm 23 ;
+          environmentsensor:isDynamic true.

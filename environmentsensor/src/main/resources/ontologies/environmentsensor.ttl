@@ -1,0 +1,57 @@
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+@prefix omn:           <http://open-multinet.info/ontology/omn#> .
+@prefix fs20:   <http://open-multinet.info/ontology/resource/fs20#> .
+@prefix environmentsensor:         <http://open-multinet.info/ontology/resource/environmentsensor#> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
+@prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+
+fs20:FS20
+        a                          owl:Class ;
+        rdfs:label                 "FS20"@en ;
+        rdfs:subClassOf            omn:Adapter ;
+        omn-lifecycle:implements   environmentsensor:EnvironmentSensor .
+        
+environmentsensor:EnvironmentSensor
+        a                            owl:Class ;
+        rdfs:label                   "EnvironmentSensor"@en ;
+        rdfs:subClassOf              omn:Resource ;
+        omn-lifecycle:implementedBy  fs20:FS20 .
+          
+environmentsensor:manufacturer
+        a            owl:DatatypeProperty ;
+        a            owl:FunctionalProperty ;
+        rdfs:domain  environmentsensor:EnvironmentSensor ;
+        rdfs:label   "manufacturer"@en ;
+        rdfs:range   xsd:string .
+
+environmentsensor:throttle
+        a            owl:DatatypeProperty ;
+        a            owl:FunctionalProperty ;
+        rdfs:domain  environmentsensor:EnvironmentSensor ;
+        rdfs:label   "throttle"@en ;
+        rdfs:range   xsd:integer .
+
+environmentsensor:isDynamic
+        a            owl:DatatypeProperty ;
+        a            owl:FunctionalProperty ;
+        rdfs:domain  environmentsensor:EnvironmentSensor ;
+        rdfs:label   "dynamic"@en ;
+        rdfs:range   xsd:boolean .
+
+environmentsensor:rpm
+        a            owl:DatatypeProperty ;
+        a            owl:FunctionalProperty ;
+        rdfs:domain  environmentsensor:EnvironmentSensor ;
+        rdfs:label   "rounds per minutes"@en ;
+        rdfs:range   xsd:integer .
+
+environmentsensor:maxRpm
+        a            owl:DatatypeProperty ;
+        a            owl:FunctionalProperty ;
+        rdfs:domain  environmentsensor:EnvironmentSensor ;
+        rdfs:label   "maximum rounds per minute"@en ;
+        rdfs:range   xsd:integer .
+

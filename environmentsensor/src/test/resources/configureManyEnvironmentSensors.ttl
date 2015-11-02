@@ -1,0 +1,12 @@
+@prefix fs20: <http://open-multinet.info/ontology/resource/fs20#> .
+@prefix environmentsensor: <http://open-multinet.info/ontology/resource/environmentsensor#> .
+@prefix av:    <http://federation.av.tu-berlin.de/about#> .
+
+av:FS20-1 a fs20:FS20 .
+
+av:EnvironmentSensor1 a environmentsensor:EnvironmentSensor ;
+          environmentsensor:rpm 500 ;
+			    environmentsensor:maxRpm 1000 .
+
+av:EnvironmentSensor2 a environmentsensor:EnvironmentSensor ;
+          environmentsensor:rpm 102 .
