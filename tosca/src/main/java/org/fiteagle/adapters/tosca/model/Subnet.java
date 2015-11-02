@@ -11,6 +11,25 @@ public class Subnet {
     private String name;
     private String cidr;
     private String startIp;
+    private boolean mgmt;
+
+    public String getFloatingIp() {
+        return floatingIp;
+    }
+
+    public void setFloatingIp(String floatingIp) {
+        this.floatingIp = floatingIp;
+    }
+
+    private String floatingIp;
+
+    public boolean isMgmt() {
+        return mgmt;
+    }
+
+    public void setMgmt(boolean mgmt) {
+        this.mgmt = mgmt;
+    }
 
     public String getId() {
         return id;

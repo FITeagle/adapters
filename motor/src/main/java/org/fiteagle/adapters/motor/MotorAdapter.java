@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
-<<<<<<< f602314234e0b59f46e6a5e83c08e1ef279efecf
-=======
-
->>>>>>> merge
 
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
@@ -27,14 +23,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-<<<<<<< f602314234e0b59f46e6a5e83c08e1ef279efecf
-import info.openmultinet.ontology.vocabulary.Omn;
-import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
-=======
-import org.fiteagle.api.core.MessageBusOntologyModel;
 
-
->>>>>>> merge
 
 public final class MotorAdapter extends AbstractAdapter {
 
@@ -76,22 +65,12 @@ public final class MotorAdapter extends AbstractAdapter {
     }
 
     @Override
-<<<<<<< f602314234e0b59f46e6a5e83c08e1ef279efecf
     public Model createInstance(final String instanceURI, final Model modelCreate) {
-	final Motor motor = new Motor(this, instanceURI);
-	this.instanceList.put(instanceURI, motor);
-	this.updateInstance(instanceURI, modelCreate);
-	return this.parseToModel(motor);
-=======
-    public Model createInstance(String instanceURI, Model modelCreate) {
-        LOGGER.info("Creating instance "+instanceURI+" for Motor ");
-        LOGGER.info("I am ADAPTER: "+ this.adapterABox.getLocalName() );
-        Motor motor = new Motor(this, instanceURI);
-        instanceList.put(instanceURI, motor);
-        updateInstance(instanceURI, modelCreate);
-        return parseToModel(motor);
->>>>>>> merge
-    }
+		final Motor motor = new Motor(this, instanceURI);
+		this.instanceList.put(instanceURI, motor);
+		this.updateInstance(instanceURI, modelCreate);
+		return this.parseToModel(motor);
+	}
 
     @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     Model parseToModel(final Motor motor) {

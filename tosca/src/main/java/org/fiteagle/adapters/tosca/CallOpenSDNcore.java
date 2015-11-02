@@ -103,9 +103,9 @@ public class CallOpenSDNcore implements Runnable{
      
      protected String parseToDefinitions(Model model) throws InvalidRequestException {
        try {
-         InfModel infModel = createInfModel(model);
-         infModel.setNsPrefix("osco","http://opensdncore.org/ontology/");
-         return OMN2Tosca.getTopology(infModel); 
+         //InfModel infModel = createInfModel(model);
+         //infModel.setNsPrefix("osco","http://opensdncore.org/ontology/");
+         return OMN2Tosca.getTopology(model);
        } catch(InvalidModelException | JAXBException | MultiplePropertyValuesException | RequiredResourceNotFoundException | MultipleNamespacesException e){
          throw new InvalidRequestException(e);
        }

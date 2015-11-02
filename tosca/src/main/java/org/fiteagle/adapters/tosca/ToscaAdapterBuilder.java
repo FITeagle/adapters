@@ -6,6 +6,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import info.openmultinet.ontology.vocabulary.*;
+import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.tosca.client.IToscaClient;
 import org.fiteagle.adapters.tosca.client.OrchestratorClient;
 import org.fiteagle.adapters.tosca.client.ToscaClient;
@@ -52,13 +53,15 @@ public class ToscaAdapterBuilder {
         return  locations;
     }
 
-    public void handleAdapter(ToscaAdapter adapter) {
+    public void handleAdapter(AbstractAdapter adapter) {
         addServices(adapter);
         addLocations(adapter);
+        
+
 
     }
 
-    private void addLocations(ToscaAdapter adapter) {
+    private void addLocations(AbstractAdapter adapter) {
         for(Location location: locations){
 
             Resource resource = adapter.getAdapterDescriptionModel().createResource(adapter.getAdapterABox().getURI() + "/" + location.getName());
@@ -74,7 +77,7 @@ public class ToscaAdapterBuilder {
         }
     }
 
-    private void addServices(ToscaAdapter adapter) {
+    private void addServices(AbstractAdapter adapter) {
         for(Service service: services){
 
             Resource resource = adapter.getAdapterDescriptionModel().createResource(adapter.getAdapterABox().getURI() + "/"+ service.getServiceType());
@@ -93,5 +96,9 @@ public class ToscaAdapterBuilder {
             resource.addProperty(property,p.getConfig_value());
         }
 
+    }
+
+    public List<Datacenter> getDatacenters() {
+        return datacenters;
     }
 }

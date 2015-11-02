@@ -107,13 +107,9 @@ public class ToscaAdapterTest {
     String toscaEndpoint = "http://xxx.xxx.xxx.xxx:8080/api/rest/tosca/v2/";
     Model model = ModelFactory.createDefaultModel();
     Resource resource = model.createResource(adapterInstance);
-<<<<<<< 2b536ea07ec430a5e6c78c5fb064c4caf42fded2
     ToscaAdapter adapter = new ToscaAdapter(adapterModel, resource, null);
-    adapter.setToscaClient(toscaEndpoint);
-=======
-    ToscaAdapter adapter = new ToscaAdapter(adapterModel, resource);
 
->>>>>>> wip tosca
+
     
     return adapter;
   }

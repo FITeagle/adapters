@@ -89,18 +89,41 @@ public class ToscaAdapterControl extends AdapterControl {
                     String toscaEndpointURI = endpoint + configInstanceObject.getString(TOSCA_ENDPOINT);
                     String adminEndpoint = configInstanceObject.getString(ADMIN_ENDPOINT);
 
-                    OrchestratorClient client = new OrchestratorClient(endpoint);
-                    client.setOrchestratorEndpoint(orchestrator_enpoint);
-                    client.setAdminEndpoint(adminEndpoint);
-                    IToscaClient  toscaClient = new ToscaClient(toscaEndpointURI);
-                    ToscaAdapterBuilder adapterBuilder = new ToscaAdapterBuilder(client, toscaClient);
+                    boolean jsonAdapter = configInstanceObject.getBoolean("json");
+                    if(jsonAdapter){
+                        JsonArray datacenters = configInstanceObject.getJsonArray("datacenters");
+                        OscoclientConfigObject oscoclientConfigObject = new OscoclientConfigObject();
+
+                        oscoclientConfigObject.addDatacenters(datacenters);
+                        oscoclientConfigObject.setEndpoint(endpoint);
+                        oscoclientConfigObject.setOrchestratorEndpoint(orchestrator_enpoint);
+                        oscoclientConfigObject.setAdminEndpoint(adminEndpoint);
+                        OrchestratorClient client = new OrchestratorClient(oscoclientConfigObject);
+                        ToscaAdapterBuilder adapterBuilder = new ToscaAdapterBuilder(client,null);
+                        Resource adapterInstance = adapterModel.createResource(configComponentId);
+                        OSCOAdapter oscoAdapter = new OSCOAdapter(adapterModel,adapterInstance,mdbSender);
+                        adapterBuilder.handleAdapter(oscoAdapter);
+                        oscoAdapter.setClient(client);
+                        oscoAdapter.addDatacenters(adapterBuilder.getDatacenters());
+                        this.adapterInstances.put(oscoAdapter.getId(), oscoAdapter);
+
+                    }else{
+                        OrchestratorClient client = new OrchestratorClient(endpoint);
+                        client.setOrchestratorEndpoint(orchestrator_enpoint);
+                        client.setAdminEndpoint(adminEndpoint);
+                        IToscaClient  toscaClient = new ToscaClient(toscaEndpointURI);
+                        ToscaAdapterBuilder adapterBuilder = new ToscaAdapterBuilder(client, toscaClient);
 
 
-                    Resource adapterInstance = adapterModel.createResource(configComponentId);
-                    ToscaAdapter adapter = (ToscaAdapter) createAdapterInstance(adapterModel, adapterInstance);
+                        Resource adapterInstance = adapterModel.createResource(configComponentId);
+                        ToscaAdapter adapter = (ToscaAdapter) createAdapterInstance(adapterModel, adapterInstance);
 
-                    adapterBuilder.handleAdapter(adapter);
-                    this.adapterInstances.put(adapter.getId(), adapter);
+                        adapterBuilder.handleAdapter(adapter);
+                        this.adapterInstances.put(adapter.getId(), adapter);
+                    }
+
+
+
 
 
                 }
@@ -109,7 +132,8 @@ public class ToscaAdapterControl extends AdapterControl {
 
         }
     }
-    
+
+
     @Override
     protected void addAdapterProperties(Map<String, String> adapterInstnaceMap){
       adapterInstnaceMap.put(TOSCA_ENDPOINT, "");
