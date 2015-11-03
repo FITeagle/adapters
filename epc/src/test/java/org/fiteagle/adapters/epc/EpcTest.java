@@ -30,28 +30,28 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 public class EpcTest {
 
-	// @Test
-	// public void testEpc() throws UnsupportedEncodingException {
-	//
-	// final String instanceName = "http://foo";
-	// final EpcAdapter owningAdapter = null;
-	// final UserEquipment epc = new UserEquipment(owningAdapter, instanceName);
-	// epc.setLteSupport(true);
-	// Assert.assertEquals(true, epc.isLteSupport());
-	// Assert.assertEquals(instanceName, epc.getInstanceName());
-	// Assert.assertFalse(epc.isLteSupport() == false);
-	//
-	// String statementString = "<"
-	// + instanceName
-	// + "> <"
-	// + info.openmultinet.ontology.vocabulary.Epc.lteSupport
-	// .toString() + "> false";
-	//
-	// final Statement statement = getStatement(statementString);
-	//
-	// epc.updateProperty(statement);
-	// Assert.assertTrue(epc.isLteSupport() == false);
-	// }
+	@Test
+	public void testEpc() throws UnsupportedEncodingException {
+
+		final String instanceName = "http://foo";
+		final EpcAdapter owningAdapter = null;
+		final UserEquipment epc = new UserEquipment(owningAdapter, instanceName);
+		epc.setLteSupport(true);
+		Assert.assertEquals(true, epc.isLteSupport());
+		Assert.assertEquals(instanceName, epc.getInstanceName());
+		Assert.assertFalse(epc.isLteSupport() == false);
+
+		String statementString = "<"
+				+ instanceName
+				+ "> <"
+				+ info.openmultinet.ontology.vocabulary.Epc.lteSupport
+						.toString() + "> false";
+
+		final Statement statement = getStatement(statementString);
+
+		epc.updateProperty(statement);
+		Assert.assertTrue(epc.isLteSupport() == false);
+	}
 
 	@Test
 	public void testCreateMultipleNodes() throws JAXBException,
@@ -82,19 +82,19 @@ public class EpcTest {
 
 		String statementString1 = "<http://open-multinet.info/example#ue1> <"
 				+ RDF.type.toString()
-				+ "> <http://open-multinet.info/ontology/epc#UserEquipment>";
+				+ "> <http://open-multinet.info/ontology/resource/epc#UserEquipment>";
 		final Statement statement1 = getStatement(statementString1);
 		Assert.assertTrue(allInstances.contains(statement1));
 
 		String statementString2 = "<http://open-multinet.info/example#an1> <"
 				+ RDF.type.toString()
-				+ "> <http://open-multinet.info/ontology/epc#AccessNetwork>";
+				+ "> <http://open-multinet.info/ontology/resource/epc#AccessNetwork>";
 		final Statement statement2 = getStatement(statementString2);
 		Assert.assertTrue(allInstances.contains(statement2));
 
 		String statementString3 = "<http://open-multinet.info/example#epc1> <"
 				+ RDF.type.toString()
-				+ "> <http://open-multinet.info/ontology/epc#EvolvedPacketCore>";
+				+ "> <http://open-multinet.info/ontology/resource/epc#EvolvedPacketCore>";
 		final Statement statement3 = getStatement(statementString3);
 		Assert.assertTrue(allInstances.contains(statement3));
 
@@ -118,6 +118,8 @@ public class EpcTest {
 				StandardCharsets.UTF_8.name(), Lang.TTL.getName());
 		final Resource adapterABox = defaultModel
 				.createResource("http://www.test.com/EpcAdapter-1");
+		System.out.println("***********adapter a box");
+		System.out.println(Parser.toString(adapterABox.getModel()));
 		final EpcAdapter adapter = new EpcAdapter(adapterTBox, adapterABox);
 
 		return adapter;
