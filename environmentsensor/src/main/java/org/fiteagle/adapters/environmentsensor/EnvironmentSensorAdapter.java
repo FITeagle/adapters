@@ -35,7 +35,7 @@ public final class EnvironmentSensorAdapter extends AbstractAdapter {
 
     private transient final HashMap<String, EnvironmentSensor> instanceList = new HashMap<String, EnvironmentSensor>();
     private static final Logger LOGGER = Logger.getLogger(EnvironmentSensorAdapter.class.toString());
-	private String sshIP;
+	private String sshIP="";
 	private String username;
 	private String password;
 	private JSch jsch;
