@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -80,9 +81,13 @@ public class UserEquipment extends EpcImplementable {
 	public void parseToModel(Resource resource) {
 		resource.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.UserEquipment);
+		resource.addProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Omn.Resource);
 
-		String uuid = "urn:uuid:" + UUID.randomUUID().toString();
-		final Resource ueDetails = resource.getModel().createResource(uuid);
+		// String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+		String resourceUri = resource.getURI().toString() + "-details";
+		final Resource ueDetails = resource.getModel().createResource(
+				resourceUri);
 		ueDetails.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.UserEquipmentDetails);
 		resource.addProperty(
@@ -112,6 +117,25 @@ public class UserEquipment extends EpcImplementable {
 					.addProperty(
 							info.openmultinet.ontology.vocabulary.Epc.hasAccessPointName,
 							apnResource);
+		}
+	}
+
+	@SuppressWarnings({ "PMD.GuardLogStatementJavaUtil", "PMD.LongVariable" })
+	public void updateProperty(final Statement configureStatement) {
+		if (configureStatement.getSubject().getURI()
+				.equals(this.getInstanceName())) {
+			Property predicate = configureStatement.getPredicate();
+
+			if (predicate.equals(Epc.lteSupport)) {
+				this.setLteSupport(configureStatement.getObject().asLiteral()
+						.getBoolean());
+			} else {
+				LOGGER.warning("Unknown predicate: " + predicate);
+			}
+		} else {
+			LOGGER.warning("Unknown URI: "
+					+ configureStatement.getSubject().getURI());
+			LOGGER.warning("Expected URI: " + this.getInstanceName());
 		}
 	}
 

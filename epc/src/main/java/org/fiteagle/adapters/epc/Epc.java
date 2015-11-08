@@ -19,7 +19,6 @@ public class Epc extends EpcImplementable {
 	private List<String> subscribers;
 	private String vendor;
 	// private List<ENodeB> eNodeB;
-	
 
 	// private final transient EpcAdapter owningAdapter;
 	// private final String instanceName;
@@ -126,9 +125,12 @@ public class Epc extends EpcImplementable {
 	public void parseToModel(Resource resource) {
 		resource.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.EvolvedPacketCore);
-
-		String uuid = "urn:uuid:" + UUID.randomUUID().toString();
-		final Resource epcDetails = resource.getModel().createResource(uuid);
+		resource.addProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Omn.Resource);
+		// String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+		String resourceUri = resource.getURI().toString() + "-details";
+		final Resource epcDetails = resource.getModel().createResource(
+				resourceUri);
 		epcDetails
 				.addProperty(
 						RDF.type,

@@ -73,8 +73,8 @@ public final class EpcAdapter extends AbstractAdapter {
 				EpcAdapter.EPC_CTRL_PROPS.add(property);
 			}
 		}
-		System.out.println("***********Tbox");
-		System.out.println(Parser.toString(adapterTBox));
+		// System.out.println("***********Tbox");
+		// System.out.println(Parser.toString(adapterTBox));
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public final class EpcAdapter extends AbstractAdapter {
 			LOGGER.info("Returning updated epc: " + newModel);
 			return newModel;
 		} else {
-			LOGGER.info("Instance list does not contain key.");	
+			LOGGER.info("Instance list does not contain key.");
 		}
 		LOGGER.info("Creating new instance");
 		return ModelFactory.createDefaultModel();
@@ -172,11 +172,13 @@ public final class EpcAdapter extends AbstractAdapter {
 
 	@Override
 	public Resource getAdapterABox() {
+		LOGGER.info("Getting adapter ABox...");
 		return this.adapterABox;
 	}
 
 	@Override
 	public Model getAdapterDescriptionModel() {
+		LOGGER.info("Getting adapter description model...");
 		return this.adapterTBox;
 	}
 

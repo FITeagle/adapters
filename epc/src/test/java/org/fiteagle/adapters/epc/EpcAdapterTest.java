@@ -61,6 +61,7 @@ public class EpcAdapterTest {
 				.getResourceAsStream("/updateEpc.ttl");
 		cfgModel.read(cfg, StandardCharsets.UTF_8.name(), Lang.TTL.getName());
 		epc = adapter.updateInstance(URN_USER_EQUIPMENT_1, cfgModel);
+		
 		Resource epcDetailsNew = epc.getResource(URN_USER_EQUIPMENT_1)
 				.getProperty(Epc.hasUserEquipment).getObject().asResource();
 		Assert.assertEquals(true, epcDetailsNew.getProperty(Epc.lteSupport)

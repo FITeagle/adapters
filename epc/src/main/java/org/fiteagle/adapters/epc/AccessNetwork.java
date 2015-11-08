@@ -163,9 +163,12 @@ public class AccessNetwork extends EpcImplementable {
 	public void parseToModel(Resource resource) {
 		resource.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.AccessNetwork);
-
-		String uuid = "urn:uuid:" + UUID.randomUUID().toString();
-		final Resource anDetails = resource.getModel().createResource(uuid);
+		resource.addProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Omn.Resource);
+		// String uuid = "urn:uuid:" + UUID.randomUUID().toString();
+		String resourceUri = resource.getURI().toString() + "-details";
+		final Resource anDetails = resource.getModel().createResource(
+				resourceUri);
 		anDetails.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.AccessNetworkDetails);
 		resource.addProperty(
