@@ -79,7 +79,16 @@ public class EnvironmentSensorAdapterControl extends AdapterControl {
 		    final Model model = ModelFactory.createDefaultModel();
 		    final Resource resource = model.createResource(adapterInstance);
 		    // parse possible additional values from config
-		    this.createAdapterInstance(this.adapterModel, resource);
+		    EnvironmentSensorAdapter adapter = (EnvironmentSensorAdapter)this.createAdapterInstance(this.adapterModel, resource);
+			String sshIp = adaptInstObject.getString("ssh_ip");
+			String username = adaptInstObject.getString("username");
+			String password = adaptInstObject.getString("password");
+
+			adapter.setSshIP(sshIp);
+			adapter.setUsername(username);
+			adapter.setPassword(password);
+
+
 		}
 	    }
 

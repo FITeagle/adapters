@@ -62,7 +62,8 @@ public class CallOpenSDNcoreJson implements Runnable{
             Statement statement = stmtIterator.nextStatement();
             Resource service = newInstanceModel.getResource(statement.getObject().asResource().getURI());
             ServiceContainerRequest serviceContainerRequest = new ServiceContainerRequest();
-            Resource location = service.getProperty(Omn_resource.hasLocation).getObject().asResource();
+
+            Resource location = getLocation(service);
             addServiceLocations(serviceContainerRequest, location);
             Datacenter requestedDatacenter = getDatacenter(location);
             if(requestedDatacenter != null){
@@ -80,6 +81,22 @@ public class CallOpenSDNcoreJson implements Runnable{
 
         }
          return topologyRequest;
+    }
+
+    private Resource getLocation(Resource service) {
+        service.getProperty(Omn_resource.hasLocation).getObject().asResource();
+        StmtIterator stmtIterator = service.listProperties(Omn_resource.hasLocation);
+        Resource ret = null;
+        while(stmtIterator.hasNext()){
+            Statement statement = stmtIterator.nextStatement();
+            Resource location = newInstanceModel.getResource(statement.getObject().asResource().getURI());
+            if(!location.hasProperty(Omn_resource.jfedX)){
+                ret = location;
+            }
+
+        }
+        return ret;
+        
     }
 
     private void addServices(Resource service, ServiceContainerRequest serviceContainerRequest) {
@@ -191,12 +208,17 @@ public class CallOpenSDNcoreJson implements Runnable{
         ResIterator resIterator = newInstanceModel.listResourcesWithProperty(RDF.type, Omn_resource.Location);
         while(resIterator.hasNext()){
             Resource location = resIterator.nextResource();
-            if(location.hasProperty(RDFS.label)){
-                locations.add(location.getProperty(RDFS.label).getObject().asLiteral().getString());
+            if(location.hasProperty(Omn_resource.jfedX)){
+
             }else{
-                String locationName = findLocation(location);
-                locations.add(locationName);
+                if(location.hasProperty(RDFS.label)){
+                    locations.add(location.getProperty(RDFS.label).getObject().asLiteral().getString());
+                }else{
+                    String locationName = findLocation(location);
+                    locations.add(locationName);
+                }
             }
+
 
 
 

@@ -1,13 +1,16 @@
 package org.fiteagle.adapters.environmentsensor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_service;
+import info.openmultinet.ontology.vocabulary.Osco;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -22,7 +25,8 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-
+import com.jcraft.jsch.*;
+import org.fiteagle.api.core.OntologyModelUtil;
 
 
 public final class EnvironmentSensorAdapter extends AbstractAdapter {
@@ -31,8 +35,12 @@ public final class EnvironmentSensorAdapter extends AbstractAdapter {
 
     private transient final HashMap<String, EnvironmentSensor> instanceList = new HashMap<String, EnvironmentSensor>();
     private static final Logger LOGGER = Logger.getLogger(EnvironmentSensorAdapter.class.toString());
+	private String sshIP;
+	private String username;
+	private String password;
+	private JSch jsch;
 
-    public EnvironmentSensorAdapter(final Model adapterModel, final Resource adapterABox) {
+	public EnvironmentSensorAdapter(final Model adapterModel, final Resource adapterABox) {
 	super();
 	this.uuid = UUID.randomUUID().toString();
 	this.adapterTBox = adapterModel;
@@ -82,6 +90,14 @@ public final class EnvironmentSensorAdapter extends AbstractAdapter {
 		Omn_lifecycle.hasState.getLocalName());
 	property.addProperty(RDF.type, OWL.FunctionalProperty);
 	resource.addProperty(property, Omn_lifecycle.Ready);
+		Resource loginService = resource.getModel().createResource(OntologyModelUtil
+				.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+		loginService.addProperty(RDF.type, Omn_service.LoginService);
+		loginService.addProperty(Omn_service.authentication,"ssh-keys");
+		loginService.addProperty(Omn_service.username, "stack");
+		loginService.addProperty(Omn_service.hostname, sshIP);
+		loginService.addProperty(Omn_service.port,"22");
+		resource.addProperty(Omn.hasService, loginService);
 	for (final Property prop : EnvironmentSensorAdapter.MOTOR_CTRL_PROPS) {
 	    switch (prop.getLocalName()) {
 	    case "rpm":
@@ -189,6 +205,95 @@ public final class EnvironmentSensorAdapter extends AbstractAdapter {
 	LOGGER.warning("Not implemented. Input: " + configuration);
     }
 
-	public void handleInform(Model model) {
+	public void handleNewGW(String uri, Model model) {
+		Resource service = model.getResource(uri);
+		Resource loginService = model.getResource(service.getProperty(Omn.hasService).getObject().asResource().getURI());
+		String ip = loginService.getProperty(Omn_service.hostname).getObject().asLiteral().getString();
+		String port = service.getProperty(Osco.APP_PORT).getObject().asLiteral().getString();
+		String id = service.getProperty(RDFS.label).getObject().asLiteral().getString();
+		LOGGER.log(Level.INFO,"################## executing command");
+		this.jsch = new JSch();
+		try {
+			Session session = jsch.getSession(username,sshIP);
+			Properties prop = new Properties();
+			prop.put("StrictHostKeyChecking", "no");
+			session.setConfig(prop);
+			session.setPassword(password);
+			session.connect();
+			ChannelExec commandChannel = (ChannelExec) session.openChannel("exec");
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			commandChannel.setOutputStream(stream);
+			String command = "./start_iwp.sh " + ip + " "+port + " " + id ;
+			commandChannel.setCommand(command);
+			executeCommand(commandChannel);
+		} catch (JSchException e) {
+			LOGGER.log(Level.SEVERE, "could not connect to iwp");
+		}
+	}
+
+	public void setSshIP(String sshIP) {
+		this.sshIP = sshIP;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	private void executeCommand(ChannelExec channel) {
+		try {
+			channel.connect();
+			InputStream in = channel.getInputStream();
+			byte[] tmp = new byte[1024];
+			while (true) {
+				while (in.available() > 0) {
+					int i = in.read(tmp, 0, 1024);
+					if (i < 0) break;
+					LOGGER.log(Level.INFO, new String(tmp, 0, i));
+				}
+				if (channel.isClosed()) {
+					LOGGER.log(Level.INFO, "exit-status: " + channel.getExitStatus());
+					break;
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (Exception ee) {
+				}
+			}
+
+
+			channel.disconnect();
+
+		} catch (JSchException e) {
+			LOGGER.log(Level.SEVERE, " problem by executing this command ", e);
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, " problem by executing this command ", e);
+		}
+
+	}
+
+	public void handleDelete(String uri, Model model) {
+		LOGGER.log(Level.INFO,"################## executing command");
+		Resource service = model.getResource(uri);
+		String id = service.getProperty(RDFS.label).getObject().asLiteral().getString();
+		this.jsch = new JSch();
+		try {
+			Session session = jsch.getSession(username,sshIP);
+			Properties prop = new Properties();
+			prop.put("StrictHostKeyChecking", "no");
+			session.setConfig(prop);
+			session.setPassword(password);
+			session.connect();
+			ChannelExec commandChannel = (ChannelExec) session.openChannel("exec");
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			commandChannel.setOutputStream(stream);
+			String command = "./stop_iwp.sh "+ id;
+			commandChannel.setCommand(command);
+			executeCommand(commandChannel);
+		} catch (JSchException e) {
+			LOGGER.log(Level.SEVERE, "could not connect to iwp");
+		}
 	}
 }

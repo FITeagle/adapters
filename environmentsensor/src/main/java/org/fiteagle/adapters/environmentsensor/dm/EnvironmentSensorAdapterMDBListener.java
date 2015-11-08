@@ -10,6 +10,11 @@ import javax.ejb.MessageDriven;
 import javax.jms.Message;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
+import info.openmultinet.ontology.vocabulary.Omn;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBListener;
 import org.fiteagle.adapters.environmentsensor.EnvironmentSensorAdapter;
@@ -49,14 +54,38 @@ public class EnvironmentSensorAdapterMDBListener extends AbstractAdapterMDBListe
 
 		if (messageType != null && messageBody != null) {
 			if (messageType.equals(IMessageBus.TYPE_INFORM)) {
-				Model model = MessageUtil.parseSerializedModel(messageBody,serialization);
+				Model model = MessageUtil.parseSerializedModel(messageBody, serialization);
 
-				for(AbstractAdapter aadapter : getAdapterInstances()){
-					EnvironmentSensorAdapter adapter = (EnvironmentSensorAdapter)aadapter;
-					adapter.handleInform(model);
+				ResIterator resIterator = model.listResourcesWithProperty(RDF.type);
+				while (resIterator.hasNext()) {
+
+					Resource resource = resIterator.nextResource();
+					if (resource.getProperty(RDF.type).getObject().asResource().getLocalName().equals("m2m_gateway")) {
+						LOGGER.log(Level.INFO, "Found M2MGateway");
+						if (resource.hasProperty(Omn.hasService)) {
+							if (resource.hasProperty(Omn_lifecycle.hasState)) {
+								if (resource.getProperty(Omn_lifecycle.hasState).getObject().asResource().getURI().equals(Omn_lifecycle.Removing.getURI())) {
+									LOGGER.log(Level.INFO, "Deleting GW");
+									for (AbstractAdapter aadapter : getAdapterInstances()) {
+										EnvironmentSensorAdapter adapter = (EnvironmentSensorAdapter) aadapter;
+										adapter.handleDelete(resource.getURI(), model);
+									}
+								} else {
+
+									for (AbstractAdapter aadapter : getAdapterInstances()) {
+										EnvironmentSensorAdapter adapter = (EnvironmentSensorAdapter) aadapter;
+										adapter.handleNewGW(resource.getURI(), model);
+									}
+								}
+							}
+						} else {
+							LOGGER.log(Level.INFO, "NO IP yet");
+						}
+
+					}
 				}
-
-			} else
+			}
+			else
 				super.onMessage(message);
 		}
 	}

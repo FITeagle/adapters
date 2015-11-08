@@ -60,5 +60,6 @@
 		<module>openstack</module>
 		<module>sshService</module>
 		<module>tosca</module>
+		<module>environmentsensor</module>
 	</modules>
 </project>

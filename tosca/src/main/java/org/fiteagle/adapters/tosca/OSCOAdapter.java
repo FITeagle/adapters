@@ -5,10 +5,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import info.openmultinet.ontology.translators.tosca.jaxb.Definitions;
-import info.openmultinet.ontology.vocabulary.Omn;
-import info.openmultinet.ontology.vocabulary.Omn_federation;
-import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
-import info.openmultinet.ontology.vocabulary.Omn_service;
+import info.openmultinet.ontology.vocabulary.*;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.tosca.client.OrchestratorClient;
 import org.fiteagle.adapters.tosca.dm.ToscaMDBSender;
@@ -100,6 +97,7 @@ public class OSCOAdapter extends AbstractAdapter {
             Resource res = returnModel.createResource(resource.getURI());
             Property property = returnModel.createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
             property.addProperty(RDF.type, OWL.FunctionalProperty);
+            res.addProperty(RDF.type, Omn.Resource);
             res.addProperty(property, Omn_lifecycle.Uncompleted);
         }
 
@@ -116,23 +114,36 @@ public class OSCOAdapter extends AbstractAdapter {
     public Model deleteInstances(Model model) throws InvalidRequestException, ProcessingException {
 
         Model deletedInstancesModel = ModelFactory.createDefaultModel();
-
+        TopologyResponse response = null;
         NodeIterator nodeIterator = model.listObjectsOfProperty(Omn.hasResource);
-        while(nodeIterator.hasNext()){
-            RDFNode node = nodeIterator.nextNode();
-            String instanceLocalName = node.asResource().getLocalName();
-            if(this.topologies.get(instanceLocalName)!= null){
-                TopologyResponse topologyResponse = topologies.get(instanceLocalName);
-                client.deleteTopology(topologyResponse.getId());
+        while(nodeIterator.hasNext()) {
+            Resource node = nodeIterator.nextNode().asResource();
+            String instanceLocalName = node.getLocalName();
+            if (this.topologies.get(instanceLocalName) != null) {
+                response = topologies.get(instanceLocalName);
                 topologies.remove(instanceLocalName);
+            }
+        }
+        NodeIterator nodeIterator2 = model.listObjectsOfProperty(Omn.hasResource);
+        while (nodeIterator2.hasNext()) {
+            Resource node = nodeIterator2.nextNode().asResource();
+            for (ServiceContainerResponse serviceContainerResponse : response.getServiceContainers()) {
+
+                if (serviceContainerResponse.getContainerName().equals(node.getLocalName())) {
+                    node.removeAll(RDF.type);
+                    node.addProperty(RDF.type, deletedInstancesModel.createResource(getAdapterABox().getURI() + "/" + serviceContainerResponse.getRelationElements().get(0).getServiceInstance().getServiceType()));
+                    node.addProperty(RDFS.label, serviceContainerResponse.getRelationElements().get(0).getServiceInstance().getInstanceName());
+                    node.removeAll(Omn_lifecycle.hasState);
+                    node.addProperty(Omn_lifecycle.hasState,Omn_lifecycle.Removing);
+                }
+
 
             }
-
-            Resource deletedInstance = deletedInstancesModel.createResource(node.asResource().getURI());
-            deletedInstance.addProperty(Omn_lifecycle.hasState, Omn_lifecycle.Removing);
         }
 
-        return deletedInstancesModel;
+        client.deleteTopology(response.getId());
+
+        return model;
     }
     protected String getLocalname(String instanceURI) throws InvalidRequestException {
         try{
@@ -202,15 +213,35 @@ public class OSCOAdapter extends AbstractAdapter {
         while(resIterator.hasNext()){
             Resource resource = resIterator.nextResource();
             Resource res = returnModel.createResource(resource.getURI());
+            setResouceType(resource,res);
             Property property = returnModel.createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
             property.addProperty(RDF.type, OWL.FunctionalProperty);
             res.addProperty(property, Omn_lifecycle.Ready);
-            addLoginService(res,result);
+            if(resource.hasProperty(Osco.APP_PORT)){
+                res.addProperty(Osco.APP_PORT, resource.getProperty(Osco.APP_PORT).getObject());
+            }
+            res.addProperty(RDFS.label, resource.getProperty(RDFS.label).getObject());
+            addLoginService(res, result);
         }
 
         return returnModel;
 
 
+    }
+
+    private void setResouceType(Resource resource, Resource res) {
+
+        StmtIterator stmtIterator = resource.listProperties(RDF.type);
+        while (stmtIterator.hasNext()){
+            Statement statement = stmtIterator.nextStatement();
+            RDFNode type = statement.getObject();
+            if(Omn_resource.Node.getURI().equals(type.asResource().getURI()) || Omn.Resource.getURI().equals(type.asResource().getURI())){
+                LOGGER.log(Level.INFO,"ignore node type");
+            }else {
+                LOGGER.log(Level.INFO,"add type " + type.asResource().getURI());
+                res.addProperty(RDF.type, type.asResource());
+            }
+        }
     }
 
     private void addLoginService(Resource res, TopologyResponse result) {
