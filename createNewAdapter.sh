@@ -64,7 +64,7 @@ mv ${dir_main}/${src_resource_small} ${dir_main}/${resource_small}
 mv ${dir_test}/${src_resource_small} ${dir_test}/${resource_small}
 
 find src -iname "${src_resource}*.java"| xargs -I {} sh -c 'mv {} $(echo {}|sed "s/'${src_resource}/${resource}'/g")'
-
+find src -iname "*${src_resource}*.ttl"| xargs -I {} sh -c 'mv {} $(echo {}|sed "s/'${src_resource}/${resource}'/g")'
 mv src/main/resources/ontologies/${src_resource_small}.ttl src/main/resources/ontologies/${resource_small}.ttl
 find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_adapter}/${adapter}'/g" {}'
 find src -type f| xargs -I {} sh -c 'sed -i.bak -e "s/'${src_resource}/${resource}'/g" {}'

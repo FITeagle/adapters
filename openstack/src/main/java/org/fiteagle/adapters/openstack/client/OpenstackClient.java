@@ -420,8 +420,18 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 
 
 	@Override
-	public void deleteServer(String id){
-		
+	public boolean deleteServer(String id){
+	if(novaApi == null){
+		init();
+	}
+	
+	ServerApi serverApi = novaApi.getServerApi(DEFAULT_REGION);
+	
+	if(serverApi.delete(id)){
+		return true;
+	}else return false;
+	
+	
 	}
 
 	public String getNetworkId() {

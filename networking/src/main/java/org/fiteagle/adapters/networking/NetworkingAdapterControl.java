@@ -36,10 +36,13 @@ public class NetworkingAdapterControl extends AdapterControl{
   
   @PostConstruct
   public void initialize(){
+	  
     LOGGER.log(Level.SEVERE, "Starting NetworkingAdapter");
+	this.propertiesName = "NetworkingAdapter";
+
     this.adapterModel = OntologyModelUtil.loadModel("ontologies/networking.ttl", IMessageBus.SERIALIZATION_TURTLE);
 
-    this.adapterInstancesConfig= readConfig("NetworkingAdapter");
+    this.adapterInstancesConfig= readConfig(propertiesName);
 
     createAdapterInstances();
 

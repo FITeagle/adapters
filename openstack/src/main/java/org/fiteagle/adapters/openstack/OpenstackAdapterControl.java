@@ -58,6 +58,7 @@ public class OpenstackAdapterControl extends AdapterControl {
 
 
     Logger LOGGER = Logger.getLogger(this.getClass().getName());
+    
     @PostConstruct
     public void initialize(){
         LOGGER.log(Level.INFO, "Starting OpenStackAdapter");
@@ -66,66 +67,69 @@ public class OpenstackAdapterControl extends AdapterControl {
 
 
         
-        try {
+//        try {
+        
+        	this.propertiesName = "OpenStackAdapter";
         	init();
-			final WatchService watcher = FileSystems.getDefault().newWatchService();
-			final Path filePath = this.adapterInstancesConfig.getFilePath();
-			
-			try {
-			    final WatchKey key = filePath.getParent().register(watcher,
-			                           ENTRY_CREATE,
-			                           ENTRY_DELETE,
-			                           ENTRY_MODIFY);
-			    
-			    
-			    executorService.submit(new Runnable(){
-			    	Path tmpPath = filePath.getFileName();
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						
-						while(true){
-							WatchKey tmpKey = null;
-							try {
-								tmpKey = watcher.take();
-							} catch (InterruptedException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-							for (WatchEvent<?> event : tmpKey.pollEvents()) {
-								WatchEvent.Kind<?> kind = event.kind();
-								Path eventPath = (Path) event.context();
-								 if (eventPath.endsWith(tmpPath)) {
-									 
-										LOGGER.log(Level.SEVERE, "Property File changed. Will refresh Adapter now");
-										init();
-						            }
-								 key.reset();
-							}
-							
-						} 
-						
-						
-						
-					}
-			    	
-			    });
-			    
-			    
-			} catch (IOException x) {
-			    x.printStackTrace();
-			}
-			
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        	
+//			final WatchService watcher = FileSystems.getDefault().newWatchService();
+//			final Path filePath = this.adapterInstancesConfig.getFilePath();
+//			
+//			try {
+//			    final WatchKey key = filePath.getParent().register(watcher,
+//			                           ENTRY_CREATE,
+//			                           ENTRY_DELETE,
+//			                           ENTRY_MODIFY);
+//			    
+//			    
+//			    executorService.submit(new Runnable(){
+//			    	Path tmpPath = filePath.getFileName();
+//					@Override
+//					public void run() {
+//						// TODO Auto-generated method stub
+//						
+//						while(true){
+//							WatchKey tmpKey = null;
+//							try {
+//								tmpKey = watcher.take();
+//							} catch (InterruptedException e) {
+//								// TODO Auto-generated catch block
+//								e.printStackTrace();
+//							}
+//							
+//							for (WatchEvent<?> event : tmpKey.pollEvents()) {
+//								WatchEvent.Kind<?> kind = event.kind();
+//								Path eventPath = (Path) event.context();
+//								 if (eventPath.endsWith(tmpPath)) {
+//									 
+//										LOGGER.log(Level.SEVERE, "Property File changed. Will refresh Adapter now");
+//										init();
+//						            }
+//								 key.reset();
+//							}
+//							
+//						} 
+//						
+//						
+//						
+//					}
+//			    	
+//			    });
+//			    
+//			    
+//			} catch (IOException x) {
+//			    x.printStackTrace();
+//			}
+//			
+//			
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
     }
     
     public void init(){
-        this.adapterInstancesConfig= readConfig("OpenStackAdapter");
+        this.adapterInstancesConfig= readConfig(propertiesName);
 
         createAdapterInstances();
 

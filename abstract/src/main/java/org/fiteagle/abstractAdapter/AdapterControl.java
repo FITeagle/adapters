@@ -1,24 +1,37 @@
 package org.fiteagle.abstractAdapter;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
+
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
+import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterMDBSender;
 import org.fiteagle.abstractAdapter.dm.IAbstractAdapter;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IConfig;
 
 import javax.ejb.Local;
+import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  * Created by dne on 15.06.15.
@@ -33,6 +46,9 @@ public abstract class AdapterControl {
 
     @Inject
     protected AbstractAdapterMDBSender mdbSender;
+    @javax.annotation.Resource
+	private ManagedExecutorService executorService;
+    protected String propertiesName;
 
     public abstract AbstractAdapter createAdapterInstance(Model model, Resource resource);
 
@@ -47,9 +63,67 @@ public abstract class AdapterControl {
             this.adapterInstances = new HashMap<>();
 
         parseConfig();
+        startFileWatcher();
     }
 
-    protected abstract void parseConfig() ;
+    private void startFileWatcher() {
+        
+    	try {
+			final WatchService watcher = FileSystems.getDefault().newWatchService();
+			final Path filePath = this.adapterInstancesConfig.getFilePath();
+			
+			try {
+			    final WatchKey key = filePath.getParent().register(watcher,
+			                           ENTRY_CREATE,
+			                           ENTRY_DELETE,
+			                           ENTRY_MODIFY);
+			    
+			    
+			    executorService.submit(new Runnable(){
+			    	Path tmpPath = filePath.getFileName();
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						
+						while(true){
+							WatchKey tmpKey = null;
+							try {
+								tmpKey = watcher.take();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							
+							for (WatchEvent<?> event : tmpKey.pollEvents()) {
+								WatchEvent.Kind<?> kind = event.kind();
+								Path eventPath = (Path) event.context();
+								 if (eventPath.endsWith(tmpPath)) {
+									 adapterInstancesConfig= readConfig(propertiesName);
+								     createAdapterInstances();
+								     publishInstances();
+
+									}
+						            }
+								 key.reset();
+							}
+						} 
+			    });
+			    
+			    
+			} catch (IOException x) {
+			    x.printStackTrace();
+			}
+			
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+
+
+
+	protected abstract void parseConfig() ;
 
     public Collection<AbstractAdapter> getAdapterInstances() {
         return adapterInstances.values();
@@ -106,4 +180,6 @@ public abstract class AdapterControl {
         adapter.addListener(this.mdbSender);
         this.mdbSender.register(adapter, 1000);
     }
+    
+    
 }

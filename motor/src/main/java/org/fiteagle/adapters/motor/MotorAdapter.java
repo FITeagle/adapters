@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import info.openmultinet.ontology.vocabulary.Omn;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -21,8 +23,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import info.openmultinet.ontology.vocabulary.Omn;
-import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 
 public final class MotorAdapter extends AbstractAdapter {
 
@@ -65,11 +66,11 @@ public final class MotorAdapter extends AbstractAdapter {
 
     @Override
     public Model createInstance(final String instanceURI, final Model modelCreate) {
-	final Motor motor = new Motor(this, instanceURI);
-	this.instanceList.put(instanceURI, motor);
-	this.updateInstance(instanceURI, modelCreate);
-	return this.parseToModel(motor);
-    }
+		final Motor motor = new Motor(this, instanceURI);
+		this.instanceList.put(instanceURI, motor);
+		this.updateInstance(instanceURI, modelCreate);
+		return this.parseToModel(motor);
+	}
 
     @SuppressWarnings("PMD.GuardLogStatementJavaUtil")
     Model parseToModel(final Motor motor) {

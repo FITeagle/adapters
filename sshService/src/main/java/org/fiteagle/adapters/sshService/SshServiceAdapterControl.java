@@ -39,6 +39,8 @@ public class SshServiceAdapterControl extends AdapterControl {
     @PostConstruct
     public void initialize() {
         LOGGER.log(Level.SEVERE, "Starting SshService");
+    	this.propertiesName = ISshService.SSH_SERVICE;
+
         this.adapterModel = OntologyModelUtil.loadModel(ISshService.SEMANTIC_DESCRIPTION_PATH, IMessageBus.SERIALIZATION_TURTLE);
 
         this.adapterInstancesConfig = readConfig(ISshService.SSH_SERVICE);
