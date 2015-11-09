@@ -42,9 +42,10 @@ public class ToscaAdapterControl extends AdapterControl {
     @PostConstruct
     public void initialize(){
         LOGGER.log(Level.SEVERE, "Starting Tosca");
+    	this.propertiesName = "ToscaAdapter";
         this.adapterModel =  OntologyModelUtil.loadModel("ontologies/tosca.ttl", IMessageBus.SERIALIZATION_TURTLE);
 
-        this.adapterInstancesConfig= readConfig("ToscaAdapter");
+        this.adapterInstancesConfig= readConfig(propertiesName);
 
         createAdapterInstances();
 
