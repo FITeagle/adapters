@@ -15,7 +15,7 @@ import org.fiteagle.api.core.IMessageBus;
 	@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
 	@ActivationConfigProperty(propertyName = "destination", propertyValue = IMessageBus.TOPIC_CORE),
 	@ActivationConfigProperty(propertyName = "messageSelector", propertyValue = IMessageBus.METHOD_TARGET + " = '"
-		+ "http://open-multinet.info/ontology/resource/epc-adapter#EpcAdapter" + "'" + "AND ("
+		+ "http://open-multinet.info/ontology/epc#EpcAdapter" + "'" + "AND ("
 		+ IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_CREATE + "' " + "OR " + IMessageBus.METHOD_TYPE
 		+ " = '" + IMessageBus.TYPE_CONFIGURE + "' " + "OR " + IMessageBus.METHOD_TYPE + " = '"
 		+ IMessageBus.TYPE_GET + "' " + "OR " + IMessageBus.METHOD_TYPE + " = '" + IMessageBus.TYPE_DELETE

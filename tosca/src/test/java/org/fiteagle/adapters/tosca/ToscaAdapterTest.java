@@ -108,7 +108,8 @@ public class ToscaAdapterTest {
     Model model = ModelFactory.createDefaultModel();
     Resource resource = model.createResource(adapterInstance);
     ToscaAdapter adapter = new ToscaAdapter(adapterModel, resource, null);
-    adapter.setToscaClient(toscaEndpoint);
+
+
     
     return adapter;
   }

@@ -42,8 +42,12 @@ public class EpcAdapterControl extends AdapterControl {
 	@PostConstruct
 	public void initialize() {
 		LOGGER.log(Level.INFO, "Starting EpcAdapter");
+
+		// this.adapterModel = OntologyModelUtil.loadModel(
+		// "ontologies/epc-adapter.ttl", IMessageBus.SERIALIZATION_TURTLE);
+
 		this.adapterModel = OntologyModelUtil.loadModel(
-				"ontologies/epc-adapter.ttl", IMessageBus.SERIALIZATION_TURTLE);
+				"ontologies/epc.ttl", IMessageBus.SERIALIZATION_TURTLE);
 
 		this.adapterInstancesConfig = this.readConfig("EpcAdapter");
 

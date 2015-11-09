@@ -11,10 +11,11 @@ import javax.ws.rs.core.Application;
  */
 @ApplicationPath("/epc")
 public class EpcApp extends Application {
-    @Override
-    public Set<Class<?>> getClasses() {
-	final Set<Class<?>> classes = new HashSet<Class<?>>();
-	classes.add(EpcAdapterREST.class);
-	return classes;
-    }
+
+	@Override
+	public Set<Class<?>> getClasses() {
+		final Set<Class<?>> classes = new HashSet<Class<?>>();
+		classes.add(EpcAdapterREST.class);
+		return classes;
+	}
 }

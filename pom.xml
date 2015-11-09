@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<name>FITeagle :: Adapters</name>
@@ -17,9 +18,9 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-jaxrs</artifactId>
+			<artifactId>resteasy-client</artifactId>
 			<version>3.0.13.Final</version>
-			<scope>provided</scope>
+			<!-- scope>provided</scope -->
 		</dependency>
 
 		<dependency>
@@ -27,11 +28,11 @@
 			<artifactId>api</artifactId>
 			<version>0.1-SNAPSHOT</version>
 			<exclusions>
-        <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-guava</artifactId>
-        </exclusion>
-      </exclusions>
+				<exclusion>
+					<groupId>org.sonatype.sisu</groupId>
+					<artifactId>sisu-guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -48,16 +49,17 @@
 
 	<modules>
 		<module>abstract</module>
-		<module>motor</module>
+		<module>ACSclient</module>
 		<module>common</module>
-	<!--	<module>epcClient</module>
-		<module>epcMeasurementServer</module> -->
-		<module>openstack</module>
-	<!--	<module>openMTC</module> -->
-		<module>tosca</module>
-		<module>sshService</module>
+		<module>epc</module>
+		<!-- <module>epcClient</module> <module>epcMeasurementServer</module> -->
 		<module>monitoring</module>
-    <module>networking</module>
-    <module>ACSclient</module>
-  </modules>
+		<module>motor</module>
+		<module>networking</module>
+		<!-- <module>openMTC</module> -->
+		<module>openstack</module>
+		<module>sshService</module>
+		<module>tosca</module>
+		<module>environmentsensor</module>
+	</modules>
 </project>

@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.motor;
 
+import info.openmultinet.ontology.Parser;
+
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -29,7 +31,13 @@ public class MotorAdapterTest {
 	final Resource adapterABox = defaultModel.createResource("MotorGarage-1");
 
 	final MotorAdapter adapter = new MotorAdapter(adapterTBox, adapterABox);
-	adapter.createInstance(URN_MOTOR_1, ModelFactory.createDefaultModel());
+	Model model = ModelFactory.createDefaultModel();
+	System.out.println(Parser.toString(model));
+	System.out.println("****************************");
+	Model blah = adapter.createInstance(URN_MOTOR_1, ModelFactory.createDefaultModel());
+	
+	System.out.println(Parser.toString(blah));
+	
 	Model motor = adapter.getInstance(URN_MOTOR_1);
 
 	Assert.assertEquals(0, motor.getResource(URN_MOTOR_1).getProperty(rpmProp).getInt());

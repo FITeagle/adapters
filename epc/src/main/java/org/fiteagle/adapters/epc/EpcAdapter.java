@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.epc;
 
+import info.openmultinet.ontology.Parser;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +11,9 @@ import java.util.logging.Logger;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
+import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
+import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -16,19 +21,16 @@ import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
-
-import info.openmultinet.ontology.vocabulary.Omn;
-import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 public final class EpcAdapter extends AbstractAdapter {
 
 	private static final List<Property> EPC_CTRL_PROPS = new ArrayList<Property>();
 
-	private transient final HashMap<String, Epc> instanceList = new HashMap<String, Epc>();
+	private transient final HashMap<String, EpcImplementable> instanceList = new HashMap<String, EpcImplementable>();
 	private static final Logger LOGGER = Logger.getLogger(EpcAdapter.class
 			.toString());
 
@@ -53,7 +55,9 @@ public final class EpcAdapter extends AbstractAdapter {
 		this.adapterABox.addProperty(latitude, "52.516377");
 		this.adapterABox.addProperty(longitude, "13.323732");
 
-		final NodeIterator resourceIterator = this.adapterTBox
+		Model implementables = OntologyModelUtil.loadModel(
+				"ontologies/epc-adapter.ttl", IMessageBus.SERIALIZATION_TURTLE);
+		final NodeIterator resourceIterator = implementables
 				.listObjectsOfProperty(Omn_lifecycle.implements_);
 
 		while (resourceIterator.hasNext()) {
@@ -65,56 +69,70 @@ public final class EpcAdapter extends AbstractAdapter {
 			while (propIterator.hasNext()) {
 				final Property property = this.adapterTBox
 						.getProperty(propIterator.next().getURI());
+				// System.out.println(property);
 				EpcAdapter.EPC_CTRL_PROPS.add(property);
 			}
 		}
+		// System.out.println("***********Tbox");
+		// System.out.println(Parser.toString(adapterTBox));
 	}
 
 	@Override
 	public Model createInstance(final String instanceURI,
 			final Model modelCreate) {
-		
-		final Epc epc = new Epc(this, instanceURI);
-		this.instanceList.put(instanceURI, epc);
-		this.updateInstance(instanceURI, modelCreate);
-		return this.parseToModel(epc);
+		LOGGER.warning("Creating instance: " + instanceURI);
+		Resource resource = modelCreate.getResource(instanceURI);
+
+		if (resource.hasProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Epc.AccessNetwork)) {
+			LOGGER.warning("Try to update instance: " + instanceURI);
+			final AccessNetwork accessNetwork = new AccessNetwork(this,
+					instanceURI);
+			this.instanceList.put(instanceURI, accessNetwork);
+			this.updateInstance(instanceURI, modelCreate);
+			return this.parseToModel(accessNetwork);
+		} else if (resource.hasProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Epc.EvolvedPacketCore)) {
+			LOGGER.warning("Try to update instance: " + instanceURI);
+			final Epc epc = new Epc(this, instanceURI);
+			this.instanceList.put(instanceURI, epc);
+			this.updateInstance(instanceURI, modelCreate);
+			return this.parseToModel(epc);
+		} else if (resource.hasProperty(RDF.type,
+				info.openmultinet.ontology.vocabulary.Epc.UserEquipment)) {
+			LOGGER.warning("Try to update instance: " + instanceURI);
+			final UserEquipment ue = new UserEquipment(this, instanceURI);
+			this.instanceList.put(instanceURI, ue);
+			this.updateInstance(instanceURI, modelCreate);
+			return this.parseToModel(ue);
+		}
+
+		LOGGER.warning("Couldn't recognize type, so returning original model.");
+		return modelCreate;
 	}
 
 	@SuppressWarnings("PMD.GuardLogStatementJavaUtil")
-	Model parseToModel(final Epc epc) {
+	Model parseToModel(final EpcImplementable epcImplementable) {
+
 		final Resource resource = ModelFactory.createDefaultModel()
-				.createResource(epc.getInstanceName());
-		
-		// gives new model first type it comes across
-		// resource.addProperty(RDF.type, this.getAdapterManagedResources().get(0));
-		resource.addProperty(RDF.type, Omn.Resource);
+				.createResource(epcImplementable.getInstanceName());
+
 		resource.addProperty(RDFS.label, resource.getLocalName());
 		final Property property = resource.getModel().createProperty(
 				Omn_lifecycle.hasState.getNameSpace(),
 				Omn_lifecycle.hasState.getLocalName());
 		// property.addProperty(RDF.type, OWL.FunctionalProperty);
-		// resource.addProperty(property, Omn_lifecycle.Ready);
-		for (final Property prop : EpcAdapter.EPC_CTRL_PROPS) {
-			switch (prop.getLocalName()) {
-			case "lteSupport":
-				resource.addLiteral(prop, epc.isLteSupport());
-				break;
-			// case "maxRpm":
-			// resource.addLiteral(prop, epc.getMaxRpm());
-			// break;
-			// case "manufacturer":
-			// resource.addLiteral(prop, epc.getManufacturer());
-			// break;
-			// case "throttle":
-			// resource.addLiteral(prop, epc.getThrottle());
-			// break;
-			// case "isDynamic":
-			// resource.addLiteral(prop, epc.isDynamic());
-			// break;
-			default:
-				LOGGER.warning("Unkown: " + prop.getLocalName());
-				break;
-			}
+		resource.addProperty(property, Omn_lifecycle.Ready);
+
+		if (epcImplementable instanceof AccessNetwork) {
+			AccessNetwork an = (AccessNetwork) epcImplementable;
+			an.parseToModel(resource);
+		} else if (epcImplementable instanceof Epc) {
+			Epc epc = (Epc) epcImplementable;
+			epc.parseToModel(resource);
+		} else if (epcImplementable instanceof UserEquipment) {
+			UserEquipment ue = (UserEquipment) epcImplementable;
+			ue.parseToModel(resource);
 		}
 		return resource.getModel();
 	}
@@ -122,15 +140,19 @@ public final class EpcAdapter extends AbstractAdapter {
 	@Override
 	public Model updateInstance(final String instanceURI,
 			final Model configureModel) {
+
+		// if the instance is in the list of instances in the adapter
 		if (this.instanceList.containsKey(instanceURI)) {
-			final Epc currentEpc = this.instanceList.get(instanceURI);
-			final StmtIterator iter = configureModel.listStatements();
-			while (iter.hasNext()) {
-				currentEpc.updateProperty(iter.next());
-			}
+			final EpcImplementable currentEpc = this.instanceList
+					.get(instanceURI);
+			Resource epcResource = configureModel.getResource(instanceURI);
+			currentEpc.updateInstance(epcResource);
+
 			final Model newModel = this.parseToModel(currentEpc);
 			LOGGER.info("Returning updated epc: " + newModel);
 			return newModel;
+		} else {
+			LOGGER.info("Instance list does not contain key.");
 		}
 		LOGGER.info("Creating new instance");
 		return ModelFactory.createDefaultModel();
@@ -138,22 +160,25 @@ public final class EpcAdapter extends AbstractAdapter {
 
 	@Override
 	public void deleteInstance(final String instanceURI) {
-		final Epc epc = this.getInstanceByName(instanceURI);
+		final EpcImplementable epc = this.getInstanceByName(instanceURI);
 		// epc.terminate();
+		LOGGER.info("Deleting instance: " + instanceURI);
 		this.instanceList.remove(instanceURI);
 	}
 
-	private Epc getInstanceByName(final String instanceURI) {
+	private EpcImplementable getInstanceByName(final String instanceURI) {
 		return this.instanceList.get(instanceURI);
 	}
 
 	@Override
 	public Resource getAdapterABox() {
+		LOGGER.info("Getting adapter ABox...");
 		return this.adapterABox;
 	}
 
 	@Override
 	public Model getAdapterDescriptionModel() {
+		LOGGER.info("Getting adapter description model...");
 		return this.adapterTBox;
 	}
 
@@ -165,7 +190,7 @@ public final class EpcAdapter extends AbstractAdapter {
 	@Override
 	public Model getInstance(final String instanceURI)
 			throws InstanceNotFoundException {
-		final Epc epc = this.instanceList.get(instanceURI);
+		final EpcImplementable epc = this.instanceList.get(instanceURI);
 		if (epc == null) {
 			throw new InstanceNotFoundException("Instance " + instanceURI
 					+ " not found");
@@ -202,5 +227,4 @@ public final class EpcAdapter extends AbstractAdapter {
 	public void configure(final Config configuration) {
 		LOGGER.warning("Not implemented. Input: " + configuration);
 	}
-
 }

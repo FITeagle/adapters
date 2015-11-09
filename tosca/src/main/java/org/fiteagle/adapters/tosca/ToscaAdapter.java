@@ -223,11 +223,11 @@ public final class ToscaAdapter extends AbstractAdapter {
   
   @Override
   public void updateAdapterDescription() throws ProcessingException {
-    LOGGER.log(Level.INFO, "Updating adapter description: Getting types via ToscaClient..");
-    Definitions types = client.getAllTypes();
-    Model model = parseToModel(types);
+  //  LOGGER.log(Level.INFO, "Updating adapter description: Getting types via ToscaClient..");
+//    Definitions types = client.getAllTypes();
+ //   Model model = parseToModel(types);
     
-    updateAdapterDescriptionWithModel(model);
+  //  updateAdapterDescriptionWithModel(model);
   }
 
   protected void updateAdapterDescriptionWithModel(Model model) {
@@ -311,10 +311,10 @@ public void refreshConfig() throws ProcessingException {
 
     }
 
-    public void setToscaClient(String toscaClientURI) {
-    this.client = new ToscaClient(toscaClientURI);
+    public void setToscaClient(IToscaClient client) {
+    this.client = client;
   }
-    
+
     public IToscaClient getClient(){
       return this.client;
     }

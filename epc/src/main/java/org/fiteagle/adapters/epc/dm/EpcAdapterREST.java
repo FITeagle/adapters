@@ -14,24 +14,24 @@ import org.fiteagle.adapters.epc.EpcAdapterControl;
 @Path("/")
 public class EpcAdapterREST extends AbstractAdapterREST {
 
-    @EJB
-    private transient EpcAdapterControl controller;
+	@EJB
+	private transient EpcAdapterControl controller;
 
-    @Override
-    protected Collection<AbstractAdapter> getAdapterInstances() {
-	return this.controller.getAdapterInstances();
-    }
+	@Override
+	protected Collection<AbstractAdapter> getAdapterInstances() {
+		return this.controller.getAdapterInstances();
+	}
 
-    @GET
-    @Path("/hallo")
-    public Response hallo() {
-	return Response.ok("HalloWelt2").build();
-    }
+	@GET
+	@Path("/hallo")
+	public Response hallo() {
+		return Response.ok("HalloWelt2").build();
+	}
 
-    @GET
-    @Path("/ontology")
-    public Response ont() {
-	return Response.ok("Ontology").build();
-    }
+	@GET
+	@Path("/ontology")
+	public Response ont() {
+		return Response.ok("Ontology").build();
+	}
 
 }
