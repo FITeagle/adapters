@@ -41,9 +41,11 @@ public class MotorAdapterControl extends AdapterControl {
     @PostConstruct
     public void initialize() {
 	LOGGER.log(Level.INFO, "Starting MotorAdapter");
+	this.propertiesName = "MotorGarage";
+
 	this.adapterModel = OntologyModelUtil.loadModel("ontologies/motor.ttl", IMessageBus.SERIALIZATION_TURTLE);
 
-	this.adapterInstancesConfig = this.readConfig("MotorGarage");
+	this.adapterInstancesConfig = this.readConfig(propertiesName);
 
 	this.createAdapterInstances();
 
