@@ -20,7 +20,7 @@ public class ListDevicesTest {
     ClientResponse<String> response = request.get(String.class);
     
     int re = response.getResponseStatus().getStatusCode();
-    System.out.println("adf " + re);
+    System.out.println("response code " + re);
    
     System.out.println(response.getEntity());
     

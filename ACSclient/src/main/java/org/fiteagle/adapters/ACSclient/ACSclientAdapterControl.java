@@ -1,5 +1,7 @@
 package org.fiteagle.adapters.ACSclient;
 
+import info.openmultinet.ontology.vocabulary.Omn_service;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -72,6 +74,17 @@ public class ACSclientAdapterControl extends AdapterControl{
           final Model model = ModelFactory.createDefaultModel();
           final Resource resource = model.createResource(adapterInstance);
           // parse possible additional values from config
+          
+          String url = adaptInstObject.getString("url");
+          if(url != null){
+            resource.addProperty(model.createProperty(Omn_service.getURI(), "url"), url);
+          }
+          
+          String device = adaptInstObject.getString("device");
+          if(device != null){
+            resource.addProperty(model.createProperty(Omn_service.getURI(), "device"), device);
+          }
+          
           this.createAdapterInstance(this.adapterModel, resource);
           }
         }

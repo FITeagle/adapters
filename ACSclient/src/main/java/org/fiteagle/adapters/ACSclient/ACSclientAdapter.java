@@ -2,19 +2,34 @@ package org.fiteagle.adapters.ACSclient;
 
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.enterprise.concurrent.ManagedThreadFactory;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
+import org.fiteagle.adapters.ACSclient.model.Parameter;
+import org.fiteagle.adapters.ACSclient.model.ParameterPlusValuesMap;
 import org.fiteagle.api.core.Config;
+import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
+import org.fiteagle.api.core.MessageUtil;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
@@ -34,12 +49,32 @@ public class ACSclientAdapter extends AbstractAdapter{
   
   private static final Logger LOGGER = Logger.getLogger(ACSclient.class.toString());
   
+  private final String url;
+  
+  private final String device;
+  
+  private final List<Parameter> parametersList;
+  
+  private static final String DEVICE_PARAMETERS = "/parameters/?device=";
+  
+  private final String powerParameter = "Device.Services.FAPService.1.CellConfig.LTE.RAN.PHY.ULPowerControl.P0NominalPUCCH";
+  
+  private final HashMap<String, ParameterPlusValuesMap> parametersNames = new HashMap<String, ParameterPlusValuesMap>();
+  
+  
   public ACSclientAdapter(final Model adapterModel, final Resource adapterABox) {
     
     super();
     this.uuid = UUID.randomUUID().toString();
     this.adapterTBox = adapterModel;
-    this.adapterABox = adapterABox;
+    
+    this.url = parseConfig(adapterABox, "url");
+    this.device = parseConfig(adapterABox, "device");
+    
+    Model model = ModelFactory.createDefaultModel();
+    Resource adapterInstance = model.createResource(adapterABox.getURI());
+    
+    this.adapterABox = adapterInstance;
     final Resource adapterType = this.getAdapterClass();
     this.adapterABox.addProperty(RDF.type, adapterType);
     this.adapterABox.addProperty(RDFS.label, this.adapterABox.getLocalName());
@@ -60,14 +95,33 @@ public class ACSclientAdapter extends AbstractAdapter{
         }
     }
 
+    
+    // call REST API to get parameters
+    this.parametersList = getDeviceParameters();
+    System.out.println("PARAMETER SIZE IS " + parametersList.size());
+    
+    setDefaultParameters();
   }
   
 
   @Override
   public Model createInstance(final String instanceURI, final Model modelCreate) {
+    
+    String createModel = MessageUtil.serializeModel(modelCreate, IMessageBus.SERIALIZATION_TURTLE);
+    System.out.println("ACS create model \n" + createModel);
+    
     final ACSclient acs_client = new ACSclient(this, instanceURI);
+    acs_client.parseConfigureModel(modelCreate);
+    
     this.instanceList.put(instanceURI, acs_client);
-    this.updateInstance(instanceURI, modelCreate);
+    
+    try{
+      ManagedThreadFactory managedThreadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+      Thread acsThread = managedThreadFactory.newThread(acs_client);
+      acsThread.start();
+    } catch (NamingException e) {
+      LOGGER.log(Level.SEVERE, "Thread couldn't be created ", e);
+    }
     return this.parseToModel(acs_client);
     
   }
@@ -88,14 +142,6 @@ public class ACSclientAdapter extends AbstractAdapter{
   @Override
   @SuppressWarnings({ "PMD.GuardLogStatement", "PMD.GuardLogStatementJavaUtil" })
   public Model updateInstance(final String instanceURI, final Model configureModel) {
-    if (instanceList.containsKey(instanceURI)) {
-      ACSclient acs_client = instanceList.get(instanceURI);
-      StmtIterator iter = configureModel.listStatements();
-      while(iter.hasNext()){
-        acs_client.updateProperty(iter.next());
-      }
-      return parseToModel(acs_client);
-    }
     return ModelFactory.createDefaultModel();
   }
   
@@ -165,5 +211,47 @@ LOGGER.warning("Not implemented.");
     LOGGER.warning("Not implemented. Input: " + configuration);
   }
   
+  private String parseConfig(Resource resource, String parameter){
+    Model model = ModelFactory.createDefaultModel();
+    return resource.getProperty(model.createProperty(Omn_service.getURI(), parameter)).getLiteral().getString();
+  }
+  
+  protected String getURL(){
+    return this.url;
+  }
+  
+  protected String getDevice(){
+    return this.device;
+  }
+  
+  private List<Parameter> getDeviceParameters(){
+    Client client = ClientBuilder.newClient().register(JacksonJsonProvider.class);
+    WebTarget target = client.target(this.url+this.DEVICE_PARAMETERS+getDevice());
+    List<Parameter> parameters = target.request().get(new GenericType<List<Parameter>>(){});
+    return parameters;
+  }
+  
+  private void setDefaultParameters(){
+    
+    // look for the parameter and put in the Map
+    
+    ParameterPlusValuesMap parameterPlusValuesMap = new ParameterPlusValuesMap();
+    parameterPlusValuesMap.setValue("on", "1");
+    parameterPlusValuesMap.setValue("off", "0");
+    
+    for(Parameter parameter : parametersList){
+      if(this.powerParameter.equals(parameter.getName())){
+        parameterPlusValuesMap.setParameter(parameter);
+        break;
+        }
+      }
+    this.parametersNames.put("power", parameterPlusValuesMap);
+  }
+  
+  public HashMap<String, ParameterPlusValuesMap> getParametersNames(){
+    return this.parametersNames;
+  }
+  
+ 
   
 }

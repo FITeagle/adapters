@@ -2,13 +2,13 @@
 @prefix owl:           <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
 @prefix omn:           <http://open-multinet.info/ontology/omn#> .
-@prefix acs_client:           <http://open-multinet.info/ontology/resource/ACSclient#> .
+@prefix acs-client:           <http://open-multinet.info/ontology/resource/ACSclient#> .
 @prefix acs:         <http://open-multinet.info/ontology/resource/acs#> .
 @prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
 @prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
 @prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
-acs_client:ACSclient
+acs-client:ACSclient
         a                          owl:Class ;
         rdfs:label                 "ACS client"@en ;
         rdfs:subClassOf            omn:Adapter ;
@@ -16,6 +16,6 @@ acs_client:ACSclient
         
 acs:ACS
         a                            owl:Class ;
-        rdfs:label                   "Motor"@en ;
+        rdfs:label                   "Automatic Configuration Server"@en ;
         rdfs:subClassOf              omn:Resource ;
-        omn-lifecycle:implementedBy  asc_client:ACSclient .
+        omn-lifecycle:implementedBy  acs-client:ACSclient .
