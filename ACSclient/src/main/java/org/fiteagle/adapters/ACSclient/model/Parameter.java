@@ -4,17 +4,17 @@ import java.io.Serializable;
 
 public class Parameter implements Serializable{
   
-  private String id;
+  private int id;
   private String name;
   private String value;
-  private String writable;
+  private boolean writable;
   private String last_update;
   
-  public void setId(String id){
+  public void setId(int id){
     this.id = id;
   }
   
-  public String getId(){
+  public int getId(){
     return this.id;
   }
   
@@ -34,11 +34,11 @@ public class Parameter implements Serializable{
     return this.value;
   }
   
-  public void setWritable(String writable){
+  public void setWritable(boolean writable){
     this.writable = writable;
   }
   
-  public String getWritable(){
+  public boolean getWritable(){
     return this.writable;
   }
   

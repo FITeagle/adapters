@@ -1,11 +1,12 @@
 package org.fiteagle.adapters.ACSclient.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfigureRequest {
+public class ConfigureRequest implements Serializable{
   
-  private List<Integer> devices;
+  private List<Integer> devices = new ArrayList<Integer>();
   private List<Parameter> parameters = new ArrayList<Parameter>();
   
   

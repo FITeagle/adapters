@@ -57,7 +57,7 @@ public class ACSclientAdapter extends AbstractAdapter{
   
   private static final String DEVICE_PARAMETERS = "/parameters/?device=";
   
-  private final String powerParameter = "Device.Services.FAPService.1.CellConfig.LTE.RAN.PHY.ULPowerControl.P0NominalPUCCH";
+  private final String powerParameter = "Device.DeviceInfo.ProvisioningCode";
   
   private final HashMap<String, ParameterPlusValuesMap> parametersNames = new HashMap<String, ParameterPlusValuesMap>();
   
@@ -110,7 +110,7 @@ public class ACSclientAdapter extends AbstractAdapter{
     String createModel = MessageUtil.serializeModel(modelCreate, IMessageBus.SERIALIZATION_TURTLE);
     System.out.println("ACS create model \n" + createModel);
     
-    final ACSclient acs_client = new ACSclient(this, instanceURI);
+    ACSclient acs_client = new ACSclient(this, instanceURI);
     acs_client.parseConfigureModel(modelCreate);
     
     this.instanceList.put(instanceURI, acs_client);
