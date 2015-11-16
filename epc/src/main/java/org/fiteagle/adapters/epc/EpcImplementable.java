@@ -1,10 +1,7 @@
 package org.fiteagle.adapters.epc;
 
-import java.util.logging.Logger;
-
 import javax.enterprise.concurrent.ManagedThreadFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 

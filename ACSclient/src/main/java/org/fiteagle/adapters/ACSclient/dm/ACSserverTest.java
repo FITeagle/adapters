@@ -2,8 +2,6 @@ package org.fiteagle.adapters.ACSclient.dm;
 
 import java.util.Properties;
 
-import javax.json.JsonObject;
-import javax.print.attribute.standard.Media;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -17,7 +15,6 @@ import org.hornetq.utils.json.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 
 
 @Path("/api")

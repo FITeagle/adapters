@@ -1,6 +1,5 @@
 package org.fiteagle.adapters.epc;
 
-import info.openmultinet.ontology.Parser;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.util.ArrayList;
@@ -21,8 +20,6 @@ import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
