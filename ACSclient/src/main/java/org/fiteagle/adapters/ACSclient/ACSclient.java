@@ -16,7 +16,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.fiteagle.adapters.ACSclient.ACSclientAdapter;
 import org.fiteagle.adapters.ACSclient.Exceptions.BadConfigureRequest;
 import org.fiteagle.adapters.ACSclient.model.ConfigureRequest;
 import org.fiteagle.adapters.ACSclient.model.Device;

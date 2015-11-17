@@ -20,13 +20,10 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.GenericType;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
-import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
-import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.adapters.ACSclient.model.Parameter;
 import org.fiteagle.adapters.ACSclient.model.ParameterPlusValuesMap;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.MessageUtil;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
@@ -36,7 +33,6 @@ import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;

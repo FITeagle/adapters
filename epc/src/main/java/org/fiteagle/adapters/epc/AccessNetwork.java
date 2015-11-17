@@ -1,16 +1,12 @@
 package org.fiteagle.adapters.epc;
 
+import info.openmultinet.ontology.vocabulary.Epc;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.enterprise.concurrent.ManagedThreadFactory;
-
-import info.openmultinet.ontology.vocabulary.Epc;
-
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
