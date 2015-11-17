@@ -23,15 +23,92 @@ public class ACSClientAdapterREST extends AbstractAdapterREST {
     }
 
     @GET
-    @Path("/hallo")
-    public Response hallo() {
-	return Response.ok("HalloWelt2").build();
+    @Path("/bs/airinterface")
+    public Response airinterface() {
+	return Response.ok("Ok").build();
     }
 
     @GET
-    @Path("/ontology")
-    public Response ont() {
-	return Response.ok("Ontology").build();
+    @Path("/bs/config/delete")
+    public Response deleteConfig() {
+	return Response.ok("Ok").build();
+    }
+    @GET
+    @Path("/bs/config/list")
+    public Response listConfig() {
+	return Response.ok("Ok").build();
+    }    
+    
+    @GET
+    @Path("/bs/config/load")
+    public Response loadConfig() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/config/save")
+    public Response saveConfig() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/default_byxml")
+    public Response default_byxml() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/epc")
+    public Response epc() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/get")
+    public Response get() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/info")
+    public Response info() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/powercontrol")
+    public Response powercontrol() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/reporting")
+    public Response reporting() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/restart")
+    public Response restart() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/set")
+    public Response set() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/status")
+    public Response status() {
+	return Response.ok("Ok").build();
+    }
+    
+    @GET
+    @Path("/bs/wireless")
+    public Response wireless() {
+	return Response.ok("Ok").build();
     }
 
 }
