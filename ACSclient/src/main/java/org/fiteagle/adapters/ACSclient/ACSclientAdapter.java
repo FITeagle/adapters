@@ -96,7 +96,6 @@ public class ACSclientAdapter extends AbstractAdapter{
     }
 
     
-    // call REST API to get parameters
     this.parametersList = getDeviceParameters();
     System.out.println("PARAMETER SIZE IS " + parametersList.size());
     
@@ -111,17 +110,9 @@ public class ACSclientAdapter extends AbstractAdapter{
     System.out.println("ACS create model \n" + createModel);
     
     ACSclient acs_client = new ACSclient(this, instanceURI);
-    acs_client.parseConfigureModel(modelCreate);
     
     this.instanceList.put(instanceURI, acs_client);
     
-    try{
-      ManagedThreadFactory managedThreadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
-      Thread acsThread = managedThreadFactory.newThread(acs_client);
-      acsThread.start();
-    } catch (NamingException e) {
-      LOGGER.log(Level.SEVERE, "Thread couldn't be created ", e);
-    }
     return this.parseToModel(acs_client);
     
   }
@@ -142,14 +133,27 @@ public class ACSclientAdapter extends AbstractAdapter{
   @Override
   @SuppressWarnings({ "PMD.GuardLogStatement", "PMD.GuardLogStatementJavaUtil" })
   public Model updateInstance(final String instanceURI, final Model configureModel) {
-    return ModelFactory.createDefaultModel();
+    
+    String confModel = MessageUtil.serializeModel(configureModel, IMessageBus.SERIALIZATION_TURTLE);
+    System.out.println("ACS Configure model \n" + confModel);
+    
+    ACSclient acs_client = this.getInstanceByName(instanceURI);
+    acs_client.parseConfigureModel(configureModel);
+    
+    try{
+      ManagedThreadFactory managedThreadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+      Thread acsThread = managedThreadFactory.newThread(acs_client);
+      acsThread.start();
+    } catch (NamingException e) {
+      LOGGER.log(Level.SEVERE, "Thread couldn't be created ", e);
+    }
+    return this.parseToModel(acs_client);
+    
   }
   
   
   @Override
   public void deleteInstance(final String instanceURI) {
-    ACSclient acs_client = this.getInstanceByName(instanceURI);
-    acs_client.terminate();
     instanceList.remove(instanceURI);
   }
   

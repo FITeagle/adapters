@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.ACSclient;
 
 import info.openmultinet.ontology.vocabulary.Acs;
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.SimpleSelector;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -57,52 +59,19 @@ public class ACSclient implements Runnable{
     }
   
   public void parseConfigureModel(Model configureModel) {
-    StmtIterator stmtIterator = configureModel.listStatements(new SimpleSelector((Resource) null, Acs.hasDevice, (Object) null));
-    while(stmtIterator.hasNext()){
-      Statement hasDeviceStatement = stmtIterator.nextStatement();
-      Resource device_res = hasDeviceStatement.getObject().asResource();
-      
-      String deviceId = parseDeviceID(device_res);
-      Device device = new Device(Integer.parseInt(deviceId));
-      
-      List<Resource> parameters_List = parseParametersResources(device_res);
-      for(Resource parameter_res : parameters_List){
-        String parameter_name = parseParameterName(parameter_res);
-        
-        String parameter_value = parseParameterValue(parameter_res);
-        
-        device.setParameter(parameter_name, parameter_value);
-      }
-      this.devices.add(device);
-    }
-  }
-  
-  private String parseDeviceID(Resource device){
-    return device.getProperty(Acs.hasAcsId).getLiteral().getString();
-  }
-  
-  private List<Resource> parseParametersResources(Resource device){
-    final List<Resource> parameters = new ArrayList<Resource>();
     
-    StmtIterator paramIterator = device.listProperties(Acs.hasParameter);
-    while(paramIterator.hasNext()){
-      parameters.add(paramIterator.nextStatement().getObject().asResource());
+    this.devices.clear();
+    
+    Device device = new Device(Integer.parseInt(this.owningAdapter.getDevice()));
+    
+    if(configureModel.contains((Resource) null, Acs.power)){
+      device.setParameter("power", configureModel.getProperty((Resource) null, Acs.power).getString());
     }
-    return parameters;
-  }
-  
-  private String parseParameterName(Resource parameter){
-    return parameter.getProperty(Acs.hasParamName).getLiteral().getString();
-  }
-  
-  private String parseParameterValue(Resource parameter){
-    return parameter.getProperty(Acs.hasParamValue).getLiteral().getString();
-  }
-  
-  
-  public void terminate() {
+    
+    this.devices.add(device);
     
   }
+  
   
   @Override
   public void run(){
@@ -114,10 +83,8 @@ public class ACSclient implements Runnable{
     
     RequestedParameters requestedParameters = getRequestedParameters();
     
-    
     configureParameter(requestedParameters, jobID);
 
-    
     LOGGER.info("PATCH request is successful");
     commitConfiguration(jobID);
     
@@ -135,14 +102,15 @@ public class ACSclient implements Runnable{
     Client client = ClientBuilder.newClient().register(JacksonJsonProvider.class);
     WebTarget target = client.target(this.owningAdapter.getURL()+this.JOBS);
     
-    
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String jsonString = gson.toJson(configRequest);
-    System.out.println("CONFIG REQuest " + jsonString);
+    LOGGER.info("CONFIG REQuest " + jsonString);
     
     JobInstance jobInstance = target.request().post(Entity.json(jsonString), JobInstance.class);
     
-
+    if(jobInstance.getID() == null || jobInstance.getID().isEmpty()){
+      throw new BadConfigureRequest("No job ID has been assigned.");
+    }
     return jobInstance.getID();
     
   }
@@ -185,9 +153,16 @@ public class ACSclient implements Runnable{
         if(this.owningAdapter.getParametersNames().containsKey(requestedParameter.getKey())){
           ParameterPlusValuesMap parameterPlusValuesMap = this.owningAdapter.getParametersNames().get(requestedParameter.getKey());
           Parameter parameter = parameterPlusValuesMap.getParameter();
+          
+          if(!parameterPlusValuesMap.getValues().containsKey(requestedParameter.getValue())){
+            throw new BadConfigureRequest("The requested value " + requestedParameter.getValue() + " can't be matched.");
+          }
+          
           parameter.setValue(parameterPlusValuesMap.getValue(requestedParameter.getValue()));
           parameter.setLast_update(getDate());
           parameters.setParameters(parameter);
+        } else {
+          throw new BadConfigureRequest("Parameter name " + requestedParameter.getKey() + " is not supported.");
         }
       }
    return parameters;

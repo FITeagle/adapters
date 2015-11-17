@@ -135,18 +135,7 @@ public class AppTest {
     
     System.out.println(value);
     
-    
-    
-    
-//    ClientRequest request = new ClientRequest("http://localhost:8080/ACSclient/api/devices");
-//    request.accept("application/json");
-//    
-//    String input = "{\"FirstName\":\"myName\"}";
-//    request.body("application/json", input);
-//    
-//    ClientResponse<String> response = request.get();
-//    JSONObject json = (JSONObject) new JSONObject(response.getEntity());
-//    System.out.println("First name " + json.getString("FirstName"));
+
     
   }
   

@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.json.JsonObject;
 import javax.print.attribute.standard.Media;
+import javax.websocket.server.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -21,7 +22,7 @@ import com.google.gson.JsonElement;
 
 
 @Path("/api")
-public class ACSserverTest {
+public class ACSadapterREST {
  
   @GET
   @Path("/listDevices")
@@ -63,6 +64,7 @@ public class ACSserverTest {
     return Response.status(200).entity(configuration).build();
     
   }
+  
   
 
 }
