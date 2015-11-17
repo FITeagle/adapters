@@ -21,7 +21,13 @@ public class ACSClientAdapterREST extends AbstractAdapterREST {
     protected Collection<AbstractAdapter> getAdapterInstances() {
 	return this.controller.getAdapterInstances();
     }
-
+    
+    @GET
+    @Path("/hallo")
+    public Response hallo() {
+	return Response.ok("HAlloWelt").build();
+    }
+    
     @GET
     @Path("/bs/airinterface")
     public Response airinterface() {
