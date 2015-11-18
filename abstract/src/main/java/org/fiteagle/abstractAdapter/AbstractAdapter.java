@@ -40,6 +40,9 @@ public abstract class AbstractAdapter {
 
 	public void updateConfig(String adapterName, String configInput)
 			throws ProcessingException, IOException {
+
+		LOGGER.log(Level.WARNING, "configInput: " + configInput);
+
 		Config config = new Config(adapterName);
 		config.deletePropertiesFile();
 
@@ -51,6 +54,7 @@ public abstract class AbstractAdapter {
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE,
 					"Could not read the JSON serialized Config-File from REST-Interface");
+			e.printStackTrace();
 		}
 
 	}
@@ -131,7 +135,7 @@ public abstract class AbstractAdapter {
 	public Model createInstances(Model model) throws ProcessingException,
 			InvalidRequestException {
 		Model createdInstancesModel = ModelFactory.createDefaultModel();
-		
+
 		if (getAdapterManagedResources().isEmpty())
 			LOGGER.log(Level.WARNING,
 					"To create an instance, I've to manage some :/");

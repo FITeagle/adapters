@@ -151,7 +151,7 @@ public abstract class AbstractAdapterREST {
 	}
 
 	/**
-	 * HTTP GET method to get a specified resource controlled by this adapter,
+	 * HTTP GET methods to get a specified resource controlled by this adapter,
 	 * according to its URI
 	 * 
 	 * @param adapterName
@@ -227,25 +227,95 @@ public abstract class AbstractAdapterREST {
 	}
 
 	/**
-	 * Other methods
+	 * Creates the instances given in a model, e.g. send following string
+	 * encoded with URL escape characters and as a post request to
+	 * http://localhost:8080/epc/epc/EpcAdapter-1/instances
+	 * 
+	 * <http://localhost/resource/EpcAdapter-1/new> a
+	 * <http://open-multinet.info/ontology/resource/epc#UserEquipment> ,
+	 * <http://open-multinet.info/ontology/omn#Resource> ;
+	 * <http://www.w3.org/2000/01/rdf-schema#label> "new resource" ;
 	 * 
 	 * @param adapterName
 	 * @param rdfInput
 	 * @return
+	 * @throws UnsupportedEncodingException
 	 */
 	@POST
 	@Path("/{adapterName}/instances")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces("text/html")
 	public String createInstances(@PathParam("adapterName") String adapterName,
-			String rdfInput) {
-
+			String rdfInput) throws UnsupportedEncodingException {
+		LOGGER.log(Level.INFO, "createInstances rdfInput: " + rdfInput);
 		AbstractAdapter adapter = getAdapterInstance(adapterName);
+
+		String unencodedRdfInput = java.net.URLDecoder
+				.decode(rdfInput, "UTF-8");
+		LOGGER.log(Level.INFO, "createInstances unencodedRdfInput: "
+				+ unencodedRdfInput);
 
 		try {
 			Model resultModel = adapter.createInstances(MessageUtil
-					.parseSerializedModel(rdfInput,
+					.parseSerializedModel(unencodedRdfInput,
 							IMessageBus.SERIALIZATION_TURTLE));
+
+			return MessageUtil.serializeModel(resultModel,
+					IMessageBus.SERIALIZATION_TURTLE);
+
+		} catch (ProcessingException e) {
+			processProcessingRequestException(e);
+		} catch (InvalidRequestException e) {
+			processInvalidRequestException(e);
+		}
+		return null;
+	}
+
+	/**
+	 * Update properties of a resource
+	 * 
+	 * e.g. send the following as a PUT request with content type
+	 * application/x-www-form-urlencoded using URL escape characters to
+	 * http://localhost:8080/epc/epc/
+	 * EpcAdapter-1/instances/http%3A%2F%2Flocalhost
+	 * %2Fresource%2FEpcAdapter-1%2Fnew
+	 * 
+	 * <http://localhost/resource/EpcAdapter-1/new-details>
+	 * <http://open-multinet.info/ontology/resource/epc#lteSupport> false .
+	 * <http://localhost/resource/EpcAdapter-1/new>
+	 * <http://open-multinet.info/ontology/resource/epc#hasUserEquipment>
+	 * <http://localhost/resource/EpcAdapter-1/new-details> .
+	 * 
+	 * @param adapterName
+	 * @param rdfInput
+	 * @param instanceURI
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
+	@PUT
+	@Path("/{adapterName}/instances/{instanceURI}")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Produces("text/html")
+	public String configureInstance(
+			@PathParam("adapterName") String adapterName, String rdfInput,
+			@PathParam("instanceURI") String instanceURI)
+			throws UnsupportedEncodingException {
+
+		LOGGER.log(Level.INFO,
+				"Try to carry out method configureInstance with input: "
+						+ rdfInput);
+
+		String unencodedRdfInput = java.net.URLDecoder
+				.decode(rdfInput, "UTF-8");
+		LOGGER.log(Level.INFO, "createInstances unencodedRdfInput: "
+				+ unencodedRdfInput);
+
+		AbstractAdapter adapter = getAdapterInstance(adapterName);
+		try {
+			Model resultModel = adapter.updateInstance(decode(instanceURI),
+					MessageUtil.parseSerializedModel(unencodedRdfInput,
+							IMessageBus.SERIALIZATION_TURTLE));
+
 			return MessageUtil.serializeModel(resultModel,
 					IMessageBus.SERIALIZATION_TURTLE);
 		} catch (ProcessingException e) {
@@ -256,6 +326,41 @@ public abstract class AbstractAdapterREST {
 		return null;
 	}
 
+	/**
+	 * Deletes a given resource of the current adapter
+	 * 
+	 * @param adapterName
+	 * @param instanceURI
+	 * @return
+	 */
+	@DELETE
+	@Path("/{adapterName}/instances/{instanceURI}")
+	@Produces("text/html")
+	public Response deleteInstance(
+			@PathParam("adapterName") String adapterName,
+			@PathParam("instanceURI") String instanceURI) {
+
+		AbstractAdapter adapter = getAdapterInstance(adapterName);
+		try {
+			adapter.deleteInstance(decode(instanceURI));
+		} catch (InstanceNotFoundException e) {
+			throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
+		} catch (ProcessingException e) {
+			processProcessingRequestException(e);
+		} catch (InvalidRequestException e) {
+			processInvalidRequestException(e);
+		}
+		return Response.status(Response.Status.OK.getStatusCode()).build();
+	}
+
+	/**
+	 * Other methods
+	 * 
+	 * @param adapterName
+	 * @param rdfInput
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
 	@POST
 	@Path("/{adapterName}/config")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -275,48 +380,6 @@ public abstract class AbstractAdapterREST {
 		}
 		return Response.status(Response.Status.CONFLICT.getStatusCode())
 				.build();
-	}
-
-	@PUT
-	@Path("/{adapterName}/instances/{instanceURI}")
-	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-	@Produces("text/html")
-	public String configureInstance(
-			@PathParam("adapterName") String adapterName, String rdfInput,
-			@PathParam("instanceURI") String instanceURI) {
-		AbstractAdapter adapter = getAdapterInstance(adapterName);
-		try {
-			Model resultModel = adapter.updateInstance(decode(instanceURI),
-					MessageUtil.parseSerializedModel(rdfInput,
-							IMessageBus.SERIALIZATION_TURTLE));
-			return MessageUtil.serializeModel(resultModel,
-					IMessageBus.SERIALIZATION_TURTLE);
-		} catch (ProcessingException e) {
-			processProcessingRequestException(e);
-		} catch (InvalidRequestException e) {
-			processInvalidRequestException(e);
-		}
-		return null;
-	}
-
-	@DELETE
-	@Path("/{adapterName}/instances/{instanceURI}")
-	@Produces("text/html")
-	public Response deleteInstance(
-			@PathParam("adapterName") String adapterName,
-			@PathParam("instanceURI") String instanceURI) {
-
-		AbstractAdapter adapter = getAdapterInstance(adapterName);
-		try {
-			adapter.deleteInstance(decode(instanceURI));
-		} catch (InstanceNotFoundException e) {
-			throw new AdapterWebApplicationException(Status.NOT_FOUND, e);
-		} catch (ProcessingException e) {
-			processProcessingRequestException(e);
-		} catch (InvalidRequestException e) {
-			processInvalidRequestException(e);
-		}
-		return Response.status(Response.Status.OK.getStatusCode()).build();
 	}
 
 	// returns the underlying model for the adapter
