@@ -17,25 +17,28 @@ import javax.servlet.http.HttpServletRequest;
  */
 @WebFilter("/hallo")
 public class EpcFilter implements Filter {
-    private static final Logger LOGGER = Logger.getLogger(EpcFilter.class.toString());
+	private static final Logger LOGGER = Logger.getLogger(EpcFilter.class
+			.toString());
 
-    @Override
-    public void init(final FilterConfig filterConfig) throws ServletException {
-	LOGGER.info("Init not implemented");
-    }
-
-    @Override
-    public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
-	    final FilterChain filterChain) throws IOException, ServletException {
-
-	final HttpServletRequest req = (HttpServletRequest) servletRequest;
-	if (req.getMethod().equals("GET")) {
-	    servletRequest.getRequestDispatcher("/ontology").forward(servletRequest, servletResponse);
+	@Override
+	public void init(final FilterConfig filterConfig) throws ServletException {
+		LOGGER.info("Init not implemented");
 	}
-    }
 
-    @Override
-    public void destroy() {
-	LOGGER.info("Destroy not implemented");
-    }
+	@Override
+	public void doFilter(final ServletRequest servletRequest,
+			final ServletResponse servletResponse, final FilterChain filterChain)
+			throws IOException, ServletException {
+
+		final HttpServletRequest req = (HttpServletRequest) servletRequest;
+		if (req.getMethod().equals("GET")) {
+			servletRequest.getRequestDispatcher("/ontology").forward(
+					servletRequest, servletResponse);
+		}
+	}
+
+	@Override
+	public void destroy() {
+		LOGGER.info("Destroy not implemented");
+	}
 }

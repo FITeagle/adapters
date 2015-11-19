@@ -46,7 +46,7 @@ public abstract class AbstractAdapterREST {
 	 * @param adapterName
 	 * @return
 	 */
-	// e.g. http://localhost:8080/epc/epc/EpcAdapter-1
+	// e.g. http://localhost:8080/epc/EpcAdapter-1
 	@GET
 	@Path("/{adapterName}")
 	@Produces("text/turtle")
@@ -71,7 +71,7 @@ public abstract class AbstractAdapterREST {
 	 * @throws InstanceNotFoundException
 	 */
 	// e.g. curl -H "Accept: text/turtle" -X GET
-	// "http://localhost:8080/epc/epc/EpcAdapter-1/instances"
+	// "http://localhost:8080/epc/EpcAdapter-1/instances"
 	@GET
 	@Path("/{adapterName}/instances")
 	@Produces("text/turtle")
@@ -111,7 +111,7 @@ public abstract class AbstractAdapterREST {
 	}
 
 	// e.g. curl -H "Accept: application/rdf+xml" -X GET
-	// "http://localhost:8080/epc/epc/EpcAdapter-1/instances"
+	// "http://localhost:8080/epc/EpcAdapter-1/instances"
 	@GET
 	@Path("/{adapterName}/instances")
 	@Produces("application/rdf+xml")
@@ -131,7 +131,7 @@ public abstract class AbstractAdapterREST {
 	}
 
 	// e.g. curl -H "Accept: application/n-triples" -X GET
-	// "http://localhost:8080/epc/epc/EpcAdapter-1/instances"
+	// "http://localhost:8080/epc/EpcAdapter-1/instances"
 	@GET
 	@Path("/{adapterName}/instances")
 	@Produces("application/n-triples")
@@ -158,7 +158,7 @@ public abstract class AbstractAdapterREST {
 	 * @param instanceURI
 	 * @return
 	 */
-	// e.g. http://localhost:8080/epc/epc/EpcAdapter-1/instances/
+	// e.g. http://localhost:8080/epc/EpcAdapter-1/instances/
 	// http%3A%2F%2Flocalhost%2Fresource%2FEpcAdapter-1%2Fe1d02989-3b61-45f5-932f-078ad1d0bbc6
 	@GET
 	@Path("/{adapterName}/instances/{instanceURI}")
@@ -229,7 +229,7 @@ public abstract class AbstractAdapterREST {
 	/**
 	 * Creates the instances given in a model, e.g. send following string
 	 * encoded with URL escape characters and as a post request to
-	 * http://localhost:8080/epc/epc/EpcAdapter-1/instances
+	 * http://localhost:8080/epc/EpcAdapter-1/instances
 	 * 
 	 * <http://localhost/resource/EpcAdapter-1/new> a
 	 * <http://open-multinet.info/ontology/resource/epc#UserEquipment> ,
@@ -276,8 +276,7 @@ public abstract class AbstractAdapterREST {
 	 * 
 	 * e.g. send the following as a PUT request with content type
 	 * application/x-www-form-urlencoded using URL escape characters to
-	 * http://localhost:8080/epc/epc/
-	 * EpcAdapter-1/instances/http%3A%2F%2Flocalhost
+	 * http://localhost:8080/epc/EpcAdapter-1/instances/http%3A%2F%2Flocalhost
 	 * %2Fresource%2FEpcAdapter-1%2Fnew
 	 * 
 	 * <http://localhost/resource/EpcAdapter-1/new-details>
@@ -435,7 +434,7 @@ public abstract class AbstractAdapterREST {
 				e.getMessage());
 	}
 
-	private String decode(String string) {
+	protected String decode(String string) {
 		try {
 			return URLDecoder.decode(string, "UTF8");
 		} catch (UnsupportedEncodingException e) {

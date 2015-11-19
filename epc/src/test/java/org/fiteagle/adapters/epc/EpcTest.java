@@ -1,6 +1,5 @@
 package org.fiteagle.adapters.epc;
 
-import info.openmultinet.ontology.Parser;
 import info.openmultinet.ontology.exceptions.InvalidModelException;
 import info.openmultinet.ontology.exceptions.MissingRspecElementException;
 import info.openmultinet.ontology.translators.geni.RequestConverter;
@@ -20,6 +19,8 @@ import org.apache.jena.riot.Lang;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
+import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageUtil;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -68,14 +69,16 @@ public class EpcTest {
 
 		final InputStream rspec = EpcTest.class.getResourceAsStream("/epc.xml");
 		final Model model = RequestConverter.getModel(rspec);
-		String modelString = Parser.toString(model);
+
+		String modelString = MessageUtil.serializeModel(model,
+				IMessageBus.SERIALIZATION_TURTLE);
 		System.out.println("********** input model*************");
 		System.out.println(modelString);
 
 		epcAdapter.createInstances(model);
 		Model allInstances = epcAdapter.getAllInstances();
-		String allInstancesString = Parser.toString(epcAdapter
-				.getAllInstances());
+		String allInstancesString = MessageUtil.serializeModel(
+				epcAdapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
 		System.out
 				.println("********** instances created in adapter*************");
 		System.out.println(allInstancesString);
@@ -119,7 +122,8 @@ public class EpcTest {
 		final Resource adapterABox = defaultModel
 				.createResource("http://www.test.com/EpcAdapter-1");
 		System.out.println("***********adapter a box");
-		System.out.println(Parser.toString(adapterABox.getModel()));
+		System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
+				IMessageBus.SERIALIZATION_TURTLE));
 		final EpcAdapter adapter = new EpcAdapter(adapterTBox, adapterABox);
 
 		return adapter;
