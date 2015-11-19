@@ -24,7 +24,7 @@ The adapter can be accessed via different delivery mechanisms: direct REST, Webs
 
 If you want to access this Adapter via REST you have to use:
 www.localhost[Or other URI]:8080/lterf/bs
-as the path. The normal and old Path "localhost:8080/bs" is not working anymore for this Adapter.
+as the path.
 
 
 JMS/MDB Delivery Mechanism
