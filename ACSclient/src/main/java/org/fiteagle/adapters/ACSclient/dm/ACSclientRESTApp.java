@@ -7,7 +7,7 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 
-@ApplicationPath("/api")
+@ApplicationPath("/")
 public class ACSclientRESTApp extends Application {
     @Override
     public Set<Class<?>> getClasses() {
