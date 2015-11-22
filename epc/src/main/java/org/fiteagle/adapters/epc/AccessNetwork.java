@@ -12,7 +12,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-public class AccessNetwork extends EpcImplementable {
+public class AccessNetwork extends EpcGeneric {
 
 	private List<AccessPointName> accessPointNames;
 	private int band;
@@ -49,6 +49,8 @@ public class AccessNetwork extends EpcImplementable {
 		if (epcResource.hasProperty(Epc.hasAccessNetwork)) {
 			Resource accessNetworkDetails = epcResource
 					.getProperty(Epc.hasAccessNetwork).getObject().asResource();
+
+			super.updateInstance(accessNetworkDetails);
 
 			if (accessNetworkDetails.hasProperty(Epc.band)) {
 				this.setBand(accessNetworkDetails.getProperty(Epc.band)
@@ -167,6 +169,9 @@ public class AccessNetwork extends EpcImplementable {
 				resourceUri);
 		anDetails.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.AccessNetworkDetails);
+
+		super.parseToModel(anDetails);
+
 		resource.addProperty(
 				info.openmultinet.ontology.vocabulary.Epc.hasAccessNetwork,
 				anDetails);

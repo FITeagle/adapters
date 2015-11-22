@@ -128,6 +128,7 @@ public abstract class AdapterControl {
     public Collection<AbstractAdapter> getAdapterInstances() {
         return adapterInstances.values();
     }
+    
     public Model configure(String adapterId,Config configuration) {
         AbstractAdapter adapter = adapterInstances.get(adapterId);
         adapter.configure(configuration);

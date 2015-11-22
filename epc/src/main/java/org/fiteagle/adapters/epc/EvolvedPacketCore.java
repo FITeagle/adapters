@@ -10,7 +10,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-public class Epc extends EpcImplementable {
+public class EvolvedPacketCore extends EpcGeneric {
 
 	private List<AccessPointName> accessPointNames;
 	private String mmeAddress;
@@ -29,9 +29,11 @@ public class Epc extends EpcImplementable {
 	// "java:jboss/ee/concurrency/factory/default";
 	// private transient ManagedThreadFactory threadFactory;
 
-	private static final Logger LOGGER = Logger.getLogger(Epc.class.toString());
+	private static final Logger LOGGER = Logger
+			.getLogger(EvolvedPacketCore.class.toString());
 
-	public Epc(final EpcAdapter owningAdapter, final String instanceName) {
+	public EvolvedPacketCore(final EpcAdapter owningAdapter,
+			final String instanceName) {
 		super(owningAdapter, instanceName);
 
 		this.accessPointNames = new ArrayList<AccessPointName>();
@@ -51,6 +53,8 @@ public class Epc extends EpcImplementable {
 					.getProperty(
 							info.openmultinet.ontology.vocabulary.Epc.hasEvolvedPacketCore)
 					.getObject().asResource();
+
+			super.updateInstance(epcDetails);
 
 			// below assumes that each propertie only occurs once, really need
 			// an interator or something to catch all properties
@@ -135,6 +139,9 @@ public class Epc extends EpcImplementable {
 				.addProperty(
 						RDF.type,
 						info.openmultinet.ontology.vocabulary.Epc.EvolvedPacketCoreDetails);
+		
+		super.parseToModel(epcDetails);
+		
 		resource.addProperty(
 				info.openmultinet.ontology.vocabulary.Epc.hasEvolvedPacketCore,
 				epcDetails);

@@ -2,6 +2,7 @@ package org.fiteagle.adapters.epc;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,8 +47,8 @@ public class EpcAdapterControl extends AdapterControl {
 		// this.adapterModel = OntologyModelUtil.loadModel(
 		// "ontologies/epc-adapter.ttl", IMessageBus.SERIALIZATION_TURTLE);
 
-		this.adapterModel = OntologyModelUtil.loadModel(
-				"ontologies/epc.ttl", IMessageBus.SERIALIZATION_TURTLE);
+		this.adapterModel = OntologyModelUtil.loadModel("ontologies/epc.ttl",
+				IMessageBus.SERIALIZATION_TURTLE);
 
 		this.adapterInstancesConfig = this.readConfig("EpcAdapter");
 
@@ -60,8 +61,43 @@ public class EpcAdapterControl extends AdapterControl {
 	@Override
 	public AbstractAdapter createAdapterInstance(final Model tbox,
 			final Resource abox) {
+
+		LOGGER.log(Level.WARNING,
+				"createAdapterInstance, adding " + abox.getURI());
+
 		final AbstractAdapter adapter = new EpcAdapter(tbox, abox);
+
 		this.adapterInstances.put(adapter.getId(), adapter);
+
+		LOGGER.log(Level.WARNING, "added adapter, new adapterInstances size: "
+				+ adapterInstances.size());
+
+		AbstractAdapter adapterInstance = null;
+		Iterator<?> it = this.adapterInstances.entrySet().iterator();
+		while (it.hasNext()) {
+			@SuppressWarnings("unchecked")
+			Map.Entry<String, AbstractAdapter> pair = (Map.Entry<String, AbstractAdapter>) it
+					.next();
+			LOGGER.log(Level.WARNING, "adapter instance key: " + pair.getKey());
+			AbstractAdapter epcAdapter = pair.getValue();
+			LOGGER.log(Level.WARNING, "adapter instance value: "
+					+ epcAdapter.getAdapterABox().getURI());
+			if (abox.getURI().equals(epcAdapter.getAdapterABox().getURI())) {
+				adapterInstance = epcAdapter;
+			}
+		}
+
+		// AbstractAdapter adapterInstance =
+		// adapterInstances.get(abox.getURI());
+
+		if (adapterInstance == null) {
+			LOGGER.log(Level.WARNING,
+					"createAdapterInstance method in EpcAdapterControl: adapterInstance is null");
+		} else {
+			LOGGER.log(Level.WARNING,
+					"createAdapterInstance method in EpcAdapterControl: adapterInstance "
+							+ adapterInstance.getAdapterABox().getURI());
+		}
 		return adapter;
 	}
 
@@ -95,11 +131,9 @@ public class EpcAdapterControl extends AdapterControl {
 			}
 
 		}
-
 	}
 
 	@Override
-	@SuppressWarnings("PMD.GuardLogStatementJavaUtil")
 	protected void addAdapterProperties(final Map<String, String> adaptInstance) {
 		LOGGER.warning("Not implemented. Input: " + adaptInstance);
 	}

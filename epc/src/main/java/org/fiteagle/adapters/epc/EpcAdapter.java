@@ -6,12 +6,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
+import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -20,6 +22,7 @@ import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -27,7 +30,7 @@ public final class EpcAdapter extends AbstractAdapter {
 
 	private static final List<Property> EPC_CTRL_PROPS = new ArrayList<Property>();
 
-	private transient final HashMap<String, EpcImplementable> instanceList = new HashMap<String, EpcImplementable>();
+	private transient final HashMap<String, EpcGeneric> instanceList = new HashMap<String, EpcGeneric>();
 	private static final Logger LOGGER = Logger.getLogger(EpcAdapter.class
 			.toString());
 
@@ -91,7 +94,8 @@ public final class EpcAdapter extends AbstractAdapter {
 		} else if (resource.hasProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.EvolvedPacketCore)) {
 			LOGGER.warning("Try to update instance: " + instanceURI);
-			final Epc epc = new Epc(this, instanceURI);
+			final EvolvedPacketCore epc = new EvolvedPacketCore(this,
+					instanceURI);
 			this.instanceList.put(instanceURI, epc);
 			this.updateInstance(instanceURI, modelCreate);
 			return this.parseToModel(epc);
@@ -109,8 +113,9 @@ public final class EpcAdapter extends AbstractAdapter {
 	}
 
 	@SuppressWarnings("PMD.GuardLogStatementJavaUtil")
-	Model parseToModel(final EpcImplementable epcImplementable) {
+	Model parseToModel(final EpcGeneric epcImplementable) {
 
+		LOGGER.warning("Calling parse to model...");
 		final Resource resource = ModelFactory.createDefaultModel()
 				.createResource(epcImplementable.getInstanceName());
 
@@ -118,19 +123,21 @@ public final class EpcAdapter extends AbstractAdapter {
 		final Property property = resource.getModel().createProperty(
 				Omn_lifecycle.hasState.getNameSpace(),
 				Omn_lifecycle.hasState.getLocalName());
-		// property.addProperty(RDF.type, OWL.FunctionalProperty);
+		property.addProperty(RDF.type, OWL.FunctionalProperty);
 		resource.addProperty(property, Omn_lifecycle.Ready);
 
 		if (epcImplementable instanceof AccessNetwork) {
 			AccessNetwork an = (AccessNetwork) epcImplementable;
 			an.parseToModel(resource);
-		} else if (epcImplementable instanceof Epc) {
-			Epc epc = (Epc) epcImplementable;
+		} else if (epcImplementable instanceof EvolvedPacketCore) {
+			EvolvedPacketCore epc = (EvolvedPacketCore) epcImplementable;
 			epc.parseToModel(resource);
 		} else if (epcImplementable instanceof UserEquipment) {
 			UserEquipment ue = (UserEquipment) epcImplementable;
 			ue.parseToModel(resource);
 		}
+		LOGGER.log(Level.INFO, "CONTENT parse to model: "
+				+ resource.getModel().toString());
 		return resource.getModel();
 	}
 
@@ -140,8 +147,7 @@ public final class EpcAdapter extends AbstractAdapter {
 
 		// if the instance is in the list of instances in the adapter
 		if (this.instanceList.containsKey(instanceURI)) {
-			final EpcImplementable currentEpc = this.instanceList
-					.get(instanceURI);
+			final EpcGeneric currentEpc = this.instanceList.get(instanceURI);
 			Resource epcResource = configureModel.getResource(instanceURI);
 			currentEpc.updateInstance(epcResource);
 
@@ -157,13 +163,13 @@ public final class EpcAdapter extends AbstractAdapter {
 
 	@Override
 	public void deleteInstance(final String instanceURI) {
-		final EpcImplementable epc = this.getInstanceByName(instanceURI);
+		final EpcGeneric epc = this.getInstanceByName(instanceURI);
 		// epc.terminate();
 		LOGGER.info("Deleting instance: " + instanceURI);
 		this.instanceList.remove(instanceURI);
 	}
 
-	private EpcImplementable getInstanceByName(final String instanceURI) {
+	public EpcGeneric getInstanceByName(final String instanceURI) {
 		return this.instanceList.get(instanceURI);
 	}
 
@@ -181,26 +187,49 @@ public final class EpcAdapter extends AbstractAdapter {
 
 	@Override
 	public void updateAdapterDescription() {
-		LOGGER.warning("Not implemented.");
+		LOGGER.warning("updateAdapterDescription() is not implemented.");
 	}
 
 	@Override
 	public Model getInstance(final String instanceURI)
 			throws InstanceNotFoundException {
-		final EpcImplementable epc = this.instanceList.get(instanceURI);
+
+		final EpcGeneric epc = this.instanceList.get(instanceURI);
+		LOGGER.warning("Get instance: " + instanceURI);
+
 		if (epc == null) {
 			throw new InstanceNotFoundException("Instance " + instanceURI
 					+ " not found");
 		}
-		return this.parseToModel(epc);
+		Model model = this.parseToModel(epc);
+		LOGGER.warning("Returning this model from get instance method: "
+				+ MessageUtil.serializeModel(model,
+						IMessageBus.SERIALIZATION_TURTLE));
+
+		return model;
+	}
+
+	public EpcGeneric getInstanceObject(final String instanceURI) {
+
+		final EpcGeneric epc = this.instanceList.get(instanceURI);
+		LOGGER.warning("Get instance: " + instanceURI);
+
+		return epc;
 	}
 
 	@Override
 	public Model getAllInstances() throws InstanceNotFoundException {
+		LOGGER.warning("getAllInstances()");
+		LOGGER.warning("instanceList size " + instanceList.size());
 		final Model model = ModelFactory.createDefaultModel();
+
 		for (final String uri : this.instanceList.keySet()) {
+			LOGGER.warning("instance key " + uri);
 			model.add(this.getInstance(uri));
 		}
+		LOGGER.warning("Returning this model from getAllInstances method: "
+				+ MessageUtil.serializeModel(model,
+						IMessageBus.SERIALIZATION_TURTLE));
 		return model;
 	}
 
@@ -220,7 +249,6 @@ public final class EpcAdapter extends AbstractAdapter {
 	}
 
 	@Override
-	@SuppressWarnings("PMD.GuardLogStatementJavaUtil")
 	public void configure(final Config configuration) {
 		LOGGER.warning("Not implemented. Input: " + configuration);
 	}

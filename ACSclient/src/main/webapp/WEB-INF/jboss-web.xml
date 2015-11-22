@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-web>
+    <context-root>/lterf/bs</context-root>
+    <context-root>/ACSclient</context-root>
+</jboss-web>

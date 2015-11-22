@@ -13,7 +13,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-public class UserEquipment extends EpcImplementable {
+public class UserEquipment extends EpcGeneric {
 
 	private List<AccessPointName> accessPointNames;
 	private boolean lteSupport;
@@ -39,6 +39,8 @@ public class UserEquipment extends EpcImplementable {
 		if (epcResource.hasProperty(Epc.hasUserEquipment)) {
 			Resource ueDetails = epcResource.getProperty(Epc.hasUserEquipment)
 					.getObject().asResource();
+
+			super.updateInstance(ueDetails);
 
 			if (ueDetails.hasProperty(Epc.lteSupport)) {
 				this.setLteSupport(ueDetails.getProperty(Epc.lteSupport)
@@ -90,6 +92,9 @@ public class UserEquipment extends EpcImplementable {
 				resourceUri);
 		ueDetails.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.UserEquipmentDetails);
+
+		super.parseToModel(ueDetails);
+
 		resource.addProperty(
 				info.openmultinet.ontology.vocabulary.Epc.hasUserEquipment,
 				ueDetails);
@@ -120,7 +125,6 @@ public class UserEquipment extends EpcImplementable {
 		}
 	}
 
-	@SuppressWarnings({ "PMD.GuardLogStatementJavaUtil", "PMD.LongVariable" })
 	public void updateProperty(final Statement configureStatement) {
 		if (configureStatement.getSubject().getURI()
 				.equals(this.getInstanceName())) {

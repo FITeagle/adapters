@@ -9,7 +9,7 @@ import javax.ws.rs.core.Application;
 /**
  * Created by dne on 24.06.15.
  */
-@ApplicationPath("/epc")
+@ApplicationPath("/")
 public class EpcApp extends Application {
 
 	@Override

@@ -15,7 +15,7 @@ Build and Deploy the Adapter
 
         mvn clean install wildfly:deploy
 
-4. This will deploy `target/epc.war` to the running instance of the server. Look at the WildFly Application Server console or Server log and you should see log messages corresponding to the deployment of the message-driven beans and the JMS destinations.
+4. This will deploy `target/ACSclient.war` to the running instance of the server. Look at the WildFly Application Server console or Server log and you should see log messages corresponding to the deployment of the message-driven beans and the JMS destinations.
 
 Access the Adapter
 ------------------
@@ -23,7 +23,7 @@ Access the Adapter
 The adapter can be accessed via different delivery mechanisms: direct REST, Websocket, EJB or JMS (via Northbound REST or Web GUI)
 
 If you want to access this Adapter via REST you have to use:
-www.localhost[Or other URI]:8080/lterf/epc
+www.localhost[Or other URI]:8080/lterf/bs
 as the path.
 
 

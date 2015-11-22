@@ -1,8 +1,5 @@
 package org.fiteagle.adapters.epc;
 
-import com.hp.hpl.jena.vocabulary.RDF;
-
-import info.openmultinet.ontology.Parser;
 import info.openmultinet.ontology.vocabulary.Epc;
 
 import java.io.InputStream;
@@ -12,13 +9,15 @@ import junit.framework.Assert;
 
 import org.apache.jena.riot.Lang;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
+import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageUtil;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 public class EpcAdapterTest {
 
@@ -54,17 +53,31 @@ public class EpcAdapterTest {
 		Assert.assertEquals(false, epcDetails.getProperty(Epc.lteSupport)
 				.getObject().asLiteral().getBoolean());
 
+		System.out.println("************ EPC model ************");
+		System.out.println(MessageUtil.serializeModel(epc,
+				IMessageBus.SERIALIZATION_TURTLE));
+
 		// get the update model, carry out the update and check that lteSupport
 		// has the new value (true)
 		final Model cfgModel = ModelFactory.createDefaultModel();
 		final InputStream cfg = EpcAdapterTest.class
 				.getResourceAsStream("/updateEpc.ttl");
 		cfgModel.read(cfg, StandardCharsets.UTF_8.name(), Lang.TTL.getName());
+
+		System.out.println("************ Configure model ************");
+		System.out.println(MessageUtil.serializeModel(cfgModel,
+				IMessageBus.SERIALIZATION_TURTLE));
+
 		epc = adapter.updateInstance(URN_USER_EQUIPMENT_1, cfgModel);
-		
+
 		Resource epcDetailsNew = epc.getResource(URN_USER_EQUIPMENT_1)
 				.getProperty(Epc.hasUserEquipment).getObject().asResource();
 		Assert.assertEquals(true, epcDetailsNew.getProperty(Epc.lteSupport)
 				.getObject().asLiteral().getBoolean());
+		
+		Model epcNew = adapter.getInstance(URN_USER_EQUIPMENT_1);
+		System.out.println("************ new EPC model ************");
+		System.out.println(MessageUtil.serializeModel(epcNew,
+				IMessageBus.SERIALIZATION_TURTLE));
 	}
 }
