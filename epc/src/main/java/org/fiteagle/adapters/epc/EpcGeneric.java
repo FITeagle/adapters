@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDFS;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
@@ -31,6 +32,7 @@ public class EpcGeneric {
 	private Session session;
 	private ChannelExec commandChannel;
 
+	private String label;
 	private int delayCode;
 	private int packetlossCode;
 	private int rateCode;
@@ -54,6 +56,7 @@ public class EpcGeneric {
 
 		this.session = null;
 		this.commandChannel = null;
+		this.label = null;
 	}
 
 	/**
@@ -260,7 +263,7 @@ public class EpcGeneric {
 	}
 
 	/**
-	 * Methods to be overridden in subclasses
+	 * Methods to be overridden/expanded in subclasses
 	 * 
 	 * @param epcResource
 	 */
@@ -289,6 +292,9 @@ public class EpcGeneric {
 	}
 
 	public void parseToModel(Resource resource) {
+		if (this.getLabel() != null) {
+			resource.addLiteral(RDFS.label, this.getLabel());
+		}
 		resource.addLiteral(Epc.delayCode, this.getDelayCode());
 		resource.addLiteral(Epc.packetlossCode, this.getPacketlossCode());
 		resource.addLiteral(Epc.rateCode, this.getRateCode());
@@ -329,6 +335,14 @@ public class EpcGeneric {
 
 	public void setRateCode(int rateCode) {
 		this.rateCode = rateCode;
+	}
+
+	public String getLabel() {
+		return this.label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 }

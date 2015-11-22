@@ -121,7 +121,7 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 	}
 
 	/**
-	 * This method sends stop as a parameter ot the script net-fuseco.sh
+	 * This method sends stop as a parameter to the script net-fuseco.sh
 	 * 
 	 * @param adapterName
 	 * @param instanceURI

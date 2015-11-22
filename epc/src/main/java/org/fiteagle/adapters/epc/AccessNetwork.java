@@ -11,6 +11,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class AccessNetwork extends EpcGeneric {
 
@@ -45,6 +46,14 @@ public class AccessNetwork extends EpcGeneric {
 
 	@Override
 	public void updateInstance(Resource epcResource) {
+
+		if (epcResource.hasProperty(RDFS.label)) {
+
+			String label = epcResource.getProperty(RDFS.label).getObject()
+					.asLiteral().getString();
+
+			this.setLabel(label);
+		}
 
 		if (epcResource.hasProperty(Epc.hasAccessNetwork)) {
 			Resource accessNetworkDetails = epcResource

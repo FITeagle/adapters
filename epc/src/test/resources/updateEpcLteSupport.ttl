@@ -1,0 +1,6 @@
+<http://localhost/resource/EpcAdapter-1/new-details>
+	 <http://open-multinet.info/ontology/resource/epc#lteSupport> true .
+	 
+<http://localhost/resource/EpcAdapter-1/new>
+	 <http://open-multinet.info/ontology/resource/epc#hasUserEquipment>
+	 <http://localhost/resource/EpcAdapter-1/new-details> .

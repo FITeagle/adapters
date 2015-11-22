@@ -1,0 +1,14 @@
+<http://localhost/resource/EpcAdapter-1/82a18a71-ddd0-40fa-a994-fc087bebd4db-details>
+    <http://open-multinet.info/ontology/resource/epc#delayCode>
+            "4"^^<http://www.w3.org/2001/XMLSchema#long> ;
+    <http://open-multinet.info/ontology/resource/epc#packetlossCode>
+            "5"^^<http://www.w3.org/2001/XMLSchema#long> ;
+    <http://open-multinet.info/ontology/resource/epc#rateCode>
+            "6"^^<http://www.w3.org/2001/XMLSchema#long> .
+	 
+<http://localhost/resource/EpcAdapter-1/82a18a71-ddd0-40fa-a994-fc087bebd4db>
+	a <http://open-multinet.info/ontology/omn#Resource> ;
+	   <http://www.w3.org/2000/01/rdf-schema#label>
+                "tetslsdjfl sjkd" ;
+	<http://open-multinet.info/ontology/resource/epc#hasEvolvedPacketCore>
+	<http://localhost/resource/EpcAdapter-1/82a18a71-ddd0-40fa-a994-fc087bebd4db-details> .

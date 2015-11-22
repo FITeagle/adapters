@@ -2,6 +2,7 @@ package org.fiteagle.abstractAdapter;
 
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDFS;
+
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 import java.io.IOException;
@@ -15,10 +16,13 @@ import javax.ws.rs.core.Response;
 
 import org.fiteagle.abstractAdapter.dm.AdapterEventListener;
 import org.fiteagle.api.core.Config;
+import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hp.hpl.jena.vocabulary.RDF;
+
 import org.fiteagle.api.core.MessageBusOntologyModel;
 
 public abstract class AbstractAdapter {
@@ -202,8 +206,19 @@ public abstract class AbstractAdapter {
 	 */
 	public Model updateInstances(Model model) throws InvalidRequestException,
 			ProcessingException, InstanceNotFoundException {
+
+		LOGGER.log(Level.INFO, "abstract adapter updateInstances");
+		LOGGER.log(
+				Level.INFO,
+				"abstract adapter updateInstances input model"
+						+ MessageUtil.serializeModel(model,
+								IMessageBus.SERIALIZATION_TURTLE));
+
 		Model updatedInstancesModel = ModelFactory.createDefaultModel();
 		for (Resource resource : getAdapterManagedResources()) {
+			LOGGER.log(Level.INFO,
+					"abstract adapter updateInstances resource: " + resource);
+
 			ResIterator resourceInstanceIterator = model
 					.listSubjectsWithProperty(RDF.type, resource);
 			while (resourceInstanceIterator.hasNext()) {
@@ -215,8 +230,49 @@ public abstract class AbstractAdapter {
 						resourceInstance, null, (RDFNode) null);
 				Model updateModel = ModelFactory.createDefaultModel();
 				while (propertiesIterator.hasNext()) {
-					updateModel.add(propertiesIterator.next());
+					// updateModel.add(propertiesIterator.next());
+					// }
+
+					// get the first level of properties fanning out from the
+					// resource
+					// StmtIterator properties = resource.listProperties();
+					// while (properties.hasNext()) {
+					Statement property = propertiesIterator.next();
+					updateModel.add(property);
+
+					// get the second level of properties fanning out from the
+					// resource
+					if (property.getObject().isResource()) {
+						Resource child = property.getObject().asResource();
+						StmtIterator childProperties = child.listProperties();
+						while (childProperties.hasNext()) {
+							Statement childProperty = childProperties.next();
+							updateModel.add(childProperty);
+
+							// get the third level of properties fanning out
+							// from
+							// the resource
+							if (childProperty.getObject().isResource()) {
+								Resource grandchild = childProperty.getObject()
+										.asResource();
+								StmtIterator grandchildProperties = grandchild
+										.listProperties();
+								while (grandchildProperties.hasNext()) {
+									Statement grandchildProperty = grandchildProperties
+											.next();
+									updateModel.add(grandchildProperty);
+								}
+							}
+						}
+					}
 				}
+
+				LOGGER.log(
+						Level.INFO,
+						"abstract adapter updateInstances updatedModel"
+								+ MessageUtil.serializeModel(updateModel,
+										IMessageBus.SERIALIZATION_TURTLE));
+
 				Model updatedModel = updateInstance(resourceInstance.getURI(),
 						updateModel);
 				updatedInstancesModel.add(updatedModel);
