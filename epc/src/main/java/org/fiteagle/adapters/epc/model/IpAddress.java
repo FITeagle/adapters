@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.epc;
+package org.fiteagle.adapters.epc.model;
 
 public class IpAddress {
 

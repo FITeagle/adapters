@@ -1,9 +1,12 @@
-package org.fiteagle.adapters.epc;
+package org.fiteagle.adapters.epc.model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+
+import org.fiteagle.adapters.epc.EpcAdapter;
+import org.fiteagle.adapters.epc.EpcGeneric;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -11,24 +14,27 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+/**
+ * This class serves to model Evolved Packet Cores as defined in Deliverable 3.1
+ * from the Flex project, where there are two different EPC networks (SiRRAN’s
+ * and OpenAirInterface)
+ * http://www.flex-project.eu/images/deliverables/FLEX_WP3_D3_1_final.pdf
+ * 
+ * @author robynloughnane
+ *
+ */
 public class EvolvedPacketCore extends EpcGeneric {
 
 	private List<AccessPointName> accessPointNames;
 	private String mmeAddress;
-	private String pdnGateway;
+	private PDNGateway pdnGateway;
 	private String servingGateway;
 	private List<String> subscribers;
 	private String vendor;
-	// private List<ENodeB> eNodeB;
+	private List<ENodeB> eNodeBs;
 
 	// private final transient EpcAdapter owningAdapter;
 	// private final String instanceName;
-	//
-	// @SuppressWarnings("PMD.DoNotUseThreads")
-	// private transient Thread thread;
-	// private final static String THREAD_FACTORY =
-	// "java:jboss/ee/concurrency/factory/default";
-	// private transient ManagedThreadFactory threadFactory;
 
 	private static final Logger LOGGER = Logger
 			.getLogger(EvolvedPacketCore.class.toString());
@@ -39,9 +45,10 @@ public class EvolvedPacketCore extends EpcGeneric {
 
 		this.accessPointNames = new ArrayList<AccessPointName>();
 		this.mmeAddress = "";
-		this.pdnGateway = "";
+		this.pdnGateway = new PDNGateway();
 		this.servingGateway = "";
 		this.subscribers = new ArrayList<String>();
+		this.eNodeBs = new ArrayList<ENodeB>();
 		this.vendor = "";
 	}
 
@@ -58,6 +65,7 @@ public class EvolvedPacketCore extends EpcGeneric {
 
 		if (epcResource
 				.hasProperty(info.openmultinet.ontology.vocabulary.Epc.hasEvolvedPacketCore)) {
+
 			Resource epcDetails = epcResource
 					.getProperty(
 							info.openmultinet.ontology.vocabulary.Epc.hasEvolvedPacketCore)
@@ -81,15 +89,26 @@ public class EvolvedPacketCore extends EpcGeneric {
 			}
 
 			if (epcDetails
+					.hasProperty(info.openmultinet.ontology.vocabulary.Epc.vendor)) {
+				String vendor = epcDetails
+						.getProperty(
+								info.openmultinet.ontology.vocabulary.Epc.vendor)
+						.getLiteral().getString();
+				this.setVendor(vendor);
+			}
+
+			if (epcDetails
 					.hasProperty(info.openmultinet.ontology.vocabulary.Epc.pdnGateway)) {
-				this.setPdnGateway(epcDetails
+				Resource pgwResource = epcDetails
 						.getProperty(
 								info.openmultinet.ontology.vocabulary.Epc.pdnGateway)
-						.getObject().asLiteral().getString());
+						.getObject().asResource();
+				this.getPdnGateway().updateInstance(pgwResource);
 			}
 
 			if (epcDetails
 					.hasProperty(info.openmultinet.ontology.vocabulary.Epc.servingGateway)) {
+
 				this.setServingGateway(epcDetails
 						.getProperty(
 								info.openmultinet.ontology.vocabulary.Epc.servingGateway)
@@ -109,27 +128,21 @@ public class EvolvedPacketCore extends EpcGeneric {
 			while (apns.hasNext()) {
 				Statement apnStatement = apns.next();
 				Resource apnResource = apnStatement.getObject().asResource();
-
-				String networkIdentifier = null;
-				if (apnResource
-						.hasProperty(info.openmultinet.ontology.vocabulary.Epc.networkIdentifier)) {
-					networkIdentifier = apnResource
-							.getProperty(
-									info.openmultinet.ontology.vocabulary.Epc.networkIdentifier)
-							.getObject().asLiteral().getString();
-				}
-
-				String operatorIdentifier = null;
-				if (apnResource
-						.hasProperty(info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier)) {
-					operatorIdentifier = apnResource
-							.getProperty(
-									info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier)
-							.getObject().asLiteral().getString();
-				}
-				AccessPointName apn = new AccessPointName(networkIdentifier,
-						operatorIdentifier);
+				AccessPointName apn = new AccessPointName();
+				apn.updateInstance(apnResource);
 				this.addApn(apn);
+			}
+
+			StmtIterator eNodeBs = epcDetails
+					.listProperties(info.openmultinet.ontology.vocabulary.Epc.hasENodeB);
+			while (eNodeBs.hasNext()) {
+				Statement eNodeBStatement = eNodeBs.next();
+				Resource eNodeBResource = eNodeBStatement.getObject()
+						.asResource();
+				ENodeB eNodeB = new ENodeB();
+				eNodeB.updateInstance(eNodeBResource);
+
+				this.addENodeB(eNodeB);
 			}
 		}
 	}
@@ -160,10 +173,6 @@ public class EvolvedPacketCore extends EpcGeneric {
 				this.getMmeAddress());
 
 		epcDetails.addLiteral(
-				info.openmultinet.ontology.vocabulary.Epc.pdnGateway,
-				this.getPdnGateway());
-
-		epcDetails.addLiteral(
 				info.openmultinet.ontology.vocabulary.Epc.servingGateway,
 				this.getServingGateway());
 
@@ -177,26 +186,37 @@ public class EvolvedPacketCore extends EpcGeneric {
 					subscriber);
 		}
 
+		// String uuidPgw = "urn:uuid:" + UUID.randomUUID().toString();
+		String pgwUrl = resource.getURI().toString() + "-pgw";
+		Resource pgwResource = epcDetails.getModel().createResource(pgwUrl);
+		this.getPdnGateway().parseToModel(pgwResource);
+		epcDetails.addProperty(
+				info.openmultinet.ontology.vocabulary.Epc.pdnGateway,
+				pgwResource);
+
 		List<AccessPointName> accessPointNames = this.getApns();
 		for (AccessPointName apn : accessPointNames) {
 
 			String uuidApn = "urn:uuid:" + UUID.randomUUID().toString();
 			Resource apnResource = epcDetails.getModel()
 					.createResource(uuidApn);
-			apnResource.addProperty(RDF.type,
-					info.openmultinet.ontology.vocabulary.Epc.AccessPointName);
-			apnResource
-					.addLiteral(
-							info.openmultinet.ontology.vocabulary.Epc.networkIdentifier,
-							apn.getNetworkIdentifier());
-			apnResource
-					.addLiteral(
-							info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier,
-							apn.getOperatorIdentifier());
+			apn.parseToModel(apnResource);
 			epcDetails
 					.addProperty(
 							info.openmultinet.ontology.vocabulary.Epc.hasAccessPointName,
 							apnResource);
+		}
+
+		List<ENodeB> eNodeBs = this.getENodeBs();
+		for (ENodeB eNodeB : eNodeBs) {
+
+			String uuidENodeB = "urn:uuid:" + UUID.randomUUID().toString();
+			Resource eNodeBResource = epcDetails.getModel().createResource(
+					uuidENodeB);
+			eNodeB.parseToModel(eNodeBResource);
+			epcDetails.addProperty(
+					info.openmultinet.ontology.vocabulary.Epc.hasENodeB,
+					eNodeBResource);
 		}
 
 	}
@@ -225,11 +245,11 @@ public class EvolvedPacketCore extends EpcGeneric {
 		this.mmeAddress = mmeAddress;
 	}
 
-	public String getPdnGateway() {
+	public PDNGateway getPdnGateway() {
 		return this.pdnGateway;
 	}
 
-	public void setPdnGateway(final String pdnGateway) {
+	public void setPdnGateway(final PDNGateway pdnGateway) {
 		LOGGER.info("Setting PDN gateway: " + pdnGateway);
 		this.pdnGateway = pdnGateway;
 	}
@@ -244,21 +264,30 @@ public class EvolvedPacketCore extends EpcGeneric {
 	}
 
 	public List<String> getSubscribers() {
-		return subscribers;
+		return this.subscribers;
 	}
 
 	public void addSubscriber(String subscriber) {
 		LOGGER.info("Adding subscriber: " + subscriber);
-		this.subscribers.add(subscriber);
+		this.getSubscribers().add(subscriber);
 	}
 
 	public String getVendor() {
-		return vendor;
+		return this.vendor;
 	}
 
 	public void setVendor(String vendor) {
 		LOGGER.info("Setting vendor: " + vendor);
 		this.vendor = vendor;
+	}
+
+	public List<ENodeB> getENodeBs() {
+		return this.eNodeBs;
+	}
+
+	public void addENodeB(ENodeB eNodeB) {
+		LOGGER.info("Adding eNodeB: " + eNodeB);
+		this.getENodeBs().add(eNodeB);
 	}
 
 }

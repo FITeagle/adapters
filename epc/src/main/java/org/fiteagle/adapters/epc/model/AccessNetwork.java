@@ -1,4 +1,4 @@
-package org.fiteagle.adapters.epc;
+package org.fiteagle.adapters.epc.model;
 
 import info.openmultinet.ontology.vocabulary.Epc;
 
@@ -7,12 +7,24 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+import org.fiteagle.adapters.epc.EpcAdapter;
+import org.fiteagle.adapters.epc.EpcGeneric;
+
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+/**
+ * This class serves to model Access Networks as defined in Deliverable 3.1 from
+ * the Flex project, where an Access Network of FLEX’s building blocks are the
+ * commercial or the Open Source eNodeB’s
+ * http://www.flex-project.eu/images/deliverables/FLEX_WP3_D3_1_final.pdf
+ * 
+ * @author robynloughnane
+ *
+ */
 public class AccessNetwork extends EpcGeneric {
 
 	private List<AccessPointName> accessPointNames;
@@ -59,7 +71,7 @@ public class AccessNetwork extends EpcGeneric {
 			Resource accessNetworkDetails = epcResource
 					.getProperty(Epc.hasAccessNetwork).getObject().asResource();
 
-			super.updateInstance(accessNetworkDetails);
+			// super.updateInstance(accessNetworkDetails);
 
 			if (accessNetworkDetails.hasProperty(Epc.band)) {
 				this.setBand(accessNetworkDetails.getProperty(Epc.band)
@@ -179,7 +191,7 @@ public class AccessNetwork extends EpcGeneric {
 		anDetails.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.AccessNetworkDetails);
 
-		super.parseToModel(anDetails);
+		// super.parseToModel(anDetails);
 
 		resource.addProperty(
 				info.openmultinet.ontology.vocabulary.Epc.hasAccessNetwork,

@@ -3,7 +3,7 @@
         <http://www.w3.org/2000/01/rdf-schema#label>
                 "test ue label" ;
         <http://open-multinet.info/ontology/omn-lifecycle#implementedBy>
-                <http://localhost/resource/EpcAdapter-1> ;
+                <http://www.test.com/EpcAdapter-1> ;
         <http://open-multinet.info/ontology/resource/epc#hasUserEquipment>
                 <urn:ue1-details> .
 

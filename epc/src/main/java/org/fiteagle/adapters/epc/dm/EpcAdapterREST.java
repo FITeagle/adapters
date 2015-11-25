@@ -19,10 +19,10 @@ import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterREST;
 import org.fiteagle.abstractAdapter.dm.AbstractAdapterREST.AdapterWebApplicationException;
-import org.fiteagle.adapters.epc.EvolvedPacketCore;
 import org.fiteagle.adapters.epc.EpcAdapter;
 import org.fiteagle.adapters.epc.EpcAdapterControl;
 import org.fiteagle.adapters.epc.EpcGeneric;
+import org.fiteagle.adapters.epc.model.EvolvedPacketCore;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 
@@ -73,13 +73,13 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 		EpcAdapter adapter = (EpcAdapter) getAdapterInstance(adapterName);
 		EpcGeneric epcGeneric = adapter.getInstanceObject(instanceURI);
 		int codeInt = Integer.parseInt(code);
-		if (type.equals("rate")) {
-			epcGeneric.setRateCode(codeInt);
-		} else if (type.equals("delay")) {
-			epcGeneric.setDelayCode(codeInt);
-		} else if (type.equals("loss")) {
-			epcGeneric.setPacketlossCode(codeInt);
-		}
+		// if (type.equals("rate")) {
+		// epcGeneric.setRateCode(codeInt);
+		// } else if (type.equals("delay")) {
+		// epcGeneric.setDelayCode(codeInt);
+		// } else if (type.equals("loss")) {
+		// epcGeneric.setPacketlossCode(codeInt);
+		// }
 
 		Model instances = adapter.getInstance(instanceURI);
 		String instancesString = null;

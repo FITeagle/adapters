@@ -12,6 +12,9 @@ import java.util.logging.Logger;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
+import org.fiteagle.adapters.epc.model.AccessNetwork;
+import org.fiteagle.adapters.epc.model.EvolvedPacketCore;
+import org.fiteagle.adapters.epc.model.UserEquipment;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
@@ -92,7 +95,7 @@ public final class EpcAdapter extends AbstractAdapter {
 					instanceURI);
 			this.instanceList.put(instanceURI, accessNetwork);
 
-			System.out.println("#######creteinstance modelCreate: "
+			System.out.println("#######create instance modelCreate: "
 					+ MessageUtil.serializeModel(modelCreate,
 							IMessageBus.SERIALIZATION_TURTLE));
 			this.updateInstance(instanceURI, modelCreate);
@@ -177,6 +180,8 @@ public final class EpcAdapter extends AbstractAdapter {
 			final EpcGeneric currentEpc = this.instanceList.get(instanceURI);
 			Resource epcResource = configureModel.getResource(instanceURI);
 			currentEpc.updateInstance(epcResource);
+			
+			
 			final Model newModel = this.parseToModel(currentEpc);
 			LOGGER.info("Returning updated epc: " + newModel);
 
@@ -219,6 +224,10 @@ public final class EpcAdapter extends AbstractAdapter {
 	@Override
 	public void updateAdapterDescription() {
 		LOGGER.warning("updateAdapterDescription() is not implemented.");
+	}
+	
+	public void addInstance(String uri, EpcGeneric epc){
+		this.instanceList.put(uri, epc);
 	}
 
 	@Override

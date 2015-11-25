@@ -1,0 +1,78 @@
+<http://localhost/resource/EpcAdapter-1/5c94f8e6-1887-432b-83a2-36cba5a6ee89>
+        a       <http://open-multinet.info/ontology/resource/epc#EvolvedPacketCore> , <http://open-multinet.info/ontology/omn-resource#Node> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "epc1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/omn#hasReservation>
+                <http://localhost/reservation/cffc45d0-048d-4502-b644-5b9f85bd94e2> ;
+        <http://open-multinet.info/ontology/omn#isResourceOf>
+                <http://wall2.ilabt.iminds.be/topology/epc15> ;
+        <http://open-multinet.info/ontology/resource/epc#hasEvolvedPacketCore>
+                <urn:uuid:9b36c643-f7e0-41c3-b1ff-3c401691df79> ;
+        <http://open-multinet.info/ontology/omn-lifecycle#hasComponentID>
+                "urn:publicid:IDN+localhost+node+http%3A%2F%2Flocalhost%2Fresource%2FEpcAdapter-1"^^<http://www.w3.org/2001/XMLSchema#anyURI> ;
+        <http://open-multinet.info/ontology/omn-lifecycle#hasID>
+                "epc1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/omn-lifecycle#hasState>
+                <http://open-multinet.info/ontology/omn-lifecycle#Uncompleted> ;
+        <http://open-multinet.info/ontology/omn-lifecycle#implementedBy>
+                <http://localhost/resource/EpcAdapter-1> ;
+        <http://open-multinet.info/ontology/omn-lifecycle#managedBy>
+                <urn:publicid:IDN+testbed.example.org+authority+cm> ;
+        <http://open-multinet.info/ontology/omn-resource#hasSliverType>
+                <urn:uuid:5a37dd71-3f64-4639-b93b-0f693c767aff> ;
+        <http://open-multinet.info/ontology/omn-resource#isExclusive>
+                false .
+
+<urn:uuid:9b36c643-f7e0-41c3-b1ff-3c401691df79>
+        a       <http://open-multinet.info/ontology/resource/epc#EvolvedPacketCoreDetails> ;
+        <http://open-multinet.info/ontology/resource/epc#hasAccessPointName>
+                <urn:uuid:079b0467-52e9-4a41-9dc1-3f808520b54c> , <urn:uuid:4562b4b5-c634-4357-9e7c-147ee6878ce6> ;
+        <http://open-multinet.info/ontology/resource/epc#hasENodeB>
+                <urn:uuid:966a8f02-2a67-4a2b-b6b9-11176fac4e97> ;
+        <http://open-multinet.info/ontology/resource/epc#mmeAddress>
+                "mme1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/resource/epc#pdnGateway>
+                <urn:uuid:2a0caa3c-612f-4a0d-bcd4-b58f477a634a> ;
+        <http://open-multinet.info/ontology/resource/epc#servingGateway>
+                "sg1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/resource/epc#subscriber>
+                "imsi2"^^<http://www.w3.org/2001/XMLSchema#string> , "imsi1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/resource/epc#vendor>
+                "vendor1"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<urn:uuid:2a0caa3c-612f-4a0d-bcd4-b58f477a634a>
+        a       <http://open-multinet.info/ontology/resource/epc#PDNGateway> ;
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "pdn1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/resource/epc#delayCode>
+                2 ;
+        <http://open-multinet.info/ontology/resource/epc#packetlossCode>
+                3 ;
+        <http://open-multinet.info/ontology/resource/epc#rateCode>
+                1 .
+
+<http://localhost/resource/topology/04106d6b-1e96-4984-9bfb-67538070a401>
+        a       <http://open-multinet.info/ontology/omn#Topology> ;
+        <http://open-multinet.info/ontology/omn#hasResource>
+                <http://localhost/resource/EpcAdapter-1/5c94f8e6-1887-432b-83a2-36cba5a6ee89> .
+
+<urn:uuid:966a8f02-2a67-4a2b-b6b9-11176fac4e97>
+        a       <http://open-multinet.info/ontology/resource/epc#ENodeB> ;
+        <http://open-multinet.info/ontology/resource/epc#eNodeBAddress>
+                "address1"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/resource/epc#eNodeBName>
+                "name1"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<urn:uuid:079b0467-52e9-4a41-9dc1-3f808520b54c>
+        a       <http://open-multinet.info/ontology/resource/epc#AccessPointName> ;
+        <http://open-multinet.info/ontology/resource/epc#networkIdentifier>
+                "123"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/resource/epc#operatorIdentifier>
+                "456"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<urn:uuid:4562b4b5-c634-4357-9e7c-147ee6878ce6>
+        a       <http://open-multinet.info/ontology/resource/epc#AccessPointName> ;
+        <http://open-multinet.info/ontology/resource/epc#networkIdentifier>
+                "1111123"^^<http://www.w3.org/2001/XMLSchema#string> ;
+        <http://open-multinet.info/ontology/resource/epc#operatorIdentifier>
+                "4444456"^^<http://www.w3.org/2001/XMLSchema#string> .
