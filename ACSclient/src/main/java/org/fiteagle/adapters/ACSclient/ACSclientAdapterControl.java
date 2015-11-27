@@ -44,7 +44,7 @@ public class ACSclientAdapterControl extends AdapterControl{
   @PostConstruct
   public void initialize() {
 	  propertiesName= "ACSclient";
-    LOGGER.log(Level.INFO, "Starting MotorAdapter");
+    LOGGER.log(Level.INFO, "Starting ACSclientAdapter");
     this.adapterModel = OntologyModelUtil.loadModel("ontologies/ACSclient.ttl", IMessageBus.SERIALIZATION_TURTLE);
     this.adapterInstancesConfig = this.readConfig(propertiesName);
     this.createAdapterInstances();
