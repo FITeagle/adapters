@@ -48,6 +48,8 @@ public class EpcAdapterTest {
 		// the default value assigned at creation (false)
 		adapter.createInstance(URN_USER_EQUIPMENT_1, model);
 		Model epc = adapter.getInstance(URN_USER_EQUIPMENT_1);
+	
+		
 		Resource epcDetails = epc.getResource(URN_USER_EQUIPMENT_1)
 				.getProperty(Epc.hasUserEquipment).getObject().asResource();
 		Assert.assertEquals(false, epcDetails.getProperty(Epc.lteSupport)

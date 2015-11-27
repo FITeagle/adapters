@@ -234,7 +234,7 @@ public abstract class AbstractAdapterREST {
 	 * <http://localhost/resource/EpcAdapter-1/new> a
 	 * <http://open-multinet.info/ontology/resource/epc#UserEquipment> ,
 	 * <http://open-multinet.info/ontology/omn#Resource> ;
-	 * <http://www.w3.org/2000/01/rdf-schema#label> "new resource" ;
+	 * <http://www.w3.org/2000/01/rdf-schema#label> "new resource" .
 	 * 
 	 * @param adapterName
 	 * @param rdfInput
