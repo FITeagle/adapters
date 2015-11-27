@@ -49,11 +49,11 @@ public class ACSclientAdapter extends AbstractAdapter{
   
   private final String device;
   
+  private final String parameterName;
+  
   private final List<Parameter> parametersList;
   
   private static final String DEVICE_PARAMETERS = "/parameters/?device=";
-  
-  private final String powerParameter = "Device.DeviceInfo.ProvisioningCode";
   
   private final HashMap<String, ParameterPlusValuesMap> parametersNames = new HashMap<String, ParameterPlusValuesMap>();
   
@@ -66,6 +66,7 @@ public class ACSclientAdapter extends AbstractAdapter{
     
     this.url = parseConfig(adapterABox, "url");
     this.device = parseConfig(adapterABox, "device");
+    this.parameterName = parseConfig(adapterABox, "parameter");
     
     Model model = ModelFactory.createDefaultModel();
     Resource adapterInstance = model.createResource(adapterABox.getURI());
@@ -236,11 +237,11 @@ LOGGER.warning("Not implemented.");
     // look for the parameter and put in the Map
     
     ParameterPlusValuesMap parameterPlusValuesMap = new ParameterPlusValuesMap();
-    parameterPlusValuesMap.setValue("on", "1");
-    parameterPlusValuesMap.setValue("off", "0");
+    parameterPlusValuesMap.setValue("on", "TRUE");
+    parameterPlusValuesMap.setValue("off", "FALSE");
     
     for(Parameter parameter : parametersList){
-      if(this.powerParameter.equals(parameter.getName())){
+      if(this.parameterName.equals(parameter.getName())){
         parameterPlusValuesMap.setParameter(parameter);
         break;
         }
