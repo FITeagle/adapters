@@ -35,7 +35,7 @@ public class EpcGeneric {
 	 * @param epcResource
 	 */
 	public void updateInstance(Resource epcResource) {
-		
+
 	}
 
 	public void parseToModel(Resource resource) {

@@ -1,6 +1,8 @@
 package org.fiteagle.adapters.epc;
 
+import info.openmultinet.ontology.vocabulary.Epc;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -99,12 +101,17 @@ public final class EpcAdapter extends AbstractAdapter {
 					+ MessageUtil.serializeModel(modelCreate,
 							IMessageBus.SERIALIZATION_TURTLE));
 			this.updateInstance(instanceURI, modelCreate);
+
 			return this.parseToModel(accessNetwork);
 		} else if (resource.hasProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Epc.EvolvedPacketCore)) {
 			LOGGER.warning("Try to update instance: " + instanceURI);
 			final EvolvedPacketCore epc = new EvolvedPacketCore(this,
 					instanceURI);
+
+			// start the PDN Gateway
+			epc.getPdnGateway().startInstance();
+
 			this.instanceList.put(instanceURI, epc);
 			System.out.println("#######creteinstance modelCreate: "
 					+ MessageUtil.serializeModel(modelCreate,
@@ -140,8 +147,7 @@ public final class EpcAdapter extends AbstractAdapter {
 			resource.addProperty(RDFS.label, epcGeneric.getLabel());
 		}
 		final Property propertyLabel = resource.getModel().createProperty(
-				RDFS.label.getNameSpace(),
-				RDFS.label.getLocalName());
+				RDFS.label.getNameSpace(), RDFS.label.getLocalName());
 		propertyLabel.addProperty(RDF.type, OWL.FunctionalProperty);
 
 		final Property property = resource.getModel().createProperty(
@@ -180,14 +186,9 @@ public final class EpcAdapter extends AbstractAdapter {
 			final EpcGeneric currentEpc = this.instanceList.get(instanceURI);
 			Resource epcResource = configureModel.getResource(instanceURI);
 			currentEpc.updateInstance(epcResource);
-			
-			
+
 			final Model newModel = this.parseToModel(currentEpc);
 			LOGGER.info("Returning updated epc: " + newModel);
-
-			// Model resultModel = this
-			// .updateInstance(instanceURI, configureModel);
-			// return resultModel;
 
 			return newModel;
 		} else {
@@ -199,8 +200,15 @@ public final class EpcAdapter extends AbstractAdapter {
 
 	@Override
 	public void deleteInstance(final String instanceURI) {
-		final EpcGeneric epc = this.getInstanceByName(instanceURI);
-		// epc.terminate();
+		final EpcGeneric epcGeneric = this.getInstanceByName(instanceURI);
+
+		// if the item is an EPC, stop the PDN gateway before deleting the
+		// instance
+		if (epcGeneric instanceof EvolvedPacketCore) {
+			EvolvedPacketCore epc = (EvolvedPacketCore) epcGeneric;
+			epc.getPdnGateway().stopInstance();
+		}
+
 		LOGGER.info("Deleting instance: " + instanceURI);
 		this.instanceList.remove(instanceURI);
 	}
@@ -225,8 +233,8 @@ public final class EpcAdapter extends AbstractAdapter {
 	public void updateAdapterDescription() {
 		LOGGER.warning("updateAdapterDescription() is not implemented.");
 	}
-	
-	public void addInstance(String uri, EpcGeneric epc){
+
+	public void addInstance(String uri, EpcGeneric epc) {
 		this.instanceList.put(uri, epc);
 	}
 
@@ -276,6 +284,13 @@ public final class EpcAdapter extends AbstractAdapter {
 	@Override
 	public void refreshConfig() throws ProcessingException {
 		LOGGER.warning("Not implemented.");
+	}
+
+	public String parseConfig(Resource resource, String parameter) {
+		Model model = ModelFactory.createDefaultModel();
+		return resource
+				.getProperty(model.createProperty(Epc.getURI(), parameter))
+				.getLiteral().getString();
 	}
 
 	@Override

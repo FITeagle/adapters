@@ -71,15 +71,19 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 				+ ", in adapter " + adapterName + " for type " + type);
 
 		EpcAdapter adapter = (EpcAdapter) getAdapterInstance(adapterName);
-		EpcGeneric epcGeneric = adapter.getInstanceObject(instanceURI);
 		int codeInt = Integer.parseInt(code);
-		// if (type.equals("rate")) {
-		// epcGeneric.setRateCode(codeInt);
-		// } else if (type.equals("delay")) {
-		// epcGeneric.setDelayCode(codeInt);
-		// } else if (type.equals("loss")) {
-		// epcGeneric.setPacketlossCode(codeInt);
-		// }
+
+		if (adapter.getInstanceObject(instanceURI) instanceof EvolvedPacketCore) {
+			EvolvedPacketCore epcGeneric = (EvolvedPacketCore) adapter
+					.getInstanceObject(instanceURI);
+			if (type.equals("rate")) {
+				epcGeneric.getPdnGateway().setRateCode(codeInt);
+			} else if (type.equals("delay")) {
+				epcGeneric.getPdnGateway().setDelayCode(codeInt);
+			} else if (type.equals("loss")) {
+				epcGeneric.getPdnGateway().setPacketlossCode(codeInt);
+			}
+		}
 
 		Model instances = adapter.getInstance(instanceURI);
 		String instancesString = null;
@@ -87,13 +91,6 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 				IMessageBus.SERIALIZATION_TURTLE);
 
 		return instancesString;
-	}
-
-	// http://localhost:8080/epc/get
-	@GET
-	@Path("get")
-	public String get() {
-		return "get";
 	}
 
 	/**
@@ -106,22 +103,28 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 	 */
 
 	@GET
-	@Path("start/{adapterName}/{instanceURI}")
-	public String start(@PathParam("adapterName") String adapterName,
+	@Path("update/{adapterName}/{instanceURI}")
+	public String update(@PathParam("adapterName") String adapterName,
 			@PathParam("instanceURI") String instanceURI) {
 
-		LOGGER.log(Level.INFO, "Send start script for " + instanceURI
+		LOGGER.log(Level.INFO, "Send update script for " + instanceURI
 				+ ", in adapter " + adapterName);
 
-		EpcAdapter adapter = (EpcAdapter) getAdapterInstance(adapterName);
-		EpcGeneric epcGeneric = adapter.getInstanceObject(instanceURI);
-		// epcGeneric.updateRateDelayPacktloss();
+		String output = "update";
 
-		return "start";
+		EpcAdapter adapter = (EpcAdapter) getAdapterInstance(adapterName);
+
+		if (adapter.getInstanceObject(instanceURI) instanceof EvolvedPacketCore) {
+			EvolvedPacketCore epcGeneric = (EvolvedPacketCore) adapter
+					.getInstanceObject(instanceURI);
+			output = epcGeneric.getPdnGateway().updateRateDelayPacktloss();
+		}
+
+		return output;
 	}
 
 	/**
-	 * This method sends stop as a parameter to the script net-fuseco.sh
+	 * This method sends stop as a parameter to the relevant hardware
 	 * 
 	 * @param adapterName
 	 * @param instanceURI
@@ -134,16 +137,37 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 		LOGGER.log(Level.INFO, "Send stop script for " + instanceURI
 				+ ", in adapter " + adapterName);
 
+		String output = "stop";
 		EpcAdapter adapter = (EpcAdapter) getAdapterInstance(adapterName);
-		EpcGeneric epcGeneric = adapter.getInstanceObject(instanceURI);
-		// epcGeneric.stopInstance();
-
-		return "stop";
+		if (adapter.getInstanceObject(instanceURI) instanceof EvolvedPacketCore) {
+			EvolvedPacketCore epcGeneric = (EvolvedPacketCore) adapter
+					.getInstanceObject(instanceURI);
+			output = epcGeneric.getPdnGateway().stopInstance();
+		}
+		return output;
 	}
 
+	/**
+	 * This method sends stop as a parameter to the script net-fuseco.sh
+	 * 
+	 * @param adapterName
+	 * @param instanceURI
+	 * @return
+	 */
 	@GET
-	@Path("restart")
-	public String restart() {
-		return "restart";
+	@Path("start/{adapterName}/{instanceURI}")
+	public String start(@PathParam("adapterName") String adapterName,
+			@PathParam("instanceURI") String instanceURI) {
+		LOGGER.log(Level.INFO, "Send stop script for " + instanceURI
+				+ ", in adapter " + adapterName);
+
+		String output = "start";
+		EpcAdapter adapter = (EpcAdapter) getAdapterInstance(adapterName);
+		if (adapter.getInstanceObject(instanceURI) instanceof EvolvedPacketCore) {
+			EvolvedPacketCore epcGeneric = (EvolvedPacketCore) adapter
+					.getInstanceObject(instanceURI);
+			output = epcGeneric.getPdnGateway().startInstance();
+		}
+		return output;
 	}
 }

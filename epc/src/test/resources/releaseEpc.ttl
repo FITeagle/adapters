@@ -1,1 +1,1 @@
-<http://localhost/resource/EpcAdapter-1/03ba13d0-de61-470e-a495-48040d44a167> a <http://open-multinet.info/ontology/omn#Resource> .
+<http://localhost/resource/EpcAdapter-1/88bb902e-5178-44e0-ad42-be1ad38a2d5c> a <http://open-multinet.info/ontology/omn#Resource> .

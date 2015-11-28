@@ -1,18 +1,18 @@
-<http://localhost/resource/EpcAdapter-1/new-pgw>
-        a       <http://open-multinet.info/ontology/resource/epc#PDNGateway> ;
+<http://localhost/resource/EpcAdapter-1/88bb902e-5178-44e0-ad42-be1ad38a2d5c-pgw>
+        <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://open-multinet.info/ontology/resource/epc#PDNGateway> ;
         <http://open-multinet.info/ontology/resource/epc#delayCode>
-                "6"^^<http://www.w3.org/2001/XMLSchema#long> ;
+                "223"^^<http://www.w3.org/2001/XMLSchema#long> ;
         <http://open-multinet.info/ontology/resource/epc#packetlossCode>
-                "6"^^<http://www.w3.org/2001/XMLSchema#long> ;
+                "3234"^^<http://www.w3.org/2001/XMLSchema#long> ;
         <http://open-multinet.info/ontology/resource/epc#rateCode>
-                "9"^^<http://www.w3.org/2001/XMLSchema#long> .
+                "1234"^^<http://www.w3.org/2001/XMLSchema#long> .
 
-<http://localhost/resource/EpcAdapter-1/new-details>
-        a       <http://open-multinet.info/ontology/resource/epc#EvolvedPacketCoreDetails> ;
+<http://localhost/resource/EpcAdapter-1/88bb902e-5178-44e0-ad42-be1ad38a2d5c-details>
+        <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://open-multinet.info/ontology/resource/epc#EvolvedPacketCoreDetails> ;
         <http://open-multinet.info/ontology/resource/epc#pdnGateway>
-                <http://localhost/resource/EpcAdapter-1/new-pgw> .
+                <http://localhost/resource/EpcAdapter-1/88bb902e-5178-44e0-ad42-be1ad38a2d5c-pgw> .
 
-<http://localhost/resource/EpcAdapter-1/new>
-        a       <http://open-multinet.info/ontology/omn#Resource> , <http://open-multinet.info/ontology/resource/epc#EvolvedPacketCore> ;
+<http://localhost/resource/EpcAdapter-1/88bb902e-5178-44e0-ad42-be1ad38a2d5c>
+        <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://open-multinet.info/ontology/omn#Resource> , <http://open-multinet.info/ontology/resource/epc#EvolvedPacketCore> ;
         <http://open-multinet.info/ontology/resource/epc#hasEvolvedPacketCore>
-                <http://localhost/resource/EpcAdapter-1/new-details> .
+                <http://localhost/resource/EpcAdapter-1/88bb902e-5178-44e0-ad42-be1ad38a2d5c-details> .

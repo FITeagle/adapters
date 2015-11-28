@@ -46,7 +46,6 @@ public class AccessPointName {
 		apnResource.addLiteral(
 				info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier,
 				this.getOperatorIdentifier());
-
 	}
 
 	public void updateInstance(Resource apnResource) {

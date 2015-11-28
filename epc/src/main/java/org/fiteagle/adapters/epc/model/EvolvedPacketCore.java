@@ -33,9 +33,6 @@ public class EvolvedPacketCore extends EpcGeneric {
 	private String vendor;
 	private List<ENodeB> eNodeBs;
 
-	// private final transient EpcAdapter owningAdapter;
-	// private final String instanceName;
-
 	private static final Logger LOGGER = Logger
 			.getLogger(EvolvedPacketCore.class.toString());
 
@@ -45,11 +42,20 @@ public class EvolvedPacketCore extends EpcGeneric {
 
 		this.accessPointNames = new ArrayList<AccessPointName>();
 		this.mmeAddress = "";
-		this.pdnGateway = new PDNGateway();
 		this.servingGateway = "";
 		this.subscribers = new ArrayList<String>();
 		this.eNodeBs = new ArrayList<ENodeB>();
 		this.vendor = "";
+
+		String ip = this.getOwningAdapter().parseConfig(
+				this.getOwningAdapter().getAdapterABox(), "pgwIp");
+		String start = this.getOwningAdapter().parseConfig(
+				this.getOwningAdapter().getAdapterABox(), "pgwStart");
+		String stop = this.getOwningAdapter().parseConfig(
+				this.getOwningAdapter().getAdapterABox(), "pgwStop");
+
+		LOGGER.info("Create PDN Gateway with pgwIp: " + ip);
+		this.pdnGateway = new PDNGateway(ip, start, stop);
 	}
 
 	@Override
@@ -73,7 +79,7 @@ public class EvolvedPacketCore extends EpcGeneric {
 
 			super.updateInstance(epcDetails);
 
-			// below assumes that each propertie only occurs once, really need
+			// below assumes that each property only occurs once, really need
 			// an interator or something to catch all properties
 			// StmtIterator properties = epcDetails.listProperties();
 			// while (properties.hasNext()) {
@@ -186,7 +192,6 @@ public class EvolvedPacketCore extends EpcGeneric {
 					subscriber);
 		}
 
-		// String uuidPgw = "urn:uuid:" + UUID.randomUUID().toString();
 		String pgwUrl = resource.getURI().toString() + "-pgw";
 		Resource pgwResource = epcDetails.getModel().createResource(pgwUrl);
 		this.getPdnGateway().parseToModel(pgwResource);
@@ -218,7 +223,6 @@ public class EvolvedPacketCore extends EpcGeneric {
 					info.openmultinet.ontology.vocabulary.Epc.hasENodeB,
 					eNodeBResource);
 		}
-
 	}
 
 	/**

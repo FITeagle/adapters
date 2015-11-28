@@ -3,6 +3,7 @@ package org.fiteagle.adapters.epc;
 import info.openmultinet.ontology.exceptions.InvalidModelException;
 import info.openmultinet.ontology.exceptions.MissingRspecElementException;
 import info.openmultinet.ontology.translators.geni.RequestConverter;
+import info.openmultinet.ontology.vocabulary.Epc;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -59,9 +60,9 @@ public class UpdateInstanceTest {
 
 		EpcGeneric instance = epcAdapter.getInstanceByName(instanceURI);
 		EvolvedPacketCore epcInstance = (EvolvedPacketCore) instance;
-		
-		
-		System.out.println(epcInstance.getMmeAddress() + "###########*********");
+
+		System.out
+				.println(epcInstance.getMmeAddress() + "###########*********");
 		Model blah = epcAdapter.parseToModel(epc);
 
 		System.out.println("***********parse to model");
@@ -78,6 +79,12 @@ public class UpdateInstanceTest {
 				StandardCharsets.UTF_8.name(), Lang.TTL.getName());
 		final Resource adapterABox = defaultModel
 				.createResource("http://www.test.com/EpcAdapter-1");
+		adapterABox.addProperty(
+				defaultModel.createProperty(Epc.getURI(), "pgwIp"), "pgwIp1");
+		adapterABox.addProperty(
+				defaultModel.createProperty(Epc.getURI(), "pgwStart"), "pgwStart1");
+		adapterABox.addProperty(
+				defaultModel.createProperty(Epc.getURI(), "pgwStop"), "pgwStop1");
 		// System.out.println("***********adapter a box");
 		// System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
 		// IMessageBus.SERIALIZATION_TURTLE));
