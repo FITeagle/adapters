@@ -2,6 +2,7 @@ package org.fiteagle.adapters.epc.model;
 
 import info.openmultinet.ontology.vocabulary.Epc;
 
+import java.math.BigInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -152,21 +153,22 @@ public class PDNGateway {
 		}
 
 		if (this.getRateCode() != -1) {
+			BigInteger rate = BigInteger.valueOf(this.getRateCode());
 			pgwResource.addLiteral(
-					info.openmultinet.ontology.vocabulary.Epc.rateCode,
-					this.getRateCode());
+					info.openmultinet.ontology.vocabulary.Epc.rateCode, rate);
 		}
 
 		if (this.getDelayCode() != -1) {
+			BigInteger delay = BigInteger.valueOf(this.getDelayCode());
 			pgwResource.addLiteral(
-					info.openmultinet.ontology.vocabulary.Epc.delayCode,
-					this.getDelayCode());
+					info.openmultinet.ontology.vocabulary.Epc.delayCode, delay);
 		}
 
 		if (this.getPacketlossCode() != -1) {
+			BigInteger loss = BigInteger.valueOf(this.getPacketlossCode());
 			pgwResource.addLiteral(
 					info.openmultinet.ontology.vocabulary.Epc.packetlossCode,
-					this.getPacketlossCode());
+					loss);
 		}
 	}
 

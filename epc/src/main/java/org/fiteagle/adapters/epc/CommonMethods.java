@@ -19,6 +19,7 @@ public class CommonMethods {
 	public static String executeCommand(String command) {
 
 		LOGGER.info("Execute command: " + command);
+		
 		String separator = System.getProperty("line.separator");
 		StringBuilder lines = new StringBuilder("Executed command: " + command);
 		lines.append(separator);

@@ -174,17 +174,25 @@ public class EvolvedPacketCore extends EpcGeneric {
 				info.openmultinet.ontology.vocabulary.Epc.hasEvolvedPacketCore,
 				epcDetails);
 
-		epcDetails.addLiteral(
-				info.openmultinet.ontology.vocabulary.Epc.mmeAddress,
-				this.getMmeAddress());
+		if (this.getMmeAddress() != null && !this.getMmeAddress().equals("")) {
+			epcDetails.addLiteral(
+					info.openmultinet.ontology.vocabulary.Epc.mmeAddress,
+					this.getMmeAddress());
+		}
 
-		epcDetails.addLiteral(
-				info.openmultinet.ontology.vocabulary.Epc.servingGateway,
-				this.getServingGateway());
+		if (this.getServingGateway() != null
+				&& !this.getServingGateway().equals("")) {
+			epcDetails.addLiteral(
+					info.openmultinet.ontology.vocabulary.Epc.servingGateway,
+					this.getServingGateway());
+		}
 
-		epcDetails.addLiteral(info.openmultinet.ontology.vocabulary.Epc.vendor,
-				this.getVendor());
-
+		if (this.getVendor() != null && !this.getVendor().equals("")) {
+			epcDetails.addLiteral(
+					info.openmultinet.ontology.vocabulary.Epc.vendor,
+					this.getVendor());
+		}
+		
 		List<String> subscribers = this.getSubscribers();
 		for (String subscriber : subscribers) {
 			epcDetails.addLiteral(
