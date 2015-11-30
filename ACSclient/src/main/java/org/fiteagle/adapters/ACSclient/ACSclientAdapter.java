@@ -246,7 +246,7 @@ LOGGER.warning("Not implemented.");
         break;
         }
       }
-    this.parametersNames.put("power", parameterPlusValuesMap);
+    this.parametersNames.put("adminState", parameterPlusValuesMap);
   }
   
   public HashMap<String, ParameterPlusValuesMap> getParametersNames(){
