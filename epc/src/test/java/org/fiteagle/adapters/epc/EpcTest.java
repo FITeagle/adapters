@@ -15,14 +15,11 @@ import javax.xml.bind.JAXBException;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.riot.Lang;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.adapters.epc.model.UserEquipment;
-import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageUtil;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
@@ -64,26 +61,26 @@ public class EpcTest {
 
 		EpcAdapter epcAdapter = createAdapterInstance();
 
-		final InputStream rspec2 = EpcTest.class
-				.getResourceAsStream("/epc.xml");
-		String theString = IOUtils.toString(rspec2, "UTF-8");
-		System.out.println(theString);
+		// final InputStream rspec2 = EpcTest.class
+		// .getResourceAsStream("/epc.xml");
+		// String theString = IOUtils.toString(rspec2, "UTF-8");
+		// System.out.println(theString);
 
 		final InputStream rspec = EpcTest.class.getResourceAsStream("/epc.xml");
 		final Model model = RequestConverter.getModel(rspec);
 
-		String modelString = MessageUtil.serializeModel(model,
-				IMessageBus.SERIALIZATION_TURTLE);
-		System.out.println("********** input model*************");
-		System.out.println(modelString);
+		// String modelString = MessageUtil.serializeModel(model,
+		// IMessageBus.SERIALIZATION_TURTLE);
+		// System.out.println("********** input model*************");
+		// System.out.println(modelString);
 
 		epcAdapter.createInstances(model);
 		Model allInstances = epcAdapter.getAllInstances();
-		String allInstancesString = MessageUtil.serializeModel(
-				epcAdapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
-		System.out
-				.println("********** instances created in adapter*************");
-		System.out.println(allInstancesString);
+		// String allInstancesString = MessageUtil.serializeModel(
+		// epcAdapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
+		// System.out
+		// .println("********** instances created in adapter*************");
+		// System.out.println(allInstancesString);
 
 		String statementString1 = "<http://open-multinet.info/example#ue1> <"
 				+ RDF.type.toString()
@@ -131,9 +128,9 @@ public class EpcTest {
 		adapterABox.addProperty(
 				defaultModel.createProperty(Epc.getURI(), "pgwStop"),
 				"pgwStop1");
-		System.out.println("***********adapter a box");
-		System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
-				IMessageBus.SERIALIZATION_TURTLE));
+		// System.out.println("***********adapter a box");
+		// System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
+		// IMessageBus.SERIALIZATION_TURTLE));
 		final EpcAdapter adapter = new EpcAdapter(adapterTBox, adapterABox);
 
 		return adapter;

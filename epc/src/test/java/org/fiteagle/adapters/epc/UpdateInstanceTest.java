@@ -2,35 +2,24 @@ package org.fiteagle.adapters.epc;
 
 import info.openmultinet.ontology.exceptions.InvalidModelException;
 import info.openmultinet.ontology.exceptions.MissingRspecElementException;
-import info.openmultinet.ontology.translators.geni.RequestConverter;
 import info.openmultinet.ontology.vocabulary.Epc;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import javax.xml.bind.JAXBException;
 
-import junit.framework.Assert;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.jena.riot.Lang;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InstanceNotFoundException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.InvalidRequestException;
 import org.fiteagle.abstractAdapter.AbstractAdapter.ProcessingException;
 import org.fiteagle.adapters.epc.model.EvolvedPacketCore;
-import org.fiteagle.adapters.epc.model.UserEquipment;
-import org.fiteagle.api.core.IMessageBus;
-import org.fiteagle.api.core.MessageUtil;
 import org.junit.Test;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 public class UpdateInstanceTest {
 
@@ -53,21 +42,21 @@ public class UpdateInstanceTest {
 		cfgModel.read(cfg, StandardCharsets.UTF_8.name(), Lang.TTL.getName());
 
 		epcAdapter.addInstance(instanceURI, epc);
-		System.out.println("#######creteinstance modelCreate: "
-				+ MessageUtil.serializeModel(cfgModel,
-						IMessageBus.SERIALIZATION_TURTLE));
+		// System.out.println("#######creteinstance modelCreate: "
+		// + MessageUtil.serializeModel(cfgModel,
+		// IMessageBus.SERIALIZATION_TURTLE));
 		epcAdapter.updateInstance(instanceURI, cfgModel);
 
 		EpcGeneric instance = epcAdapter.getInstanceByName(instanceURI);
 		EvolvedPacketCore epcInstance = (EvolvedPacketCore) instance;
 
-		System.out
-				.println(epcInstance.getMmeAddress() + "###########*********");
+		// System.out
+		// .println(epcInstance.getMmeAddress() + "###########*********");
 		Model blah = epcAdapter.parseToModel(epc);
 
-		System.out.println("***********parse to model");
-		System.out.println(MessageUtil.serializeModel(blah,
-				IMessageBus.SERIALIZATION_TURTLE));
+		// System.out.println("***********parse to model");
+		// System.out.println(MessageUtil.serializeModel(blah,
+		// IMessageBus.SERIALIZATION_TURTLE));
 	}
 
 	private EpcAdapter createAdapterInstance() {
@@ -82,9 +71,11 @@ public class UpdateInstanceTest {
 		adapterABox.addProperty(
 				defaultModel.createProperty(Epc.getURI(), "pgwIp"), "pgwIp1");
 		adapterABox.addProperty(
-				defaultModel.createProperty(Epc.getURI(), "pgwStart"), "pgwStart1");
+				defaultModel.createProperty(Epc.getURI(), "pgwStart"),
+				"pgwStart1");
 		adapterABox.addProperty(
-				defaultModel.createProperty(Epc.getURI(), "pgwStop"), "pgwStop1");
+				defaultModel.createProperty(Epc.getURI(), "pgwStop"),
+				"pgwStop1");
 		// System.out.println("***********adapter a box");
 		// System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
 		// IMessageBus.SERIALIZATION_TURTLE));

@@ -50,18 +50,18 @@ public class EpcPgwTest {
 				.getResourceAsStream("/pgw.xml");
 		final Model model = RequestConverter.getModel(rspec);
 
-		String modelString = MessageUtil.serializeModel(model,
-				IMessageBus.SERIALIZATION_TURTLE);
-		System.out.println("********** input model*************");
-		System.out.println(modelString);
+		// String modelString = MessageUtil.serializeModel(model,
+		// IMessageBus.SERIALIZATION_TURTLE);
+		// System.out.println("********** input model*************");
+		// System.out.println(modelString);
 
 		epcAdapter.createInstances(model);
 		Model allInstances = epcAdapter.getAllInstances();
-		String allInstancesString = MessageUtil.serializeModel(
-				epcAdapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
-		System.out
-				.println("********** instances created in adapter*************");
-		System.out.println(allInstancesString);
+		// String allInstancesString = MessageUtil.serializeModel(
+		// epcAdapter.getAllInstances(), IMessageBus.SERIALIZATION_TURTLE);
+		// System.out
+		// .println("********** instances created in adapter*************");
+		// System.out.println(allInstancesString);
 
 		String statementString3 = "<http://open-multinet.info/example#epc1> <"
 				+ RDF.type.toString()
@@ -92,12 +92,14 @@ public class EpcPgwTest {
 		adapterABox.addProperty(
 				defaultModel.createProperty(Epc.getURI(), "pgwIp"), "pgwIp1");
 		adapterABox.addProperty(
-				defaultModel.createProperty(Epc.getURI(), "pgwStart"), "pgwStart1");
+				defaultModel.createProperty(Epc.getURI(), "pgwStart"),
+				"pgwStart1");
 		adapterABox.addProperty(
-				defaultModel.createProperty(Epc.getURI(), "pgwStop"), "pgwStop1");
-		System.out.println("***********adapter a box");
-		System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
-				IMessageBus.SERIALIZATION_TURTLE));
+				defaultModel.createProperty(Epc.getURI(), "pgwStop"),
+				"pgwStop1");
+		// System.out.println("***********adapter a box");
+		// System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
+		// IMessageBus.SERIALIZATION_TURTLE));
 		final EpcAdapter adapter = new EpcAdapter(adapterTBox, adapterABox);
 
 		return adapter;
