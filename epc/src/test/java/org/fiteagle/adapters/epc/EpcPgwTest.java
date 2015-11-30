@@ -3,6 +3,7 @@ package org.fiteagle.adapters.epc;
 import info.openmultinet.ontology.exceptions.InvalidModelException;
 import info.openmultinet.ontology.exceptions.MissingRspecElementException;
 import info.openmultinet.ontology.translators.geni.RequestConverter;
+import info.openmultinet.ontology.vocabulary.Epc;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -45,7 +46,8 @@ public class EpcPgwTest {
 		String theString = IOUtils.toString(rspec2, "UTF-8");
 		System.out.println(theString);
 
-		final InputStream rspec = EpcPgwTest.class.getResourceAsStream("/pgw.xml");
+		final InputStream rspec = EpcPgwTest.class
+				.getResourceAsStream("/pgw.xml");
 		final Model model = RequestConverter.getModel(rspec);
 
 		String modelString = MessageUtil.serializeModel(model,
@@ -86,7 +88,13 @@ public class EpcPgwTest {
 		final Model adapterTBox = defaultModel.read(tbox,
 				StandardCharsets.UTF_8.name(), Lang.TTL.getName());
 		final Resource adapterABox = defaultModel
-				.createResource("http://www.test.com/EpcAdapter-1");
+				.createResource("http://open-multinet.info/ontology/resource/epc#EpcAdapter-1");
+		adapterABox.addProperty(
+				defaultModel.createProperty(Epc.getURI(), "pgwIp"), "pgwIp1");
+		adapterABox.addProperty(
+				defaultModel.createProperty(Epc.getURI(), "pgwStart"), "pgwStart1");
+		adapterABox.addProperty(
+				defaultModel.createProperty(Epc.getURI(), "pgwStop"), "pgwStop1");
 		System.out.println("***********adapter a box");
 		System.out.println(MessageUtil.serializeModel(adapterABox.getModel(),
 				IMessageBus.SERIALIZATION_TURTLE));

@@ -52,10 +52,8 @@ public class UserEquipment extends EpcGeneric {
 	public void updateInstance(Resource epcResource) {
 
 		if (epcResource.hasProperty(RDFS.label)) {
-
 			String label = epcResource.getProperty(RDFS.label).getObject()
 					.asLiteral().getString();
-
 			this.setLabel(label);
 		}
 
@@ -74,55 +72,17 @@ public class UserEquipment extends EpcGeneric {
 				Resource diskImageResource = ueDetails
 						.getProperty(Omn_domain_pc.hasDiskImage).getObject()
 						.asResource();
-
-				String name = null;
-				String description = null;
-
-				if (diskImageResource
-						.hasProperty(Omn_domain_pc.hasDiskimageDescription)) {
-					description = diskImageResource
-							.getProperty(Omn_domain_pc.hasDiskimageDescription)
-							.getLiteral().getString();
-				}
-
-				if (diskImageResource
-						.hasProperty(Omn_domain_pc.hasDiskimageLabel)) {
-					name = diskImageResource
-							.getProperty(Omn_domain_pc.hasDiskimageLabel)
-							.getLiteral().getString();
-				}
-
-				DiskImage diskImage = new DiskImage(name, description);
+				DiskImage diskImage = new DiskImage();
+				diskImage.updateInstance(diskImageResource);
 				this.setDiskImage(diskImage);
 			}
 
 			if (ueDetails.hasProperty(Epc.hasControlAddress)) {
-				String address = null;
-				String netmask = null;
-				String type = null;
-
 				Resource controlAddressResource = ueDetails
 						.getProperty(Epc.hasControlAddress).getObject()
 						.asResource();
-				if (controlAddressResource.hasProperty(Omn_resource.address)) {
-					address = controlAddressResource
-							.getProperty(Omn_resource.address).getLiteral()
-							.getString();
-				}
-
-				if (controlAddressResource.hasProperty(Omn_resource.netmask)) {
-					netmask = controlAddressResource
-							.getProperty(Omn_resource.netmask).getLiteral()
-							.getString();
-				}
-
-				if (controlAddressResource.hasProperty(Omn_resource.type)) {
-					type = controlAddressResource
-							.getProperty(Omn_resource.type).getLiteral()
-							.getString();
-				}
-
-				IpAddress controlAddress = new IpAddress(address, netmask, type);
+				IpAddress controlAddress = new IpAddress();
+				controlAddress.updateInstance(controlAddressResource);
 				this.setControlAddress(controlAddress);
 			}
 
@@ -142,31 +102,11 @@ public class UserEquipment extends EpcGeneric {
 			while (apns.hasNext()) {
 				Statement apnStatement = apns.next();
 				Resource apnResource = apnStatement.getObject().asResource();
-
-				String networkIdentifier = null;
-				if (apnResource
-						.hasProperty(info.openmultinet.ontology.vocabulary.Epc.networkIdentifier)) {
-					networkIdentifier = apnResource
-							.getProperty(
-									info.openmultinet.ontology.vocabulary.Epc.networkIdentifier)
-							.getObject().asLiteral().getString();
-				}
-
-				String operatorIdentifier = null;
-				if (apnResource
-						.hasProperty(info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier)) {
-					operatorIdentifier = apnResource
-							.getProperty(
-									info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier)
-							.getObject().asLiteral().getString();
-				}
-				AccessPointName apn = new AccessPointName(networkIdentifier,
-						operatorIdentifier);
+				AccessPointName apn = new AccessPointName();
+				apn.updateInstance(apnResource);
 				this.addApn(apn);
 			}
-
 		}
-
 	}
 
 	@Override
@@ -199,39 +139,19 @@ public class UserEquipment extends EpcGeneric {
 					+ UUID.randomUUID().toString();
 			Resource controlAddressResource = ueDetails.getModel()
 					.createResource(uuidControlAddress);
-			controlAddressResource.addProperty(RDF.type, Epc.ControlAddress);
+			this.getControlAddress().parseToModel(controlAddressResource);
 			ueDetails
 					.addProperty(Epc.hasControlAddress, controlAddressResource);
 
-			if (this.getControlAddress().getAddress() != null
-					&& !this.getControlAddress().getAddress().equals("")) {
-				controlAddressResource.addProperty(Omn_resource.address, this
-						.getControlAddress().getAddress());
-			}
-			if (this.getControlAddress().getNetmask() != null
-					&& !this.getControlAddress().getNetmask().equals("")) {
-				controlAddressResource.addProperty(Omn_resource.netmask, this
-						.getControlAddress().getNetmask());
-			}
-			if (this.getControlAddress().getType() != null
-					&& !this.getControlAddress().getType().equals("")) {
-				controlAddressResource.addProperty(Omn_resource.type, this
-						.getControlAddress().getType());
-			}
 		}
-		if (diskImage != null) {
+		if (this.getDiskImage() != null) {
 			// disk image
 			String uuidDiskImage = "urn:uuid:" + UUID.randomUUID().toString();
 			Resource diskImageResource = ueDetails.getModel().createResource(
 					uuidDiskImage);
-			diskImageResource.addProperty(RDF.type, Omn_domain_pc.DiskImage);
+			this.getDiskImage().parseToModel(diskImageResource);
 			ueDetails
 					.addProperty(Omn_domain_pc.hasDiskImage, diskImageResource);
-			diskImageResource.addProperty(Omn_domain_pc.hasDiskimageLabel, this
-					.getDiskImage().getName());
-			diskImageResource.addProperty(
-					Omn_domain_pc.hasDiskimageDescription, this.getDiskImage()
-							.getDescription());
 		}
 
 		if (this.getHardwareType() != null) {
@@ -251,16 +171,7 @@ public class UserEquipment extends EpcGeneric {
 
 			String uuidApn = "urn:uuid:" + UUID.randomUUID().toString();
 			Resource apnResource = ueDetails.getModel().createResource(uuidApn);
-			apnResource.addProperty(RDF.type,
-					info.openmultinet.ontology.vocabulary.Epc.AccessPointName);
-			apnResource
-					.addLiteral(
-							info.openmultinet.ontology.vocabulary.Epc.networkIdentifier,
-							apn.getNetworkIdentifier());
-			apnResource
-					.addLiteral(
-							info.openmultinet.ontology.vocabulary.Epc.operatorIdentifier,
-							apn.getOperatorIdentifier());
+			apn.parseToModel(apnResource);
 			ueDetails
 					.addProperty(
 							info.openmultinet.ontology.vocabulary.Epc.hasAccessPointName,

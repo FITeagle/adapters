@@ -29,9 +29,9 @@
                                         
                                          dc:date "2015-10-26"^^xsd:date ;
                                          
-                                         dcterms:modified "2015-11-25"^^xsd:date ;
+                                         dcterms:modified "2015-11-27"^^xsd:date ;
                                          
-                                         owl:versionInfo "2015-11-25"^^xsd:string ;
+                                         owl:versionInfo "2015-11-27"^^xsd:string ;
                                          
                                          dc:title "EPC ontology"@en ;
                                          
@@ -156,7 +156,8 @@
 
 ###  http://open-multinet.info/ontology/resource/epc#pdnGateway
 
-:pdnGateway rdf:type owl:ObjectProperty ;
+:pdnGateway rdf:type owl:ObjectProperty ,
+                   owl:FunctionalProperty ;
 
                 rdfs:label "PDN gateway"@en ;
                 
@@ -188,6 +189,22 @@
                 rdfs:comment "The APN that is used by the LTE AP or the supported APNs from the EPC or the APNs pre-set to the Android smartphone"@en ;
                 
                 rdfs:domain :AccessNetwork ;
+                
+                rdfs:range xsd:string .
+
+                
+
+###  http://open-multinet.info/ontology/resource/epc#attenuator
+
+:attenuator rdf:type owl:DatatypeProperty ;
+
+                rdfs:label "attenuator"@en ;
+                
+                rdfs:seeAlso <http://www.flex-project.eu> ;
+                
+                rdfs:comment "attenuator"@en ;
+                
+                rdfs:domain omn:Resource ;
                 
                 rdfs:range xsd:string .
 
@@ -228,7 +245,8 @@
 
 ###  http://open-multinet.info/ontology/resource/epc#delayCode
 
-:delayCode rdf:type owl:DatatypeProperty ;
+:delayCode rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
 
                 rdfs:label "delay code"@en ;
                 
@@ -390,7 +408,8 @@
 
 ###  http://open-multinet.info/ontology/resource/epc#packetlossCode
 
-:packetlossCode rdf:type owl:DatatypeProperty ;
+:packetlossCode rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
 
                 rdfs:label "packet loss code"@en ;
                 
@@ -422,7 +441,8 @@
 
 ###  http://open-multinet.info/ontology/resource/epc#rateCode
 
-:rateCode rdf:type owl:DatatypeProperty ;
+:rateCode rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
 
                 rdfs:label "rate code"@en ;
                 
@@ -494,7 +514,8 @@
 
 ###  http://open-multinet.info/ontology/omn-lifecycle#hasID
 
-omn-lifecycle:hasID rdf:type owl:DatatypeProperty .
+omn-lifecycle:hasID rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty .
 
 
 

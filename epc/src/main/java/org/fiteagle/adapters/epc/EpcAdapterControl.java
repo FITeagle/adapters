@@ -1,5 +1,8 @@
 package org.fiteagle.adapters.epc;
 
+import info.openmultinet.ontology.vocabulary.Epc;
+import info.openmultinet.ontology.vocabulary.Omn_service;
+
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
@@ -51,11 +54,8 @@ public class EpcAdapterControl extends AdapterControl {
 				IMessageBus.SERIALIZATION_TURTLE);
 
 		this.adapterInstancesConfig = this.readConfig("EpcAdapter");
-
 		this.createAdapterInstances();
-
 		this.publishInstances();
-
 	}
 
 	@Override
@@ -125,7 +125,28 @@ public class EpcAdapterControl extends AdapterControl {
 					final Model model = ModelFactory.createDefaultModel();
 					final Resource resource = model
 							.createResource(adapterInstance);
-					// parse possible additional values from config
+
+					String pgwIp = adaptInstObject.getString("pgwIp");
+					if (pgwIp != null) {
+						resource.addProperty(
+								model.createProperty(Epc.getURI(), "pgwIp"),
+								pgwIp);
+					}
+
+					String pgwStart = adaptInstObject.getString("pgwStart");
+					if (pgwStart != null) {
+						resource.addProperty(
+								model.createProperty(Epc.getURI(), "pgwStart"),
+								pgwStart);
+					}
+
+					String pgwStop = adaptInstObject.getString("pgwStop");
+					if (pgwStop != null) {
+						resource.addProperty(
+								model.createProperty(Epc.getURI(), "pgwStop"),
+								pgwStop);
+					}
+
 					this.createAdapterInstance(this.adapterModel, resource);
 				}
 			}
