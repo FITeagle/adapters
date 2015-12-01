@@ -49,14 +49,19 @@ public class AttenuatorSetter implements Runnable{
     String configureResoponse = null;
     
     try {
+      LOGGER.info("establishing Telnet connection with " + this.attenuator.get_attenuator_url() + " ...");
       attenuator_socket = new Socket(this.attenuator.get_attenuator_url(), Integer.parseInt(this.attenuator.get_attenuator_port()));
       out = new PrintWriter(attenuator_socket.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(attenuator_socket.getInputStream()));
       
+      LOGGER.info("Telnet connection has been established");
+      LOGGER.info("configuring attenuator ...");
       out.println("SA -R " + this.attenuator.get_attenuator_id() + " " + attenuator_value);
       
       configureResoponse = in.readLine();
+      LOGGER.info("Configuration response: " + configureResoponse);
       
+      LOGGER.info("closing Telnet connection ...");
       out.close();
       in.close();
       attenuator_socket.close();
@@ -64,8 +69,6 @@ public class AttenuatorSetter implements Runnable{
   } catch (IOException e) {
    LOGGER.error("Attenuator couldn't be configured !");
   }
-    
-    LOGGER.info("Attenuator confiugration response: " + configureResoponse);
     
     String expectedResponse = "Atten #" + this.attenuator.get_attenuator_id() + " = " + attenuator_value + "dB";
     if(!configureResoponse.contains(expectedResponse)){

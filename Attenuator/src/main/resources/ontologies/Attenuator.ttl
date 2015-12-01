@@ -3,6 +3,7 @@
 @prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
 @prefix omn:           <http://open-multinet.info/ontology/omn#> .
 @prefix attenuator:           <http://open-multinet.info/ontology/resource/Attenuator#> .
+@prefix attenuation:           <http://open-multinet.info/ontology/resource/attenuation#> .
 @prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
 @prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
 @prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
@@ -11,9 +12,9 @@ attenuator:AttenuatorAdapter
         a                          owl:Class ;
         rdfs:label                 "Attenuator Adapter"@en ;
         rdfs:subClassOf            omn:Adapter ;
-        omn-lifecycle:implements   attenuator:Attenuator .
+        omn-lifecycle:implements   attenuation:Attenuator .
         
-attenuator:Attenuator
+attenuation:Attenuator
         a                            owl:Class ;
         rdfs:label                   "Attenuator"@en ;
         rdfs:subClassOf              omn:Resource ;
