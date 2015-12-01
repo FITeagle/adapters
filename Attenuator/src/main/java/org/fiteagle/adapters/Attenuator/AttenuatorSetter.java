@@ -16,14 +16,14 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 
 
-public class AttenuatorSeter implements Runnable{
+public class AttenuatorSetter implements Runnable{
   
   private Attenuator attenuator;
   private final String attenuator_value;
   
   private Logger LOGGER  = LoggerFactory.getLogger(this.getClass().getName());
   
-  public AttenuatorSeter(Attenuator attenuator, Model configureModel){
+  public AttenuatorSetter(Attenuator attenuator, Model configureModel){
    this.attenuator = attenuator; 
    this.attenuator_value = parseConfigureModel(configureModel);
    
@@ -49,7 +49,7 @@ public class AttenuatorSeter implements Runnable{
     String configureResoponse = null;
     
     try {
-      attenuator_socket = new Socket(this.attenuator.get_attenuator_url(), Integer.getInteger(this.attenuator.get_attenuator_port()));
+      attenuator_socket = new Socket(this.attenuator.get_attenuator_url(), Integer.parseInt(this.attenuator.get_attenuator_port()));
       out = new PrintWriter(attenuator_socket.getOutputStream(), true);
       in = new BufferedReader(new InputStreamReader(attenuator_socket.getInputStream()));
       

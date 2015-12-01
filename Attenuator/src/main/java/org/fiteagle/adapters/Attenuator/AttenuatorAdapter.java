@@ -40,9 +40,9 @@ public class AttenuatorAdapter extends AbstractAdapter{
   
 private static final List<Property> ATTENUATOR_CTRL_PROPS = new ArrayList<Property>();
   
-  private transient final HashMap<String, AttenuatorSeter> instanceList = new HashMap<String, AttenuatorSeter>();
+  private transient final HashMap<String, AttenuatorSetter> instanceList = new HashMap<String, AttenuatorSetter>();
   
-  private static final Logger LOGGER = Logger.getLogger(AttenuatorSeter.class.toString());
+  private static final Logger LOGGER = Logger.getLogger(AttenuatorSetter.class.toString());
   
   private Attenuator attenuator;
   
@@ -115,7 +115,7 @@ public AttenuatorAdapter(final Model adapterModel, final Resource adapterABox) {
     String confModel = MessageUtil.serializeModel(configureModel, IMessageBus.SERIALIZATION_TURTLE);
     System.out.println("Attenuator Configure model \n" + confModel);
     
-    AttenuatorSeter attenuatorSeter = new AttenuatorSeter(this.attenuator, configureModel);
+    AttenuatorSetter attenuatorSeter = new AttenuatorSetter(this.attenuator, configureModel);
     
     try{
       ManagedThreadFactory managedThreadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
@@ -133,7 +133,7 @@ public AttenuatorAdapter(final Model adapterModel, final Resource adapterABox) {
   public void deleteInstance(final String instanceURI) {
   }
   
-  private AttenuatorSeter getInstanceByName(final String instanceURI) {
+  private AttenuatorSetter getInstanceByName(final String instanceURI) {
     return this.instanceList.get(instanceURI);
       }
 
@@ -154,7 +154,7 @@ LOGGER.warning("Not implemented.");
 
   @Override
   public Model getInstance(final String instanceURI) throws InstanceNotFoundException {
-    final AttenuatorSeter attenuator = this.instanceList.get(instanceURI);
+    final AttenuatorSetter attenuator = this.instanceList.get(instanceURI);
     if(attenuator == null){
       throw new InstanceNotFoundException("Instance "+instanceURI+" not found");
   }
