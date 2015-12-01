@@ -265,6 +265,13 @@ public final class EpcAdapter extends AbstractAdapter {
 		return epc;
 	}
 
+	public HashMap<String, EpcGeneric> getAllInstanceObjects() {
+
+		LOGGER.warning("Get all instance objects");
+
+		return this.instanceList;
+	}
+
 	@Override
 	public Model getAllInstances() throws InstanceNotFoundException {
 		LOGGER.warning("getAllInstances()");
