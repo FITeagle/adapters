@@ -48,14 +48,15 @@ public class EpcAdapterTest {
 		// the default value assigned at creation (false)
 		adapter.createInstance(URN_USER_EQUIPMENT_1, model);
 		Model epc = adapter.getInstance(URN_USER_EQUIPMENT_1);
+
 		Resource epcDetails = epc.getResource(URN_USER_EQUIPMENT_1)
 				.getProperty(Epc.hasUserEquipment).getObject().asResource();
 		Assert.assertEquals(false, epcDetails.getProperty(Epc.lteSupport)
 				.getObject().asLiteral().getBoolean());
 
-		System.out.println("************ EPC model ************");
-		System.out.println(MessageUtil.serializeModel(epc,
-				IMessageBus.SERIALIZATION_TURTLE));
+		// System.out.println("************ EPC model ************");
+		// System.out.println(MessageUtil.serializeModel(epc,
+		// IMessageBus.SERIALIZATION_TURTLE));
 
 		// get the update model, carry out the update and check that lteSupport
 		// has the new value (true)
@@ -64,9 +65,9 @@ public class EpcAdapterTest {
 				.getResourceAsStream("/updateEpc.ttl");
 		cfgModel.read(cfg, StandardCharsets.UTF_8.name(), Lang.TTL.getName());
 
-		System.out.println("************ Configure model ************");
-		System.out.println(MessageUtil.serializeModel(cfgModel,
-				IMessageBus.SERIALIZATION_TURTLE));
+		// System.out.println("************ Configure model ************");
+		// System.out.println(MessageUtil.serializeModel(cfgModel,
+		// IMessageBus.SERIALIZATION_TURTLE));
 
 		epc = adapter.updateInstance(URN_USER_EQUIPMENT_1, cfgModel);
 
@@ -74,10 +75,10 @@ public class EpcAdapterTest {
 				.getProperty(Epc.hasUserEquipment).getObject().asResource();
 		Assert.assertEquals(true, epcDetailsNew.getProperty(Epc.lteSupport)
 				.getObject().asLiteral().getBoolean());
-		
+
 		Model epcNew = adapter.getInstance(URN_USER_EQUIPMENT_1);
-		System.out.println("************ new EPC model ************");
-		System.out.println(MessageUtil.serializeModel(epcNew,
-				IMessageBus.SERIALIZATION_TURTLE));
+		// System.out.println("************ new EPC model ************");
+		// System.out.println(MessageUtil.serializeModel(epcNew,
+		// IMessageBus.SERIALIZATION_TURTLE));
 	}
 }

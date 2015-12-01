@@ -37,10 +37,14 @@ public class ACSclientAdapterControl extends AdapterControl{
   
   private static final Logger LOGGER = Logger.getLogger(ACSclientAdapterControl.class.getName());
   
+  private static final String URL= "url";
+  private static final String DEVICE = "device";
+  private static final String PARAMETER = "parameter";
+  
   @PostConstruct
   public void initialize() {
 	  propertiesName= "ACSclient";
-    LOGGER.log(Level.INFO, "Starting MotorAdapter");
+    LOGGER.log(Level.INFO, "Starting ACSclientAdapter");
     this.adapterModel = OntologyModelUtil.loadModel("ontologies/ACSclient.ttl", IMessageBus.SERIALIZATION_TURTLE);
     this.adapterInstancesConfig = this.readConfig(propertiesName);
     this.createAdapterInstances();
@@ -75,14 +79,19 @@ public class ACSclientAdapterControl extends AdapterControl{
           final Resource resource = model.createResource(adapterInstance);
           // parse possible additional values from config
           
-          String url = adaptInstObject.getString("url");
+          String url = adaptInstObject.getString(URL);
           if(url != null){
-            resource.addProperty(model.createProperty(Omn_service.getURI(), "url"), url);
+            resource.addProperty(model.createProperty(Omn_service.getURI(), URL), url);
           }
           
-          String device = adaptInstObject.getString("device");
+          String device = adaptInstObject.getString(DEVICE);
           if(device != null){
-            resource.addProperty(model.createProperty(Omn_service.getURI(), "device"), device);
+            resource.addProperty(model.createProperty(Omn_service.getURI(), DEVICE), device);
+          }
+          
+          String param = adaptInstObject.getString(PARAMETER);
+          if(param != null){
+            resource.addProperty(model.createProperty(Omn_service.getURI(), PARAMETER), param);
           }
           
           this.createAdapterInstance(this.adapterModel, resource);

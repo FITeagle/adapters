@@ -21,17 +21,17 @@
 
                                          voaf:Vocabulary ;
                                          
-                                         rdfs:label "omn-domain-epc"@en ;
+                                         rdfs:label "omn-resource/epc"@en ;
                                          
-                                         vann:preferredNamespacePrefix "omn-domain-epc"^^xsd:string ;
+                                         vann:preferredNamespacePrefix "omn-resource/epc"^^xsd:string ;
 
                                          vann:preferredNamespaceUri <http://open-multinet.info/ontology/resource/epc#> ;
                                         
                                          dc:date "2015-10-26"^^xsd:date ;
                                          
-                                         dcterms:modified "2015-11-19"^^xsd:date ;
+                                         dcterms:modified "2015-11-27"^^xsd:date ;
                                          
-                                         owl:versionInfo "2015-11-19"^^xsd:string ;
+                                         owl:versionInfo "2015-11-27"^^xsd:string ;
                                          
                                          dc:title "EPC ontology"@en ;
                                          
@@ -153,6 +153,23 @@
 
 
 
+
+###  http://open-multinet.info/ontology/resource/epc#pdnGateway
+
+:pdnGateway rdf:type owl:ObjectProperty ,
+                   owl:FunctionalProperty ;
+
+                rdfs:label "PDN gateway"@en ;
+                
+                rdfs:seeAlso <http://www.flex-project.eu> ;
+                
+                rdfs:comment "The address of the PDN gateway"@en ;
+                
+                rdfs:domain :EvolvedPacketCore ;
+                
+                rdfs:range :PDNGateway .
+
+
 #################################################################
 #
 #    Datatype Properties
@@ -172,6 +189,22 @@
                 rdfs:comment "The APN that is used by the LTE AP or the supported APNs from the EPC or the APNs pre-set to the Android smartphone"@en ;
                 
                 rdfs:domain :AccessNetwork ;
+                
+                rdfs:range xsd:string .
+
+                
+
+###  http://open-multinet.info/ontology/resource/epc#attenuator
+
+:attenuator rdf:type owl:DatatypeProperty ;
+
+                rdfs:label "attenuator"@en ;
+                
+                rdfs:seeAlso <http://www.flex-project.eu> ;
+                
+                rdfs:comment "attenuator"@en ;
+                
+                rdfs:domain omn:Resource ;
                 
                 rdfs:range xsd:string .
 
@@ -212,7 +245,8 @@
 
 ###  http://open-multinet.info/ontology/resource/epc#delayCode
 
-:delayCode rdf:type owl:DatatypeProperty ;
+:delayCode rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
 
                 rdfs:label "delay code"@en ;
                 
@@ -220,7 +254,7 @@
                 
                 rdfs:comment "delay code (0 => 0, 1 => 4, 2 => 10, 3 => 50, 4 => 200, 5 => 500)"@en ;
                 
-                rdfs:domain :EpcResource ;
+                rdfs:domain :PDNGateway ;
                 
                 rdfs:range xsd:integer .
 
@@ -374,7 +408,8 @@
 
 ###  http://open-multinet.info/ontology/resource/epc#packetlossCode
 
-:packetlossCode rdf:type owl:DatatypeProperty ;
+:packetlossCode rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
 
                 rdfs:label "packet loss code"@en ;
                 
@@ -382,7 +417,7 @@
                 
                 rdfs:comment "packet loss code (0 => 0, 1 => 4, 2 => 6, 3 => 20, 4 => 40, 5 => 70)"@en ;
                 
-                rdfs:domain :EpcResource ;
+                rdfs:domain :PDNGateway ;
                 
                 rdfs:range xsd:integer .
 
@@ -404,25 +439,10 @@
 
 
 
-###  http://open-multinet.info/ontology/resource/epc#pdnGateway
-
-:pdnGateway rdf:type owl:DatatypeProperty ;
-
-                rdfs:label "PDN gateway"@en ;
-                
-                rdfs:seeAlso <http://www.flex-project.eu> ;
-                
-                rdfs:comment "The address of the PDN gateway"@en ;
-                
-                rdfs:domain :EvolvedPacketCore ;
-                
-                rdfs:range xsd:string .
-
-
-
 ###  http://open-multinet.info/ontology/resource/epc#rateCode
 
-:rateCode rdf:type owl:DatatypeProperty ;
+:rateCode rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
 
                 rdfs:label "rate code"@en ;
                 
@@ -430,7 +450,7 @@
                 
                 rdfs:comment "rate code (0 => 0, 1 => 500, 2 => 1000, 3 => 10000, 4 => 100000, 5 => 1000000)"@en ;
                 
-                rdfs:domain :EpcResource ;
+                rdfs:domain :PDNGateway ;
                 
                 rdfs:range xsd:integer .
 
@@ -494,7 +514,8 @@
 
 ###  http://open-multinet.info/ontology/omn-lifecycle#hasID
 
-omn-lifecycle:hasID rdf:type owl:DatatypeProperty .
+omn-lifecycle:hasID rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty .
 
 
 
@@ -628,6 +649,19 @@ omn-lifecycle:hasID rdf:type owl:DatatypeProperty .
       rdfs:subClassOf omn:Resource ;
       
       rdfs:comment "Evolved Packet Core networks (SiRRAN’s and OpenAirInterface)"@en ;
+      
+      rdfs:seeAlso <http://www.flex-project.eu> .
+
+
+###  http://open-multinet.info/ontology/resource/epc#PDNGateway
+
+:PDNGateway rdf:type owl:Class ;
+
+      rdfs:label "PDN Gateway"@en ;
+      
+      rdfs:subClassOf omn:Resource ;
+      
+      rdfs:comment "PDN Gateway (PGW)"@en ;
       
       rdfs:seeAlso <http://www.flex-project.eu> .
 

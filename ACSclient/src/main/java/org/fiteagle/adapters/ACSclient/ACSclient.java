@@ -63,8 +63,8 @@ public class ACSclient implements Runnable{
     
     Device device = new Device(Integer.parseInt(this.owningAdapter.getDevice()));
     
-    if(configureModel.contains((Resource) null, Acs.power)){
-      device.setParameter("power", configureModel.getProperty((Resource) null, Acs.power).getString());
+    if(configureModel.contains((Resource) null, Acs.adminState)){
+      device.setParameter("adminState", configureModel.getProperty((Resource) null, Acs.adminState).getString());
     }
     
     this.devices.add(device);
