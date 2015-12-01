@@ -67,8 +67,14 @@ public class PDNGateway {
 		String delayCodeString = Integer.toString(delayCode);
 		String packetlossCodeString = Integer.toString(packetlossCode);
 
-		String command = "ssh " + ip + " " + rateCodeString + " "
-				+ delayCodeString + " " + packetlossCodeString;
+		String command = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
+				+ ip
+				+ " "
+				+ rateCodeString
+				+ " "
+				+ delayCodeString
+				+ " "
+				+ packetlossCodeString;
 
 		LOGGER.log(Level.INFO, "Try to execute command: " + command);
 		String output = CommonMethods.executeCommand(command);
