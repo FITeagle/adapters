@@ -39,8 +39,20 @@ public class CallOpenSDNcoreJson implements Runnable{
 
             TopologyResponse result = this.oscoAdapter.getClient().createTopology(request);
             LOGGER.log(Level.INFO, "Result definitions: \n"+ result);
-            this.oscoAdapter.saveTopology(result);
-            Model model = oscoAdapter.parseToModel(newInstanceModel,result);
+            TopologyResponse started= null;
+            while(true){
+                try {
+                    Thread.sleep(20000);
+                    started = this.oscoAdapter.getClient().getTopology(result.getId());
+                    if(started.getState().equals("STARTED")){
+                        break;
+                    }
+                } catch (InterruptedException e) {
+                    LOGGER.log(Level.SEVERE,e.getMessage());
+                }
+            }
+            this.oscoAdapter.saveTopology(started);
+            Model model = oscoAdapter.parseToModel(newInstanceModel,started);
             LOGGER.log(Level.INFO, "Result Model: \n" + model);
             this.oscoAdapter.getSender().publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
 

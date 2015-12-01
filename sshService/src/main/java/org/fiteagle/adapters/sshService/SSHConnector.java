@@ -108,6 +108,36 @@ public class SSHConnector {
 
                 executeCommand(channel_createUserAccount);
 
+                //add group experimenters
+
+                ChannelExec channelNewGroup = (ChannelExec) session.openChannel("exec");
+
+                channelNewGroup.setOutputStream(stream);
+
+                if (password != null) {
+                    command = "sleep 1; echo " + password + "| sudo -S addgroup experimenters";
+                    LOGGER.log(Level.INFO, "executing command: " + command);
+                    channelNewGroup.setCommand(command);
+                } else {
+                    channelNewGroup.setCommand("sudo -S addgroup experimenters");
+                }
+                executeCommand(channelNewGroup);
+
+
+                //add User to group experimenters
+
+                ChannelExec channelAddGroup = (ChannelExec) session.openChannel("exec");
+
+                channelAddGroup.setOutputStream(stream);
+
+                if (password != null) {
+                    command = "sleep 1; echo " + password + "| sudo -S adduser "+newUser+" experimenters";
+                    LOGGER.log(Level.INFO, "executing command: " + command);
+                    channelAddGroup.setCommand(command);
+                } else {
+                    channelAddGroup.setCommand("sudo -S adduser "+newUser+" experimenters");
+                }
+                executeCommand(channelAddGroup);
 
                 // createUserSSHDirectory
                 ChannelExec channel_createUserSSHDirectory = (ChannelExec) session.openChannel("exec");
