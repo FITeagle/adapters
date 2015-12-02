@@ -59,7 +59,7 @@ public class AttenuatorAdapterREST extends AbstractAdapterREST{
     LOGGER.info("Setting attenuator " + id + " to " + value + "dB . . .");
     
     Model configModel = ModelFactory.createDefaultModel();
-    Resource resource = configModel.createResource(adapterURL);
+    Resource resource = configModel.createResource("http://flexcare.fokus.fraunhofer.de/resource/"+adapterURL);
     resource.addProperty(Epc.attenuator, value);
     
     AttenuatorAdapter adapter = (AttenuatorAdapter) getAdapterInstance(adapterURL);
