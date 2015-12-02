@@ -21,7 +21,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 public class AttenuatorSetter implements Runnable{
   
   private Attenuator attenuator;
-  private final String attenuator_value;
+  private final int attenuator_value;
   private Resource adapterInstanceName;
   
   private Logger LOGGER  = LoggerFactory.getLogger(this.getClass().getName());
@@ -33,10 +33,11 @@ public class AttenuatorSetter implements Runnable{
    LOGGER.info("requested new value for attenuator is " + this.attenuator_value);
   }
   
-  public String parseConfigureModel(Model configureModel) {
+  public int parseConfigureModel(Model configureModel) {
     
     if(configureModel.contains((Resource) null, Epc.attenuator)){
-      return configureModel.getProperty(adapterInstanceName, Epc.attenuator).getString(); 
+      String value = configureModel.getProperty(adapterInstanceName, Epc.attenuator).getString(); 
+      return Integer.parseInt(value);
     }
     else 
       throw new ConfigureException("Configure model doesn't contain attenuator property");
@@ -49,30 +50,40 @@ public class AttenuatorSetter implements Runnable{
     String configureResoponse = null;
     String attenuator_url = this.attenuator.get_attenuator_url();
     int attenuator_port = Integer.parseInt(this.attenuator.get_attenuator_port());
-    String attenuator_id = this.attenuator.get_attenuator_id();
+    int attenuator_id = Integer.parseInt(this.attenuator.get_attenuator_id());
     
     try {
       
       LOGGER.info("establishing Telnet connection with " + attenuator_url + ":" + attenuator_port + " ...");
       TelnetClient telnet = new TelnetClient();
       telnet.connect(attenuator_url, attenuator_port);
-      LOGGER.info("Telnet connection has been established");
       
-      BufferedReader telnetIN = new BufferedReader(new InputStreamReader(telnet.getInputStream()));
-      PrintStream telnetOUT= new PrintStream(telnet.getOutputStream());
-     
-      String configCommand = "SA -R " + this.attenuator.get_attenuator_id() + " " + attenuator_value;
-      LOGGER.info("configuring attenuator: " + configCommand + "  ...");
+      if(telnet.isConnected()){
+        LOGGER.info("Telnet connection has been established");
+        BufferedReader telnetIN = new BufferedReader(new InputStreamReader(telnet.getInputStream()));
+        PrintStream telnetOUT= new PrintStream(telnet.getOutputStream());
+        
+        String configCommand = "SA " + attenuator_id + " " + attenuator_value;
+        LOGGER.info("configuring attenuator: " + configCommand + "  ...");
+        telnetOUT.println(configCommand);
+        
+        try {
+          Thread.sleep(1000);
+          } catch (InterruptedException e) {
+          e.printStackTrace();
+          }
+        
+        String readAttenuator = "RA " + attenuator_id;
+        telnetOUT.println(readAttenuator);
+        configureResoponse = telnetIN.readLine();
+        LOGGER.info("Configuration response: " + configureResoponse);
+        
+        LOGGER.info("closing Telnet connection ...");
+        telnetOUT.close();
+        telnetIN.close();
+      } else
+        LOGGER.error("Telnet connection couldn't be established");
       
-      
-      telnetOUT.println(configCommand);
-      
-      configureResoponse = telnetIN.readLine();
-      LOGGER.info("Configuration response: " + configureResoponse);
-      
-      LOGGER.info("closing Telnet connection ...");
-      telnetOUT.close();
-      telnetIN.close();
       telnet.disconnect();
       
   } catch (IOException e) {
