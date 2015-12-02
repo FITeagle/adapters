@@ -2,12 +2,14 @@ package org.fiteagle.adapters.Attenuator;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
 import info.openmultinet.ontology.vocabulary.Acs;
 import info.openmultinet.ontology.vocabulary.Epc;
 
+import org.apache.commons.net.telnet.TelnetClient;
 import org.fiteagle.adapters.Exceptions.ConfigureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,19 +22,21 @@ public class AttenuatorSetter implements Runnable{
   
   private Attenuator attenuator;
   private final String attenuator_value;
+  private Resource adapterInstanceName;
   
   private Logger LOGGER  = LoggerFactory.getLogger(this.getClass().getName());
   
-  public AttenuatorSetter(Attenuator attenuator, Model configureModel){
+  public AttenuatorSetter(Attenuator attenuator, Model configureModel, Resource adapterInstance){
    this.attenuator = attenuator; 
+   this.adapterInstanceName = adapterInstance;
    this.attenuator_value = parseConfigureModel(configureModel);
-   
+   LOGGER.info("requested new value for attenuator is " + this.attenuator_value);
   }
   
   public String parseConfigureModel(Model configureModel) {
     
     if(configureModel.contains((Resource) null, Epc.attenuator)){
-      return configureModel.getProperty((Resource) null, Epc.attenuator).getString(); 
+      return configureModel.getProperty(adapterInstanceName, Epc.attenuator).getString(); 
     }
     else 
       throw new ConfigureException("Configure model doesn't contain attenuator property");
@@ -42,37 +46,42 @@ public class AttenuatorSetter implements Runnable{
   @Override
   public void run(){
     
-    Socket attenuator_socket = null;
-    PrintWriter out = null;
-    BufferedReader in = null;
-    
     String configureResoponse = null;
+    String attenuator_url = this.attenuator.get_attenuator_url();
+    int attenuator_port = Integer.parseInt(this.attenuator.get_attenuator_port());
+    String attenuator_id = this.attenuator.get_attenuator_id();
     
     try {
-      LOGGER.info("establishing Telnet connection with " + this.attenuator.get_attenuator_url() + " ...");
-      attenuator_socket = new Socket(this.attenuator.get_attenuator_url(), Integer.parseInt(this.attenuator.get_attenuator_port()));
-      out = new PrintWriter(attenuator_socket.getOutputStream(), true);
-      in = new BufferedReader(new InputStreamReader(attenuator_socket.getInputStream()));
       
+      LOGGER.info("establishing Telnet connection with " + attenuator_url + ":" + attenuator_port + " ...");
+      TelnetClient telnet = new TelnetClient();
+      telnet.connect(attenuator_url, attenuator_port);
       LOGGER.info("Telnet connection has been established");
-      LOGGER.info("configuring attenuator ...");
-      out.println("SA -R " + this.attenuator.get_attenuator_id() + " " + attenuator_value);
       
-      configureResoponse = in.readLine();
+      BufferedReader telnetIN = new BufferedReader(new InputStreamReader(telnet.getInputStream()));
+      PrintStream telnetOUT= new PrintStream(telnet.getOutputStream());
+     
+      String configCommand = "SA -R " + this.attenuator.get_attenuator_id() + " " + attenuator_value;
+      LOGGER.info("configuring attenuator: " + configCommand + "  ...");
+      
+      
+      telnetOUT.println(configCommand);
+      
+      configureResoponse = telnetIN.readLine();
       LOGGER.info("Configuration response: " + configureResoponse);
       
       LOGGER.info("closing Telnet connection ...");
-      out.close();
-      in.close();
-      attenuator_socket.close();
+      telnetOUT.close();
+      telnetIN.close();
+      telnet.disconnect();
       
   } catch (IOException e) {
-   LOGGER.error("Attenuator couldn't be configured !");
+   LOGGER.error("Telnet connection with Attenuator couldn't be established !");
   }
     
-    String expectedResponse = "Atten #" + this.attenuator.get_attenuator_id() + " = " + attenuator_value + "dB";
+    String expectedResponse = "Atten #" + attenuator_id + " = " + attenuator_value + "dB";
     if(!configureResoponse.contains(expectedResponse)){
-      throw new ConfigureException("Attenuator " + this.attenuator.get_attenuator_id() + " couldn't be assigned to " + attenuator_value + "dB");
+      throw new ConfigureException("Attenuator " + attenuator_id + " couldn't be assigned to " + attenuator_value + "dB");
     }
 
   }

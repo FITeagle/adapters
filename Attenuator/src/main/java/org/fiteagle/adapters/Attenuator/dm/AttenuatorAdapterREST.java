@@ -47,7 +47,7 @@ public class AttenuatorAdapterREST extends AbstractAdapterREST{
    * @param value : desired attenuation
    * @return
    */
-  // curl -k -v --request POST -H "Accept: text/html" http://localhost:8080/Attenuator/http%3A%2F%2Flocalhost%2Fresource%2FAttenuationAdapter-1/1/15
+  // curl -k -v --request POST -H "Accept: text/html" http://localhost:8080/Attenuator/AttenuationAdapter-1/1/15
   @POST
   @Path("/{adapterURL}/{attenuator_id}/{attenuator_value}")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -63,7 +63,7 @@ public class AttenuatorAdapterREST extends AbstractAdapterREST{
     resource.addProperty(Epc.attenuator, value);
     
     AttenuatorAdapter adapter = (AttenuatorAdapter) getAdapterInstance(adapterURL);
-    Model model = adapter.updateInstance("instanceURI", configModel);
+    Model model = adapter.updateInstance(adapter.getAdapterABox().getURI(), configModel);
     
     return MessageUtil.serializeModel(model,IMessageBus.SERIALIZATION_TURTLE);
   }

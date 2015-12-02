@@ -115,7 +115,7 @@ public AttenuatorAdapter(final Model adapterModel, final Resource adapterABox) {
     String confModel = MessageUtil.serializeModel(configureModel, IMessageBus.SERIALIZATION_TURTLE);
     System.out.println("Attenuator Configure model \n" + confModel);
     
-    AttenuatorSetter attenuatorSeter = new AttenuatorSetter(this.attenuator, configureModel);
+    AttenuatorSetter attenuatorSeter = new AttenuatorSetter(this.attenuator, configureModel, this.getAdapterABox());
     
     try{
       ManagedThreadFactory managedThreadFactory = (ManagedThreadFactory) new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
