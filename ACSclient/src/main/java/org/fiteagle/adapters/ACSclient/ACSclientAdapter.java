@@ -107,7 +107,7 @@ public class ACSclientAdapter extends AbstractAdapter{
     System.out.println("ACS create model \n" + createModel);
     
     ACSclient acs_client = new ACSclient(this, instanceURI);
-    
+    acs_client.reboot();
     this.instanceList.put(instanceURI, acs_client);
     
     return this.parseToModel(acs_client);

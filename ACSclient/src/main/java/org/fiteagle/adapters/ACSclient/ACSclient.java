@@ -3,6 +3,9 @@ package org.fiteagle.adapters.ACSclient;
 import info.openmultinet.ontology.vocabulary.Acs;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,7 +77,7 @@ public class ACSclient implements Runnable{
   
   @Override
   public void run(){
-    
+
     ConfigureRequest configRequest = prepareConfigureRequest();
     
     String jobID = getJobID(configRequest);
@@ -173,6 +176,35 @@ public class ACSclient implements Runnable{
     Date currentDate = new Date(currentTime);
     return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(currentDate);
   }
-  
-  
+
+
+  public void reboot() {
+    String command = "ssh enodeb reboot";
+    LOGGER.info("Execute command: " + command);
+
+    String separator = System.getProperty("line.separator");
+    StringBuilder lines = new StringBuilder("Executed command: " + command );
+    lines.append(separator);
+    lines.append("Reply:");
+    lines.append(separator);
+
+    try {
+      String line;
+      Process p = Runtime.getRuntime().exec(command);
+
+      BufferedReader in = new BufferedReader(new InputStreamReader(
+              p.getInputStream()));
+      while ((line = in.readLine()) != null) {
+        System.out.println(line);
+        lines.append(line);
+        lines.append(separator);
+      }
+      in.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    String output = lines.toString();
+    LOGGER.info(output);
+  }
 }
