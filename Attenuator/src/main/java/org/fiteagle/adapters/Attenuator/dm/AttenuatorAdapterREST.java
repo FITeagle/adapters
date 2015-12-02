@@ -47,6 +47,7 @@ public class AttenuatorAdapterREST extends AbstractAdapterREST{
    * @param value : desired attenuation
    * @return
    */
+  // curl -k -v --request POST -H "Accept: text/html" http://localhost:8080/Attenuator/http%3A%2F%2Flocalhost%2Fresource%2FAttenuationAdapter-1/1/15
   @POST
   @Path("/{adapterURL}/{attenuator_id}/{attenuator_value}")
   @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -68,9 +69,10 @@ public class AttenuatorAdapterREST extends AbstractAdapterREST{
   }
   
   
+  // curl -i GET -H "Accept: text/html" http://localhost:8080/Attenuator/hello
   @GET
   @Path("/hello")
-  public Response hallo() {
-    return Response.ok("Hello world !").build();
+  public String hallo() {
+    return "hello world";
   }
 }
