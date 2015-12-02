@@ -66,6 +66,7 @@ public class AttenuatorSetter implements Runnable{
         String configCommand = "SA " + attenuator_id + " " + attenuator_value;
         LOGGER.info("configuring attenuator: " + configCommand + "  ...");
         telnetOUT.println(configCommand);
+        telnetOUT.flush();
         
         try {
           Thread.sleep(1000);
@@ -75,6 +76,8 @@ public class AttenuatorSetter implements Runnable{
         
         String readAttenuator = "RA " + attenuator_id;
         telnetOUT.println(readAttenuator);
+        telnetOUT.flush();
+        
         configureResoponse = telnetIN.readLine();
         LOGGER.info("Configuration response: " + configureResoponse);
         
