@@ -204,7 +204,9 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
          		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("")){
          			regions = novaApi.getConfiguredRegions();
          			LOGGER.log(Level.INFO, "Default Region is Empty. Setting first one from "+ regions.toString());
+
          	        DEFAULT_REGION = regions.iterator().next();
+					LOGGER.info("Default region is now: " + DEFAULT_REGION);
 
          		}
              }
