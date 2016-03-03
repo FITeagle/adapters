@@ -88,12 +88,14 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 		if (adapter.getInstanceObject(instanceURI) instanceof EvolvedPacketCore) {
 			EvolvedPacketCore epcGeneric = (EvolvedPacketCore) adapter
 					.getInstanceObject(instanceURI);
-			if (type.equals("rate")) {
-				epcGeneric.getPdnGateway().setRateCode(codeInt);
+			if (type.equals("rateUp")) {
+				epcGeneric.getPdnGateway().setRateCodeUp(codeInt);
 			} else if (type.equals("delay")) {
 				epcGeneric.getPdnGateway().setDelayCode(codeInt);
 			} else if (type.equals("loss")) {
 				epcGeneric.getPdnGateway().setPacketlossCode(codeInt);
+			}else if (type.equals("rateDown")) {
+				epcGeneric.getPdnGateway().setRateCodeDown(codeInt);
 			}
 		}
 
@@ -329,7 +331,7 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 	 */
 	@GET
 	@Path("qos")
-	public String qos(@DefaultValue("-1") @QueryParam("rate") int rate,
+	public String qos(@DefaultValue("-1") @QueryParam("rateUp") int rateUp,@DefaultValue("-1") @QueryParam("rateDown") int rateDown,
 			@DefaultValue("-1") @QueryParam("loss") int loss,
 			@DefaultValue("-1") @QueryParam("delay") int delay)
 			throws InterruptedException {
@@ -355,8 +357,11 @@ public class EpcAdapterREST extends AbstractAdapterREST {
 				if (loss >= 0) {
 					epc.getPdnGateway().setPacketlossCode(loss);
 				}
-				if (rate >= 0) {
-					epc.getPdnGateway().setRateCode(rate);
+				if (rateUp >= 0) {
+					epc.getPdnGateway().setRateCodeUp(rateUp);
+				}
+				if (rateDown >= 0) {
+					epc.getPdnGateway().setRateCodeDown(rateDown);
 				}
 				if (delay >= 0) {
 					epc.getPdnGateway().setDelayCode(delay);

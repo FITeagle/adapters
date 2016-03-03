@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.epc;
 
 import info.openmultinet.ontology.exceptions.InvalidModelException;
+import info.openmultinet.ontology.exceptions.InvalidRspecValueException;
 import info.openmultinet.ontology.exceptions.MissingRspecElementException;
 import info.openmultinet.ontology.translators.geni.RequestConverter;
 import info.openmultinet.ontology.vocabulary.Epc;
@@ -37,7 +38,7 @@ public class EpcPgwTest {
 	public void testCreateMultipleNodes() throws JAXBException,
 			InvalidModelException, MissingRspecElementException,
 			ProcessingException, InvalidRequestException,
-			InstanceNotFoundException, IOException {
+			InstanceNotFoundException, IOException, InvalidRspecValueException {
 
 		EpcAdapter epcAdapter = createAdapterInstance();
 

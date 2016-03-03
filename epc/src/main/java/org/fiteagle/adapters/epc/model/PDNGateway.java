@@ -20,15 +20,18 @@ public class PDNGateway {
 	private String name;
 	private int delayCode;
 	private int packetlossCode;
-	private int rateCode;
+
 	private String ip;
 	private String stopCommand;
 	private String startCommand;
+	private int rateCodeUp;
+	private int rateCodeDown;
 
 	public PDNGateway(String ip, String startCommand, String stopCommand) {
 		this.name = null;
 		this.delayCode = -1;
-		this.rateCode = -1;
+		this.rateCodeUp = -1;
+		this.rateCodeDown = -1;
 		this.packetlossCode = -1;
 		this.ip = ip;
 		this.startCommand = startCommand;
@@ -54,23 +57,27 @@ public class PDNGateway {
 	 * Runs the script to update rate, delay, and packtloss of current EPC
 	 * resource
 	 * 
-	 * @param rateCode
+	 * @param rateCodeUp
+	 * @param rateCodeDown
 	 * @param delayCode
 	 * @param packetlossCode
 	 */
-	public String updateRateDelayPacktloss(int rateCode, int delayCode,
+	public String updateRateDelayPacktloss(int rateCodeUp,int rateCodeDown, int delayCode,
 			int packetlossCode) {
 
 		LOGGER.log(Level.INFO, "updateRateDelayPacktloss");
 
-		String rateCodeString = Integer.toString(rateCode);
+		String rateCodeUpString = Integer.toString(rateCodeUp);
+		String rateCodeDownString = Integer.toString(rateCodeDown);
 		String delayCodeString = Integer.toString(delayCode);
 		String packetlossCodeString = Integer.toString(packetlossCode);
 
-		String command = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
+		String command = "ssh -i /home/fiteagle/.ssh/proxy_key_id_rsa -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "
 				+ ip
 				+ " "
-				+ rateCodeString
+				+ rateCodeUpString
+				+ " "
+				+ rateCodeDownString
 				+ " "
 				+ delayCodeString
 				+ " "
@@ -86,7 +93,7 @@ public class PDNGateway {
 
 	public String updateRateDelayPacktloss() {
 
-		String output = updateRateDelayPacktloss(this.getRateCode(),
+		String output = updateRateDelayPacktloss(this.getRateCodeUp(),this.getRateCodeDown(),
 				this.getDelayCode(), this.getPacketlossCode());
 		return output;
 	}
@@ -118,12 +125,21 @@ public class PDNGateway {
 			}
 		}
 
-		if (pgwResource.hasProperty(Epc.rateCode)) {
-			int rate = pgwResource.getProperty(Epc.rateCode).getObject()
+		if (pgwResource.hasProperty(Epc.rateCodeUp)) {
+			int rate = pgwResource.getProperty(Epc.rateCodeUp).getObject()
 					.asLiteral().getInt();
 
-			if (rate != this.getRateCode()) {
-				this.setRateCode(rate);
+			if (rate != this.getRateCodeUp()) {
+				this.setRateCodeUp(rate);
+				isRateLossDelayChanged = true;
+			}
+		}
+		if (pgwResource.hasProperty(Epc.rateCodeDown)) {
+			int rate = pgwResource.getProperty(Epc.rateCodeDown).getObject()
+					.asLiteral().getInt();
+
+			if (rate != this.getRateCodeDown()) {
+				this.setRateCodeDown(rate);
 				isRateLossDelayChanged = true;
 			}
 		}
@@ -158,10 +174,15 @@ public class PDNGateway {
 			pgwResource.addLiteral(RDFS.label, this.getName());
 		}
 
-		if (this.getRateCode() != -1) {
-			BigInteger rate = BigInteger.valueOf(this.getRateCode());
+		if (this.getRateCodeUp() != -1) {
+			BigInteger rate = BigInteger.valueOf(this.getRateCodeUp());
 			pgwResource.addLiteral(
-					info.openmultinet.ontology.vocabulary.Epc.rateCode, rate);
+					info.openmultinet.ontology.vocabulary.Epc.rateCodeUp, rate);
+		}
+		if (this.getRateCodeDown() != -1) {
+			BigInteger rate = BigInteger.valueOf(this.getRateCodeDown());
+			pgwResource.addLiteral(
+					Epc.rateCodeDown, rate);
 		}
 
 		if (this.getDelayCode() != -1) {
@@ -197,13 +218,8 @@ public class PDNGateway {
 		this.packetlossCode = packetlossCode;
 	}
 
-	public int getRateCode() {
-		return this.rateCode;
-	}
 
-	public void setRateCode(int rateCode) {
-		this.rateCode = rateCode;
-	}
+
 
 	public String getName() {
 		return this.name;
@@ -211,5 +227,21 @@ public class PDNGateway {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setRateCodeUp(int rateCodeUp) {
+		this.rateCodeUp = rateCodeUp;
+	}
+
+	public void setRateCodeDown(int rateCodeDown) {
+		this.rateCodeDown = rateCodeDown;
+	}
+
+	public int getRateCodeUp() {
+		return rateCodeUp;
+	}
+
+	public int getRateCodeDown() {
+		return rateCodeDown;
 	}
 }
