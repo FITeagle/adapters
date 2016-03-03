@@ -156,15 +156,17 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 	
 
 	private void init(){
+		LOGGER.info("init client");
         if(PREFERENCES_INITIALIZED){
     		Iterable<Module> modules = ImmutableSet.<Module>of(new SLF4JLoggingModule());
     		if(KEYSTONE_AUTH_URL != null){
+				LOGGER.info("creating novaApiObject");
     			novaApi = ContextBuilder.newBuilder("openstack-nova")
     	                .endpoint(KEYSTONE_AUTH_URL)
     	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
     	                .modules(modules)
     	                .buildApi(NovaApi.class);
-    			
+    			LOGGER.info("creating neutronAPIObject");
     			neutronApi = ContextBuilder.newBuilder("openstack-neutron")
     	                .endpoint(KEYSTONE_AUTH_URL)
     	                .credentials(TENANT_NAME + ":" + KEYSTONE_USERNAME, KEYSTONE_PASSWORD)
@@ -217,12 +219,13 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 
 		List<Flavor> flavorList = new ArrayList<Flavor> ();
         try{
+			    LOGGER.info("listing flavors");
             	FlavorApi flavorApi = novaApi.getFlavorApi(DEFAULT_REGION);                
                 flavorList= flavorApi.listInDetail().concat().toList();
         }catch(Exception e){
     		LOGGER.log(Level.SEVERE, e.getStackTrace().toString());	
         }
-		
+		LOGGER.info("return flavor list with " + flavorList.size() + " entries");
 		
         return new Flavors(flavorList);
 

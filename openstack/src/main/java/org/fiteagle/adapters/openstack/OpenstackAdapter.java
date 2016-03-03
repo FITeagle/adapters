@@ -102,8 +102,11 @@ private String floatingPool;
   }
 
   public void initFlavors() {
+    LOGGER.info("init flavors");
     Flavors flavors = openstackClient.listFlavors();
+    LOGGER.info("read flavors");
     readDefaultFlavours();
+
     for(Flavor flavor: flavors.getList()){
     	
     Resource vmResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + flavor.getName());
@@ -123,7 +126,7 @@ private String floatingPool;
 		  
 		defaultFlavours =openstackAdapterControler.instancesDefaultFlavours.get(this.uuid);
 
- 		
+ 		LOGGER.info("got default flavors");
  		  for (String s :  defaultFlavours.keySet()){
 			    Resource flavourResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + s);
 			    flavourResource.addProperty(RDF.type, Omn_domain_pc.VM);
