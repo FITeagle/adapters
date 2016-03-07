@@ -106,14 +106,14 @@ private String floatingPool;
     Flavors flavors = openstackClient.listFlavors();
     LOGGER.info("read flavors");
     readDefaultFlavours();
-
+    List<Resource> diskImages = getDiskImages();
     for(Flavor flavor: flavors.getList()){
     	
     Resource vmResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + flavor.getName());
       vmResource.addProperty(RDFS.subClassOf, Omn_domain_pc.VM);
       vmResource.addProperty(Omn_domain_pc.hasCPU, String.valueOf(flavor.getVcpus()));
       vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
-      for(Resource r: getDiskImages()){
+      for(Resource r: diskImages){
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
       }
       adapterABox.addProperty(Omn_lifecycle.canImplement, vmResource);
