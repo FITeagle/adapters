@@ -109,7 +109,7 @@ private String floatingPool;
     List<Resource> diskImages = getDiskImages();
     for(Flavor flavor: flavors.getList()){
     	
-    Resource vmResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + flavor.getId());
+    Resource vmResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + flavor.getName());
       vmResource.addProperty(RDF.type, Omn_domain_pc.VM);
       vmResource.addProperty(RDFS.subClassOf, Omn.Resource);
       vmResource.addProperty(Omn_domain_pc.hasCPU, String.valueOf(flavor.getVcpus()));
@@ -152,7 +152,7 @@ private String floatingPool;
     
     Images images = openstackClient.listImages();
     for(Image image : images.getList()){
-      Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" +image.getName() );
+      Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" +image.getId() );
       diskImage.addProperty(RDF.type, Omn_domain_pc.DiskImage);
       diskImage.addProperty(Omn_domain_pc.hasDiskimageLabel,image.getName());
       diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, image.getId());
