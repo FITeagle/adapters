@@ -109,12 +109,15 @@ private String floatingPool;
     List<Resource> diskImages = getDiskImages();
     for(Flavor flavor: flavors.getList()){
     	
-    Resource vmResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + flavor.getName());
-      vmResource.addProperty(RDFS.subClassOf, Omn_domain_pc.VM);
+    Resource vmResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + flavor.getName());
+      vmResource.addProperty(RDF.type, Omn_domain_pc.VM);
+      vmResource.addProperty(RDFS.subClassOf, Omn.Resource);
       vmResource.addProperty(Omn_domain_pc.hasCPU, String.valueOf(flavor.getVcpus()));
       vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
+      
       for(Resource r: diskImages){
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
+        r.addProperty(Omn_domain_pc.hasDiskimageLabel, r.getNameSpace());
       }
       adapterABox.addProperty(Omn_lifecycle.canImplement, vmResource);
     }
@@ -128,7 +131,7 @@ private String floatingPool;
 
  		LOGGER.info("got default flavors");
  		  for (String s :  defaultFlavours.keySet()){
-			    Resource flavourResource = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + s);
+			    Resource flavourResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + s);
 			    flavourResource.addProperty(RDF.type, Omn_domain_pc.VM);
 			    flavourResource.addProperty(Omn_domain_pc.hasDiskImage, defaultFlavours.get(s).get(0));
 			    flavourResource.addProperty(Omn_lifecycle.hasID, defaultFlavours.get(s).get(1));
@@ -149,7 +152,7 @@ private String floatingPool;
     
     Images images = openstackClient.listImages();
     for(Image image : images.getList()){
-      Resource diskImage = adapterABox.getModel().createResource(OntologyModelUtil.getResourceNamespace() + "diskImage/" +image.getId() );
+      Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" +image.getName() );
       diskImage.addProperty(RDF.type, Omn_domain_pc.DiskImage);
       diskImage.addProperty(Omn_domain_pc.hasDiskimageLabel,image.getName());
       diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, image.getId());
