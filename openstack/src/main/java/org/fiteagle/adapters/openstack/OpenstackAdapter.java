@@ -109,7 +109,7 @@ private String floatingPool;
     List<Resource> diskImages = getDiskImages();
     for(Flavor flavor: flavors.getList()){
     	
-    Resource vmResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + flavor.getName());
+    Resource vmResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + flavor.getId()());
       vmResource.addProperty(RDF.type, Omn_domain_pc.VM);
       vmResource.addProperty(RDFS.subClassOf, Omn.Resource);
       vmResource.addProperty(Omn_domain_pc.hasCPU, String.valueOf(flavor.getVcpus()));
