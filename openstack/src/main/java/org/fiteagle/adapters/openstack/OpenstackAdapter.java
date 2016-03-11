@@ -298,8 +298,10 @@ private String floatingPool;
 //    Resource requestedFlavor = this.adapterABox.getModel().getResource(typeURI);
     if(typeURI != null){
       Statement statement = typeURI.getProperty(Omn_lifecycle.hasComponentID);
-      if(statement != null){
-        RDFNode node = statement.getObject();
+      Statement flavour = this.adapterABox.getModel().getResource(statement.getObject().asResource().getURI()).getProperty(Omn_lifecycle.hasID);
+
+      if(flavour != null){
+        RDFNode node = flavour.getObject();
         flavorId = node.asLiteral().getString();
       }
 
