@@ -171,7 +171,7 @@ private String floatingPool;
     Resource requestedVM = newInstanceModel.getResource(instanceURI);
     LOGGER.log(Level.SEVERE, MessageUtil.serializeModel(requestedVM.getModel(), IMessageBus.SERIALIZATION_NTRIPLE));
     String diskImageURI = getRequestedTypeURI(requestedVM);
-    String flavorId = getFlavorId(requestedVM);
+    String flavorId = getFlavorId(newInstanceModel);
 //    String diskImageURI = new String("");
     
     if(defaultFlavours == null){
@@ -292,18 +292,23 @@ private String floatingPool;
 //  public void addListener(OpenstackAdapterMDBSender newListener) {
 //    myListeners.add(newListener);
 //  }
-  private String getFlavorId(Resource typeURI) {
+  private String getFlavorId(Model typeURI) {
     String flavorId = null;
 
 //    Resource requestedFlavor = this.adapterABox.getModel().getResource(typeURI);
     if(typeURI != null){
-      Statement statement = typeURI.getProperty(Omn_lifecycle.hasComponentID);
-      Resource flavour = this.adapterABox.getModel().getResource(statement.getObject().asResource().getURI());
-      Statement blub = flavour.getProperty(Omn_lifecycle.hasID);
+      Property property = typeURI.getProperty(Omn_lifecycle.hasComponentID.toString());
+      String test1 = property.asLiteral().getString();
+      String test2 = property.getLocalName();
+      String test3 = property.getNameSpace();
+      String test4 = property.getURI();
 
-      if(blub != null){
-        RDFNode node = blub.getObject();
-        flavorId = node.asLiteral().getString();
+      Resource flavour = this.adapterABox.getModel().getResource(test4);
+//     Statement blub = flavour.getProperty(Omn_lifecycle.hasID);
+
+      if(flavour != null){
+        flavorId = flavour.getProperty(Omn_lifecycle.hasID).getString();
+ //       flavorId = node.asLiteral().getString();
       }
 
     }
