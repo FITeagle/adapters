@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.ejb.EJB;
 import javax.enterprise.concurrent.ManagedThreadFactory;
@@ -302,7 +303,15 @@ private String floatingPool;
     if(requestedVM != null){
       Statement statement = requestedVM.getProperty(Omn_lifecycle.hasComponentID);
     String tmpString = statement.getObject().asLiteral().getString();
-    String[] tmpArray = tmpString.split("+");
+    String[] tmpArray = null;
+    try{
+     tmpArray = tmpString.split(Pattern.quote("+"));
+
+    } catch(Exception e){
+    	
+        LOGGER.log(Level.SEVERE, "Could not find FlavorId for given Flavor");
+	
+    		}
     String flavorName = tmpArray[tmpArray.length];
     for (Flavor f : flavors.getList()){
      if (f.getName() == flavorName){
