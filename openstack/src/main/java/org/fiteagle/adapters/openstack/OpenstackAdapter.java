@@ -40,6 +40,7 @@ import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -81,6 +82,8 @@ private String floatingPool;
   private String default_image_id;
   private String default_region;
   
+  private Flavors flavors;
+  
   public OpenstackAdapter(Model adapterTBox, Resource adapterABox){
     this.uuid = UUID.randomUUID().toString();
     this.openstackClient = new OpenstackClient(this);
@@ -103,7 +106,7 @@ private String floatingPool;
 
   public void initFlavors() {
     LOGGER.info("init flavors");
-    Flavors flavors = openstackClient.listFlavors();
+    flavors = openstackClient.listFlavors();
     LOGGER.info("read flavors");
     readDefaultFlavours();
     List<Resource> diskImages = getDiskImages();
@@ -171,7 +174,7 @@ private String floatingPool;
     Resource requestedVM = newInstanceModel.getResource(instanceURI);
     LOGGER.log(Level.SEVERE, MessageUtil.serializeModel(requestedVM.getModel(), IMessageBus.SERIALIZATION_NTRIPLE));
     String diskImageURI = getRequestedTypeURI(requestedVM);
-    String flavorId = getFlavorId(newInstanceModel);
+    String flavorId = getFlavorId(requestedVM);
 //    String diskImageURI = new String("");
     
     if(defaultFlavours == null){
@@ -292,27 +295,34 @@ private String floatingPool;
 //  public void addListener(OpenstackAdapterMDBSender newListener) {
 //    myListeners.add(newListener);
 //  }
-  private String getFlavorId(Model typeURI) {
+  private String getFlavorId(Resource requestedVM) {
     String flavorId = null;
 
 //    Resource requestedFlavor = this.adapterABox.getModel().getResource(typeURI);
-    if(typeURI != null){
-      Property property = typeURI.getProperty(Omn_lifecycle.hasComponentID.toString());
-      String test1 = property.asLiteral().getString();
-      String test2 = property.getLocalName();
-      String test3 = property.getNameSpace();
-      String test4 = property.getURI();
+    if(requestedVM != null){
+      Statement statement = requestedVM.getProperty(Omn_lifecycle.hasComponentID);
+    String tmpString = statement.getObject().asLiteral().getString();
+    String[] tmpArray = tmpString.split("+");
+    String flavorName = tmpArray[tmpArray.length];
+    for (Flavor f : flavors.getList()){
+     if (f.getName() == flavorName){
+    	 flavorId = f.getId();
+    	 LOGGER.log(Level.INFO, "Found FlavorID for "+flavorName+" and that is: " + flavorId);
+     }
+    }
 
-      Resource flavour = this.adapterABox.getModel().getResource(test4);
+//      Resource flavour = this.adapterABox.getModel().getResource(flavorId);
 //     Statement blub = flavour.getProperty(Omn_lifecycle.hasID);
 
-      if(flavour != null){
-        flavorId = flavour.getProperty(Omn_lifecycle.hasID).getString();
+//      if(flavour != null){
+//        flavorId = flavour.getProperty(Omn_lifecycle.hasID).getObject().asLiteral().getString();
  //       flavorId = node.asLiteral().getString();
-      }
+//      }
+    return flavorId;
 
     }
-    return flavorId;
+    LOGGER.log(Level.SEVERE, "Could not find FlavorId for given Flavor");
+    return null;
   }
 
   private String getDiskImageId(Resource requestedVM) {
