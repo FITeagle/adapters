@@ -158,9 +158,9 @@ private String floatingPool;
     
     Images images = openstackClient.listImages();
     for(Image image : images.getList()){
-      Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" +image.getId() );
+      Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" +image.getName() );
       diskImage.addProperty(RDF.type, Omn_domain_pc.DiskImage);
-      diskImage.addProperty(Omn_domain_pc.hasDiskimageLabel,image.getName());
+      diskImage.addProperty(Omn_domain_pc.hasUUID,image.getId());
       diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, image.getId());
       diskimages.add(diskImage);
 
@@ -178,6 +178,8 @@ private String floatingPool;
     String flavorId = getFlavorId(requestedVM);
 //    String diskImageURI = new String("");
     
+    
+    
     if(defaultFlavours == null){
     	defaultFlavours =openstackAdapterControler.instancesDefaultFlavours.get(this.uuid);
     }
@@ -188,7 +190,7 @@ private String floatingPool;
 //		  }
 //	  } 
 
-    testFloatingIps();
+//    testFloatingIps();
     
     if(diskImageURI.isEmpty()){
     diskImageURI = getDiskImageId(requestedVM);

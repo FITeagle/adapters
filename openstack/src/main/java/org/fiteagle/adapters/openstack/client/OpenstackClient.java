@@ -33,6 +33,7 @@ import org.jclouds.openstack.nova.v2_0.features.ImageApi;
 import org.jclouds.openstack.nova.v2_0.features.ServerApi;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Closeables;
 import com.google.inject.Module;
@@ -374,7 +375,25 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 		List<FloatingIP> floatingIpList = new ArrayList<>();
 				
         try{
-        	FloatingIPApi floatingApi = novaApi.getFloatingIPApi(DEFAULT_REGION).get();
+        	Optional<FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPApi(DEFAULT_REGION);
+        	Optional<FloatingIPPoolApi> floatingApiPoolOptional = novaApi.getFloatingIPPoolApi(DEFAULT_REGION);
+//        	 Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> neutronFloatingAPI = neutronApi.getFloatingIPApi(DEFAULT_REGION);
+
+        	FloatingIPApi floatingApi = null;
+        	FloatingIPPoolApi floatingPoolApi = null;
+        	//org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi neutronApi = null;
+
+        	if(floatingApiOptional.isPresent()){
+        	floatingApi = 	floatingApiOptional.get();
+        	}else{
+        		LOGGER.log(Level.SEVERE, "FloatingIP-API is null");
+        	}
+        	if(floatingApiPoolOptional.isPresent()){
+        	floatingPoolApi = 	floatingApiPoolOptional.get();
+        	}else{
+        		LOGGER.log(Level.SEVERE, "FloatingIP-API is null");
+        	}
+
         	floatingIpList = floatingApi.list().toList();
     		List<FloatingIP> resultList = new ArrayList<>();
 
@@ -390,7 +409,7 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
             }
         	return resultList;
         }catch(Exception e){
-    		LOGGER.log(Level.SEVERE, e.getStackTrace().toString());	
+    		e.printStackTrace();	
         }
 		LOGGER.log(Level.SEVERE, "EXCEPTION IN FLOATING IP");
 		return null;
