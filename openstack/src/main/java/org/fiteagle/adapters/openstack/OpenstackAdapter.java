@@ -312,7 +312,7 @@ private String floatingPool;
         LOGGER.log(Level.SEVERE, "Could not find FlavorId for given Flavor");
 	
     		}
-    String flavorName = tmpArray[tmpArray.length];
+    String flavorName = tmpArray[tmpArray.length-1];
     for (Flavor f : flavors.getList()){
      if (f.getName() == flavorName){
     	 flavorId = f.getId();
