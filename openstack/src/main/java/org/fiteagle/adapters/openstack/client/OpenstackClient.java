@@ -375,7 +375,8 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 		List<FloatingIP> floatingIpList = new ArrayList<>();
 				
         try{
-        	Optional<FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPApi(DEFAULT_REGION);
+        	@SuppressWarnings("deprecation")
+			Optional<? extends FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPExtensionForZone(DEFAULT_REGION);
         	Optional<FloatingIPPoolApi> floatingApiPoolOptional = novaApi.getFloatingIPPoolApi(DEFAULT_REGION);
 //        	 Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> neutronFloatingAPI = neutronApi.getFloatingIPApi(DEFAULT_REGION);
 

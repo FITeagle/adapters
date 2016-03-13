@@ -8,7 +8,7 @@
   <packaging>war</packaging>
   <version>0.1-SNAPSHOT</version>
    <properties>
-    <jclouds.version>1.9.2</jclouds.version>
+    <jclouds.version>1.9.1</jclouds.version>
   </properties>
   <parent>
     <groupId>org.fiteagle</groupId>
