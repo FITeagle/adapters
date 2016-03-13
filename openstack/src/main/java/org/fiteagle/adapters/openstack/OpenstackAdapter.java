@@ -176,8 +176,8 @@ private String floatingPool;
     LOGGER.log(Level.SEVERE, MessageUtil.serializeModel(requestedVM.getModel(), IMessageBus.SERIALIZATION_NTRIPLE));
     String diskImageURI = getRequestedTypeURI(requestedVM);
     String flavorId = getFlavorId(requestedVM);
-//    String diskImageURI = new String("");
-    
+    diskImageURI = getDiskImageId(diskImageURI);
+ 
     
     
     if(defaultFlavours == null){
@@ -192,9 +192,8 @@ private String floatingPool;
 
 //    testFloatingIps();
     
-    if(diskImageURI.isEmpty()){
-    diskImageURI = getDiskImageId(requestedVM);
-    }
+ 
+   
     String username = getUsername(requestedVM);
     String publicKey = getPublicKey(requestedVM);
     Resource monitoringService =  getMonitoringService(newInstanceModel);
@@ -349,6 +348,17 @@ private String floatingPool;
     }
     return diskImageURI;
   }
+  
+  private String getDiskImageId(String diskImageUri) {
+	    String diskImageURI = null;
+
+	      Resource diskImage = this.adapterABox.getModel().getResource(diskImageUri);
+
+
+	       diskImageURI = diskImage.getProperty(Omn_domain_pc.hasDiskimageURI).getString();
+	    
+	    return diskImageURI;
+	  }
 
   private String getRequestedTypeURI(Resource requestedVM) {
     StmtIterator stmtIterator = requestedVM.listProperties(RDF.type);
