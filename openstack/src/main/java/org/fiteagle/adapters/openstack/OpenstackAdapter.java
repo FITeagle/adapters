@@ -188,6 +188,8 @@ private String floatingPool;
 //		  }
 //	  } 
 
+    testFloatingIps();
+    
     if(diskImageURI.isEmpty()){
     diskImageURI = getDiskImageId(requestedVM);
     }
@@ -580,6 +582,11 @@ public void refreshConfig() throws ProcessingException {
 
     public void setListener(OpenstackAdapterMDBSender listener) {
         this.listener = listener;
+    }
+    
+    public void testFloatingIps(){
+        List<FloatingIP> floatingIps = openstackClient.listFreeFloatingIps();
+LOGGER.log(Level.SEVERE, floatingIps.toString());
     }
 
     private class CreateVM implements Runnable {
