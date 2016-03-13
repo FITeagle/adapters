@@ -314,7 +314,7 @@ private String floatingPool;
     		}
     String flavorName = tmpArray[tmpArray.length-1];
     for (Flavor f : flavors.getList()){
-     if (f.getName() == flavorName){
+     if (f.getName().equals(flavorName)){
     	 flavorId = f.getId();
     	 LOGGER.log(Level.INFO, "Found FlavorID for "+flavorName+" and that is: " + flavorId);
      }
