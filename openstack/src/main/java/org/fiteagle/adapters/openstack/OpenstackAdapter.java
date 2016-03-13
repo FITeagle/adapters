@@ -628,7 +628,9 @@ public void refreshConfig() throws ProcessingException {
         }
       }
 
-
+      if(floatingIp == null){
+		    LOGGER.log(Level.SEVERE , "FLOATING IP IS EMPTY");
+      }
       Model model = parseToModel(server, floatingIp);
       parent.publishModelUpdate(model, UUID.randomUUID().toString(), IMessageBus.TYPE_INFORM, IMessageBus.TARGET_ORCHESTRATOR);
 
