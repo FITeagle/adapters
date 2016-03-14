@@ -376,12 +376,12 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 				
         try{
         	@SuppressWarnings("deprecation")
-			Optional<? extends FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPExtensionForZone(DEFAULT_REGION);
-        	Optional<FloatingIPPoolApi> floatingApiPoolOptional = novaApi.getFloatingIPPoolApi(DEFAULT_REGION);
+			Optional<? extends FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPApi(DEFAULT_REGION);
+        	Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> floatingNeutronOptional = neutronApi.getFloatingIPApi(DEFAULT_REGION);
 //        	 Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> neutronFloatingAPI = neutronApi.getFloatingIPApi(DEFAULT_REGION);
 
         	FloatingIPApi floatingApi = null;
-        	FloatingIPPoolApi floatingPoolApi = null;
+        	org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi floatingNeutronIpApi = null;
         	//org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi neutronApi = null;
 
         	if(floatingApiOptional.isPresent()){
@@ -389,8 +389,8 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
         	}else{
         		LOGGER.log(Level.SEVERE, "FloatingIP-API is null");
         	}
-        	if(floatingApiPoolOptional.isPresent()){
-        	floatingPoolApi = 	floatingApiPoolOptional.get();
+        	if(floatingNeutronOptional.isPresent()){
+        		floatingNeutronIpApi = 	floatingNeutronOptional.get();
         	}else{
         		LOGGER.log(Level.SEVERE, "FloatingIP-API is null");
         	}
