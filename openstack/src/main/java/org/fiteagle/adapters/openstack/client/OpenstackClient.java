@@ -212,6 +212,7 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
          		}
              }
         }
+        listFreeFloatingIps();
 }
 
 	@Override
@@ -377,8 +378,9 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
         try{
         	@SuppressWarnings("deprecation")
 			Optional<? extends FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPApi(DEFAULT_REGION);
-        	Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> floatingNeutronOptional = neutronApi.getFloatingIPApi(DEFAULT_REGION);
 //        	 Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> neutronFloatingAPI = neutronApi.getFloatingIPApi(DEFAULT_REGION);
+    		LOGGER.log(Level.SEVERE, "NeutronApi Regions are "+ neutronApi.getConfiguredRegions().toArray().toString());
+        	Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> floatingNeutronOptional = neutronApi.getFloatingIPApi(neutronApi.getConfiguredRegions().iterator().next());
 
         	FloatingIPApi floatingApi = null;
         	org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi floatingNeutronIpApi = null;
