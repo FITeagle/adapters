@@ -59,9 +59,11 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 	private String TENANT_ID = "";
 	private String networkId = "";
 	private String DEFAULT_REGION ="";
+	private String DEFAULT_REGION_NEUTRON ="";
 
 	private NovaApi novaApi;
     private Set<String> regions;
+    private Set<String> regionsNeutron;
     private NeutronApi neutronApi;
     
 	boolean PREFERENCES_INITIALIZED = false;
@@ -176,10 +178,14 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
     		}
     		
     		
-    		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("")){
+    		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("") || DEFAULT_REGION_NEUTRON.equals("") || DEFAULT_REGION_NEUTRON.equals("")){
     			regions = novaApi.getConfiguredRegions();
-    			LOGGER.log(Level.INFO, "Default Region is Empty. Setting first one from "+ regions.toString());
+    			LOGGER.log(Level.INFO, "Default Nova-Region is Empty. Setting first one from "+ regions.toString());
     	        DEFAULT_REGION = regions.iterator().next();
+    	        
+    	        regionsNeutron = neutronApi.getConfiguredRegions();
+    			LOGGER.log(Level.INFO, "Default Neutron-Region is Empty. Setting first one from "+ regionsNeutron.toString());
+    	        DEFAULT_REGION_NEUTRON = regionsNeutron.iterator().next();
 
     		}
         }else{
@@ -202,12 +208,14 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
          		}
          		
          		
-         		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("")){
+         		if(DEFAULT_REGION == null || DEFAULT_REGION.equals("") || DEFAULT_REGION_NEUTRON.equals("") || DEFAULT_REGION_NEUTRON.equals("")){
          			regions = novaApi.getConfiguredRegions();
-         			LOGGER.log(Level.INFO, "Default Region is Empty. Setting first one from "+ regions.toString());
-
-         	        DEFAULT_REGION = regions.iterator().next();
-					LOGGER.info("Default region is now: " + DEFAULT_REGION);
+        			LOGGER.log(Level.INFO, "Default Nova-Region is Empty. Setting first one from "+ regions.toString());
+        	        DEFAULT_REGION = regions.iterator().next();
+        	        
+        	        regionsNeutron = neutronApi.getConfiguredRegions();
+        			LOGGER.log(Level.INFO, "Default Neutron-Region is Empty. Setting first one from "+ regionsNeutron.toString());
+        	        DEFAULT_REGION_NEUTRON = regionsNeutron.iterator().next();
 
          		}
              }
