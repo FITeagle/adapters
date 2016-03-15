@@ -8,13 +8,24 @@
   <packaging>war</packaging>
   <version>0.1-SNAPSHOT</version>
    <properties>
-    <jclouds.version>1.9.2</jclouds.version>
+    <jclouds.version>2.0.666-SNAPSHOT</jclouds.version>
   </properties>
   <parent>
     <groupId>org.fiteagle</groupId>
     <artifactId>adapters</artifactId>
     <version>0.1-SNAPSHOT</version>
   </parent>
+  
+  <repositories>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>fiteagle-repo</id>
+            <url>http://fiteagle.org/maven</url>
+        </repository>
+    </repositories>
 
   <dependencies>
     <dependency>
@@ -64,16 +75,16 @@
       <artifactId>openstack-trove</artifactId>
       <version>${jclouds.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>openstack-glance</artifactId>
-      <version>${jclouds.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.jclouds.labs</groupId>
-      <artifactId>openstack-marconi</artifactId>
-      <version>${jclouds.version}</version>
-    </dependency>
+<!--     <dependency> -->
+<!--       <groupId>org.apache.jclouds.labs</groupId> -->
+<!--       <artifactId>openstack-glance</artifactId> -->
+<!--       <version>${jclouds.version}</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>org.apache.jclouds.labs</groupId> -->
+<!--       <artifactId>openstack-marconi</artifactId> -->
+<!--       <version>${jclouds.version}</version> -->
+<!--     </dependency> -->
     <dependency>
       <groupId>org.apache.jclouds.labs</groupId>
       <artifactId>openstack-neutron</artifactId>
