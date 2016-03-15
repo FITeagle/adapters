@@ -14,6 +14,8 @@ import org.fiteagle.adapters.openstack.client.model.Flavors;
 import org.fiteagle.adapters.openstack.client.model.Images;
 import org.fiteagle.adapters.openstack.client.model.Servers;
 import org.jclouds.ContextBuilder;
+import org.jclouds.collect.IterableWithMarker;
+import org.jclouds.collect.PagedIterable;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.openstack.neutron.v2.NeutronApi;
 import org.jclouds.openstack.neutron.v2.domain.Network;
@@ -34,6 +36,7 @@ import org.jclouds.openstack.nova.v2_0.features.ServerApi;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.Closeables;
 import com.google.inject.Module;
@@ -377,53 +380,166 @@ public class OpenstackClient implements IOpenstackClient,Closeable{
 	}
 
 	@Override
-	public List<FloatingIP> listFreeFloatingIps() {
+	public List<?> listFreeFloatingIps() {
+
+		try{
+	    return tryNovaFloatingIpApi();
+		}catch(Exception e){
+			try{
+			return tryNeutronFloatingIpApi();
+			}catch(Exception e2){
+				return null;
+			}
+		}
+//		if(novaApi == null){
+//			init();
+//		}
+//		List<FloatingIP> floatingIpList = new ArrayList<>();
+//		List<IterableWithMarker<org.jclouds.openstack.neutron.v2.domain.FloatingIP>> neutronFloatingIpList = new ArrayList<>();		
+//        try{
+//        	
+//        	// Trying to get Nova or Neutron Api for Floating IPs
+//			Optional<? extends FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPApi(DEFAULT_REGION);
+//    		LOGGER.log(Level.INFO, "NeutronApi Regions are "+ neutronApi.getConfiguredRegions().toArray().toString());
+//        	Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> floatingNeutronOptional = neutronApi.getFloatingIPApi(DEFAULT_REGION_NEUTRON);
+//
+//        	FloatingIPApi floatingApi = null;
+//        	org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi floatingNeutronIpApi = null;
+//
+//        	// Checking if one of them (Nova/Neutron) is null)
+//        	if(floatingApiOptional.isPresent()){
+//        	floatingApi = 	floatingApiOptional.get();
+//        	}else{
+//        		LOGGER.log(Level.WARNING, "Nova FloatingIP-API is null");
+//        	}
+//        	if(floatingNeutronOptional.isPresent()){
+//        		floatingNeutronIpApi = 	floatingNeutronOptional.get();
+//        	}else{
+//        		LOGGER.log(Level.WARNING, "Neutron FloatingIP-API is null");
+//        	}
+//        	
+//        	
+//        	// First try Nova-Api to allocate FloatingIp. If it Fails try with Neutron-Api
+//        	try{
+//        		floatingIpList = floatingApi.list().toList();
+//        		List<FloatingIP> resultList = new ArrayList<>();
+//
+//            	for (FloatingIP floatIp : floatingIpList){
+//            		if(floatIp.getFixedIp() == null){
+//            			resultList.add(floatIp);
+//            		}
+//            	}
+//            	
+//            	if(resultList.isEmpty()){
+//            		LOGGER.log(Level.SEVERE, "NO FLOATING IP FOUND");
+//                	return null;
+//                }
+//            	return resultList;
+//            	
+//        	}catch(Exception e){
+//        		try{
+//        			neutronFloatingIpList = floatingNeutronIpApi.list().toList();
+//            		List<FloatingIP> resultList = new ArrayList<>();
+//
+//                	for (FloatingIP floatIp : floatingIpList){
+//                		if(floatIp.getFixedIp() == null){
+//                			resultList.add(floatIp);
+//                		}
+//                	}
+//                	
+//                	if(resultList.isEmpty()){
+//                		LOGGER.log(Level.SEVERE, "NO FLOATING IP FOUND");
+//                    	return null;
+//                    }
+//                	return resultList;     	
+//        		}catch(Exception e2){
+//        			LOGGER.log(Level.SEVERE, "EXCEPTION IN FLOATING IP - Nova and Neutron FloatingIpApi don't work!");
+//        			return null;
+//        		}
+//        		   		
+//        	}
+//        	
+//        }catch(Exception e){
+//    		e.printStackTrace();	
+//        }
+//		LOGGER.log(Level.SEVERE, "EXCEPTION IN FLOATING IP");
+//		return null;
+	}
+	
+	public List<FloatingIP> tryNovaFloatingIpApi(){
 		if(novaApi == null){
 			init();
 		}
+		
 		List<FloatingIP> floatingIpList = new ArrayList<>();
-				
-        try{
-        	@SuppressWarnings("deprecation")
-			Optional<? extends FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPApi(DEFAULT_REGION);
-//        	 Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> neutronFloatingAPI = neutronApi.getFloatingIPApi(DEFAULT_REGION);
-    		LOGGER.log(Level.SEVERE, "NeutronApi Regions are "+ neutronApi.getConfiguredRegions().toArray().toString());
-        	Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> floatingNeutronOptional = neutronApi.getFloatingIPApi(neutronApi.getConfiguredRegions().iterator().next());
+		Optional<? extends FloatingIPApi> floatingApiOptional = novaApi.getFloatingIPApi(DEFAULT_REGION);
+    	FloatingIPApi floatingApi = null;
+    	
+    	
+    	if(floatingApiOptional.isPresent()){
+    	floatingApi = 	floatingApiOptional.get();
+    	}else{
+    		LOGGER.log(Level.WARNING, "----");
+    		LOGGER.log(Level.WARNING, "Nova FloatingIP-API is null");
+    		LOGGER.log(Level.WARNING, "----");
 
-        	FloatingIPApi floatingApi = null;
-        	org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi floatingNeutronIpApi = null;
-        	//org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi neutronApi = null;
+    		throw new RuntimeException();
+    	}
 
-        	if(floatingApiOptional.isPresent()){
-        	floatingApi = 	floatingApiOptional.get();
-        	}else{
-        		LOGGER.log(Level.SEVERE, "FloatingIP-API is null");
-        	}
-        	if(floatingNeutronOptional.isPresent()){
-        		floatingNeutronIpApi = 	floatingNeutronOptional.get();
-        	}else{
-        		LOGGER.log(Level.SEVERE, "FloatingIP-API is null");
-        	}
 
-        	floatingIpList = floatingApi.list().toList();
-    		List<FloatingIP> resultList = new ArrayList<>();
+		floatingIpList = floatingApi.list().toList();
+		List<FloatingIP> resultList = new ArrayList<>();
 
-        	for (FloatingIP floatIp : floatingIpList){
-        		if(floatIp.getFixedIp() == null){
-        			resultList.add(floatIp);
-        		}
-        	}
-        	
-        	if(resultList.isEmpty()){
-        		LOGGER.log(Level.SEVERE, "NO FLOATING IP FOUND");
-            	return null;
-            }
-        	return resultList;
-        }catch(Exception e){
-    		e.printStackTrace();	
+    	for (FloatingIP floatIp : floatingIpList){
+    		if(floatIp.getFixedIp() == null){
+    			resultList.add(floatIp);
+    		}
+    	}
+    	
+    	if(resultList.isEmpty()){
+    		LOGGER.log(Level.SEVERE, "NO FLOATING IP FOUND");
+        	return null;
         }
-		LOGGER.log(Level.SEVERE, "EXCEPTION IN FLOATING IP");
-		return null;
+    	return resultList;
+	}
+	
+	public List<org.jclouds.openstack.neutron.v2.domain.FloatingIP> tryNeutronFloatingIpApi(){
+		if(novaApi == null){
+			init();
+		}
+		FluentIterable<org.jclouds.openstack.neutron.v2.domain.FloatingIP> neutronFloatingIpList;		
+		Optional<org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi> floatingApiOptional = neutronApi.getFloatingIPApi(DEFAULT_REGION);
+    	
+		org.jclouds.openstack.neutron.v2.extensions.FloatingIPApi floatingNeutronIpApi = null;
+
+    	
+    	if(floatingApiOptional.isPresent()){
+    		floatingNeutronIpApi = 	floatingApiOptional.get();
+    	}else{
+    		LOGGER.log(Level.SEVERE, "----");
+    		LOGGER.log(Level.SEVERE, "Neutron FloatingIP-API also(!) null");
+    		LOGGER.log(Level.SEVERE, "----");
+
+    		throw new RuntimeException();
+    	}
+
+
+		neutronFloatingIpList = floatingNeutronIpApi.list().concat();
+		List<org.jclouds.openstack.neutron.v2.domain.FloatingIP> resultList = new ArrayList<>();
+
+    	for (org.jclouds.openstack.neutron.v2.domain.FloatingIP floatIp : neutronFloatingIpList){
+    		
+    		if(floatIp.getFixedIpAddress() == null){
+    			resultList.add(floatIp);
+    		}
+    		
+    	}
+    	
+    	if(resultList.isEmpty()){
+    		LOGGER.log(Level.SEVERE, "NO FLOATING IP FOUND");
+        	return null;
+        }
+    	return resultList;
 	}
 
 	@Override

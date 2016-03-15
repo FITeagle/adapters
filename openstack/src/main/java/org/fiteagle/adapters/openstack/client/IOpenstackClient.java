@@ -34,7 +34,7 @@ public interface IOpenstackClient {
   
   public abstract void addFloatingIp();
   
-  public abstract List<FloatingIP> listFreeFloatingIps();
+  public abstract List<?> listFreeFloatingIps();
   
   public abstract void addKeyPair(String name, String publicKey,String tmpRegion);
   

@@ -597,7 +597,7 @@ public void refreshConfig() throws ProcessingException {
     }
     
     public void testFloatingIps(){
-        List<FloatingIP> floatingIps = openstackClient.listFreeFloatingIps();
+        List<FloatingIP> floatingIps = (List<FloatingIP>) openstackClient.listFreeFloatingIps();
 LOGGER.log(Level.SEVERE, floatingIps.toString());
     }
 
@@ -633,7 +633,7 @@ LOGGER.log(Level.SEVERE, floatingIps.toString());
     public void run() {
       ServerCreated server = openstackClient.createServer(name,imageId,flavorId,options);
       
-      List<FloatingIP> floatingIps = openstackClient.listFreeFloatingIps();
+      List<FloatingIP> floatingIps = (List<FloatingIP>) openstackClient.listFreeFloatingIps();
       FloatingIP floatingIp = null;
       if(floatingIps != null){
         Iterator<FloatingIP> floatingIpIterator = floatingIps.iterator();
