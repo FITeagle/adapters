@@ -662,7 +662,7 @@ LOGGER.log(Level.SEVERE, floatingIps.toString());
       //TODO: better check whether it's already an URI
 
       Model parsedServerModel =  ModelFactory.createDefaultModel();
-      Resource parsedServer = parsedServerModel.createResource(adapterABox.getLocalName() + server.getId());
+      Resource parsedServer = parsedServerModel.createResource(name);
       Server tmpServer = openstackClient.getServerDetails(server.getId());
 
       int retryCounter = 0;
