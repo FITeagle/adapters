@@ -93,8 +93,8 @@ private String floatingPool;
     this.adapterABox = adapterABox;
     
     Resource adapterType = Omn_domain_pc.VMServer;  
-    this.adapterABox.addProperty(RDF.type,OWL.Class);
-    this.adapterABox.addProperty(RDF.type,Omn.Resource);
+    this.adapterABox.addProperty(RDF.type,adapterType);
+//    this.adapterABox.addProperty(RDF.type,Omn.Resource);
 //    this.adapterABox.addProperty(RDFS.subClassOf, Omn.);
     this.adapterABox.addProperty(RDFS.label,  this.adapterABox.getLocalName());
     this.adapterABox.addProperty(RDFS.comment, "Openstack server");
@@ -104,7 +104,20 @@ private String floatingPool;
     Property latitude = adapterTBox.createProperty("http://www.w3.org/2003/01/geo/wgs84_pos#lat");
     this.adapterABox.addProperty(latitude, "52.516377");
     this.adapterABox.addProperty(longitude, "13.323732");
-    this.adapterABox.addProperty(Omn_lifecycle.canImplement, Omn_domain_pc.VM);
+//    this.adapterABox.addProperty(Omn_lifecycle.canImplement, Omn_domain_pc.VM);
+    
+    final NodeIterator resourceIterator = this.adapterTBox.listObjectsOfProperty(Omn_lifecycle.implements_);
+	if (resourceIterator.hasNext()) {
+	    final Resource resource = resourceIterator.next().asResource();
+
+	    this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
+	    this.adapterABox.getModel().add(resource.getModel());
+	    final ResIterator propIterator = this.adapterTBox.listSubjectsWithProperty(RDFS.domain, resource);
+	    
+	    while (propIterator.hasNext()) {
+		final Property property = this.adapterTBox.getProperty(propIterator.next().getURI());
+	    }
+	}
 
   }
 

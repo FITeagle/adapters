@@ -1,83 +1,28 @@
-@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix owl:   <http://www.w3.org/2002/07/owl#> .
-@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
-@prefix omn:   <http://open-multinet.info/ontology/omn#> .
-@prefix openstack:    <http://open-multinet.info/ontology/resource/openstack#> .
-@prefix openstackvm:  <http://open-multinet.info/ontology/resource/openstackvm#> .
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+@prefix omn:           <http://open-multinet.info/ontology/omn#> .
+@prefix vm-server:   <http://open-multinet.info/ontology/omn-domain-pc/VMServer#> .
+@prefix vm:         <http://open-multinet.info/ontology/omn-domain-pc/VM#> .
 @prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
-@prefix omn-domain-pc: <http://open-multinet.info/ontology/omn-domain-pc#>
+@prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
+@prefix wgs:           <http://www.w3.org/2003/01/geo/wgs84_pos#> .
 
-
-
-
-openstack:images
-        a      owl:AsymmetricProperty ,
-               owl:IrreflexiveProperty ,
-               owl:FunctionalProperty ,
-               owl:ObjectProperty ;
-        rdfs:domain openstack:Openstack ;
-        rdfs:range owl:Thing ;
-        rdfs:label   "Images"@en ;
-        rdfs:comment "Defines the images which are available at the Openstack Instance"@en .
-
-openstackvm:OpenstackVM
-        a                  owl:Class ;
-        rdfs:label         "OpenstackVM"@en ;
-        rdfs:subClassOf    omn:Resource ;
-        omn-lifecycle:implementedBy  openstack:Openstack .
+vm-server:VM-Server
+        a                          owl:Class ;
+        rdfs:label                 "VM-Server"@en ;
+        rdfs:subClassOf            omn:Adapter ;
+        omn-lifecycle:implements   vm:VM ;
+        omn-lifecycle:implements   vm-server:r1%2Esmall .
         
-openstackvm:OpenstackImage
-        a                  owl:Class ;
-        rdfs:label         "Image"@en .
+vm:VM
+        a                            owl:Class ;
+        rdfs:label                   "VM"@en ;
+        rdfs:subClassOf              omn:Resource ;
+        omn-lifecycle:implementedBy  vm-server:VM-Server .
         
-openstackvm:imageid
-        a      owl:DatatypeProperty ;
-        a            owl:FunctionalProperty ;
-        rdfs:label   "The ID of an Openstack Image"@en ;
-        rdfs:domain  openstackvm:OpenstackImage ;
-        rdfs:range   xsd:string .
-
-openstackvm:id
-        a            owl:DatatypeProperty ;
-        a            owl:FunctionalProperty ;
-        rdfs:label   "The ID of an Openstack VM Instance"@en ;
-        rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:range   xsd:string .
-
-openstackvm:image
-        a      owl:AsymmetricProperty ,
-               owl:IrreflexiveProperty ,
-               owl:ObjectProperty ,
-               owl:FunctionalProperty ;
-        rdfs:domain openstackvm:OpenstackVM ;
-        rdfs:range openstackvm:OpenstackImage ;
-        rdfs:label   "The image of the Openstack VM"@en ;
-        rdfs:comment "Defines the image used for the Openstack VM"@en .
-
-openstackvm:status
-        a            owl:DatatypeProperty ;
-        a            owl:FunctionalProperty ;
-        rdfs:label   "The status of the Openstack VM"@en ;
-        rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:range   xsd:string .
-        
-openstackvm:created
-        a             owl:DatatypeProperty ;
-        a            owl:FunctionalProperty ;
-        rdfs:label   "The date when the Openstack VM was created"@en ;
-        rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:range   xsd:string .
-        
-openstackvm:keypairname
-        a             owl:DatatypeProperty ;
-        a            owl:FunctionalProperty ;
-        rdfs:label   "The name of the keypair of the Openstack VM"@en ;
-        rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:range   xsd:string .
-        
-openstackvm:flavor
-        a            owl:DatatypeProperty ;
-        a            owl:FunctionalProperty ;
-        rdfs:label   "The id of the flavor of the Openstack VM"@en ;
-        rdfs:domain  openstackvm:OpenstackVM ;
-        rdfs:range   xsd:integer .
+vm-server:r1%2Esmall
+        a                            owl:Class ;
+        rdfs:label                   "Flavour r1.small"@en ;
+        rdfs:subClassOf              omn:Resource ;
+        omn-lifecycle:implementedBy  vm-server:VM-Server .
