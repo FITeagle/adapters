@@ -142,6 +142,7 @@ private String floatingPool;
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
         r.addProperty(Omn_domain_pc.hasDiskimageLabel, r.getLocalName());
         adapterABox.addProperty(Omn_lifecycle.canImplement, r);
+        r.addProperty(RDFS.subClassOf, Omn.Resource);
         
       }
       adapterABox.addProperty(Omn_lifecycle.canImplement, vmResource);
