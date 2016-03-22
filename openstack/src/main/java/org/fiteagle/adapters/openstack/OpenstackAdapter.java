@@ -93,6 +93,7 @@ private String floatingPool;
     
     Resource adapterType = Omn_domain_pc.VMServer;  
     this.adapterABox.addProperty(RDF.type,adapterType);
+    this.adapterABox.addProperty(RDF.type,Omn.Resource);
     this.adapterABox.addProperty(RDFS.subClassOf,Omn.Resource);
     this.adapterABox.addProperty(RDFS.label,  this.adapterABox.getLocalName());
     this.adapterABox.addProperty(RDFS.comment, "Openstack server");
