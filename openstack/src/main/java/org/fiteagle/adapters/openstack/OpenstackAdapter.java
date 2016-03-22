@@ -115,16 +115,19 @@ private String floatingPool;
     if(flavor.getName().startsWith("r1.")){
     Resource vmResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + flavor.getName());
       vmResource.addProperty(RDF.type, Omn_domain_pc.VM);
-      vmResource.addProperty(RDFS.subClassOf, Omn.Resource);
+//      vmResource.addProperty(RDFS.subClassOf, Omn.Resource);
       vmResource.addProperty(Omn_domain_pc.hasCPU, String.valueOf(flavor.getVcpus()));
       vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
+      vmResource.addProperty(Omn_lifecycle.hasSliverName, vmResource.getLocalName());
       
       for(Resource r: diskImages){
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
-        r.addProperty(Omn_domain_pc.hasDiskimageLabel, r.getNameSpace());
-        adapterABox.addProperty(Omn_lifecycle.canImplement, r);
+        r.addProperty(Omn_domain_pc.hasDiskimageLabel, r.getLocalName());
+//        adapterABox.addProperty(Omn_lifecycle.canImplement, r);
+        
       }
       adapterABox.addProperty(Omn_lifecycle.canImplement, vmResource);
+      adapterABox.addProperty(Omn_resource.hasSliverType, vmResource);
     }
     }
     
