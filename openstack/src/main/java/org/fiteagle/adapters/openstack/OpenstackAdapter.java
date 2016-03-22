@@ -2,6 +2,7 @@ package org.fiteagle.adapters.openstack;
 
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_domain_pc;
+import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import info.openmultinet.ontology.vocabulary.Omn_monitoring;
 import info.openmultinet.ontology.vocabulary.Omn_resource;
@@ -93,8 +94,8 @@ private String floatingPool;
     
     Resource adapterType = Omn_domain_pc.VMServer;  
     this.adapterABox.addProperty(RDF.type,adapterType);
-    this.adapterABox.addProperty(RDF.type,Omn.Resource);
-    this.adapterABox.addProperty(RDFS.subClassOf,Omn.Resource);
+//    this.adapterABox.addProperty(RDF.type,Omn.Resource);
+//    this.adapterABox.addProperty(RDFS.subClassOf, Omn.);
     this.adapterABox.addProperty(RDFS.label,  this.adapterABox.getLocalName());
     this.adapterABox.addProperty(RDFS.comment, "Openstack server");
 
@@ -116,8 +117,9 @@ private String floatingPool;
     for(Flavor flavor: flavors.getList()){
     if(flavor.getName().startsWith("r1.")){
     Resource vmResource = adapterABox.getModel().createResource(adapterABox.getNameSpace() + flavor.getName());
-      vmResource.addProperty(RDF.type, Omn_domain_pc.VM);
-//      vmResource.addProperty(RDFS.subClassOf, Omn.Resource);
+    vmResource.addProperty(RDF.type, Omn_domain_pc.VM);
+    vmResource.addProperty(Omn_lifecycle.implementedBy, Omn_domain_pc.VMServer);
+      vmResource.addProperty(RDFS.subClassOf, Omn.Resource);
       vmResource.addProperty(Omn_domain_pc.hasCPU, String.valueOf(flavor.getVcpus()));
       vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
       vmResource.addProperty(Omn_lifecycle.hasSliverName, vmResource.getLocalName());
