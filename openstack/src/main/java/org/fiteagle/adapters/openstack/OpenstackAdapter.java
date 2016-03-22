@@ -136,7 +136,8 @@ private String floatingPool;
       vmResource.addProperty(Omn_domain_pc.hasCPU, String.valueOf(flavor.getVcpus()));
       vmResource.addProperty(Omn_lifecycle.hasID,flavor.getId());
       vmResource.addProperty(Omn_lifecycle.hasSliverName, vmResource.getLocalName());
-      
+      vmResource.addProperty(RDF.type, Omn_resource.SliverType);
+
       for(Resource r: diskImages){
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
         r.addProperty(Omn_domain_pc.hasDiskimageLabel, r.getLocalName());
