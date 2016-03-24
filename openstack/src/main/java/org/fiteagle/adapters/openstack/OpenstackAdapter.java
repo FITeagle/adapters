@@ -33,6 +33,7 @@ import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
+import org.fiteagle.api.tripletStoreAccessor.TripletStoreAccessor;
 import org.jclouds.openstack.nova.v2_0.domain.Flavor;
 import org.jclouds.openstack.nova.v2_0.domain.FloatingIP;
 import org.jclouds.openstack.nova.v2_0.domain.Image;
@@ -141,7 +142,7 @@ private String floatingPool;
       for(Resource r: diskImages){
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
         r.addProperty(Omn_domain_pc.hasDiskimageLabel, r.getLocalName());
-        adapterABox.addProperty(Omn_lifecycle.canImplement, r);
+//        adapterABox.addProperty(Omn_lifecycle.canImplement, r);
         r.addProperty(RDFS.subClassOf, Omn.Resource);
         
       }
@@ -183,7 +184,7 @@ private String floatingPool;
       Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" +image.getName() );
       diskImage.addProperty(RDF.type, Omn_domain_pc.DiskImage);
       diskImage.addProperty(Omn_domain_pc.hasUUID,image.getId());
-      diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, image.getId());
+      diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, diskImage.getURI());
       diskimages.add(diskImage);
 
     }
@@ -194,6 +195,7 @@ private String floatingPool;
   @Override
   public Model createInstance(String instanceURI, Model newInstanceModel)  {
 
+//	Model vmModel = TripletStoreAccessor.getResource(instanceURI);
     Resource requestedVM = newInstanceModel.getResource(instanceURI);
     LOGGER.log(Level.SEVERE, MessageUtil.serializeModel(requestedVM.getModel(), IMessageBus.SERIALIZATION_NTRIPLE));
     String diskImageURI = getRequestedTypeURI(requestedVM);
