@@ -142,7 +142,9 @@ private String floatingPool;
       for(Resource r: diskImages){
         vmResource.addProperty(Omn_domain_pc.hasDiskImage, r);
         r.addProperty(Omn_domain_pc.hasDiskimageLabel, r.getLocalName());
-//        adapterABox.addProperty(Omn_lifecycle.canImplement, r);
+//        r.addProperty(Omn_lifecycle.implementedBy, vmResource);
+//        vmResource.addProperty(Omn_lifecycle.implements_, r);
+
         r.addProperty(RDFS.subClassOf, Omn.Resource);
         
       }
@@ -181,7 +183,7 @@ private String floatingPool;
     
     Images images = openstackClient.listImages();
     for(Image image : images.getList()){
-      Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" +image.getName() );
+      Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" + escapeNames(image.getName()) );
       diskImage.addProperty(RDF.type, Omn_domain_pc.DiskImage);
       diskImage.addProperty(Omn_domain_pc.hasUUID,image.getId());
       diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, diskImage.getURI());
@@ -190,6 +192,12 @@ private String floatingPool;
     }
     
     return diskimages;
+  }
+  
+  private String escapeNames(String name){
+	  String blub = name.replaceAll("\\s+","_");
+  	LOGGER.log(Level.SEVERE, "Replaced DiskName" + name +" with "+ blub);
+	  return blub;
   }
 
   @Override
