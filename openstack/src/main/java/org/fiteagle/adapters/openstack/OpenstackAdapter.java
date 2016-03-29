@@ -208,9 +208,10 @@ private String floatingPool;
 //	Model vmModel = TripletStoreAccessor.getResource(instanceURI);
     Resource requestedVM = newInstanceModel.getResource(instanceURI);
     LOGGER.log(Level.SEVERE, MessageUtil.serializeModel(requestedVM.getModel(), IMessageBus.SERIALIZATION_NTRIPLE));
-    String diskImageURI = getRequestedTypeURI(requestedVM);
+    String diskImageURI = getRequestedDiskImageUri(requestedVM);
+    String diskImageID = getDiskImageId(diskImageURI);
     String flavorId = getFlavorId(requestedVM);
-    diskImageURI = getDiskImageId(diskImageURI);
+//    diskImageURI = getDiskImageId(diskImageURI);
  
     
     
@@ -254,7 +255,7 @@ private String floatingPool;
 //    }
    
     try {
-      CreateVM createVM = new CreateVM(instanceURI, diskImageURI, flavorId, options, this.listener, username);
+      CreateVM createVM = new CreateVM(instanceURI, diskImageID, flavorId, options, this.listener, username);
       if(monitoringService != null){
         createVM.setMonitoringService(monitoringService);
       }
@@ -384,29 +385,30 @@ private String floatingPool;
   }
   
   private String getDiskImageId(String diskImageUri) {
-	    String diskImageURI = null;
+	    String diskImageID = null;
 
 	      Resource diskImage = this.adapterABox.getModel().getResource(diskImageUri);
 
 
-	       diskImageURI = diskImage.getProperty(Omn_domain_pc.hasDiskimageURI).getString();
+	       diskImageID = diskImage.getProperty(Omn_domain_pc.hasUUID).getString();
 	    
-	    return diskImageURI;
+	    return diskImageID;
 	  }
 
-  private String getRequestedTypeURI(Resource requestedVM) {
-    StmtIterator stmtIterator = requestedVM.listProperties(RDF.type);
+  private String getRequestedDiskImageUri(Resource requestedVM) {
+    NodeIterator stmtIterator = requestedVM.getModel().listObjectsOfProperty(Omn_domain_pc.hasDiskimageLabel);
     String requestedType = null;
     while (stmtIterator.hasNext()){
-      Statement statement = stmtIterator.nextStatement();
-      RDFNode one = statement.getObject();
-      boolean isNode =  one.equals(Omn_resource.Node);
-      if(!isNode){
-        requestedType = statement.getObject().asResource().getURI();
-        break;
-      }
+      RDFNode statement = stmtIterator.next();
+      String one = statement.asLiteral().getString();
+//      boolean isNode =  one.equals(Omn_resource.Node);
+//      if(!isNode){
+//        requestedType = statement.getObject().asResource().getURI();
+//        break;
+//      }
+      return one;
     }
-    return requestedType;
+    return null;
   }
 
   @Override
