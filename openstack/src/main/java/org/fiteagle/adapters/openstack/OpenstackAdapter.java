@@ -188,6 +188,7 @@ private String floatingPool;
       diskImage.addProperty(Omn_domain_pc.hasDiskimageDescription,escapeNames(image.getName()));
       diskImage.addProperty(Omn_domain_pc.hasUUID,image.getId());
       diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, diskImage.getURI());
+      diskImage.addProperty(Omn_domain_pc.hasDiskimageLabel, diskImage.getURI());
       diskimages.add(diskImage);
 
     }
