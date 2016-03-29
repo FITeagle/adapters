@@ -145,7 +145,7 @@ private String floatingPool;
 //        r.addProperty(Omn_lifecycle.implementedBy, vmResource);
 //        vmResource.addProperty(Omn_lifecycle.implements_, r);
 
-        r.addProperty(RDFS.subClassOf, Omn.Resource);
+       // r.addProperty(RDFS.subClassOf, Omn.Resource);
         
       }
       adapterABox.addProperty(Omn_lifecycle.canImplement, vmResource);
@@ -185,6 +185,7 @@ private String floatingPool;
     for(Image image : images.getList()){
       Resource diskImage = adapterABox.getModel().createResource(adapterABox.getNameSpace() + "diskImage/" + escapeNames(image.getName()) );
       diskImage.addProperty(RDF.type, Omn_domain_pc.DiskImage);
+      diskImage.addProperty(Omn_domain_pc.hasDiskimageDescription,escapeNames(image.getName()));
       diskImage.addProperty(Omn_domain_pc.hasUUID,image.getId());
       diskImage.addProperty(Omn_domain_pc.hasDiskimageURI, diskImage.getURI());
       diskimages.add(diskImage);
