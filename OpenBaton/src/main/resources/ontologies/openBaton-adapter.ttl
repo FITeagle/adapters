@@ -1,0 +1,93 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix omn: <http://open-multinet.info/ontology/omn#> .
+@prefix osco:  <http://opensdncore.org/ontology/> .
+@prefix openbaton-adapter: <http://open-multinet.info/ontology/resource/openbaton-adapter#> .
+@prefix openbaton: <http://open-multinet.info/ontology/resource/openbaton#> .
+@prefix omn-lifecycle: <http://open-multinet.info/ontology/omn-lifecycle#> .
+@prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
+@prefix wgs: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+openbaton:OpenBatonAdapter
+    omn-lifecycle:implements   openbaton:MME ;
+    omn-lifecycle:implements   openbaton:FiveGCore ;
+    omn-lifecycle:implements   openbaton:DomainNameSystem ;
+    omn-lifecycle:implements   openbaton:Gateway ;
+    omn-lifecycle:implements   openbaton:ENodeB ;
+    omn-lifecycle:implements   openbaton:NetworkServiceRecord ;
+    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionManager ;
+    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionDescriptor ;
+    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionPackage ;
+    omn-lifecycle:implements   openbaton:VirtualDeploymentUnit ;
+    omn-lifecycle:implements   openbaton:VimInstance .
+    
+    
+openbaton:MME					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:DomainNameSystem			omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:Gateway				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:ENodeB				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:FiveGCore				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:NetworkServiceRecord 			omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:VirtualNetworkFunctionManager 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:VirtualNetworkFunctionDescriptor 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:VirtualNetworkFunctionPackage 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:VirtualDeploymentUnit 		omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:VimInstance 				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+    
+    
+    
+############### repeated from the EPC ontology:
+    
+openbaton:MME rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+
+openbaton:FiveGCore rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+
+openbaton:DomainNameSystem rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+
+openbaton:Gateway rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+
+openbaton:ENodeB rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+      
+    
+openbaton:NetworkServiceRecord rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+      
+    
+openbaton:VirtualNetworkFunctionManager rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+      
+    
+openbaton:VirtualNetworkFunctionDescriptor rdf:type owl:Class ;
+    
+  rdfs:subClassOf omn:Resource .
+      
+    
+openbaton:VirtualNetworkFunctionPackage rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+      
+    
+openbaton:VirtualDeploymentUnit rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+      
+    
+openbaton:VimInstance rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+    
+    

@@ -1,0 +1,113 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<name>FITeagle :: Adapters :: OpenBaton</name>
+	<groupId>org.fiteagle.adapters</groupId>
+	<artifactId>OpenBaton</artifactId>
+	<packaging>war</packaging>
+	<parent>
+		<groupId>org.fiteagle</groupId>
+		<artifactId>adapters</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+	
+	  <repositories>
+        <repository>
+            <id>OpenBaton-Repo</id>
+            <url>http://get.openbaton.org:8081/nexus/content/groups/public</url>
+        </repository>
+    </repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.fiteagle.adapters</groupId>
+			<artifactId>abstract</artifactId>
+			<version>0.1-SNAPSHOT</version>
+			<exclusions>
+						<exclusion>
+							<artifactId>resteasy-client</artifactId>
+							<groupId>org.jboss.resteasy</groupId>
+						</exclusion>
+						<exclusion>
+							<artifactId>hdt-java-core</artifactId>
+							<groupId>org.rdfhdt.hdt-java-parent</groupId>
+						</exclusion>
+						<exclusion>
+							<artifactId>hdt-java-core</artifactId>
+							<groupId>org.rdfhdt</groupId>
+						</exclusion>
+			</exclusions>
+					
+					
+		</dependency>
+				<dependency>
+			<groupId>org.openbaton</groupId>
+			<artifactId>sdk</artifactId>
+			<version>1.0.2-package</version>
+				</dependency>
+
+				<dependency>
+					<groupId>org.fiteagle</groupId>
+					<artifactId>api</artifactId>
+					<version>0.1-SNAPSHOT</version>
+					<exclusions>
+						<exclusion>
+							<artifactId>sisu-guava</artifactId>
+							<groupId>org.sonatype.sisu</groupId>
+						</exclusion>
+						<exclusion>
+							<artifactId>hdt-java-core</artifactId>
+							<groupId>org.rdfhdt</groupId>
+						</exclusion>
+						<exclusion>
+							<artifactId>httpclient</artifactId>
+							<groupId>org.apache.httpcomponents</groupId>
+						</exclusion>
+<!-- 						<exclusion> -->
+<!-- 							<artifactId>gson</artifactId> -->
+<!-- 							<groupId>com.google.code.gson</groupId> -->
+<!-- 						</exclusion> -->
+					</exclusions>
+				</dependency>
+				
+				
+				<dependency>
+					<groupId>org.rdfhdt</groupId>
+					<artifactId>hdt-jena</artifactId>
+					<version>1.1.1-SNAPSHOT</version>
+					<exclusions>
+						<exclusion>
+							<artifactId>hdt-java-core</artifactId>
+							<groupId>org.rdfhdt</groupId>
+						</exclusion>
+					</exclusions>
+				</dependency>
+				<dependency>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>resteasy-jaxrs</artifactId>
+					<version>${resteasy.version}</version>
+					<exclusions>
+						<exclusion>
+							<artifactId>httpclient</artifactId>
+							<groupId>org.apache.httpcomponents</groupId>
+						</exclusion>
+					</exclusions>
+				</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+			<plugin>
+				<groupId>org.wildfly.plugins</groupId>
+				<artifactId>wildfly-maven-plugin</artifactId>
+				<version>${wildfly.version}</version>
+				<configuration>
+					<skip>false</skip>
+					<filename>${project.build.finalName}.war</filename>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
