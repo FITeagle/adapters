@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,10 +27,12 @@ import org.openbaton.catalogue.mano.descriptor.VirtualDeploymentUnit;
 import org.openbaton.catalogue.nfvo.Configuration;
 import org.openbaton.catalogue.nfvo.ConfigurationParameter;
 
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import info.openmultinet.ontology.vocabulary.Fiveg;
+import info.openmultinet.ontology.vocabulary.OpenBaton;
 
 public class ENodeB extends OpenBatonService{
 
@@ -138,33 +141,33 @@ private void initVariables(){
 				//Initiate the vdu params
 				vduSet = new HashSet<VirtualDeploymentUnit>();
 
-				VirtualDeploymentUnit vdu = new VirtualDeploymentUnit();
-				vdu.setScale_in_out(1);
-				vdu.setVimInstanceName("vim-instance");
-				// TODO set VM-Image correctly 
-				Set<String> imageSet = new HashSet<String>();
-				imageSet.add("Ubuntu 14.04 Cloud based");
-				vdu.setVm_image(imageSet);
+					VirtualDeploymentUnit vdu = new VirtualDeploymentUnit();
+					vdu.setScale_in_out(1);
+					vdu.setVimInstanceName("vim-instance");
+					// TODO set VM-Image correctly 
+					Set<String> imageSet = new HashSet<String>();
+					imageSet.add("Ubuntu 14.04 Cloud based");
+					vdu.setVm_image(imageSet);
 				
-					Set<VNFComponent> vnfdSet = new HashSet<VNFComponent>();
-						VNFComponent vnfComponent = new VNFComponent();
-							VNFDConnectionPoint vnfdConnectionPoint = new VNFDConnectionPoint();
-							Set<VNFDConnectionPoint> vnfdConnecSet = new HashSet<VNFDConnectionPoint>();
-						
-							// First Connection Point in above VNFComponent
-							vnfdConnectionPoint.setVirtual_link_reference("mgmt");
-							vnfdConnecSet.add(vnfdConnectionPoint);
+						Set<VNFComponent> vnfdSet = new HashSet<VNFComponent>();
+							VNFComponent vnfComponent = new VNFComponent();
+								VNFDConnectionPoint vnfdConnectionPoint = new VNFDConnectionPoint();
+								Set<VNFDConnectionPoint> vnfdConnecSet = new HashSet<VNFDConnectionPoint>();
 							
-							// Next Connection Point. And so on
-							vnfdConnectionPoint = new VNFDConnectionPoint();
-							vnfdConnectionPoint.setVirtual_link_reference("net_d");
-							vnfdConnectionPoint.setFloatingIp("random");
-							vnfdConnecSet.add(vnfdConnectionPoint);
-
-							vnfdConnectionPoint = new VNFDConnectionPoint();
-							vnfdConnectionPoint.setVirtual_link_reference("net_c");
-							vnfdConnectionPoint.setFloatingIp("random");
-							vnfdConnecSet.add(vnfdConnectionPoint);
+								// First Connection Point in above VNFComponent
+								vnfdConnectionPoint.setVirtual_link_reference("mgmt");
+								vnfdConnecSet.add(vnfdConnectionPoint);
+								
+								// Next Connection Point. And so on
+								vnfdConnectionPoint = new VNFDConnectionPoint();
+								vnfdConnectionPoint.setVirtual_link_reference("net_d");
+								vnfdConnectionPoint.setFloatingIp("random");
+								vnfdConnecSet.add(vnfdConnectionPoint);
+	
+								vnfdConnectionPoint = new VNFDConnectionPoint();
+								vnfdConnectionPoint.setVirtual_link_reference("net_c");
+								vnfdConnectionPoint.setFloatingIp("random");
+								vnfdConnecSet.add(vnfdConnectionPoint);
 						
 						
 						vnfComponent.setConnection_point(vnfdConnecSet);
@@ -207,8 +210,82 @@ private void initVariables(){
 		resource.addProperty(RDF.type, Fiveg.ENodeB);
 		resource.addProperty(RDF.type,
 				info.openmultinet.ontology.vocabulary.Omn.Resource);
-
 		super.parseToModel(resource);
+
+		if (this.getServiceName() != null && !this.getServiceName().equals("") ) {
+			String flavour = this.getServiceName();
+			resource.addLiteral(OpenBaton.instanceName, flavour);
+		}
+		
+		if (this.getVendor() != null && !this.getVendor().equals("") ) {
+			String vendor = this.getVendor();
+			resource.addLiteral(OpenBaton.vendor, vendor);
+		}
+		
+		if (this.getVersion() != null && !this.getVersion().equals("") ) {
+			String version = this.getVersion();
+			resource.addLiteral(OpenBaton.version, version);
+		}
+		
+		if (this.getLifecycleEvents() != null && !this.getLifecycleEvents().isEmpty() ) {
+			Iterator<LifecycleEvent> keySet = getLifecycleEvents().iterator();
+			while(keySet.hasNext()){
+				LifecycleEvent event = keySet.next();
+				String eventName = event.getEvent().toString();
+
+//				List<String> list = getLifecycleEvents().get(event);
+				Property tmpProperty = null;
+				switch (eventName){
+			case "CONFIGURE":
+				tmpProperty = OpenBaton.configureEvent;
+				break;
+			case "INSTANTIATE":
+				tmpProperty = OpenBaton.instantiateEvent;
+				break;
+			case "START":
+				tmpProperty = OpenBaton.startEvent;
+				break;
+			default:
+				LOGGER.log(Level.SEVERE,"LifecycleEvent doesn't equal CONFIGURE, INSTANTIATE or START");
+				LOGGER.log(Level.SEVERE,"Couldn't add to Database");
+				break;
+				}
+				
+				if(tmpProperty != null){
+					Iterator<String> listIterator = event.getLifecycle_events().iterator();
+					while(listIterator.hasNext()){
+						resource.addLiteral(tmpProperty, listIterator.next());	
+					}
+				}
+				
+					
+			}
+		}
+		
+		if (this.getEndpoint() != null && !this.getEndpoint().equals("") ) {
+			String endpoint = this.getEndpoint();
+			resource.addLiteral(OpenBaton.endpoint, endpoint);
+		}
+		
+		if (this.getType() != null && !this.getType().equals("") ) {
+			String type = this.getType();
+			resource.addLiteral(OpenBaton.type, type);
+		}
+		
+		if (this.getVimInstanceName() != null && !this.getVimInstanceName().equals("") ) {
+			String vimInstanceName = this.getVimInstanceName();
+			resource.addLiteral(OpenBaton.vimInstanceName, vimInstanceName);
+		}
+		
+		
+		if (this.getScaleInOut() != -1 ) {
+			Integer scaleInOut = this.getScaleInOut();
+			resource.addLiteral(OpenBaton.scaleInOut, scaleInOut.toString());
+		}
+		if (this.getDeploymentFlavour() != null && !this.getDeploymentFlavour().equals("") ) {
+			String flavour = this.getDeploymentFlavour().getFlavour_key();
+			resource.addLiteral(OpenBaton.deploymentFlavour, flavour);
+		}
 
 	}
 

@@ -126,6 +126,26 @@
       
       rdfs:comment "MME Resource"@en .
 
+###  http://open-multinet.info/ontology/resource/openbaton#MME
+
+:UE rdf:type owl:Class ;
+
+      rdfs:label "UE Resource"@en ;
+      
+      rdfs:subClassOf :OpenBatonResource ;
+      
+      rdfs:comment "UE Resource"@en .
+
+###  http://open-multinet.info/ontology/resource/openbaton#MME
+
+:SgwuPgwu rdf:type owl:Class ;
+
+      rdfs:label "SgwuPgwu Resource"@en ;
+      
+      rdfs:subClassOf :OpenBatonResource ;
+      
+      rdfs:comment "SgwuPgwu Resource"@en .
+
 ###  http://open-multinet.info/ontology/resource/openbaton#FiveGCore
 
 :FiveGCore rdf:type owl:Class ;

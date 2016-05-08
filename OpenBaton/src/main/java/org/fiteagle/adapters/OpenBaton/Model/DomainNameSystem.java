@@ -249,20 +249,11 @@ public class DomainNameSystem extends OpenBatonService {
 			resource.addLiteral(OpenBaton.vimInstanceName, vimInstanceName);
 		}
 		
-//		if (this.getVmImage() != null && !this.getVmImage().isEmpty() ) {
-//			Iterator<?> vmImage = this.getVmImage().iterator();
-//			while(vmImage.hasNext()){
-//				resource.addLiteral(OpenBaton.vmImage, vmImage.next());
-//			}		}
 		
 		if (this.getScaleInOut() != -1 ) {
 			Integer scaleInOut = this.getScaleInOut();
 			resource.addLiteral(OpenBaton.scaleInOut, scaleInOut.toString());
 		}
-//		if (this.getDeploymentFlavour() != null && !this.getDeploymentFlavour().equals("") ) {
-//			String flavour = this.getDeploymentFlavour();
-//			resource.addLiteral(OpenBaton.deploymentFlavour, flavour);
-//		}
 		
 	}
 

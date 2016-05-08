@@ -36,6 +36,10 @@ public class MME extends OpenBatonService {
 	private static final Logger LOGGER = Logger.getLogger(MME.class
 			.toString());
 
+	/**
+	 * The Config-Files are now Generic, that means that all Classes have the same variables and are build the same way
+	 */
+	
 	private String serviceName;
 	private String vendor;
 	private String version;
@@ -73,7 +77,10 @@ public class MME extends OpenBatonService {
 		this.vendor = "fokus";
 		this.version = "0.1";
 		
-		//Initiate the lifecycleEvents
+		/**
+		 * Adds scripts to each Lifecycle-event that should be startet when reached
+		 * First start all Scripts in the CONFIGURE LifecycleEvent, than INSTANTIATE and last START
+		 */
 				lifecycleEvents = new HashSet<LifecycleEvent>();
 				
 				LifecycleEvent event = new LifecycleEvent();
@@ -112,7 +119,10 @@ public class MME extends OpenBatonService {
 				lifecycleEvents.add(event);
 				
 				
-				//Initiate the Configuration Parameter
+				/**
+				 * Setting all necessary Parameters for the Instance to work
+				 * They are all copied from the JSON example file
+				 */
 				this.configurationParameter = new HashMap<>();
 				this.configurationParameter.put("var_num_intf", "2");
 				this.configurationParameter.put("var_mgmt_network", "mgmt");
@@ -144,17 +154,19 @@ public class MME extends OpenBatonService {
 				}
 				configuration.setConfigurationParameters(tmpConfs);
 				
-				//Initiate the vdu params
+				
+				//Initiate the VirtualDeploymentUnit parameters
 				vduSet = new HashSet<VirtualDeploymentUnit>();
 
 					VirtualDeploymentUnit vdu = new VirtualDeploymentUnit();
 					vdu.setScale_in_out(1);
 					vdu.setVimInstanceName("vim-instance");
-					// TODO set VM-Image correctly 
 					Set<String> imageSet = new HashSet<String>();
 					imageSet.add("Ubuntu 14.04 Cloud based");
 					vdu.setVm_image(imageSet);
 				
+						// Adding Networks in which this instance is allowed to communicate
+						// Also sayin if the Network has an Floating Ip or not
 						Set<VNFComponent> vnfdSet = new HashSet<VNFComponent>();
 							VNFComponent vnfComponent = new VNFComponent();
 								VNFDConnectionPoint vnfdConnectionPoint = new VNFDConnectionPoint();
@@ -169,7 +181,7 @@ public class MME extends OpenBatonService {
 								vnfdConnecSet.add(vnfdConnectionPoint);
 
 							
-							
+							// Vdu [has] Set(VNFComponents), VNFComponent [has] Set(VNFDConnectionPoint)
 							vnfComponent.setConnection_point(vnfdConnecSet);
 							vnfdSet.add(vnfComponent);
 					vdu.setVnfc(vnfdSet);
@@ -178,7 +190,7 @@ public class MME extends OpenBatonService {
 					
 				vduSet.add(vdu);
 				
-				//Initiate Virtual Links
+				//Initiate Virtual Links for this Instance
 				virtualLinkSet = new HashSet<InternalVirtualLink>();
 				
 				InternalVirtualLink virtualLink = new InternalVirtualLink();

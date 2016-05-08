@@ -27,8 +27,10 @@ import org.fiteagle.adapters.OpenBaton.Model.HomeSubscriberService;
 import org.fiteagle.adapters.OpenBaton.Model.MME;
 import org.fiteagle.adapters.OpenBaton.Model.OpenBatonGeneric;
 import org.fiteagle.adapters.OpenBaton.Model.ServiceContainer;
+import org.fiteagle.adapters.OpenBaton.Model.SgwuPgwu;
 import org.fiteagle.adapters.OpenBaton.Model.Switch;
 import org.fiteagle.adapters.OpenBaton.Model.Topology;
+import org.fiteagle.adapters.OpenBaton.Model.UE;
 import org.fiteagle.adapters.OpenBaton.dm.OpenBatonAdapterMDBSender;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
@@ -78,6 +80,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 //        this.adapterABox.addProperty(Omn_lifecycle.canImplement, Omn_domain_pc.PC);
         openBatonClient = new OpenBatonClient(this);
         
+        
+        /**
+         *  Looking up all Resources that belongs to the Adapter and will be shown in SFA as Nodes. 
+         */
 		Model implementables = OntologyModelUtil.loadModel(
 				"ontologies/openBaton-adapter.ttl",
 				IMessageBus.SERIALIZATION_TURTLE);
@@ -121,6 +127,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 							+ MessageUtil.serializeModel(configureModel,
 									IMessageBus.SERIALIZATION_TURTLE));
 		}
+		
 		// if the instance is in the list of instances in the adapter
 		if (this.getInstanceList().containsKey(instanceURI)) {
 
@@ -210,25 +217,28 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		// Check which Ressource should be created
 		if (resource.hasProperty(RDF.type, OpenBaton.Gateway)) {
 
-			final Gateway fiveg = new Gateway(this, instanceURI);
-			this.getInstanceList().put(instanceURI, fiveg);
+			final Gateway openBaton = new Gateway(this, instanceURI);
+			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			return this.parseToModel(fiveg);
+			openBatonClient.createGateway(openBaton, null);
+			return this.parseToModel(openBaton);
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.DomainNameSystem)) {
 
-			final DomainNameSystem fiveg = new DomainNameSystem(this,
+			final DomainNameSystem openBaton = new DomainNameSystem(this,
 					instanceURI);
-			this.getInstanceList().put(instanceURI, fiveg);
+			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			return this.parseToModel(fiveg);
+			openBatonClient.createDomainNameSystem(openBaton, null);
+			return this.parseToModel(openBaton);
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.ENodeB)) {
 
-			final ENodeB fiveg = new ENodeB(this, instanceURI);
-			this.getInstanceList().put(instanceURI, fiveg);
+			final ENodeB openBaton = new ENodeB(this, instanceURI);
+			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			return this.parseToModel(fiveg);
+			openBatonClient.createENodeB(openBaton, null);
+			return this.parseToModel(openBaton);
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.Switch)) {
 
@@ -280,7 +290,27 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			Model model = this.parseToModel(fiveg);
 			return model;
 
-		} else if (resource.hasProperty(RDF.type, Osco.ServiceContainer)) {
+		}else if (resource.hasProperty(RDF.type, OpenBaton.UE)) {
+
+			final UE openBaton = new UE(this,
+					instanceURI);
+			this.getInstanceList().put(instanceURI, openBaton);
+			this.updateInstance(instanceURI, newInstanceModel);
+			openBatonClient.createUe(openBaton,null);
+			Model model = this.parseToModel(openBaton);
+			return model;
+
+		}else if (resource.hasProperty(RDF.type, OpenBaton.SgwuPgwu)) {
+
+			final SgwuPgwu openBaton = new SgwuPgwu(this,
+					instanceURI);
+			this.getInstanceList().put(instanceURI, openBaton);
+			this.updateInstance(instanceURI, newInstanceModel);
+			openBatonClient.createSgwuPgwu(openBaton,null);
+			Model model = this.parseToModel(openBaton);
+			return model;
+
+		}else if (resource.hasProperty(RDF.type, Osco.ServiceContainer)) {
 			if (LOGGER.isLoggable(Level.WARNING)) {
 				LOGGER.warning("createInstance: Creating ServiceContainer "
 						+ instanceURI);
@@ -354,6 +384,12 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		}else if (fivegGeneric instanceof MME) {
 			MME mme = (MME) fivegGeneric;
 			mme.parseToModel(resource);
+		}else if (fivegGeneric instanceof UE) {
+			UE ue = (UE) fivegGeneric;
+			ue.parseToModel(resource);
+		}else if (fivegGeneric instanceof SgwuPgwu) {
+			SgwuPgwu sgwuPgwu = (SgwuPgwu) fivegGeneric;
+			sgwuPgwu.parseToModel(resource);
 		}else if (fivegGeneric instanceof FiveGCore) {
 			FiveGCore fiveG = (FiveGCore) fivegGeneric;
 			fiveG.parseToModel(resource);
@@ -365,30 +401,26 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		return resource.getModel();
 	}
 	
-	public Model testCreateInstance(String instanceURI, Model newInstanceModel)
-			throws ProcessingException, InvalidRequestException {
-		
-		Resource resource = newInstanceModel.getResource(instanceURI);
-
-		if (resource.hasProperty(RDF.type, OpenBaton.NetworkServiceDescriptor)) {
-
-//			final Gateway fiveg = new Gateway(this, instanceURI);
-//			this.getInstanceList().put(instanceURI, fiveg);
-//			this.updateInstance(instanceURI, modelCreate);
-			
-//			NetworkServiceDescriptor netDescriptor = openBatonClient.createNetworkServiceDescriptor();
-			return null;
-//			return this.parseToModel(netDescriptor);
-
-		}
-		
-		return null;
-	}
-	
-//	public HashMap<String, OpenBatonGeneric> getInstanceList() {
-//		return instanceList;
+//	public Model testCreateInstance(String instanceURI, Model newInstanceModel)
+//			throws ProcessingException, InvalidRequestException {
+//		
+//		Resource resource = newInstanceModel.getResource(instanceURI);
+//
+//		if (resource.hasProperty(RDF.type, OpenBaton.NetworkServiceDescriptor)) {
+//
+////			final Gateway fiveg = new Gateway(this, instanceURI);
+////			this.getInstanceList().put(instanceURI, fiveg);
+////			this.updateInstance(instanceURI, modelCreate);
+//			
+////			NetworkServiceDescriptor netDescriptor = openBatonClient.createNetworkServiceDescriptor();
+//			return null;
+////			return this.parseToModel(netDescriptor);
+//
+//		}
+//		
+//		return null;
 //	}
-
+	
 	@Override
 	public void deleteInstance(String instanceURI)
 			throws InstanceNotFoundException, InvalidRequestException,

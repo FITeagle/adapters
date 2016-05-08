@@ -12,6 +12,8 @@
 
 openbaton:OpenBatonAdapter
     omn-lifecycle:implements   openbaton:MME ;
+    omn-lifecycle:implements   openbaton:UE ;
+    omn-lifecycle:implements   openbaton:SgwuPgwu ;
     omn-lifecycle:implements   openbaton:FiveGCore ;
     omn-lifecycle:implements   openbaton:DomainNameSystem ;
     omn-lifecycle:implements   openbaton:Gateway ;
@@ -25,6 +27,8 @@ openbaton:OpenBatonAdapter
     
     
 openbaton:MME					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:UE					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+openbaton:SgwuPgwu				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
 openbaton:DomainNameSystem			omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
 openbaton:Gateway				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
 openbaton:ENodeB				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
@@ -41,6 +45,14 @@ openbaton:VimInstance 				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter
 ############### repeated from the EPC ontology:
     
 openbaton:MME rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+
+openbaton:UE rdf:type owl:Class ;
+      
+  rdfs:subClassOf omn:Resource .
+
+openbaton:SgwuPgwu rdf:type owl:Class ;
       
   rdfs:subClassOf omn:Resource .
 
