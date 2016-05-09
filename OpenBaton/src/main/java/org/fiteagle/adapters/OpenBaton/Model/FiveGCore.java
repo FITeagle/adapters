@@ -1,18 +1,25 @@
 package org.fiteagle.adapters.OpenBaton.Model;
 
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.fiteagle.adapters.OpenBaton.OpenBatonAdapter;
 import org.fiteagle.api.core.OntologyModelUtil;
+import org.openbaton.catalogue.mano.common.ConnectionPoint;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.openbaton.catalogue.mano.descriptor.VNFComponent;
+import org.openbaton.catalogue.mano.descriptor.VNFDConnectionPoint;
+import org.openbaton.catalogue.mano.descriptor.VirtualDeploymentUnit;
+import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
+import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import info.openmultinet.ontology.vocabulary.Fiveg;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 import info.openmultinet.ontology.vocabulary.OpenBaton;
@@ -27,6 +34,7 @@ public class FiveGCore extends OpenBatonService {
 	private NetworkServiceDescriptor nsd;
 	private SgwuPgwu sgwupgwu;
 	private UE ue;
+	private NetworkServiceRecord nsr;
 	
 	// Also as VirtualNetworkFunctionDescriptors
 	private VirtualNetworkFunctionDescriptor mmeVnf ;
@@ -53,16 +61,46 @@ public class FiveGCore extends OpenBatonService {
 	    Model parsedServerModel =  resource.getModel();
 	    
 	    // If available there will be added a LogInService to the NSD Instance for SSH
-		if(nsd != null){
-			Resource loginService = parsedServerModel.createResource(OntologyModelUtil
-		            .getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
-		 loginService.addProperty(RDF.type, Omn_service.LoginService);
-		 loginService.addProperty(Omn_service.authentication,"ssh-keys");
-		 // Just using Dummy data
-		 loginService.addProperty(Omn_service.username, nsd.getName());
-		 loginService.addProperty(Omn_service.hostname, "192.76.87.281");
-		 loginService.addProperty(Omn_service.port,"22");
-		    resource.addProperty(Omn.hasService, loginService);
+//		if(nsd != null){
+//			Resource loginService = parsedServerModel.createResource(OntologyModelUtil
+//		            .getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+//		 loginService.addProperty(RDF.type, Omn_service.LoginService);
+//		 loginService.addProperty(Omn_service.authentication,"ssh-keys");
+//		 // Just using Dummy data
+//		 loginService.addProperty(Omn_service.username, nsd.getName());
+//		 loginService.addProperty(Omn_service.hostname, "192.76.87.281");
+//		 loginService.addProperty(Omn_service.port,"22");
+//		    resource.addProperty(Omn.hasService, loginService);
+//				}
+		
+		if(nsr != null){
+			Iterator<VirtualNetworkFunctionRecord> iterator = nsr.getVnfr().iterator();
+			while (iterator.hasNext()){
+				VirtualNetworkFunctionRecord vnfR = iterator.next();
+				Iterator<VirtualDeploymentUnit> vnfcS = vnfR.getVdu().iterator();
+				while(vnfcS.hasNext()){
+					Iterator<VNFComponent> bla = vnfcS.next().getVnfc().iterator();
+					while(bla.hasNext()){
+					Iterator<VNFDConnectionPoint> connPoints = bla.next().getConnection_point().iterator();
+					while(connPoints.hasNext()){
+						VNFDConnectionPoint conPoint = connPoints.next();
+						String ip = conPoint.getFloatingIp();
+						String name = conPoint.getVirtual_link_reference();
+						
+						Resource loginService = parsedServerModel.createResource(OntologyModelUtil
+					            .getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+					 loginService.addProperty(RDF.type, Omn_service.LoginService);
+//					 loginService.addProperty(Omn_service.authentication,"ssh-keys");
+					 // Just using Dummy data
+					 loginService.addProperty(Omn_service.username, name);
+					 loginService.addProperty(Omn_service.hostname, ip);
+//					 loginService.addProperty(Omn_service.port,"22");
+					    resource.addProperty(Omn.hasService, loginService);
+					}
+					}
+				}
+			}
+
 				}
 		
 	}
@@ -191,6 +229,14 @@ public class FiveGCore extends OpenBatonService {
 
 	public UE getUe() {
 		return ue;
+	}
+
+	public NetworkServiceRecord getNsr() {
+		return nsr;
+	}
+
+	public void setNsr(NetworkServiceRecord nsr) {
+		this.nsr = nsr;
 	}
 	
 	

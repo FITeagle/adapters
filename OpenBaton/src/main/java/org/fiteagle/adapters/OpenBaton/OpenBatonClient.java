@@ -352,6 +352,16 @@ public void createFiveGCore(OpenBatonService openBaton){
 	NetworkServiceRecordRestAgent agent = nfvoRequestor.getNetworkServiceRecordAgent();
 	try {
 		NetworkServiceRecord newNsRecord = agent.create(nsd.getId());
+		String test;
+		test ="";
+		test ="";
+		test ="";
+		test ="";
+		test ="";
+		test ="";
+		test ="";
+		
+		fiveG.setNsr(newNsRecord);
 		
 		List<VirtualNetworkFunctionRecord> vnfrList = agent.getVirtualNetworkFunctionRecords(newNsRecord.getId());
 		LOGGER.log(Level.SEVERE,vnfrList.toString());
