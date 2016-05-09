@@ -26,6 +26,7 @@ import org.openbaton.catalogue.mano.descriptor.VNFForwardingGraphDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.nfvo.Configuration;
 import org.openbaton.sdk.*;
 import org.openbaton.sdk.api.exception.SDKException;
@@ -338,6 +339,32 @@ public VirtualNetworkFunctionDescriptor createGateway (OpenBatonService openBato
 }
 
 public void createFiveGCore(OpenBatonService openBaton){
+	checkRequestor();
+	FiveGCore fiveG = (FiveGCore) openBaton;
+	NetworkServiceDescriptor nsd = null;
+	List<NetworkServiceDescriptor> nsdList = getAllNSDs();
+	for(NetworkServiceDescriptor n : nsdList){
+		if (n.getName().contains("5G") && n.getName().contains("Core")){
+			nsd = n;
+			LOGGER.log(Level.SEVERE,"FOUND NSD");
+		}
+	}
+	NetworkServiceRecordRestAgent agent = nfvoRequestor.getNetworkServiceRecordAgent();
+	try {
+		NetworkServiceRecord newNsRecord = agent.create(nsd.getId());
+		
+		List<VirtualNetworkFunctionRecord> vnfrList = agent.getVirtualNetworkFunctionRecords(newNsRecord.getId());
+		LOGGER.log(Level.SEVERE,vnfrList.toString());
+		LOGGER.log(Level.SEVERE,"test");
+
+	} catch (SDKException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+}
+
+public void createFiveGCoreWithNewNsd(OpenBatonService openBaton){
 	//Creating the local Objects of the soon to provisioned Instances
 	MME mme = new MME(null, null);
 	ENodeB enodeb = new ENodeB(null, null);
