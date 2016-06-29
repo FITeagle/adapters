@@ -52,6 +52,8 @@ public class OpenBatonClient {
     private String nfvoIp;
     private String nfvoPort;
     private String version;
+    private String vpnIp;
+    private String vpnPort;
     
     private NFVORequestor nfvoRequestor;
 
@@ -66,17 +68,19 @@ private void loadPreferences() {
 		nfvoIp = openBatonAdapter.getNfvoIp();
 		nfvoPort = openBatonAdapter.getNfvoPort();
 		version = openBatonAdapter.getVersion();
+		vpnIp = openBatonAdapter.getVpnIP();
+		vpnPort = openBatonAdapter.getVpnPort();
 	}catch(Exception e){
 		e.printStackTrace();
 	}
 
 	
-	if (username == null){
-		throw new InsufficientOpenBatonPreferences("username");
-	}	
-	if (password == null){
-		throw new InsufficientOpenBatonPreferences("password");
-	}	
+//	if (username == null){
+//		throw new InsufficientOpenBatonPreferences("username");
+//	}	
+//	if (password == null){
+//		throw new InsufficientOpenBatonPreferences("password");
+//	}	
 	if (nfvoIp == null){
 		throw new InsufficientOpenBatonPreferences("nfvoIp");
 	}	
@@ -85,18 +89,29 @@ private void loadPreferences() {
 	}	
 	if (version == null){
 		throw new InsufficientOpenBatonPreferences("version");
-	}
+	}	
+//	if (vpnIp == null){
+//		throw new InsufficientOpenBatonPreferences("vpnIp");
+//	}	
+//	if (vpnPort == null){
+//		throw new InsufficientOpenBatonPreferences("vpnPort");
+//	}
 }
 
 public void init(){
-//	loadPreferences();
+	loadPreferences();
 	checkRequestor();
 }
 
 private void checkRequestor() {
 	if(nfvoRequestor == null){
-		// data is hard coded for the moment
-		nfvoRequestor = new NFVORequestor("","","193.175.132.242","8080","1");
+//		// data is hard coded for the moment
+//		nfvoRequestor = new NFVORequestor("","","193.175.132.242","8080","1");
+		nfvoRequestor = new NFVORequestor("","",nfvoIp,nfvoPort,version);
+		LOGGER.log(Level.SEVERE,nfvoIp);
+		LOGGER.log(Level.SEVERE,nfvoPort);
+		LOGGER.log(Level.SEVERE,version);
+
 	}
 }
 
@@ -871,60 +886,60 @@ public List<NetworkServiceRecord> getAllNSRs(){
     }
 }
 
-public boolean deleteAllVnfsOfNSD(String nsdID){
-	checkRequestor();
-	NetworkServiceDescriptorRestAgent nsdAgend = nfvoRequestor.getNetworkServiceDescriptorAgent();
-	List<VirtualNetworkFunctionDescriptor> vnfList;
-	try {
-		vnfList = nsdAgend.getVirtualNetworkFunctionDescriptors(nsdID);
-		for (VirtualNetworkFunctionDescriptor vnf : vnfList){
-			nsdAgend.deleteVirtualNetworkFunctionDescriptors(nsdID, vnf.getId());
-		}
-		return true;
-	} catch (SDKException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		return false;
-	}
-	
-}
+//public boolean deleteAllVnfsOfNSD(String nsdID){
+//	checkRequestor();
+//	NetworkServiceDescriptorRestAgent nsdAgend = nfvoRequestor.getNetworkServiceDescriptorAgent();
+//	List<VirtualNetworkFunctionDescriptor> vnfList;
+//	try {
+//		vnfList = nsdAgend.getVirtualNetworkFunctionDescriptors(nsdID);
+//		for (VirtualNetworkFunctionDescriptor vnf : vnfList){
+//			nsdAgend.deleteVirtualNetworkFunctionDescriptors(nsdID, vnf.getId());
+//		}
+//		return true;
+//	} catch (SDKException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//		return false;
+//	}
+//	
+//}
 
-@Beta
-public boolean deleteAllTestVNFs(){
-	checkRequestor();
-	VirtualNetworkFunctionDescriptorRestAgent vnfAgent = nfvoRequestor.getVirtualNetworkFunctionDescriptorRestAgent();
-	try {
-		List<VirtualNetworkFunctionDescriptor> vnfList = vnfAgent.findAll();
-		for(VirtualNetworkFunctionDescriptor vnf : vnfList){
-			if(vnf.getName().startsWith("Test")){
-				vnfAgent.delete(vnf.getId());
-			}
-		}
-		return true;
-	} catch (ClassNotFoundException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (SDKException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	return false;
+//@Beta
+//public boolean deleteAllTestVNFs(){
+//	checkRequestor();
+//	VirtualNetworkFunctionDescriptorRestAgent vnfAgent = nfvoRequestor.getVirtualNetworkFunctionDescriptorRestAgent();
+//	try {
+//		List<VirtualNetworkFunctionDescriptor> vnfList = vnfAgent.findAll();
+//		for(VirtualNetworkFunctionDescriptor vnf : vnfList){
+//			if(vnf.getName().startsWith("Test")){
+//				vnfAgent.delete(vnf.getId());
+//			}
+//		}
+//		return true;
+//	} catch (ClassNotFoundException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	} catch (SDKException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	}
+//	return false;
+//
+//}
 
-}
-
-public boolean deleteVnfOfNSD(String nsdID, String vnfID){
-	checkRequestor();
-	NetworkServiceDescriptorRestAgent nsdAgend = nfvoRequestor.getNetworkServiceDescriptorAgent();
-	try {
-			nsdAgend.deleteVirtualNetworkFunctionDescriptors(nsdID, vnfID);
-			return true;
-	} catch (SDKException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		return false;
-	}
-	
-}
+//public boolean deleteVnfOfNSD(String nsdID, String vnfID){
+//	checkRequestor();
+//	NetworkServiceDescriptorRestAgent nsdAgend = nfvoRequestor.getNetworkServiceDescriptorAgent();
+//	try {
+//			nsdAgend.deleteVirtualNetworkFunctionDescriptors(nsdID, vnfID);
+//			return true;
+//	} catch (SDKException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//		return false;
+//	}
+//	
+//}
 
 @Beta
 public NetworkServiceRecord updateNetworkServiceRecord(NetworkServiceRecord nsr) {

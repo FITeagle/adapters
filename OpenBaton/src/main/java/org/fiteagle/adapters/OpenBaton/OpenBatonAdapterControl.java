@@ -91,7 +91,13 @@ public class OpenBatonAdapterControl extends AdapterControl {
                 adapter.setNfvoPort(nfvoPort);	
                 
                 String version  = adapterInstanceObject.getString("version");
-                adapter.setVersion(version);		
+                adapter.setVersion(version);	                
+                
+                String vpnIp  = adapterInstanceObject.getString("vpn-ip");
+                adapter.setVpnIP(vpnIp);	                
+                
+                String vpnPort  = adapterInstanceObject.getString("vpn-port");
+                adapter.setVpnPort(vpnPort);		
                 
                 this.adapterInstances.put(adapter.getId(),adapter);
                 LOGGER.log(Level.SEVERE, this.adapterInstances.toString());

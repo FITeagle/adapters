@@ -614,6 +614,22 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		this.version = version;
 	}
 
+	protected String getVpnIP() {
+		return vpnIP;
+	}
+
+	protected void setVpnIP(String vpnIP) {
+		this.vpnIP = vpnIP;
+	}
+
+	protected String getVpnPort() {
+		return vpnPort;
+	}
+
+	protected void setVpnPort(String vpnPort) {
+		this.vpnPort = vpnPort;
+	}
+
 	public HashMap<String, OpenBatonGeneric> getInstanceList() {
 		return instanceList;
 	}
@@ -669,12 +685,12 @@ public final class OpenBatonAdapter extends AbstractAdapter {
         this.debugString = mmeID = this.createdDebugMME.getId();
         Model newmModel = ModelFactory.createDefaultModel();
         Resource newResource = newmModel.createResource("http://TEST.OPENBATON.RESOURCE");
-        newResource.addProperty(RDF.type, (RDFNode)OWL.Class);
+        newResource.addProperty(RDF.type, OWL.Class);
         newResource.addProperty((Property)Omn_lifecycle.hasID, mmeID);
-        newResource.addProperty(RDFS.subClassOf, (RDFNode)Omn.Resource);
-        this.adapterABox.addProperty((Property)Omn_lifecycle.canImplement, (RDFNode)newResource);
+        newResource.addProperty(RDFS.subClassOf, Omn.Resource);
+        this.adapterABox.addProperty((Property)Omn_lifecycle.canImplement, newResource);
         this.adapterABox.getModel().add(newResource.getModel());
-        ResIterator propIterator = this.adapterTBox.listSubjectsWithProperty(RDFS.domain, (RDFNode)newResource);
+        ResIterator propIterator = this.adapterTBox.listSubjectsWithProperty(RDFS.domain, newResource);
         while (propIterator.hasNext()) {
             Property property = this.adapterTBox.getProperty(((Resource)propIterator.next()).getURI());
         }
@@ -686,7 +702,15 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	}
 
-	public void addUploadedPackage(UUID uuid, String fileName) {
+	public void addUploadedPackageToDatabase(UUID uuid, String fileName) {
+		
+		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(adapterABox.getLocalName()+"/" +fileName);
+		resourceToCreate.addProperty(Omn_lifecycle.hasID,uuid.toString());
+		resourceToCreate.addProperty(RDFS.label,fileName);
+		resourceToCreate.addProperty(RDFS.subClassOf, Omn.Resource);
+		adapterABox.addProperty(Omn_lifecycle.canImplement, resourceToCreate);
+        listener.publishModelUpdate(adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+        listener.publishModelUpdate(resourceToCreate.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 
 	}
 

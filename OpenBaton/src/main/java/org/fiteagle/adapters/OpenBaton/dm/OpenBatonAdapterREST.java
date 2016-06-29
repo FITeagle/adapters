@@ -129,7 +129,7 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
             	if(adapter == null){
             	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
             	}
-            	adapter.addUploadedPackage(uuid,fileName);
+            	adapter.addUploadedPackageToDatabase(uuid,fileName);
  
                   
                 return Response.status(200).entity("Uploaded file name : " + fileName + "\n")
