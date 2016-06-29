@@ -860,8 +860,15 @@ return tmpList;
 public void getAllVnfManagers(){
 	
 }
-public void getAllNSRs(){
-	
+public List<NetworkServiceRecord> getAllNSRs(){
+    this.checkRequestor();
+    try {
+        return this.nfvoRequestor.getNetworkServiceRecordAgent().findAll();
+    }
+    catch (ClassNotFoundException | SDKException e) {
+        e.printStackTrace();
+        return null;
+    }
 }
 
 public boolean deleteAllVnfsOfNSD(String nsdID){
@@ -917,6 +924,22 @@ public boolean deleteVnfOfNSD(String nsdID, String vnfID){
 		return false;
 	}
 	
+}
+
+@Beta
+public NetworkServiceRecord updateNetworkServiceRecord(NetworkServiceRecord nsr) {
+    this.checkRequestor();
+    try {
+        NetworkServiceRecord updatedNSR = (NetworkServiceRecord)this.nfvoRequestor.getNetworkServiceRecordAgent().findById(nsr.getId());
+        return updatedNSR;
+    }
+    catch (SDKException e) {
+        e.printStackTrace();
+    }
+    catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return null;
 }
 
   public static class InsufficientOpenBatonPreferences extends RuntimeException {
