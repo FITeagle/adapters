@@ -47,6 +47,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import info.openmultinet.ontology.vocabulary.Omn;
+import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 import info.openmultinet.ontology.vocabulary.OpenBaton;
@@ -54,7 +55,7 @@ import info.openmultinet.ontology.vocabulary.Osco;
 
 public final class OpenBatonAdapter extends AbstractAdapter {
 	private static final Logger LOGGER = Logger.getLogger(OpenBatonAdapter.class.toString());
-	protected OpenBatonClient openBatonClient;
+	protected OpenBatonClient openBatonClient ;
 
 	private OpenBatonAdapterMDBSender listener;
 
@@ -72,6 +73,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
     private VirtualNetworkFunctionDescriptor createdDebugMME;
 
 	private transient final HashMap<String, OpenBatonGeneric> instanceList = new HashMap<String, OpenBatonGeneric>();
+	private HashMap<String,OpenBatonClient> clientList = new HashMap<String,OpenBatonClient>();
 
 	public OpenBatonAdapter(final Model adapterModel, final Resource adapterABox) {
 		super();
@@ -85,7 +87,6 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 		// this.adapterABox.addProperty(Omn_lifecycle.canImplement,
 		// Omn_domain_pc.PC);
-		openBatonClient = new OpenBatonClient(this);
 
 		/**
 		 * Looking up all Resources that belongs to the Adapter and will be
@@ -107,7 +108,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	}
 
 	public void init() {
-		openBatonClient.init();
+//		openBatonClient.init();
 	}
 
 	@Override
@@ -274,11 +275,11 @@ public final class OpenBatonAdapter extends AbstractAdapter {
             FiveGCore fiveg = new FiveGCore(this, instanceURI);
             this.getInstanceList().put(instanceURI, fiveg);
             this.updateInstance(instanceURI, newInstanceModel);
-            this.openBatonClient.createFiveGCore(fiveg);
+            openBatonClient.createFiveGCore(fiveg);
             Property property = resource.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
             property.addProperty(RDF.type, (RDFNode)OWL.FunctionalProperty);
             try {
-                CreateNSR createNsr = new CreateNSR(resource, fiveg, property, this.listener);
+                CreateNSR createNsr = new CreateNSR(resource, fiveg, property, this.listener,openBatonClient);
                 ManagedThreadFactory threadFactory = (ManagedThreadFactory)new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
                 Thread createVMThread = threadFactory.newThread((Runnable)createNsr);
                 createVMThread.start();
@@ -426,12 +427,12 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    private int counter;
 	    private OpenBatonAdapterMDBSender parent;
 
-	    public CreateNSR(Resource resource, OpenBatonGeneric openBatonGeneric, Property property, OpenBatonAdapterMDBSender parent) {
+	    public CreateNSR(Resource resource, OpenBatonGeneric openBatonGeneric, Property property, OpenBatonAdapterMDBSender parent,OpenBatonClient client) {
 	        this.resource = resource;
 	        this.parent = parent;
 	        this.fiveG = (FiveGCore)openBatonGeneric;
 	        this.property = property;
-	        this.client = new OpenBatonClient(null);
+	        this.client = client;
 	        this.counter = 0;
 	        LOGGER.log(Level.SEVERE, "Thread Created");
 	    }
@@ -702,16 +703,31 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	}
 
-	public void addUploadedPackageToDatabase(UUID uuid, String fileName) {
+	public void addUploadedPackageToDatabase(UUID uuid, String fileName,String projectId) {
 		
 		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(adapterABox.getLocalName()+"/" +fileName);
 		resourceToCreate.addProperty(Omn_lifecycle.hasID,uuid.toString());
 		resourceToCreate.addProperty(RDFS.label,fileName);
 		resourceToCreate.addProperty(RDFS.subClassOf, Omn.Resource);
+		resourceToCreate.addProperty(Omn.isAttributeOf, projectId);
 		adapterABox.addProperty(Omn_lifecycle.canImplement, resourceToCreate);
         listener.publishModelUpdate(adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
         listener.publishModelUpdate(resourceToCreate.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 
+	}
+
+	public void uploadPackageToDatabase(String projectId,String fileDirectory) {
+		OpenBatonClient client = findClient(projectId);
+		client.uploadPackageToDatabase(fileDirectory);		
+	}
+
+	private OpenBatonClient findClient(String projectId) {
+		if(clientList.containsKey(projectId)){
+			return clientList.get(projectId);
+		}else{
+			clientList.put(projectId,new OpenBatonClient(this,projectId));
+			return clientList.get(projectId);
+		}
 	}
 
 }

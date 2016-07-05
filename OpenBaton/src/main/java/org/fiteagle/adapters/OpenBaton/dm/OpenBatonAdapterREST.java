@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -103,44 +104,98 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/upload")
     public Response uploadFile(MultipartFormDataInput input) throws IOException {
+    	UUID uuid = null;
+    	String fileName = null;
+    	String fileNameWithDirectory = null;
+    	String projectId = null;
         
-        Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
- 
-        // Get file data to save
-        List<InputPart> inputParts = uploadForm.get("data");
- 
-        for (InputPart inputPart : inputParts) {
-            try {
- 
-                MultivaluedMap<String, String> header = inputPart.getHeaders();
-                String fileName = getFileName(header);
-   
-                // convert the uploaded file to inputstream
-                InputStream inputStream = inputPart.getBody(InputStream.class,
-                        null);
- 
-                byte[] bytes = IOUtils.toByteArray(inputStream);
-                // constructs upload file path
-                UUID uuid = UUID.randomUUID();
-                fileName =  uuid +  "--" +fileName;
-                String fileNameWithDirectory = fiteagleDirectory + fileName  ;
-                writeFile(bytes, fileNameWithDirectory);
-                
-            	if(adapter == null){
-            	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
-            	}
-            	adapter.addUploadedPackageToDatabase(uuid,fileName);
- 
-                  
-                return Response.status(200).entity("Uploaded file name : " + fileName + "\n")
-                        .build();
- 
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        
-        return null;
+    	try{
+    		
+    		 Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
+    		 
+    	        // Get file data to save
+    	        List<InputPart> inputParts = uploadForm.get("file");
+    	 
+    	        for (InputPart inputPart : inputParts) {
+    	            try {
+    	 
+    	                MultivaluedMap<String, String> header = inputPart.getHeaders();
+    	                fileName = getFileName(header);
+    	   
+    	                // convert the uploaded file to inputstream
+    	                InputStream inputStream = inputPart.getBody(InputStream.class,
+    	                        null);
+    	 
+    	                byte[] bytes = IOUtils.toByteArray(inputStream);
+    	                // constructs upload file path
+    	                uuid = UUID.randomUUID();
+    	                fileName =  uuid +  "--" +fileName;
+    	                fileNameWithDirectory = fiteagleDirectory + fileName  ;
+    	                writeFile(bytes, fileNameWithDirectory);
+    	                
+//    	            	if(adapter == null){
+//    	            	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
+//    	            	}
+//    	            	adapter.addUploadedPackageToDatabase(uuid,fileName);
+    	 
+    	                  
+//    	                return Response.status(200).entity("Uploaded file name : " + fileName + "\n")
+//    	                        .build();
+    	 
+    	            } catch (Exception e) {
+    	                e.printStackTrace();
+    	            }
+    	        }
+    	        
+    	        
+    	        inputParts = uploadForm.get("projectId");
+    	        
+    	        for (InputPart inputPart : inputParts) {
+    	            try {
+    	 
+    	                MultivaluedMap<String, String> header = inputPart.getHeaders();
+    	   
+    	                // convert the uploaded file to inputstream
+    	                InputStream inputStream = inputPart.getBody(InputStream.class,
+    	                        null);
+    	 
+//    	                byte[] bytes = IOUtils.toByteArray(inputStream);
+//    	                StringWriter writer = new StringWriter();
+//    	                IOUtils.copy(inputStream, writer,"UTF-8");
+    	                projectId = IOUtils.toString(inputStream,"UTF-8");
+    	                // constructs upload file path
+    	            	if(adapter == null){
+    	            	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
+    	            	}
+    	            	
+    	            	if(uuid != null && fileName != null  && projectId != null){
+    	                	adapter.addUploadedPackageToDatabase(uuid,fileName,projectId);
+    	                	adapter.uploadPackageToDatabase(projectId,fileNameWithDirectory);
+    	                	
+    	                	return Response.status(200).entity("Uploaded file name : " + fileName + "\n")
+    	                            .build();
+    	            	}else{
+    	            		return Response.status(500).entity("File or project-Id was null" + "\n")
+    	                            .build();
+    	            	}
+    	 
+    	                  
+    	                
+    	 
+    	            } catch (Exception e) {
+    	                e.printStackTrace();
+    	            }
+    	        }
+    	        
+    	        return Response.status(500).entity("Sorry, something went wrong!"+ "\n")
+    	                .build();
+    		
+    	}catch(Exception e){
+    		e.printStackTrace();
+    		return Response.status(500).entity("Sry, something went wrong"+ "\n")
+                    .build();
+    	}
+       
     }
  
     private String getFileName(MultivaluedMap<String, String> header) {
