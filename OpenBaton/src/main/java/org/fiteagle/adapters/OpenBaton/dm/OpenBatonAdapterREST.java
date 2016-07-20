@@ -68,7 +68,7 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 @Path("/")
 public class OpenBatonAdapterREST extends AbstractAdapterREST {
 
-	private String fiteagleDirectory = "/home/home/.fiteagle/uploads/";
+	private String fiteagleDirectory = System.getProperty("user.home") +"/.fiteagle/uploads/";
 
 
 	OpenBatonAdapter adapter;
@@ -217,6 +217,10 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     // Utility method
     private void writeFile(byte[] content, String filename) throws IOException {
         File file = new File(filename);
+        File directory = new File(fiteagleDirectory);
+        if(!directory.exists()){
+        	directory.mkdir();
+        }
         if (!file.exists()) {
             file.createNewFile();
         }

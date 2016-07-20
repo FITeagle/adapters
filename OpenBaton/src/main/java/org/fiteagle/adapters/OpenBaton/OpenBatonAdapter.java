@@ -29,11 +29,14 @@ import org.fiteagle.adapters.OpenBaton.Model.UE;
 import org.fiteagle.adapters.OpenBaton.dm.OpenBatonAdapterMDBSender;
 import org.fiteagle.api.core.Config;
 import org.fiteagle.api.core.IMessageBus;
+import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
+import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 
+import com.hp.hpl.jena.ontology.Ontology;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
@@ -49,6 +52,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_federation;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.Omn_resource;
 import info.openmultinet.ontology.vocabulary.Omn_service;
 import info.openmultinet.ontology.vocabulary.OpenBaton;
 import info.openmultinet.ontology.vocabulary.Osco;
@@ -56,6 +60,7 @@ import info.openmultinet.ontology.vocabulary.Osco;
 public final class OpenBatonAdapter extends AbstractAdapter {
 	private static final Logger LOGGER = Logger.getLogger(OpenBatonAdapter.class.toString());
 	protected OpenBatonClient openBatonClient ;
+	protected OpenBatonClient adminClient ;
 
 	private OpenBatonAdapterMDBSender listener;
 
@@ -84,6 +89,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		this.adapterABox.addProperty(RDF.type, adapterType);
 		this.adapterABox.addProperty(RDFS.label, this.adapterABox.getLocalName());
 		this.adapterABox.addProperty(RDFS.comment, "OpenBaton Adapter");
+		this.adapterABox.addLiteral(MessageBusOntologyModel.maxInstances, 100);
 
 		// this.adapterABox.addProperty(Omn_lifecycle.canImplement,
 		// Omn_domain_pc.PC);
@@ -109,6 +115,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	public void init() {
 //		openBatonClient.init();
+		adminClient = new OpenBatonClient(this);
+
 	}
 
 	@Override
@@ -180,7 +188,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	public Model createInstance(String instanceURI, Model newInstanceModel) {
 
 		Resource resource = newInstanceModel.getResource(instanceURI);
-
+		OpenBatonClient client;
 		// check if already created
 		for (Map.Entry<String, OpenBatonGeneric> entry : this.getInstanceList().entrySet()) {
 			String key = entry.getKey();
@@ -195,9 +203,12 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 		// check if topology exists, otherwise create it
 		String topologyUri = null;
+		Resource topologyResource = null;
 		Topology topology = null;
+		NetworkServiceDescriptor nsd;
 		if (resource.hasProperty(Omn.isResourceOf)) {
-			topologyUri = resource.getProperty(Omn.isResourceOf).getObject().asResource().getURI().toString();
+			topologyResource = resource.getProperty(Omn.isResourceOf).getObject().asResource();
+			topologyUri = topologyResource.getURI().toString();
 
 			if (this.getInstanceList().get(topologyUri) == null) {
 				topology = new Topology(this, topologyUri);
@@ -209,7 +220,33 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		}
 
 		// Check which Ressource should be created
-		if (resource.hasProperty(RDF.type, OpenBaton.Gateway)) {
+		if(resource.hasProperty(Omn_resource.hasInterface)){
+			
+			//If NSR allready exists, add this instance to it. Else create one and add it
+			if(topologyResource.hasProperty(Omn_resource.hasHardwareType)){
+				client = findClient(topologyResource.getProperty(Omn.hasAttribute).getString());
+			}else{
+				String projectId = adminClient.createNewProjectOnServer();
+				client = findClient(projectId);
+				nsd = client.createNetworkServiceDescriptor(null);
+				topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
+		        topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
+		        topologyResource.addProperty(Omn.hasAttribute, projectId);
+
+				this.listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		} else if (resource.hasProperty(RDF.type, OpenBaton.Gateway)) {
 
 			final Gateway openBaton = new Gateway(this, instanceURI);
 			this.getInstanceList().put(instanceURI, openBaton);
@@ -331,6 +368,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			LOGGER.warning("Couldn't recognize type, so returning original model.");
 		}
 		return newInstanceModel;
+	}
+
+	private String getExperimenterUsername(Model newInstanceModel) {
+		return newInstanceModel.listObjectsOfProperty(newInstanceModel.getProperty("http://open-multinet.info/ontology/omn-service#username")).next().asLiteral().getString();
 	}
 
 	Model parseToModel(final OpenBatonGeneric fivegGeneric) {

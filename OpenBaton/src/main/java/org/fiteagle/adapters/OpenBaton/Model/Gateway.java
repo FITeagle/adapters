@@ -133,7 +133,9 @@ public class Gateway extends OpenBatonService{
 
 					VirtualDeploymentUnit vdu = new VirtualDeploymentUnit();
 					vdu.setScale_in_out(1);
-					vdu.setVimInstanceName("vim-instance");
+					List<String> vimInstances = new ArrayList<String>();
+					vimInstances.add("vim-instance");
+					vdu.setVimInstanceName(vimInstances);
 					// TODO set VM-Image correctly 
 					Set<String> imageSet = new HashSet<String>();
 					imageSet.add("Ubuntu 14.04 Cloud based");

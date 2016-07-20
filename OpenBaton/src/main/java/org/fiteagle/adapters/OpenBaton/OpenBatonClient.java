@@ -22,6 +22,7 @@ import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
+import org.openbaton.catalogue.security.Project;
 import org.openbaton.sdk.NFVORequestor;
 import org.openbaton.sdk.api.exception.SDKException;
 import org.openbaton.sdk.api.rest.NetworkServiceDescriptorRestAgent;
@@ -44,6 +45,8 @@ public class OpenBatonClient {
 	private String vpnIp;
 	private String vpnPort;
 	private String projectId;
+	
+	private NetworkServiceDescriptor networkServiceDescriptor; 
 
 	private NFVORequestor nfvoRequestor;
 
@@ -51,6 +54,11 @@ public class OpenBatonClient {
 		this.openBatonAdapter = openBatonAdapter;
 		this.projectId = projectId;
 		init();
+	}
+	
+	public OpenBatonClient(OpenBatonAdapter openBatonAdapter) {
+		this.openBatonAdapter = openBatonAdapter;
+		loadPreferences();
 	}
 
 	private void loadPreferences() {
@@ -96,8 +104,13 @@ public class OpenBatonClient {
 
 	private void checkRequestor() {
 		if (nfvoRequestor == null) {
-			// // data is hard coded for the moment
 			nfvoRequestor = new NFVORequestor(username, password, projectId, false, nfvoIp, nfvoPort, version);
+		}
+	}
+	
+	private void checkRequestorWithoutId() {
+		if (nfvoRequestor == null) {
+			nfvoRequestor = new NFVORequestor(username, password, null, false, nfvoIp, nfvoPort, version);
 		}
 	}
 
@@ -637,6 +650,7 @@ public class OpenBatonClient {
 		try {
 			NetworkServiceDescriptor createdNSD = nfvoRequestor.getNetworkServiceDescriptorAgent()
 					.create(networkDescriptor);
+			setNetworkServiceDescriptor(createdNSD);
 			return createdNSD;
 		} catch (SDKException e) {
 			// TODO Auto-generated catch block
@@ -644,6 +658,20 @@ public class OpenBatonClient {
 		}
 		return null;
 
+	}
+	
+	public String createNewProjectOnServer(){
+		NFVORequestor requestor =  new NFVORequestor(username, password, null, false, nfvoIp, nfvoPort, version);
+		Project project = new Project();
+		project.setName("Test" + new Random().nextInt());
+		try {
+			Project response = requestor.getProjectAgent().create(project);
+			return response.getId();
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Beta
@@ -975,6 +1003,14 @@ public class OpenBatonClient {
 			e.printStackTrace();
 		}
 		
+	}
+
+	public NetworkServiceDescriptor getNetworkServiceDescriptor() {
+		return networkServiceDescriptor;
+	}
+
+	public void setNetworkServiceDescriptor(NetworkServiceDescriptor networkServiceDescriptor) {
+		this.networkServiceDescriptor = networkServiceDescriptor;
 	}
 
 }
