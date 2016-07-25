@@ -79,7 +79,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	private transient final HashMap<String, OpenBatonGeneric> instanceList = new HashMap<String, OpenBatonGeneric>();
 	private HashMap<String,OpenBatonClient> clientList = new HashMap<String,OpenBatonClient>();
-
+	private Resource debugTopologyResource;
+	
 	public OpenBatonAdapter(final Model adapterModel, final Resource adapterABox) {
 		super();
 		this.uuid = UUID.randomUUID().toString();
@@ -188,7 +189,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	public Model createInstance(String instanceURI, Model newInstanceModel) {
 
 		Resource resource = newInstanceModel.getResource(instanceURI);
-		OpenBatonClient client;
+		OpenBatonClient client =null;
 		// check if already created
 		for (Map.Entry<String, OpenBatonGeneric> entry : this.getInstanceList().entrySet()) {
 			String key = entry.getKey();
@@ -205,10 +206,11 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		String topologyUri = null;
 		Resource topologyResource = null;
 		Topology topology = null;
-		NetworkServiceDescriptor nsd;
+		NetworkServiceDescriptor nsd = null;
 		if (resource.hasProperty(Omn.isResourceOf)) {
 			topologyResource = resource.getProperty(Omn.isResourceOf).getObject().asResource();
 			topologyUri = topologyResource.getURI().toString();
+//			topologyResource = ModelFactory.createDefaultModel().getResource(topologyUri);
 
 			if (this.getInstanceList().get(topologyUri) == null) {
 				topology = new Topology(this, topologyUri);
@@ -225,17 +227,28 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			//If NSR allready exists, add this instance to it. Else create one and add it
 			if(topologyResource.hasProperty(Omn_resource.hasHardwareType)){
 				client = findClient(topologyResource.getProperty(Omn.hasAttribute).getString());
+				nsd = client.getNetworkServiceDescriptor();
+				
+				//Adding the Resource we are now starting to create
+				topologyResource.addProperty(Omn.hasResource,resource);
 			}else{
 				String projectId = adminClient.createNewProjectOnServer();
 				client = findClient(projectId);
 				nsd = client.createNetworkServiceDescriptor(null);
+				
+				// Add the NSR-Name, Experimenter username und project ID to the related Topology
 				topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
-		        topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
-		        topologyResource.addProperty(Omn.hasAttribute, projectId);
+				topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
+				topologyResource.addProperty(Omn.hasAttribute, projectId);
+		        
+		        //Adding the Resource we are now starting to create
+				topologyResource.addProperty(Omn.hasResource,resource);
 
-				this.listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+				listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 
 			}
+		} 
+
 			
 			
 			
@@ -245,13 +258,14 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			
 			
 			
-			
-		} else if (resource.hasProperty(RDF.type, OpenBaton.Gateway)) {
+
+		if (resource.hasProperty(RDF.type, OpenBaton.Gateway)) {
 
 			final Gateway openBaton = new Gateway(this, instanceURI);
 			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			openBatonClient.createGateway(openBaton, null);
+			VirtualNetworkFunctionDescriptor gateway = client.createGateway(openBaton, null);
+			client.addVnfdToNsd(gateway.getId());
 			return this.parseToModel(openBaton);
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.DomainNameSystem)) {
@@ -436,27 +450,6 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		return resource.getModel();
 	}
 
-	// public Model testCreateInstance(String instanceURI, Model
-	// newInstanceModel)
-	// throws ProcessingException, InvalidRequestException {
-	//
-	// Resource resource = newInstanceModel.getResource(instanceURI);
-	//
-	// if (resource.hasProperty(RDF.type, OpenBaton.NetworkServiceDescriptor)) {
-	//
-	//// final Gateway fiveg = new Gateway(this, instanceURI);
-	//// this.getInstanceList().put(instanceURI, fiveg);
-	//// this.updateInstance(instanceURI, modelCreate);
-	//
-	//// NetworkServiceDescriptor netDescriptor =
-	// openBatonClient.createNetworkServiceDescriptor();
-	// return null;
-	//// return this.parseToModel(netDescriptor);
-	//
-	// }
-	//
-	// return null;
-	// }
 
 	public class CreateNSR	implements Runnable {
 	    private Resource resource;

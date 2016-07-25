@@ -661,7 +661,7 @@ public class OpenBatonClient {
 	}
 	
 	public String createNewProjectOnServer(){
-		NFVORequestor requestor =  new NFVORequestor(username, password, null, false, nfvoIp, nfvoPort, version);
+		NFVORequestor requestor =  new NFVORequestor(username, password, "d28a8a82-d503-42c5-80e5-899469e9255d", false, nfvoIp, nfvoPort, version);
 		Project project = new Project();
 		project.setName("Test" + new Random().nextInt());
 		try {
@@ -1003,6 +1003,22 @@ public class OpenBatonClient {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public void addVnfdToNsd(String virtualNetworkFunctionDescriptorID){
+		checkRequestor();
+		VirtualNetworkFunctionDescriptor foundVnfd = null;
+		try {
+			foundVnfd = nfvoRequestor.getVirtualNetworkFunctionDescriptorAgent().findById(virtualNetworkFunctionDescriptorID);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		networkServiceDescriptor.getVnfd().add(foundVnfd);
+		updateNetworkServiceDescriptor(networkServiceDescriptor, networkServiceDescriptor.getId());
 	}
 
 	public NetworkServiceDescriptor getNetworkServiceDescriptor() {
