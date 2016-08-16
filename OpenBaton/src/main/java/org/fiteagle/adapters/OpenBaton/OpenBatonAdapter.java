@@ -21,6 +21,7 @@ import org.fiteagle.adapters.OpenBaton.Model.Gateway;
 import org.fiteagle.adapters.OpenBaton.Model.HomeSubscriberService;
 import org.fiteagle.adapters.OpenBaton.Model.MME;
 import org.fiteagle.adapters.OpenBaton.Model.OpenBatonGeneric;
+import org.fiteagle.adapters.OpenBaton.Model.OpenBatonService;
 import org.fiteagle.adapters.OpenBaton.Model.ServiceContainer;
 import org.fiteagle.adapters.OpenBaton.Model.SgwuPgwu;
 import org.fiteagle.adapters.OpenBaton.Model.Switch;
@@ -59,7 +60,7 @@ import info.openmultinet.ontology.vocabulary.Osco;
 
 public final class OpenBatonAdapter extends AbstractAdapter {
 	private static final Logger LOGGER = Logger.getLogger(OpenBatonAdapter.class.toString());
-	protected OpenBatonClient openBatonClient ;
+//	protected OpenBatonClient openBatonClient ;
 	protected OpenBatonClient adminClient ;
 
 	private OpenBatonAdapterMDBSender listener;
@@ -74,12 +75,15 @@ public final class OpenBatonAdapter extends AbstractAdapter {
     private String version;
     private String vpnIP;
     private String vpnPort;
+    private String adminProjectId;
+    
     private String debugString;
     private VirtualNetworkFunctionDescriptor createdDebugMME;
+	private Resource debugTopologyResource;
+    private String debugProjectId ="d28a8a82-d503-42c5-80e5-899469e9255d";
 
 	private transient final HashMap<String, OpenBatonGeneric> instanceList = new HashMap<String, OpenBatonGeneric>();
 	private HashMap<String,OpenBatonClient> clientList = new HashMap<String,OpenBatonClient>();
-	private Resource debugTopologyResource;
 	
 	public OpenBatonAdapter(final Model adapterModel, final Resource adapterABox) {
 		super();
@@ -116,8 +120,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	public void init() {
 //		openBatonClient.init();
-		adminClient = new OpenBatonClient(this);
-
+//		adminClient = new OpenBatonClient(this, adminProjectId);
+		adminClient = findClient(adminProjectId);
 	}
 
 	@Override
@@ -224,29 +228,51 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		// Check which Ressource should be created
 		if(resource.hasProperty(Omn_resource.hasInterface)){
 			
-			//If NSR allready exists, add this instance to it. Else create one and add it
-			if(topologyResource.hasProperty(Omn_resource.hasHardwareType)){
-				client = findClient(topologyResource.getProperty(Omn.hasAttribute).getString());
+			if(debugProjectId != null){
+				client = findClient(adminProjectId);
 				nsd = client.getNetworkServiceDescriptor();
-				
+				if(nsd == null){
+					nsd = client.createLocalNetworkServiceDescriptor();
+					topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
+					topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
+					topologyResource.addProperty(Omn.hasAttribute, debugProjectId);
+			        
+			        //Adding the Resource we are now starting to create
+					topologyResource.addProperty(Omn.hasResource,resource);
+
+					listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+				}
 				//Adding the Resource we are now starting to create
 				topologyResource.addProperty(Omn.hasResource,resource);
-			}else{
-				String projectId = adminClient.createNewProjectOnServer();
-				client = findClient(projectId);
-				nsd = client.createNetworkServiceDescriptor(null);
 				
-				// Add the NSR-Name, Experimenter username und project ID to the related Topology
-				topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
-				topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
-				topologyResource.addProperty(Omn.hasAttribute, projectId);
-		        
-		        //Adding the Resource we are now starting to create
-				topologyResource.addProperty(Omn.hasResource,resource);
+				
+				
+			}else{
+				//If NSR allready exists, add this instance to it. Else create one and add it
+				if(topologyResource.hasProperty(Omn_resource.hasHardwareType)){
+					client = findClient(topologyResource.getProperty(Omn.hasAttribute).getString());
+					nsd = client.getNetworkServiceDescriptor();
+					
+					//Adding the Resource we are now starting to create
+					topologyResource.addProperty(Omn.hasResource,resource);
+				}else{
+					String projectId = adminClient.createNewProjectOnServer();
+					client = findClient(projectId);
+					nsd = client.createLocalNetworkServiceDescriptor();
+					
+					// Add the NSR-Name, Experimenter username und project ID to the related Topology
+					topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
+					topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
+					topologyResource.addProperty(Omn.hasAttribute, projectId);
+			        
+			        //Adding the Resource we are now starting to create
+					topologyResource.addProperty(Omn.hasResource,resource);
 
-				listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+					listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 
+				}
 			}
+			
 		} 
 
 			
@@ -265,7 +291,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
 			VirtualNetworkFunctionDescriptor gateway = client.createGateway(openBaton, null);
-			client.addVnfdToNsd(gateway.getId());
+			client.addVnfdToNsd(gateway);
 			return this.parseToModel(openBaton);
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.DomainNameSystem)) {
@@ -273,7 +299,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			final DomainNameSystem openBaton = new DomainNameSystem(this, instanceURI);
 			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			openBatonClient.createDomainNameSystem(openBaton, null);
+//			VirtualNetworkFunctionDescriptor dns  = client.createDomainNameSystem(openBaton, null);
+//			client.addVnfdToNsd(openBaton);
 			return this.parseToModel(openBaton);
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.ENodeB)) {
@@ -281,7 +308,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			final ENodeB openBaton = new ENodeB(this, instanceURI);
 			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			openBatonClient.createENodeB(openBaton, null);
+			client.createENodeB(openBaton, null);
 			return this.parseToModel(openBaton);
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.Switch)) {
@@ -304,7 +331,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
 			Model tmpModel = this.parseToModel(openBaton);
-			openBatonClient.createMME(openBaton, null);
+			client.createMME(openBaton, null);
 			return tmpModel;
 
 		} else if (resource.hasProperty(RDF.type, OpenBaton.Control)) {
@@ -326,11 +353,11 @@ public final class OpenBatonAdapter extends AbstractAdapter {
             FiveGCore fiveg = new FiveGCore(this, instanceURI);
             this.getInstanceList().put(instanceURI, fiveg);
             this.updateInstance(instanceURI, newInstanceModel);
-            openBatonClient.createFiveGCore(fiveg);
+            client.createFiveGCore(fiveg);
             Property property = resource.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
             property.addProperty(RDF.type, (RDFNode)OWL.FunctionalProperty);
             try {
-                CreateNSR createNsr = new CreateNSR(resource, fiveg, property, this.listener,openBatonClient);
+                CreateNSR createNsr = new CreateNSR(resource, fiveg, property, this.listener,client);
                 ManagedThreadFactory threadFactory = (ManagedThreadFactory)new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
                 Thread createVMThread = threadFactory.newThread((Runnable)createNsr);
                 createVMThread.start();
@@ -346,7 +373,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			final UE openBaton = new UE(this, instanceURI);
 			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			openBatonClient.createUe(openBaton, null);
+			client.createUe(openBaton, null);
 			Model model = this.parseToModel(openBaton);
 			return model;
 
@@ -355,7 +382,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			final SgwuPgwu openBaton = new SgwuPgwu(this, instanceURI);
 			this.getInstanceList().put(instanceURI, openBaton);
 			this.updateInstance(instanceURI, newInstanceModel);
-			openBatonClient.createSgwuPgwu(openBaton, null);
+			client.createSgwuPgwu(openBaton, null);
 			Model model = this.parseToModel(openBaton);
 			return model;
 
@@ -377,6 +404,16 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			}
 
 			return this.parseToModel(sc);
+		}
+		else if (resource.hasProperty(RDF.type) && !resource.hasProperty(RDF.type, Omn_resource.Link)) {
+			
+			OpenBatonService fiveg = new OpenBatonService(this, instanceURI);
+			this.getInstanceList().put(instanceURI, fiveg);
+			this.updateInstance(instanceURI, newInstanceModel);
+//			openBatonClient.createSgwuPgwu(fiveg, null);
+			client.addVnfdToNsd(resource);
+			Model model = this.parseToModel(fiveg);
+			return model;
 		}
 		if (LOGGER.isLoggable(Level.WARNING)) {
 			LOGGER.warning("Couldn't recognize type, so returning original model.");
@@ -443,17 +480,36 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		} else if (fivegGeneric instanceof FiveGCore) {
 			FiveGCore fiveG = (FiveGCore) fivegGeneric;
 			fiveG.parseToModel(resource);
+		}else if (fivegGeneric instanceof OpenBatonGeneric) {
+			OpenBatonGeneric fiveG =  fivegGeneric;
+			fiveG.parseToModel(resource);
 		}
 		if (LOGGER.isLoggable(Level.INFO)) {
 			LOGGER.log(Level.INFO, "CONTENT parse to model: " + resource.getModel().toString());
 		}
 		return resource.getModel();
 	}
+	
+	@Override
+	public void startNSR(Model createdInstances){
+		Property property = adapterABox.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
+        property.addProperty(RDF.type, (RDFNode)OWL.FunctionalProperty);
+        try {
+            CreateNSR createNsr = new CreateNSR(createdInstances, property, this.listener,findClient(adminProjectId));
+            ManagedThreadFactory threadFactory = (ManagedThreadFactory)new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+            Thread createVMThread = threadFactory.newThread((Runnable)createNsr);
+            createVMThread.start();
+        }
+        catch (NamingException e) {
+            e.printStackTrace();
+        }
+	}
 
 
 	public class CreateNSR	implements Runnable {
 	    private Resource resource;
-	    private FiveGCore fiveG;
+	    private Model createdInstances;
+//	    private OpenBatonGeneric fiveG;
 	    private NetworkServiceRecord fivegNSR;
 	    private Property property;
 	    private OpenBatonClient client;
@@ -464,7 +520,17 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    public CreateNSR(Resource resource, OpenBatonGeneric openBatonGeneric, Property property, OpenBatonAdapterMDBSender parent,OpenBatonClient client) {
 	        this.resource = resource;
 	        this.parent = parent;
-	        this.fiveG = (FiveGCore)openBatonGeneric;
+//	        this.fiveG = openBatonGeneric;
+	        this.property = property;
+	        this.client = client;
+	        this.counter = 0;
+	        LOGGER.log(Level.SEVERE, "Thread Created");
+	    }
+	    
+	    public CreateNSR(Model model, Property property, OpenBatonAdapterMDBSender parent,OpenBatonClient client) {
+	        this.createdInstances = model;
+	        this.parent = parent;
+//	        this.fiveG = openBatonGeneric;
 	        this.property = property;
 	        this.client = client;
 	        this.counter = 0;
@@ -474,20 +540,19 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    @Override
 	    public void run() {
 	        while (!Thread.currentThread().isInterrupted() && this.counter < 10) {
-	            LOGGER.log(Level.SEVERE, "Starting RUN MEthode now");
+	            LOGGER.log(Level.SEVERE, "Starting RUN Methode now");
 	            try {
 	                try {
-	                    if (this.fivegNSR == null) {
-	                        this.fiveG.setNsr(client.getAllNSRs().get(0));
-	                        this.fivegNSR = this.fiveG.getNsr();
+	                    if (fivegNSR == null) {
+	                    	fivegNSR = client.createNetworkServiceRecord();
 	                    }
 	                }
 	                catch (Exception e) {
 	                    LOGGER.log(Level.SEVERE, "Exception in getting All NSRs");
 	                }
-	                ++this.counter;
-	                if (this.checkIfNsrIsActive()) {
-	                    this.getIpsFromNsr();
+	                ++counter;
+	                if (checkIfNsrIsActive()) {
+	                    getIpsFromNsr();
 	                    LOGGER.log(Level.SEVERE, "Adding LoginResource to Resource");
 	                    LOGGER.log(Level.SEVERE, "-------------------------------------------");
 	                    Resource loginService = this.resource.getModel().createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
@@ -541,8 +606,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	    
 	    public boolean checkIfNsrIsActive() throws InterruptedException {
-	        this.fivegNSR = this.client.updateNetworkServiceRecord(this.fivegNSR);
-	        String status = this.fivegNSR.getStatus().toString();
+	        fivegNSR = client.updateNetworkServiceRecord(fivegNSR);
+	        String status = fivegNSR.getStatus().toString();
 	        LOGGER.log(Level.SEVERE, "STATUS of NSR: " + status);
 	        switch (status) {
 	            case "NULL": {
@@ -713,46 +778,30 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		return fiveg;
 	}
 
-	public void createNewVnfPackage() {
-        String mmeID;
-        MME mme = new MME(this, "http://TEST.OPENBATON.MME");
-        this.createdDebugMME = this.openBatonClient.createMME(mme);
-        this.debugString = mmeID = this.createdDebugMME.getId();
-        Model newmModel = ModelFactory.createDefaultModel();
-        Resource newResource = newmModel.createResource("http://TEST.OPENBATON.RESOURCE");
-        newResource.addProperty(RDF.type, OWL.Class);
-        newResource.addProperty((Property)Omn_lifecycle.hasID, mmeID);
-        newResource.addProperty(RDFS.subClassOf, Omn.Resource);
-        this.adapterABox.addProperty((Property)Omn_lifecycle.canImplement, newResource);
-        this.adapterABox.getModel().add(newResource.getModel());
-        ResIterator propIterator = this.adapterTBox.listSubjectsWithProperty(RDFS.domain, newResource);
-        while (propIterator.hasNext()) {
-            Property property = this.adapterTBox.getProperty(((Resource)propIterator.next()).getURI());
-        }
-        this.listener.publishModelUpdate(this.adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-	}
+
 
 	public void updateOldVnfPackage() {
 		// TODO Auto-generated method stub
 
 	}
 
-	public void addUploadedPackageToDatabase(UUID uuid, String fileName,String projectId) {
+	public void addUploadedPackageToDatabase(String id, String fileName,String projectId) {
 		
-		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(adapterABox.getLocalName()+"/" +fileName);
-		resourceToCreate.addProperty(Omn_lifecycle.hasID,uuid.toString());
+//		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(adapterABox.getLocalName()+"/" +fileName);
+		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(OpenBaton.NAMESPACE  +fileName);
+		resourceToCreate.addProperty(Omn_lifecycle.hasID,id);
 		resourceToCreate.addProperty(RDFS.label,fileName);
 		resourceToCreate.addProperty(RDFS.subClassOf, Omn.Resource);
 		resourceToCreate.addProperty(Omn.isAttributeOf, projectId);
 		adapterABox.addProperty(Omn_lifecycle.canImplement, resourceToCreate);
-        listener.publishModelUpdate(adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
         listener.publishModelUpdate(resourceToCreate.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+        listener.publishModelUpdate(adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 
 	}
 
-	public void uploadPackageToDatabase(String projectId,String fileDirectory) {
+	public String uploadPackageToDatabase(String projectId,String fileDirectory) {
 		OpenBatonClient client = findClient(projectId);
-		client.uploadPackageToDatabase(fileDirectory);		
+		return client.uploadPackageToDatabase(fileDirectory);		
 	}
 
 	private OpenBatonClient findClient(String projectId) {
@@ -763,5 +812,33 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			return clientList.get(projectId);
 		}
 	}
+
+	public String getAdminProjectId() {
+		return adminProjectId;
+	}
+
+	public void setAdminProjectId(String adminProjectId) {
+		this.adminProjectId = adminProjectId;
+	}
+	
+	
+//	public void createNewVnfPackage() {
+//  String mmeID;
+//  MME mme = new MME(this, "http://TEST.OPENBATON.MME");
+//  this.createdDebugMME = this.admin.createMME(mme);
+//  this.debugString = mmeID = this.createdDebugMME.getId();
+//  Model newmModel = ModelFactory.createDefaultModel();
+//  Resource newResource = newmModel.createResource("http://TEST.OPENBATON.RESOURCE");
+//  newResource.addProperty(RDF.type, OWL.Class);
+//  newResource.addProperty((Property)Omn_lifecycle.hasID, mmeID);
+//  newResource.addProperty(RDFS.subClassOf, Omn.Resource);
+//  this.adapterABox.addProperty((Property)Omn_lifecycle.canImplement, newResource);
+//  this.adapterABox.getModel().add(newResource.getModel());
+//  ResIterator propIterator = this.adapterTBox.listSubjectsWithProperty(RDFS.domain, newResource);
+//  while (propIterator.hasNext()) {
+//      Property property = this.adapterTBox.getProperty(((Resource)propIterator.next()).getURI());
+//  }
+//  this.listener.publishModelUpdate(this.adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+//}
 
 }

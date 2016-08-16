@@ -4,6 +4,7 @@ import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
+import info.openmultinet.ontology.vocabulary.OpenBaton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -154,10 +155,14 @@ public abstract class AbstractAdapter {
 				createdInstancesModel.add(createdInstance);
 			}
 		}
+
 		if (createdInstancesModel.isEmpty()) {
 			LOGGER.log(Level.WARNING,
 					"Could not find any new instances to create...");
 			throw new ProcessingException(Response.Status.CONFLICT.name());
+		}
+		if(getAdapterABox().hasProperty(RDF.type, OpenBaton.OpenBatonAdapter)){
+			startNSR(createdInstancesModel);
 		}
 
 		return createdInstancesModel;
@@ -325,6 +330,8 @@ public abstract class AbstractAdapter {
 	}
 
 	public abstract Resource getAdapterABox();
+	
+	public void startNSR(Model createdInstancesModel){};
 
 	public abstract Model getAdapterDescriptionModel();
 

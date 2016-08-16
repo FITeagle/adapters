@@ -84,6 +84,9 @@ public class OpenBatonAdapterControl extends AdapterControl {
                 String password  = adapterInstanceObject.getString("password");
                 adapter.setPassword(password);		
                 
+                String adminProjectId  = adapterInstanceObject.getString("adminProjectId");
+                adapter.setAdminProjectId(adminProjectId);	
+                
                 String nfvoIp  = adapterInstanceObject.getString("nfvoIp");
                 adapter.setNfvoIp(nfvoIp);
                 

@@ -9,6 +9,7 @@
 @prefix omn-federation: <http://open-multinet.info/ontology/omn-federation#> .
 @prefix omn-resource: <http://open-multinet.info/ontology/omn-resource#> .
 @prefix wgs: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix omn-example: <http://open-multinet.info/example#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 
 openbaton:OpenBatonAdapter
@@ -26,10 +27,12 @@ openbaton:OpenBatonAdapter
     omn-lifecycle:implements   openbaton:VirtualNetworkFunctionPackage ;
     omn-lifecycle:implements   openbaton:VirtualDeploymentUnit ;
     omn-lifecycle:implements   omn-resource:Link ;
+    omn-lifecycle:implements   omn-example:raw-pc;
     omn-lifecycle:implements   openbaton:VimInstance .
 
 
 omn-resource:Link     omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+omn-example:raw-pc omn-lifecycle:implementedBy openbaton:OpenBatonAdapter.
 openbaton:MME					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
 openbaton:UE					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
 openbaton:SgwuPgwu				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .

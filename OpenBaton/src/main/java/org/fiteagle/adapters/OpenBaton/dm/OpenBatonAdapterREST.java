@@ -80,15 +80,15 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
 	return this.controller.getAdapterInstances();
     }
 
-    @GET
-    @Path("/create")
-    public Response hallo() {
-    	if(adapter == null){
-    	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
-    	}
-    	adapter.createNewVnfPackage();
-	return Response.ok("HalloWelt2").build();
-    }
+//    @GET
+//    @Path("/create")
+//    public Response hallo() {
+//    	if(adapter == null){
+//    	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
+//    	}
+//    	adapter.createNewVnfPackage();
+//	return Response.ok("HalloWelt2").build();
+//    }
     
     @GET
     @Path("/update")
@@ -169,8 +169,9 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	            	}
     	            	
     	            	if(uuid != null && fileName != null  && projectId != null){
-    	                	adapter.addUploadedPackageToDatabase(uuid,fileName,projectId);
-    	                	adapter.uploadPackageToDatabase(projectId,fileNameWithDirectory);
+    	                	String vnfPackageId = adapter.uploadPackageToDatabase(projectId,fileNameWithDirectory);
+
+    	                	adapter.addUploadedPackageToDatabase(vnfPackageId,fileName,projectId);
     	                	
     	                	return Response.status(200).entity("Uploaded file name : " + fileName + "\n")
     	                            .build();
