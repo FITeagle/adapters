@@ -6,9 +6,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.jena.atlas.lib.RandomLib;
 import org.fiteagle.adapters.OpenBaton.Model.DomainNameSystem;
 import org.fiteagle.adapters.OpenBaton.Model.ENodeB;
 import org.fiteagle.adapters.OpenBaton.Model.FiveGCore;
@@ -17,6 +19,7 @@ import org.fiteagle.adapters.OpenBaton.Model.MME;
 import org.fiteagle.adapters.OpenBaton.Model.OpenBatonService;
 import org.fiteagle.adapters.OpenBaton.Model.SgwuPgwu;
 import org.fiteagle.adapters.OpenBaton.Model.UE;
+import org.fiteagle.api.tripletStoreAccessor.TripletStoreAccessor;
 import org.openbaton.catalogue.mano.common.VNFDeploymentFlavour;
 import org.openbaton.catalogue.mano.descriptor.InternalVirtualLink;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
@@ -36,12 +39,16 @@ import org.openbaton.sdk.api.rest.VirtualLinkRestAgent;
 import org.openbaton.sdk.api.rest.VirtualNetworkFunctionDescriptorRestAgent;
 
 import com.google.common.annotations.Beta;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+
+import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 public class OpenBatonClient {
 	private static final Logger LOGGER = Logger.getLogger(OpenBatonClient.class.toString());
@@ -61,6 +68,7 @@ public class OpenBatonClient {
 	private NetworkServiceRecord networkServiceRecord;
 	private HashMap<String,VirtualNetworkFunctionDescriptor> vnfdMap;
 	private List<VirtualNetworkFunctionDescriptor> vnfdList;
+
 
 
 	private NFVORequestor nfvoRequestor;
@@ -150,7 +158,7 @@ public class OpenBatonClient {
 
 	public NetworkServiceRecord createNetworkServiceRecord(){
 
-			createNetworkServiceDescriptor(networkServiceDescriptor);
+			createNetworkServiceDescriptor();
 			networkServiceRecord = createNetworkServiceRecord(networkServiceDescriptor.getId());
 			
 			return networkServiceRecord;
@@ -169,6 +177,11 @@ public class OpenBatonClient {
 	
 	public NetworkServiceDescriptor createLocalNetworkServiceDescriptor (){
 	networkServiceDescriptor = new NetworkServiceDescriptor();
+	networkServiceDescriptor.setName("Test-"+  new Random().nextInt());
+	networkServiceDescriptor.setVendor("vendor");
+	networkServiceDescriptor.setEnabled(true);
+	networkServiceDescriptor.setVersion("demo");
+
 		return networkServiceDescriptor;
 		
 	}
@@ -187,9 +200,29 @@ public class OpenBatonClient {
 	
 	}
 	
+	public NetworkServiceDescriptor createNetworkServiceDescriptor() {
+		checkRequestor();
+		addVirtualLinksToTheNsd();
+
+			try {
+				networkServiceDescriptor = nsdAgent.create(networkServiceDescriptor);
+				return networkServiceDescriptor;
+			} catch (SDKException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return null;
+	
+	}
+	
 	private void addVirtualLinksToTheNsd() {
 		Set<VirtualLinkDescriptor> virtualLinkSet = networkServiceDescriptor.getVld();
 		if(virtualLinkSet == null) virtualLinkSet = new HashSet<VirtualLinkDescriptor>();
+		HashMap<String,VirtualLinkDescriptor> virtualLinkMap = new HashMap<String,VirtualLinkDescriptor>();
+		
+		for(VirtualLinkDescriptor vld : virtualLinkSet){
+			virtualLinkMap.put(vld.getName(), vld);
+		}
 		
 		if(vnfdMap == null){
 			updateVnfdsList();
@@ -199,11 +232,15 @@ public class OpenBatonClient {
 					for(InternalVirtualLink v : vlList){
 						VirtualLinkDescriptor tmpVld = new VirtualLinkDescriptor();
 						tmpVld.setName(v.getName());
-						virtualLinkSet.add(tmpVld);
-					}	
+						if(!virtualLinkMap.containsKey(tmpVld.getName())){
+							virtualLinkSet.add(tmpVld);
+							virtualLinkMap.put(tmpVld.getName(), tmpVld);
+						}
+						}	
 				}
 			}
 			networkServiceDescriptor.setVld(virtualLinkSet);
+			
 			}else{
 				for(String s : vnfdMap.keySet()){
 					Set<InternalVirtualLink> vlList = vnfdMap.get(s).getVirtual_link();
@@ -211,7 +248,10 @@ public class OpenBatonClient {
 					for(InternalVirtualLink v : vlList){
 						VirtualLinkDescriptor tmpVld = new VirtualLinkDescriptor();
 						tmpVld.setName(v.getName());
-						virtualLinkSet.add(tmpVld);
+						if(!virtualLinkMap.containsKey(tmpVld.getName())){
+							virtualLinkSet.add(tmpVld);
+							virtualLinkMap.put(tmpVld.getName(), tmpVld);
+						}
 					}
 					
 				}
@@ -229,21 +269,6 @@ public class OpenBatonClient {
 		}		
 	}
 
-	public NetworkServiceDescriptor createNetworkServiceDescriptor() {
-		checkRequestor();
-		addVirtualLinksToTheNsd();
-
-			try {
-				networkServiceDescriptor = nsdAgent.create(networkServiceDescriptor);
-				return networkServiceDescriptor;
-			} catch (SDKException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		return null;
-	
-	}
-	
 	public NetworkServiceDescriptor createNetworkServiceDescriptor(OpenBatonService openBaton) {
 		checkRequestor();
 		NetworkServiceDescriptor networkDescriptor = new NetworkServiceDescriptor();
@@ -305,9 +330,9 @@ public class OpenBatonClient {
 
 	public NetworkServiceDescriptor getNetworkServiceDescriptor(String nsdId) {
 		checkRequestor();
-		NetworkServiceDescriptor nsd;
+		
 		try {
-			nsd = nfvoRequestor.getNetworkServiceDescriptorAgent().findById(nsdId);
+			NetworkServiceDescriptor nsd = nsdAgent.findById(nsdId);
 			return nsd;
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -426,6 +451,7 @@ public class OpenBatonClient {
 		return null;
 	}
 
+
 	public static class InsufficientOpenBatonPreferences extends RuntimeException {
 
 		private static final long serialVersionUID = 6511540487288262809L;
@@ -445,6 +471,7 @@ public class OpenBatonClient {
 				if (vnfd.getVnfPackageLocation().equals(createdPackage.getId())){
 					String[] nameArray = fileNameWithDirectory.split("/");
 					fileName =  nameArray[nameArray.length -1 ];
+//					vnfd.setName(fileName);
 					vnfdMap.put(fileName, vnfd);
 				}
 			}
@@ -478,29 +505,56 @@ public class OpenBatonClient {
 		
 		
 		VirtualNetworkFunctionDescriptor foundVnfd = null;
-
+		String foundVnfdUri = null; 
 			StmtIterator propertyIterator = vnfResource.listProperties(RDF.type);
 			for(Statement p : propertyIterator.toList()){
 				String uri = null;
 				if(p.getObject().isLiteral()) {uri = p.getObject().asLiteral().getString();}
 				if(p.getObject().isResource()) {uri = p.getObject().asResource().getURI();}
 				String[] tmpArray = uri.split("#");
-				uri = tmpArray[1];
+				String name = tmpArray[1];
 				
-				if (vnfdMap.containsKey(uri)){
-					VirtualNetworkFunctionDescriptor tmpVnf = vnfdMap.get(uri);
+				if (vnfdMap.containsKey(name)){
+					VirtualNetworkFunctionDescriptor tmpVnf = vnfdMap.get(name);
 					foundVnfd = new VirtualNetworkFunctionDescriptor();
 					foundVnfd.setId(tmpVnf.getId());
-					
-				}
+				}else{
+					Model vnfd = TripletStoreAccessor.getResource(uri);
+					if(vnfd.contains(null, Omn_lifecycle.hasID)){
+						String vnfdId = vnfd.getProperty(null, Omn_lifecycle.hasID).getObject().asLiteral().getString();
+//						String vnfdId = vnfd.listProperties(Omn_lifecycle.hasID).next().getObject().asLiteral().toString();
+			            VirtualNetworkFunctionDescriptor tmpVnfd = getVirtualNetworkFunctionDescriptor(vnfdId);
+			            if(tmpVnfd != null){
+			            	vnfdMap.put(uri, tmpVnfd);	
+			            	foundVnfd = new VirtualNetworkFunctionDescriptor();
+							foundVnfd.setId(tmpVnfd.getId());
+			            }
+					}
+		           }
 			}
 
 		if(foundVnfd != null){
 			networkServiceDescriptor.getVnfd().add(foundVnfd);
 		}else{
             LOGGER.log(Level.SEVERE, "Could not found correct VNFD in List");
+//            Resource vnfd = ModelFactory.createDefaultModel().createResource(foundVnfdUri);
+//            String vnfdId = vnfd.listProperties(Omn_lifecycle.hasID).next().getObject().asLiteral().toString();
+//            VirtualNetworkFunctionDescriptor tmpVnfd = getVirtualNetworkFunctionDescriptor(vnfdId);
+//            
+//            if(tmpVnfd != null){
+//            	vnfdMap.put(key, tmpVnfd);
+//            }
 		}
 //		updateNetworkServiceDescriptor(networkServiceDescriptor, networkServiceDescriptor.getId());
+	}
+	public VirtualNetworkFunctionDescriptor getVirtualNetworkFunctionDescriptor(String id){
+		try {
+			return vnfdAgent.findById(id);
+		} catch (ClassNotFoundException | SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public NetworkServiceDescriptor getNetworkServiceDescriptor() {

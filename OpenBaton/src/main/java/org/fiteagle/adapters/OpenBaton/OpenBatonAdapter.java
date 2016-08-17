@@ -33,6 +33,7 @@ import org.fiteagle.api.core.IMessageBus;
 import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
+import org.fiteagle.api.tripletStoreAccessor.TripletStoreAccessor;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
@@ -46,6 +47,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -85,7 +87,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	private transient final HashMap<String, OpenBatonGeneric> instanceList = new HashMap<String, OpenBatonGeneric>();
 	private HashMap<String,OpenBatonClient> clientList = new HashMap<String,OpenBatonClient>();
 	
-	public OpenBatonAdapter(final Model adapterModel, final Resource adapterABox) {
+	public OpenBatonAdapter(final Model adapterModel, Resource adapterABox) {
 		super();
 		this.uuid = UUID.randomUUID().toString();
 		this.adapterTBox = adapterModel;
@@ -115,6 +117,15 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			while (propIterator.hasNext()) {
 				final Property property = this.adapterTBox.getProperty(propIterator.next().getURI());
 			}
+		}
+		
+		Model newImplementables = TripletStoreAccessor.getResource(adapterABox.getURI());
+		NodeIterator iterator = newImplementables.listObjectsOfProperty(Omn_lifecycle.canImplement);
+		while(iterator.hasNext()){
+			RDFNode statement = iterator.next();
+			Resource resource = statement.asResource();
+			this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
+			this.adapterABox.getModel().add(resource.getModel());
 		}
 	}
 
@@ -232,6 +243,22 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				client = findClient(adminProjectId);
 				nsd = client.getNetworkServiceDescriptor();
 				if(nsd == null){
+					nsd = client.createLocalNetworkServiceDescriptor();
+					topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
+					topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
+					topologyResource.addProperty(Omn.hasAttribute, debugProjectId);
+			        
+			        //Adding the Resource we are now starting to create
+					topologyResource.addProperty(Omn.hasResource,resource);
+
+					listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+				}else{
+					if(nsd.getId() != null){
+						nsd = client.getNetworkServiceDescriptor(nsd.getId());
+					}
+				}
+				
+			if(nsd == null){
 					nsd = client.createLocalNetworkServiceDescriptor();
 					topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
 					topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
