@@ -194,7 +194,7 @@ public class OpenBatonClient {
 				return networkServiceDescriptor;
 			} catch (SDKException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				e.printStackTrace(); 
 			}
 		return null;
 	
