@@ -462,7 +462,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		property.addProperty(RDF.type, OWL.FunctionalProperty);
 
 		if (!(fivegGeneric instanceof Topology)) {
-			resource.addProperty(property, Omn_lifecycle.Ready);
+			resource.addProperty(property, Omn_lifecycle.Uncompleted);
 			final Property propertyLabel = resource.getModel().createProperty(RDFS.label.getNameSpace(),
 					RDFS.label.getLocalName());
 			propertyLabel.addProperty(RDF.type, OWL.FunctionalProperty);
