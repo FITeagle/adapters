@@ -1,6 +1,7 @@
 package org.fiteagle.adapters.OpenBaton;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -119,6 +120,14 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			}
 		}
 		
+
+	}
+
+	public void init() {
+//		openBatonClient.init();
+//		adminClient = new OpenBatonClient(this, adminProjectId);
+		adminClient = findClient(adminProjectId);
+		
 		Model newImplementables = TripletStoreAccessor.getResource(adapterABox.getURI());
 		NodeIterator iterator = newImplementables.listObjectsOfProperty(Omn_lifecycle.canImplement);
 		while(iterator.hasNext()){
@@ -127,12 +136,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
 			this.adapterABox.getModel().add(resource.getModel());
 		}
-	}
 
-	public void init() {
-//		openBatonClient.init();
-//		adminClient = new OpenBatonClient(this, adminProjectId);
-		adminClient = findClient(adminProjectId);
 	}
 
 	@Override
@@ -437,7 +441,6 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			OpenBatonService fiveg = new OpenBatonService(this, instanceURI);
 			this.getInstanceList().put(instanceURI, fiveg);
 			this.updateInstance(instanceURI, newInstanceModel);
-//			openBatonClient.createSgwuPgwu(fiveg, null);
 			client.addVnfdToNsd(resource);
 			Model model = this.parseToModel(fiveg);
 			return model;
@@ -578,34 +581,72 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	                    LOGGER.log(Level.SEVERE, "Exception in getting All NSRs");
 	                }
 	                ++counter;
+	                // Check if the NSR is allready started and Ready.
 	                if (checkIfNsrIsActive()) {
-	                    getIpsFromNsr();
-	                    LOGGER.log(Level.SEVERE, "Adding LoginResource to Resource");
-	                    LOGGER.log(Level.SEVERE, "-------------------------------------------");
-	                    Resource loginService = this.resource.getModel().createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
-	                    if (OpenBatonAdapter.this.vpnIP == null || OpenBatonAdapter.this.vpnIP.equals("") || OpenBatonAdapter.this.vpnPort == null || OpenBatonAdapter.this.vpnPort.equals("")) {
-	                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-	                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-	                        loginService.addProperty((Property)Omn_service.username, "home");
-	                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
-	                        loginService.addProperty((Property)Omn_service.port, "22");
-	                    } else {
-	                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-	                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-	                        loginService.addProperty((Property)Omn_service.username, "home");
-	                        loginService.addProperty((Property)Omn_service.hostname, OpenBatonAdapter.this.vpnIP);
-	                        loginService.addProperty((Property)Omn_service.port, OpenBatonAdapter.this.vpnPort);
-	                    }
-	                    this.resource.addProperty((Property)Omn.hasService, (RDFNode)loginService);
-	                    Statement blub = this.resource.getProperty(this.property);
-	                    blub.changeObject((RDFNode)Omn_lifecycle.Started);
-	                    this.resource.addProperty(this.property, (RDFNode)Omn_lifecycle.Started);
-	                    this.resource.addProperty((Property)Omn_lifecycle.hasOriginalID, this.fivegNSR.getId());
-	                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
-	                    this.parent.publishModelUpdate(this.resource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-	                    LOGGER.log(Level.SEVERE, "Killing Thread now");
-	                    Thread.currentThread().interrupt();
-	                    continue;
+	                	
+	                	//Check if we are working on the Model-Object(More than 1 Nodes) or the Resource-Object(1 Instance/Node)
+	                	if(resource == null){
+	                		LOGGER.log(Level.SEVERE, "Adding LoginResource to Resource");
+		                    LOGGER.log(Level.SEVERE, "-------------------------------------------");
+		                    Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+		                    if (OpenBatonAdapter.this.vpnIP == null || OpenBatonAdapter.this.vpnIP.equals("") || OpenBatonAdapter.this.vpnPort == null || OpenBatonAdapter.this.vpnPort.equals("")) {
+		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+		                        loginService.addProperty((Property)Omn_service.username, "home");
+		                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
+		                        loginService.addProperty((Property)Omn_service.port, "22");
+		                    } else {
+		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+		                        loginService.addProperty((Property)Omn_service.username, "home");
+		                        loginService.addProperty((Property)Omn_service.hostname, OpenBatonAdapter.this.vpnIP);
+		                        loginService.addProperty((Property)Omn_service.port, OpenBatonAdapter.this.vpnPort);
+		                    }
+		                    
+		                    ResIterator resIterator = createdInstances.listResourcesWithProperty(Omn_lifecycle.hasState);
+		                    Model updatedInstances = ModelFactory.createDefaultModel();
+		                    for (Resource r : resIterator.toList()){
+		                    	r.addProperty(Omn.hasService, loginService);
+		                    	Statement blub = r.getProperty(property);
+			                    blub.changeObject(Omn_lifecycle.Started);
+		                    	r.addProperty(property, Omn_lifecycle.Started);
+			                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
+			                    updatedInstances.add(r.getModel());
+//			                    parent.publishModelUpdate(r.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+		                    }
+		                    parent.publishModelUpdate(updatedInstances, UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+		                    LOGGER.log(Level.SEVERE, "Killing Thread now");
+		                    Thread.currentThread().interrupt();
+	                	}else{
+	                		getIpsFromNsr();
+		                    LOGGER.log(Level.SEVERE, "Adding LoginResource to Resource");
+		                    LOGGER.log(Level.SEVERE, "-------------------------------------------");
+		                    Resource loginService = this.resource.getModel().createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+		                    if (OpenBatonAdapter.this.vpnIP == null || OpenBatonAdapter.this.vpnIP.equals("") || OpenBatonAdapter.this.vpnPort == null || OpenBatonAdapter.this.vpnPort.equals("")) {
+		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+		                        loginService.addProperty((Property)Omn_service.username, "home");
+		                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
+		                        loginService.addProperty((Property)Omn_service.port, "22");
+		                    } else {
+		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+		                        loginService.addProperty((Property)Omn_service.username, "home");
+		                        loginService.addProperty((Property)Omn_service.hostname, OpenBatonAdapter.this.vpnIP);
+		                        loginService.addProperty((Property)Omn_service.port, OpenBatonAdapter.this.vpnPort);
+		                    }
+		                    this.resource.addProperty((Property)Omn.hasService, (RDFNode)loginService);
+		                    Statement blub = this.resource.getProperty(this.property);
+		                    blub.changeObject((RDFNode)Omn_lifecycle.Started);
+		                    this.resource.addProperty(this.property, (RDFNode)Omn_lifecycle.Started);
+		                    this.resource.addProperty((Property)Omn_lifecycle.hasOriginalID, this.fivegNSR.getId());
+		                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
+		                    this.parent.publishModelUpdate(this.resource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+		                    LOGGER.log(Level.SEVERE, "Killing Thread now");
+		                    Thread.currentThread().interrupt();
+		                    continue;	
+	                	}
+	                    
 	                }
 	                Thread.currentThread();
 	                Thread.sleep(30000);
@@ -661,8 +702,9 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	@Override
 	public void deleteInstance(String instanceURI)
 			throws InstanceNotFoundException, InvalidRequestException, ProcessingException {
-		// TODO Auto-generated method stub
-
+		OpenBatonClient client = findClient(adminProjectId);
+		client.stopNetworkServiceRecord();
+		client.deleteNetworkServiceDescriptor();
 	}
 
 	@Override

@@ -381,14 +381,43 @@ public class OpenBatonClient {
 
 	}
 
-	
-
-	public void createVirtualNetworkFunctionPackage() {
-
+	public void stopNetworkServiceRecord(){
+		try {
+			nsrAgent.delete(networkServiceRecord.getId());
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-
-	public void createPoPInstance() {
-
+	
+	public void stopNetworkServiceRecord(String nsrId){
+		try {
+			nsrAgent.delete(nsrId);
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteNetworkServiceDescriptor(String nsrId){
+		try {
+			nsdAgent.delete(nsrId);
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteNetworkServiceDescriptor(){
+		try {
+			nsdAgent.delete(networkServiceDescriptor.getId());
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	public List<NetworkServiceDescriptor> getAllNSDs() {
@@ -441,8 +470,8 @@ public class OpenBatonClient {
 	public NetworkServiceRecord updateNetworkServiceRecord(NetworkServiceRecord nsr) {
 		checkRequestor();
 		try {
-			NetworkServiceRecord updatedNSR = nsrAgent.findById(nsr.getId());
-			return updatedNSR;
+			networkServiceRecord = nsrAgent.findById(nsr.getId());
+			return networkServiceRecord;
 		} catch (SDKException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -506,6 +535,8 @@ public class OpenBatonClient {
 		
 		VirtualNetworkFunctionDescriptor foundVnfd = null;
 		String foundVnfdUri = null; 
+		
+			// List all Statements with the Property "type"
 			StmtIterator propertyIterator = vnfResource.listProperties(RDF.type);
 			for(Statement p : propertyIterator.toList()){
 				String uri = null;
@@ -514,11 +545,41 @@ public class OpenBatonClient {
 				String[] tmpArray = uri.split("#");
 				String name = tmpArray[1];
 				
+				//If the Objectname of the Statement is in our vnfd-Map -> set foundVnfd
 				if (vnfdMap.containsKey(name)){
 					VirtualNetworkFunctionDescriptor tmpVnf = vnfdMap.get(name);
 					foundVnfd = new VirtualNetworkFunctionDescriptor();
 					foundVnfd.setId(tmpVnf.getId());
-				}else{
+				}
+				// If the slivertype was not set correctly and type is raw-pc, try to find the real type in Database
+				else if (name.equals("raw-pc")) {
+					Statement tmpStatement = vnfResource.getProperty(Omn_lifecycle.hasComponentID);
+					String componentURI = null;
+					if(tmpStatement.getObject().isLiteral()) {componentURI = tmpStatement.getObject().asLiteral().getString();}
+					if(tmpStatement.getObject().isResource()) {componentURI = tmpStatement.getObject().asResource().getURI();}
+					
+					String componentName = null;
+					tmpArray = componentURI.split("\\+");
+					componentName = tmpArray[tmpArray.length-1];
+					
+					Model vnfd = TripletStoreAccessor.getResource("http://open-multinet.info/ontology/resource/openbaton#" + componentName);
+					//If this resource exists , try to find the vnfd-id
+					if(vnfd != null){
+						if(vnfd.contains(null, Omn_lifecycle.hasID)){
+							String vnfdId = vnfd.getProperty(null, Omn_lifecycle.hasID).getObject().asLiteral().getString();
+//							String vnfdId = vnfd.listProperties(Omn_lifecycle.hasID).next().getObject().asLiteral().toString();
+				            VirtualNetworkFunctionDescriptor tmpVnfd = getVirtualNetworkFunctionDescriptor(vnfdId);
+				            if(tmpVnfd != null){
+				            	vnfdMap.put("http://open-multinet.info/ontology/resource/openbaton#"+componentName, tmpVnfd);	
+				            	foundVnfd = new VirtualNetworkFunctionDescriptor();
+								foundVnfd.setId(tmpVnfd.getId());
+				            }
+						}
+					}
+					
+				}
+				//If it was not found in the map, check RDF-Database for the vnfd
+				else{
 					Model vnfd = TripletStoreAccessor.getResource(uri);
 					if(vnfd.contains(null, Omn_lifecycle.hasID)){
 						String vnfdId = vnfd.getProperty(null, Omn_lifecycle.hasID).getObject().asLiteral().getString();
