@@ -2,12 +2,16 @@ package org.fiteagle.adapters.OpenBaton;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
+import javax.ejb.Init;
+import javax.ejb.PostActivate;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -36,6 +40,7 @@ import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
 import org.fiteagle.api.tripletStoreAccessor.TripletStoreAccessor;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 
@@ -83,7 +88,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
     private String debugString;
     private VirtualNetworkFunctionDescriptor createdDebugMME;
 	private Resource debugTopologyResource;
-    private String debugProjectId ="d28a8a82-d503-42c5-80e5-899469e9255d";
+    private String debugProjectId = "d28a8a82-d503-42c5-80e5-899469e9255d";
 
 	private transient final HashMap<String, OpenBatonGeneric> instanceList = new HashMap<String, OpenBatonGeneric>();
 	private HashMap<String,OpenBatonClient> clientList = new HashMap<String,OpenBatonClient>();
@@ -123,19 +128,46 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	}
 
+//	@PostConstruct
 	public void init() {
 //		openBatonClient.init();
 //		adminClient = new OpenBatonClient(this, adminProjectId);
 		adminClient = findClient(adminProjectId);
 		
+		// TODO CHANGE WHEN DEBUG IS OVER
+		OpenBatonClient initClient = adminClient;
+		
+		// Refresh the adapterABox Model with infos from Database
 		Model newImplementables = TripletStoreAccessor.getResource(adapterABox.getURI());
 		NodeIterator iterator = newImplementables.listObjectsOfProperty(Omn_lifecycle.canImplement);
-		while(iterator.hasNext()){
-			RDFNode statement = iterator.next();
-			Resource resource = statement.asResource();
-			this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
-			this.adapterABox.getModel().add(resource.getModel());
-		}
+		
+		//If Adapter has no "canImplement" Resources check on OpenBaton-Server
+			while(iterator.hasNext()){
+				RDFNode statement = iterator.next();
+				Resource resource = statement.asResource();
+				this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
+				this.adapterABox.getModel().add(resource.getModel());
+			}	
+			
+			try{
+				List<VirtualLinkDescriptor> vnfdList = initClient.getAllVnfDescriptor();
+				for(VirtualLinkDescriptor v : vnfdList){
+					Resource newResource = this.adapterABox.getModel().createResource(Omn.NAMESPACE + v.getName());
+					newResource.addProperty(RDFS.label, v.getName());
+					newResource.addProperty(RDFS.subClassOf, Omn.Resource);
+					newResource.addProperty(Omn_lifecycle.hasID, v.getId());
+					
+					this.adapterABox.addProperty(Omn_lifecycle.canImplement, newResource);
+					this.adapterABox.getModel().add(newResource.getModel());
+				}
+                listener.publishModelUpdate(this.adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+
+		
+		
 
 	}
 
@@ -280,15 +312,22 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				
 			}else{
 				//If NSR allready exists, add this instance to it. Else create one and add it
-				if(topologyResource.hasProperty(Omn_resource.hasHardwareType)){
-					client = findClient(topologyResource.getProperty(Omn.hasAttribute).getString());
-					nsd = client.getNetworkServiceDescriptor();
+//				if(topologyResource.hasProperty(Omn_resource.hasHardwareType)){
+//					client = findClient(topologyResource.getProperty(Omn.hasAttribute).getString());
+				if(topology.getProjectId() != null){
+						client = findClient(topology.getProjectId());
+						nsd = client.getNetworkServiceDescriptor();
+					
 					
 					//Adding the Resource we are now starting to create
-					topologyResource.addProperty(Omn.hasResource,resource);
+//					topologyResource.addProperty(Omn.hasResource,resource);
 				}else{
+					LOGGER.log(Level.WARNING, "ProjectId of Topology was NULL - Creating new Project/Client");
+					
 					String projectId = adminClient.createNewProjectOnServer();
 					client = findClient(projectId);
+					topology.setProjectId(projectId);
+					topology.setProjectClient(client);
 					nsd = client.createLocalNetworkServiceDescriptor();
 					
 					// Add the NSR-Name, Experimenter username und project ID to the related Topology
@@ -297,7 +336,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 					topologyResource.addProperty(Omn.hasAttribute, projectId);
 			        
 			        //Adding the Resource we are now starting to create
-					topologyResource.addProperty(Omn.hasResource,resource);
+//					topologyResource.addProperty(Omn.hasResource,resource);
 
 					listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 
@@ -702,9 +741,15 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	@Override
 	public void deleteInstance(String instanceURI)
 			throws InstanceNotFoundException, InvalidRequestException, ProcessingException {
-		OpenBatonClient client = findClient(adminProjectId);
-		client.stopNetworkServiceRecord();
-		client.deleteNetworkServiceDescriptor();
+		try{
+			OpenBatonClient client = findClient(adminProjectId);
+			client.stopNetworkServiceRecord();
+			client.deleteNetworkServiceDescriptor();	
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
@@ -857,7 +902,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	public void addUploadedPackageToDatabase(String id, String fileName,String projectId) {
 		
 //		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(adapterABox.getLocalName()+"/" +fileName);
-		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(OpenBaton.NAMESPACE  +fileName);
+		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(Omn.NAMESPACE  +fileName);
 		resourceToCreate.addProperty(Omn_lifecycle.hasID,id);
 		resourceToCreate.addProperty(RDFS.label,fileName);
 		resourceToCreate.addProperty(RDFS.subClassOf, Omn.Resource);

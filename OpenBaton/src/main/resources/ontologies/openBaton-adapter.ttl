@@ -14,38 +14,38 @@
 
 openbaton:OpenBatonAdapter
 #    omn:maxInstances "100";
-    omn-lifecycle:implements   openbaton:MME ;
-    omn-lifecycle:implements   openbaton:UE ;
-    omn-lifecycle:implements   openbaton:SgwuPgwu ;
-    omn-lifecycle:implements   openbaton:FiveGCore ;
-    omn-lifecycle:implements   openbaton:DomainNameSystem ;
-    omn-lifecycle:implements   openbaton:Gateway ;
-    omn-lifecycle:implements   openbaton:ENodeB ;
-    omn-lifecycle:implements   openbaton:NetworkServiceRecord ;
-    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionManager ;
-    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionDescriptor ;
-    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionPackage ;
-    omn-lifecycle:implements   openbaton:VirtualDeploymentUnit ;
+#    omn-lifecycle:implements   openbaton:MME ;
+#    omn-lifecycle:implements   openbaton:UE ;
+#    omn-lifecycle:implements   openbaton:SgwuPgwu ;
+#    omn-lifecycle:implements   openbaton:FiveGCore ;
+#    omn-lifecycle:implements   openbaton:DomainNameSystem ;
+#    omn-lifecycle:implements   openbaton:Gateway ;
+#    omn-lifecycle:implements   openbaton:ENodeB ;
+#    omn-lifecycle:implements   openbaton:NetworkServiceRecord ;
+#    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionManager ;
+#    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionDescriptor ;
+#    omn-lifecycle:implements   openbaton:VirtualNetworkFunctionPackage ;
+#    omn-lifecycle:implements   openbaton:VirtualDeploymentUnit ;
     omn-lifecycle:implements   omn-resource:Link ;
-    omn-lifecycle:implements   omn-example:raw-pc;
-    omn-lifecycle:implements   openbaton:VimInstance .
+    omn-lifecycle:implements   omn-example:raw-pc.
+#    omn-lifecycle:implements   openbaton:VimInstance .
 
 
 omn-resource:Link     omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
 omn-example:raw-pc omn-lifecycle:implementedBy openbaton:OpenBatonAdapter.
-openbaton:MME					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:UE					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:SgwuPgwu				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:DomainNameSystem			omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:Gateway				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:ENodeB				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:FiveGCore				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:NetworkServiceRecord 			omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:VirtualNetworkFunctionManager 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:VirtualNetworkFunctionDescriptor 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:VirtualNetworkFunctionPackage 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:VirtualDeploymentUnit 		omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
-openbaton:VimInstance 				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:MME					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:UE					omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:SgwuPgwu				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:DomainNameSystem			omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:Gateway				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:ENodeB				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:FiveGCore				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:NetworkServiceRecord 			omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:VirtualNetworkFunctionManager 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:VirtualNetworkFunctionDescriptor 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:VirtualNetworkFunctionPackage 	omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:VirtualDeploymentUnit 		omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
+#openbaton:VimInstance 				omn-lifecycle:implementedBy openbaton:OpenBatonAdapter .
 
 
 

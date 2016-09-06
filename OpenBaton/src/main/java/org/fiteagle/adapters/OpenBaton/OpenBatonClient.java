@@ -48,6 +48,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 
 public class OpenBatonClient {
@@ -562,7 +563,7 @@ public class OpenBatonClient {
 					tmpArray = componentURI.split("\\+");
 					componentName = tmpArray[tmpArray.length-1];
 					
-					Model vnfd = TripletStoreAccessor.getResource("http://open-multinet.info/ontology/resource/openbaton#" + componentName);
+					Model vnfd = TripletStoreAccessor.getResource(Omn.NS + componentName);
 					//If this resource exists , try to find the vnfd-id
 					if(vnfd != null){
 						if(vnfd.contains(null, Omn_lifecycle.hasID)){
@@ -570,7 +571,7 @@ public class OpenBatonClient {
 //							String vnfdId = vnfd.listProperties(Omn_lifecycle.hasID).next().getObject().asLiteral().toString();
 				            VirtualNetworkFunctionDescriptor tmpVnfd = getVirtualNetworkFunctionDescriptor(vnfdId);
 				            if(tmpVnfd != null){
-				            	vnfdMap.put("http://open-multinet.info/ontology/resource/openbaton#"+componentName, tmpVnfd);	
+				            	vnfdMap.put(Omn.NS+componentName, tmpVnfd);	
 				            	foundVnfd = new VirtualNetworkFunctionDescriptor();
 								foundVnfd.setId(tmpVnfd.getId());
 				            }

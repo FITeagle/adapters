@@ -13,6 +13,7 @@ import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 
 import org.fiteagle.adapters.OpenBaton.OpenBatonAdapter;
+import org.fiteagle.adapters.OpenBaton.OpenBatonClient;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -24,6 +25,8 @@ import info.openmultinet.ontology.vocabulary.Omn_resource;
 public class Topology extends OpenBatonGeneric {
 	List<String> locations;
 	List<ServiceContainer> serviceContainers;
+	String projectId;
+	OpenBatonClient projectClient;
 
 	private static final Logger LOGGER = Logger.getLogger(Topology.class
 			.toString());
@@ -184,5 +187,21 @@ public class Topology extends OpenBatonGeneric {
 
 	public void setServiceContainers(List<ServiceContainer> serviceContainers) {
 		this.serviceContainers = serviceContainers;
+	}
+
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
+	public OpenBatonClient getProjectClient() {
+		return projectClient;
+	}
+
+	public void setProjectClient(OpenBatonClient projectClient) {
+		this.projectClient = projectClient;
 	}
 }
