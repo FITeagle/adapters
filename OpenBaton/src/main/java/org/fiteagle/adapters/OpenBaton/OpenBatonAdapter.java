@@ -676,7 +676,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
 		                        loginService.addProperty((Property)Omn_service.port, "22");
 
-		                        String username = resource.getProperty(Omn_service.username).getObject().asLiteral().getString();
+		                        String username = r.getProperty(Omn_service.username).getObject().asLiteral().getString();
 		                        loginService.addProperty((Property)Omn_service.username, username);
 		                        
 		                        String ip = ipMap.keySet().iterator().next();
