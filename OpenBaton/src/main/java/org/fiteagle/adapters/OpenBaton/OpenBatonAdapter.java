@@ -55,6 +55,7 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -659,12 +660,13 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    Model updatedInstances = ModelFactory.createDefaultModel();
 		                    for (Resource r : resIterator.toList()){
 		                    	r.addProperty(Omn.hasService, loginService);
-		                    	Resource tmpResource = r;
 		                    	Statement blub = r.getProperty(property);
-		                    	tmpResource.removeAll(property);
-		                    	tmpResource.addProperty(property, Omn_lifecycle.Started);
+		                    	r.getModel().remove(blub);
+		                    	Statement stm = new StatementImpl(blub.getSubject(), property, Omn_lifecycle.Started);
 		                    	
-			                    updatedInstances.add(tmpResource.getModel());
+		                    	r.getModel().add(stm);
+		                    	
+			                    updatedInstances.add(r.getModel());
 			                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
 			                    
 //			                    updatedInstances.add(r.getModel());
