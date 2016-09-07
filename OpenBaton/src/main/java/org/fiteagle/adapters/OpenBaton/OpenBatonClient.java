@@ -167,7 +167,7 @@ public class OpenBatonClient {
 	
 	public NetworkServiceRecord createNetworkServiceRecord(String nsdId) {
 		try {
-			networkServiceRecord = nsrAgent.create(nsdId);
+			networkServiceRecord = nsrAgent.create(nsdId, null, null, null);
 			return networkServiceRecord;
 		} catch (SDKException e) {
 			// TODO Auto-generated catch block
@@ -303,6 +303,21 @@ public class OpenBatonClient {
 		checkRequestor();
 		Project project = new Project();
 		project.setName("Test" + new Random().nextInt());
+		project.setId("123456");
+		try {
+			Project response = nfvoRequestor.getProjectAgent().create(project);
+			return response.getId();
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public String createNewProjectOnServer(String projectName){
+		checkRequestor();
+		Project project = new Project();
+		project.setName(projectName);
 		try {
 			Project response = nfvoRequestor.getProjectAgent().create(project);
 			return response.getId();
@@ -465,6 +480,19 @@ public class OpenBatonClient {
 			return null;
 		}
 	}
+	
+	public List<Project> getAllProjectsFromServer(){
+		try {
+			return nfvoRequestor.getProjectAgent().findAll();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 
 	@Beta
@@ -494,7 +522,7 @@ public class OpenBatonClient {
 	public String uploadPackageToDatabase(String fileNameWithDirectory) {
 		checkRequestor();
 		try {
-			VNFPackageAgent agent = nfvoRequestor.getVNFPackageAgent();
+			VNFPackageAgent agent = this.nfvoRequestor.getVNFPackageAgent();
 			VNFPackage createdPackage = agent.create(fileNameWithDirectory);
 			String fileName = null ;
 			for(VirtualNetworkFunctionDescriptor vnfd : vnfdAgent.findAll()){
@@ -874,38 +902,38 @@ public class OpenBatonClient {
 	}
 
 	public void createFiveGCore(OpenBatonService openBaton) {
-		checkRequestor();
-		FiveGCore fiveG = (FiveGCore) openBaton;
-		NetworkServiceDescriptor nsd = null;
-		List<NetworkServiceDescriptor> nsdList = getAllNSDs();
-		for (NetworkServiceDescriptor n : nsdList) {
-			if (n.getName().contains("5G") && n.getName().contains("Core")) {
-				nsd = n;
-				LOGGER.log(Level.SEVERE, "FOUND NSD");
-			}
-		}
-		NetworkServiceRecordRestAgent agent = nfvoRequestor.getNetworkServiceRecordAgent();
-		try {
-			NetworkServiceRecord newNsRecord = agent.create(nsd.getId());
-			String test;
-			test = "";
-			test = "";
-			test = "";
-			test = "";
-			test = "";
-			test = "";
-			test = "";
-
-			fiveG.setNsr(newNsRecord);
-
-			List<VirtualNetworkFunctionRecord> vnfrList = agent.getVirtualNetworkFunctionRecords(newNsRecord.getId());
-			LOGGER.log(Level.SEVERE, vnfrList.toString());
-			LOGGER.log(Level.SEVERE, "test");
-
-		} catch (SDKException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		checkRequestor();
+//		FiveGCore fiveG = (FiveGCore) openBaton;
+//		NetworkServiceDescriptor nsd = null;
+//		List<NetworkServiceDescriptor> nsdList = getAllNSDs();
+//		for (NetworkServiceDescriptor n : nsdList) {
+//			if (n.getName().contains("5G") && n.getName().contains("Core")) {
+//				nsd = n;
+//				LOGGER.log(Level.SEVERE, "FOUND NSD");
+//			}
+//		}
+//		NetworkServiceRecordRestAgent agent = nfvoRequestor.getNetworkServiceRecordAgent();
+//		try {
+//			NetworkServiceRecord newNsRecord = agent.create(nsd.getId());
+//			String test;
+//			test = "";
+//			test = "";
+//			test = "";
+//			test = "";
+//			test = "";
+//			test = "";
+//			test = "";
+//
+//			fiveG.setNsr(newNsRecord);
+//
+//			List<VirtualNetworkFunctionRecord> vnfrList = agent.getVirtualNetworkFunctionRecords(newNsRecord.getId());
+//			LOGGER.log(Level.SEVERE, vnfrList.toString());
+//			LOGGER.log(Level.SEVERE, "test");
+//
+//		} catch (SDKException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
 	}
 	

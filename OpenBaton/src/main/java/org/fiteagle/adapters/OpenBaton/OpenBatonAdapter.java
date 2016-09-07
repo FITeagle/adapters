@@ -43,6 +43,7 @@ import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.security.Project;
 
 import com.hp.hpl.jena.ontology.Ontology;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -89,6 +90,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
     private VirtualNetworkFunctionDescriptor createdDebugMME;
 	private Resource debugTopologyResource;
     private String debugProjectId = "d28a8a82-d503-42c5-80e5-899469e9255d";
+//    private String debugProjectId = null;
 
 	private transient final HashMap<String, OpenBatonGeneric> instanceList = new HashMap<String, OpenBatonGeneric>();
 	private HashMap<String,OpenBatonClient> clientList = new HashMap<String,OpenBatonClient>();
@@ -323,8 +325,18 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 //					topologyResource.addProperty(Omn.hasResource,resource);
 				}else{
 					LOGGER.log(Level.WARNING, "ProjectId of Topology was NULL - Creating new Project/Client");
+//					String projectId = adminClient.createNewProjectOnServer();
+					String experimenterUsername = getExperimenterUsername(resource.getModel());
+					String projectId = null;
+					for(Project p : adminClient.getAllProjectsFromServer()){
+						if(p.getName().equals(experimenterUsername)){
+							projectId = p.getId();	
+						}
+					}
 					
-					String projectId = adminClient.createNewProjectOnServer();
+					if(projectId == null){
+						projectId =	adminClient.createNewProjectOnServer(experimenterUsername);
+					}
 					client = findClient(projectId);
 					topology.setProjectId(projectId);
 					topology.setProjectClient(client);
@@ -926,7 +938,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			return clientList.get(projectId);
 		}
 	}
-
+	public OpenBatonClient getAdminClient() {
+		return adminClient;
+	}
+	
 	public String getAdminProjectId() {
 		return adminProjectId;
 	}
