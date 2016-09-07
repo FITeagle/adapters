@@ -680,7 +680,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                        loginService.addProperty((Property)Omn_service.username, username);
 		                        try{
 			                        String ip = ipMap.keySet().iterator().next();
-			                        loginService.addProperty((Property)Omn_service.hostname, ip);
+			                        loginService.addProperty((Property)Omn_service.hostname, ipMap.get(ip).getIp());
 			                        ipMap.remove(ip);
 		                        }catch (Exception e) {
 			                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
