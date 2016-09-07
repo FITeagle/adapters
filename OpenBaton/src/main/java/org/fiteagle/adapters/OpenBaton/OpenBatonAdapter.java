@@ -39,10 +39,12 @@ import org.fiteagle.api.core.MessageBusOntologyModel;
 import org.fiteagle.api.core.MessageUtil;
 import org.fiteagle.api.core.OntologyModelUtil;
 import org.fiteagle.api.tripletStoreAccessor.TripletStoreAccessor;
+import org.openbaton.catalogue.mano.common.Ip;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.security.Project;
 
 import com.hp.hpl.jena.ontology.Ontology;
@@ -641,27 +643,46 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	                	if(resource == null){
 	                		LOGGER.log(Level.SEVERE, "Adding LoginResource to Resource");
 		                    LOGGER.log(Level.SEVERE, "-------------------------------------------");
-		                    Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+//		                    Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+//	                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+//	                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+//	                        loginService.addProperty((Property)Omn_service.port, "22");
+//
+//	                        String username = resource.getProperty(Omn_service.username).getObject().asLiteral().getString();
+//	                        loginService.addProperty((Property)Omn_service.username, username);
+
 		                    
-		                    
-		                    
-		                    if (OpenBatonAdapter.this.vpnIP == null || OpenBatonAdapter.this.vpnIP.equals("") || OpenBatonAdapter.this.vpnPort == null || OpenBatonAdapter.this.vpnPort.equals("")) {
-		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-		                        loginService.addProperty((Property)Omn_service.username, "home");
-		                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
-		                        loginService.addProperty((Property)Omn_service.port, "22");
-		                    } else {
-		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-		                        loginService.addProperty((Property)Omn_service.username, "home");
-		                        loginService.addProperty((Property)Omn_service.hostname, OpenBatonAdapter.this.vpnIP);
-		                        loginService.addProperty((Property)Omn_service.port, OpenBatonAdapter.this.vpnPort);
-		                    }
+//		                    if (OpenBatonAdapter.this.vpnIP == null || OpenBatonAdapter.this.vpnIP.equals("") || OpenBatonAdapter.this.vpnPort == null || OpenBatonAdapter.this.vpnPort.equals("")) {
+//		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+//		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+//		                        loginService.addProperty((Property)Omn_service.username, "home");
+//		                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
+//		                        loginService.addProperty((Property)Omn_service.port, "22");
+//		                    } else {
+//		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+//		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+//		                        loginService.addProperty((Property)Omn_service.username, "home");
+//		                        loginService.addProperty((Property)Omn_service.hostname, OpenBatonAdapter.this.vpnIP);
+//		                        loginService.addProperty((Property)Omn_service.port, OpenBatonAdapter.this.vpnPort);
+//		                    }
 		                    
 		                    ResIterator resIterator = createdInstances.listResourcesWithProperty(Omn_lifecycle.hasState);
 		                    Model updatedInstances = ModelFactory.createDefaultModel();
+		                    HashMap<String,Ip> ipMap = getIpsFromNsr();
 		                    for (Resource r : resIterator.toList()){
+		                    	
+		                    	Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+		                        loginService.addProperty((Property)Omn_service.port, "22");
+
+		                        String username = resource.getProperty(Omn_service.username).getObject().asLiteral().getString();
+		                        loginService.addProperty((Property)Omn_service.username, username);
+		                        
+		                        String ip = ipMap.keySet().iterator().next();
+		                        loginService.addProperty((Property)Omn_service.hostname, ip);
+		                        ipMap.remove(ip);
+		                    	
 		                    	Statement stm = new StatementImpl(r, property, Omn_lifecycle.Started);
 		                    	Statement stm2 = new StatementImpl(r, Omn.hasService, loginService);
 		                    	Statement stm3 = new StatementImpl(property, RDF.type, OWL.FunctionalProperty);
@@ -732,7 +753,14 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	        }
 	    }
 
-	    public void getIpsFromNsr() {
+	    public HashMap<String, Ip> getIpsFromNsr() {
+	    	HashMap<String, Ip> ipMap = new HashMap<>();
+	    	for(VirtualNetworkFunctionRecord v : fivegNSR.getVnfr()){
+	    	Ip ip = v.getVdu().iterator().next().getVnfc_instance().iterator().next().getFloatingIps().iterator().next();
+	    	ipMap.put(v.getName(), ip);
+	    	}
+	    	
+	    	return ipMap;
 	    }
 
 	    
