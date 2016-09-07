@@ -642,6 +642,9 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	                		LOGGER.log(Level.SEVERE, "Adding LoginResource to Resource");
 		                    LOGGER.log(Level.SEVERE, "-------------------------------------------");
 		                    Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+		                    
+		                    
+		                    
 		                    if (OpenBatonAdapter.this.vpnIP == null || OpenBatonAdapter.this.vpnIP.equals("") || OpenBatonAdapter.this.vpnPort == null || OpenBatonAdapter.this.vpnPort.equals("")) {
 		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
 		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
