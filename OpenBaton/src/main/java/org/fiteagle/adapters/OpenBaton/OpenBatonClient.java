@@ -140,7 +140,7 @@ public class OpenBatonClient {
 		checkRequestor();
 	}
 
-	private void checkRequestor() {
+	public void checkRequestor() {
 		if (nfvoRequestor == null) {
 			nfvoRequestor = new NFVORequestor(username, password, projectId, false, nfvoIp, nfvoPort, version);
 			nsdAgent = nfvoRequestor.getNetworkServiceDescriptorAgent();

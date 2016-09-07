@@ -293,20 +293,21 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				}else{
 					if(nsd.getId() != null){
 						nsd = client.getNetworkServiceDescriptor(nsd.getId());
+						if(nsd == null){
+							nsd = client.createLocalNetworkServiceDescriptor();
+							topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
+							topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
+							topologyResource.addProperty(Omn.hasAttribute, debugProjectId);
+					        
+					        //Adding the Resource we are now starting to create
+							topologyResource.addProperty(Omn.hasResource,resource);
+
+							listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+						}
 					}
 				}
 				
-			if(nsd == null){
-					nsd = client.createLocalNetworkServiceDescriptor();
-					topologyResource.addProperty(Omn_resource.hasHardwareType, ModelFactory.createDefaultModel().createResource(adapterABox.getNameSpace() + nsd.getName()));
-					topologyResource.addProperty(Omn_service.username, getExperimenterUsername(newInstanceModel));
-					topologyResource.addProperty(Omn.hasAttribute, debugProjectId);
-			        
-			        //Adding the Resource we are now starting to create
-					topologyResource.addProperty(Omn.hasResource,resource);
 
-					listener.publishModelUpdate(topologyResource.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-				}
 				//Adding the Resource we are now starting to create
 				topologyResource.addProperty(Omn.hasResource,resource);
 				
