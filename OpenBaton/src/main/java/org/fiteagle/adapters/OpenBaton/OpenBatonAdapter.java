@@ -671,30 +671,33 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    HashMap<String,Ip> ipMap = getIpsFromNsr();
 		                    for (Resource r : resIterator.toList()){
 		                    	
-		                    	Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
-		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-		                        loginService.addProperty((Property)Omn_service.port, "22");
-
-		                        String username = r.getProperty(Omn_service.username).getObject().asLiteral().getString();
-		                        loginService.addProperty((Property)Omn_service.username, username);
+		                    	
 		                        try{
+		                        	Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
+			                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
+			                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
+			                        loginService.addProperty((Property)Omn_service.port, "22");
+
+			                        String username = r.getProperty(Omn_service.username).getObject().asLiteral().getString();
+			                        loginService.addProperty((Property)Omn_service.username, username);
 			                        String ip = ipMap.keySet().iterator().next();
 			                        loginService.addProperty((Property)Omn_service.hostname, ipMap.get(ip).getIp());
 			                        ipMap.remove(ip);
+			                    	Statement stm2 = new StatementImpl(r, Omn.hasService, loginService);
+
+				                    updatedInstances.add(stm2);
+				                    updatedInstances.add(loginService.listProperties().toList());
 		                        }catch (Exception e) {
-			                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
+//			                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
 								}
 
 		                    	
 		                    	Statement stm = new StatementImpl(r, property, Omn_lifecycle.Started);
-		                    	Statement stm2 = new StatementImpl(r, Omn.hasService, loginService);
 		                    	Statement stm3 = new StatementImpl(property, RDF.type, OWL.FunctionalProperty);
 
 		                    	
 			                    updatedInstances.add(stm);
-			                    updatedInstances.add(stm2);
-			                    updatedInstances.add(loginService.listProperties().toList());
+;
 			                    updatedInstances.add(stm3);
 
 			                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
