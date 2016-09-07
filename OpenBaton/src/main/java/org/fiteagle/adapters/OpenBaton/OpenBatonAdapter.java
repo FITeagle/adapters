@@ -666,7 +666,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    	
 		                    	r.getModel().add(stm);
 		                    	
-			                    updatedInstances.add(r.getModel());
+			                    updatedInstances.add(r.listProperties().toList());
 			                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
 			                    
 //			                    updatedInstances.add(r.getModel());
