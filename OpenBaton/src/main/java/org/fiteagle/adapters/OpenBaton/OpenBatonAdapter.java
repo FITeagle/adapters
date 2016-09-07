@@ -659,14 +659,16 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    ResIterator resIterator = createdInstances.listResourcesWithProperty(Omn_lifecycle.hasState);
 		                    Model updatedInstances = ModelFactory.createDefaultModel();
 		                    for (Resource r : resIterator.toList()){
-		                    	r.addProperty(Omn.hasService, loginService);
-		                    	Statement blub = r.getProperty(property);
-		                    	r.getModel().remove(blub);
-		                    	Statement stm = new StatementImpl(blub.getSubject(), property, Omn_lifecycle.Started);
+		                    	Statement stm = new StatementImpl(r, property, Omn_lifecycle.Started);
+		                    	Statement stm2 = new StatementImpl(r, Omn.hasService, loginService);
+		                    	Statement stm3 = new StatementImpl(property, RDF.type, OWL.FunctionalProperty);
+
 		                    	
-		                    	r.getModel().add(stm);
-		                    	
-			                    updatedInstances.add(r.listProperties().toList());
+			                    updatedInstances.add(stm);
+			                    updatedInstances.add(stm2);
+			                    updatedInstances.add(loginService.listProperties().toList());
+			                    updatedInstances.add(stm3);
+
 			                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
 			                    
 //			                    updatedInstances.add(r.getModel());
