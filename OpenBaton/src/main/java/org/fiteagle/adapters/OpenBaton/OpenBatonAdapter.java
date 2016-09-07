@@ -661,9 +661,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    	r.addProperty(Omn.hasService, loginService);
 		                    	Statement blub = r.getProperty(property);
 			                    blub.changeObject(Omn_lifecycle.Started);
-		                    	r.addProperty(property, Omn_lifecycle.Started);
+			                    updatedInstances.add(blub);
+//		                    	r.addProperty(property, Omn_lifecycle.Started);
 			                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
-			                    updatedInstances.add(r.getModel());
+//			                    updatedInstances.add(r.getModel());
 //			                    parent.publishModelUpdate(r.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 		                    }
 		                    parent.publishModelUpdate(updatedInstances, UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
