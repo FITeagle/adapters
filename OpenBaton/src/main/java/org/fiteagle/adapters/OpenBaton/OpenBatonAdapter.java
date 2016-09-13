@@ -706,6 +706,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 //			                    parent.publishModelUpdate(r.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 		                    }
 		                    parent.publishModelUpdate(updatedInstances, UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+		                    
+		                    String publicKey = updatedInstances.listResourcesWithProperty(Omn_service.publickey).next().getProperty(Omn_service.publickey).getObject().asLiteral().getString();
+		                    String experimenterName = updatedInstances.listResourcesWithProperty(Omn_service.username).next().getProperty(Omn_service.username).getObject().asLiteral().getString();
+		                    client.uploadSshKey(experimenterName, publicKey);
 		                    LOGGER.log(Level.SEVERE, "Killing Thread now");
 		                    Thread.currentThread().interrupt();
 	                	}else{

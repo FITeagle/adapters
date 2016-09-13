@@ -558,6 +558,7 @@ public class OpenBatonClient {
 					fileName =  nameArray[nameArray.length -1 ];
 //					vnfd.setName(fileName);
 					vnfdMap.put(fileName, vnfd);
+					break;
 				}
 			}
 			
