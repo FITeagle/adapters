@@ -173,7 +173,7 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	            	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
     	            	}
     	            	
-    	            	if(uuid != null && fileName != null  && projectId != null){
+    	            	if(fileName != null  && projectId != null){
     	                	String vnfPackageId = adapter.uploadPackageToDatabase(projectId,fileNameWithDirectory);
 
     	                	adapter.addUploadedPackageToDatabase(vnfPackageId,fileName,projectId);
@@ -208,7 +208,6 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/upload/v2")
     public Response uploadFileWithExperimenterName(MultipartFormDataInput input,@Context HttpHeaders headers) throws IOException {
-    	UUID uuid = null;
     	String fileName = null;
     	String fileNameWithDirectory = null;
     	String username = null;
@@ -233,79 +232,52 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	 
     	                byte[] bytes = IOUtils.toByteArray(inputStream);
     	                // constructs upload file path
-    	                uuid = UUID.randomUUID();
-    	                fileName =  uuid +  "--" +fileName;
+    	                fileName =  fileName + "--" + new Random().nextInt();
     	                fileNameWithDirectory = fiteagleDirectory + fileName  ;
     	                writeFile(bytes, fileNameWithDirectory);
     	                
-//    	            	if(adapter == null){
-//    	            	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
-//    	            	}
-//    	            	adapter.addUploadedPackageToDatabase(uuid,fileName);
-    	 
-    	                  
-//    	                return Response.status(200).entity("Uploaded file name : " + fileName + "\n")
-//    	                        .build();
     	 
     	            } catch (Exception e) {
     	                e.printStackTrace();
     	            }
     	        }
     	        
-    	        for(String header : headers.getRequestHeaders().keySet()){
-    	        	System.out.println(header);
-    	        	List<String> h = headers.getRequestHeader(header);
-    	        	String b = "kn";
+    	        List<String> usernameHeader;
+    	        if(headers.getRequestHeader("username") != null){
+    	        	usernameHeader = headers.getRequestHeader("username");
+    	        }else{
+    	        	return Response.status(500).entity("Header \"username\" was null" + "\n")
+                            .build();
     	        }
-    	        inputParts = uploadForm.get("username");
-    	     
+	        	
     	        
-    	        for (InputPart inputPart : inputParts) {
-    	            try {
-    	 
-    	                MultivaluedMap<String, String> header = inputPart.getHeaders();
-    	   
-    	                // convert the uploaded file to inputstream
-    	                InputStream inputStream = inputPart.getBody(InputStream.class,
-    	                        null);
-    	 
-//    	                byte[] bytes = IOUtils.toByteArray(inputStream);
-//    	                StringWriter writer = new StringWriter();
-//    	                IOUtils.copy(inputStream, writer,"UTF-8");
-    	                username = IOUtils.toString(inputStream,"UTF-8");
+    	        		username = usernameHeader.get(0);
+    	                
     	                // constructs upload file path
     	            	if(adapter == null){
     	            	    adapter = (OpenBatonAdapter) controller.getAdapterInstances().iterator().next();
     	            	}
     	            	
-    	            	if(uuid != null && fileName != null  && username != null){
+    	            	if(fileName != null  && username != null){
     	            		for(Project p : adapter.getAdminClient().getAllProjectsFromServer()){
     							if(p.getName().equals(username)){
     								projectId = p.getId();	
     								break;
     							}
     						}
-    	                	String vnfPackageId = adapter.uploadPackageToDatabase(projectId,fileNameWithDirectory);
-
+    	            		if(projectId == null){
+        	            		projectId = adapter.getAdminClient().createNewProjectOnServer(username);
+    	            		}
+    	                	
+    	            		String vnfPackageId = adapter.uploadPackageToDatabase(projectId,fileNameWithDirectory);
     	                	adapter.addUploadedPackageToDatabase(vnfPackageId,fileName,projectId);
     	                	
     	                	return Response.status(200).entity("Uploaded file name : " + fileName + "\n")
     	                            .build();
     	            	}else{
-    	            		return Response.status(500).entity("File or project-Id was null" + "\n")
+    	            		return Response.status(500).entity("File or username was null" + "\n")
     	                            .build();
     	            	}
-    	 
-    	                  
-    	                
-    	 
-    	            } catch (Exception e) {
-    	                e.printStackTrace();
-    	            }
-    	        }
-    	        
-    	        return Response.status(500).entity("Sorry, something went wrong!"+ "\n")
-    	                .build();
     		
     	}catch(Exception e){
     		e.printStackTrace();
