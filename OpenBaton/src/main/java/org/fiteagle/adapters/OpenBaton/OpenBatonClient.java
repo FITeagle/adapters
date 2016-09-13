@@ -151,6 +151,21 @@ public class OpenBatonClient {
 			nsrAgent = nfvoRequestor.getNetworkServiceRecordAgent();
 			keyAgent = nfvoRequestor.getKeyAgent();
 		}
+		if(!nfvoRequestor.getProjectId().equals(projectId)){
+			nfvoRequestor = new NFVORequestor(username, password, projectId, false, nfvoIp, nfvoPort, version);
+		}		
+		if(!nsdAgent.getProjectId().equals(projectId)){
+			nsdAgent = nfvoRequestor.getNetworkServiceDescriptorAgent();
+		}		
+		if(!vnfdAgent.getProjectId().equals(projectId)){
+			vnfdAgent = nfvoRequestor.getVirtualNetworkFunctionDescriptorAgent();
+		}		
+		if(!nsrAgent.getProjectId().equals(projectId)){
+			nsrAgent = nfvoRequestor.getNetworkServiceRecordAgent();
+		}		
+		if(!keyAgent.getProjectId().equals(projectId)){
+			keyAgent = nfvoRequestor.getKeyAgent();
+		}
 	}
 	
 	private void checkRequestorWithoutId() {
