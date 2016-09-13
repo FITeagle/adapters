@@ -214,6 +214,13 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	String projectId = null;
         
     	try{
+	        List<String> filenameHeader;
+	        if(headers.getRequestHeader("filename") != null){
+	        	filenameHeader = headers.getRequestHeader("filename");
+	        }else{
+	        	return Response.status(500).entity("Header \"filename\" was null" + "\n")
+                        .build();
+	        }
     		
     		 Map<String, List<InputPart>> uploadForm = input.getFormDataMap();
     		 
@@ -225,6 +232,9 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	 
     	                MultivaluedMap<String, String> header = inputPart.getHeaders();
     	                fileName = getFileName(header);
+    	                if(fileName.equals("unknown")){
+    	                	fileName = filenameHeader.get(0);
+    	                }
     	   
     	                // convert the uploaded file to inputstream
     	                InputStream inputStream = inputPart.getBody(InputStream.class,
@@ -249,6 +259,8 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	        	return Response.status(500).entity("Header \"username\" was null" + "\n")
                             .build();
     	        }
+
+    	        
 	        	
     	        
     	        		username = usernameHeader.get(0);
