@@ -46,13 +46,17 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -129,8 +133,8 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	 
     	                byte[] bytes = IOUtils.toByteArray(inputStream);
     	                // constructs upload file path
-    	                uuid = UUID.randomUUID();
-    	                fileName =  uuid +  "--" +fileName;
+//    	                uuid = UUID.randomUUID();
+    	                fileName =  fileName + "--" + new Random().nextInt();
     	                fileNameWithDirectory = fiteagleDirectory + fileName  ;
     	                writeFile(bytes, fileNameWithDirectory);
     	                
@@ -203,7 +207,7 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/upload/v2")
-    public Response uploadFileWithExperimenterName(MultipartFormDataInput input) throws IOException {
+    public Response uploadFileWithExperimenterName(MultipartFormDataInput input,@Context HttpHeaders headers) throws IOException {
     	UUID uuid = null;
     	String fileName = null;
     	String fileNameWithDirectory = null;
@@ -248,8 +252,13 @@ public class OpenBatonAdapterREST extends AbstractAdapterREST {
     	            }
     	        }
     	        
-    	        
+    	        for(String header : headers.getRequestHeaders().keySet()){
+    	        	System.out.println(header);
+    	        	List<String> h = headers.getRequestHeader(header);
+    	        	String b = "kn";
+    	        }
     	        inputParts = uploadForm.get("username");
+    	     
     	        
     	        for (InputPart inputPart : inputParts) {
     	            try {
