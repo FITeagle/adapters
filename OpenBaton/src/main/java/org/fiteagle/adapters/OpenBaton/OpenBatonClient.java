@@ -29,9 +29,11 @@ import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.nfvo.VNFPackage;
+import org.openbaton.catalogue.security.Key;
 import org.openbaton.catalogue.security.Project;
 import org.openbaton.sdk.NFVORequestor;
 import org.openbaton.sdk.api.exception.SDKException;
+import org.openbaton.sdk.api.rest.KeyAgent;
 import org.openbaton.sdk.api.rest.NetworkServiceDescriptorRestAgent;
 import org.openbaton.sdk.api.rest.NetworkServiceRecordRestAgent;
 import org.openbaton.sdk.api.rest.VNFPackageAgent;
@@ -76,6 +78,7 @@ public class OpenBatonClient {
 	private VirtualNetworkFunctionDescriptorRestAgent vnfdAgent;
 	private NetworkServiceDescriptorRestAgent nsdAgent;
 	private NetworkServiceRecordRestAgent nsrAgent;
+	private KeyAgent keyAgent;
 
 	public OpenBatonClient(OpenBatonAdapter openBatonAdapter, String projectId) {
 		this.openBatonAdapter = openBatonAdapter;
@@ -146,6 +149,7 @@ public class OpenBatonClient {
 			nsdAgent = nfvoRequestor.getNetworkServiceDescriptorAgent();
 			vnfdAgent = nfvoRequestor.getVirtualNetworkFunctionDescriptorAgent();
 			nsrAgent = nfvoRequestor.getNetworkServiceRecordAgent();
+			keyAgent = nfvoRequestor.getKeyAgent();
 		}
 	}
 	
@@ -155,7 +159,16 @@ public class OpenBatonClient {
 		}
 	}
 
-	
+	public Key uploadSshKey(String experimenterName, String publicKey){
+		try {
+			Key key = keyAgent.importKey(experimenterName, publicKey);
+			return key;
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	public NetworkServiceRecord createNetworkServiceRecord(){
 
@@ -1056,234 +1069,5 @@ public class OpenBatonClient {
 	}
 	
 	
-//	public void createFiveGCoreWithNewNsd(OpenBatonService openBaton) {
-//		// Creating the local Objects of the soon to provisioned Instances
-//		MME mme = new MME(null, null);
-//		ENodeB enodeb = new ENodeB(null, null);
-//		Gateway gw = new Gateway(null, null);
-//		DomainNameSystem dns = new DomainNameSystem(null, null);
-//		UE ue = new UE(null, null);
-//		SgwuPgwu sgwupgwu = new SgwuPgwu(null, null);
-//
-//		// Save the Instances in the FiveGCore
-//		FiveGCore fiveG = (FiveGCore) openBaton;
-//		fiveG.setDns(dns);
-//		fiveG.setEnodeb(enodeb);
-//		fiveG.setGw(gw);
-//		fiveG.setMme(mme);
-//		fiveG.setUe(ue);
-//		fiveG.setSgwuPgwu(sgwupgwu);
-//
-//		// Creating empty NetworkServiceDescriptor
-//		NetworkServiceDescriptor nsd = createNetworkServiceDescriptor(null);
-//
-//		// Creating VNFs and adding them to the created NSD
-//		VirtualNetworkFunctionDescriptor vnfMME = createMME(mme, nsd.getId());
-//		VirtualNetworkFunctionDescriptor vnfdns = createDomainNameSystem(dns, nsd.getId());
-//		VirtualNetworkFunctionDescriptor vnfenodeB = createENodeB(enodeb, nsd.getId());
-//		VirtualNetworkFunctionDescriptor vnfGw = createGateway(gw, nsd.getId());
-//		VirtualNetworkFunctionDescriptor vnfUe = createUe(ue, nsd.getId());
-//		VirtualNetworkFunctionDescriptor vnfSgwuPgwu = createSgwuPgwu(sgwupgwu, nsd.getId());
-//
-//		// Also saving the VNFDs in the FiveGCore Object
-//		fiveG.setDnsVnf(vnfdns);
-//		fiveG.setEnodebVnf(vnfenodeB);
-//		fiveG.setGwVnf(vnfGw);
-//		fiveG.setMmeVnf(vnfMME);
-//		fiveG.setUeVnf(vnfUe);
-//		fiveG.setSgwupgwuVnf(vnfSgwuPgwu);
-//
-//		/**
-//		 * Setting the intern dependencys of the Instances(MME,EnodeB...) in the
-//		 * NetworkServiceDescriptor(FiveGCore) It's always: Source -> Target [+
-//		 * some configuration parameters you may set for this Dependency] These
-//		 * are the communicationlines you see when using "Show Graph" in the
-//		 * OpenBaton-Gui
-//		 */
-//		Set<VNFDependency> vnfDependencysSet = new HashSet<VNFDependency>();
-//		Set<String> parameterSet = new HashSet<String>();
-//		VNFDependency vnfDependency = new VNFDependency();
-//		vnfDependency.setSource(vnfenodeB);
-//		vnfDependency.setTarget(vnfUe);
-//		parameterSet.add("var_net_c_network");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		parameterSet.add("net_c");
-//		parameterSet.add("net_c_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfenodeB);
-//		vnfDependency.setTarget(vnfMME);
-//		parameterSet.add("var_net_c_network");
-//		parameterSet.add("var_net_d_network");
-//		parameterSet.add("var_name");
-//		parameterSet.add("var_range");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		parameterSet.add("net_c");
-//		parameterSet.add("net_c_floatingIp");
-//		parameterSet.add("net_d");
-//		parameterSet.add("net_d_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfdns);
-//		vnfDependency.setTarget(vnfUe);
-//		parameterSet.add("realm");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfdns);
-//		vnfDependency.setTarget(vnfMME);
-//		parameterSet.add("realm");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfdns);
-//		vnfDependency.setTarget(vnfenodeB);
-//		parameterSet.add("realm");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfGw);
-//		vnfDependency.setTarget(vnfSgwuPgwu);
-//		vnfDependencysSet.add(vnfDependency);
-//		parameterSet.add("var_net_a_network");
-//		parameterSet.add("net_a");
-//		parameterSet.add("net_a_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfMME);
-//		vnfDependency.setTarget(vnfenodeB);
-//		vnfDependencysSet.add(vnfDependency);
-//		parameterSet.add("var_net_d_network");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		parameterSet.add("net_d");
-//		parameterSet.add("net_d_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfMME);
-//		vnfDependency.setTarget(vnfSgwuPgwu);
-//		vnfDependencysSet.add(vnfDependency);
-//		parameterSet.add("var_ofp_transport");
-//		parameterSet.add("var_ofp_port");
-//		parameterSet.add("var_mgmt_network");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		parameterSet.add("net_d");
-//		parameterSet.add("net_d_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfMME);
-//		vnfDependency.setTarget(vnfdns);
-//		parameterSet.add("var_name");
-//		parameterSet.add("var_mgmt_network");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfSgwuPgwu);
-//		vnfDependency.setTarget(vnfMME);
-//		parameterSet.add("var_net_a_network");
-//		parameterSet.add("var_net_d_network");
-//		parameterSet.add("var_datapath_id");
-//		parameterSet.add("net_a");
-//		parameterSet.add("net_d");
-//		parameterSet.add("net_d_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfSgwuPgwu);
-//		vnfDependency.setTarget(vnfGw);
-//		parameterSet.add("var_net_a_network");
-//		parameterSet.add("var_static_num");
-//		parameterSet.add("net_a");
-//		parameterSet.add("net_a_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		vnfDependency = new VNFDependency();
-//		parameterSet = new HashSet<String>();
-//		vnfDependency.setSource(vnfUe);
-//		vnfDependency.setTarget(vnfenodeB);
-//		parameterSet.add("var_net_c_network");
-//		parameterSet.add("mgmt");
-//		parameterSet.add("mgmt_floatingIp");
-//		parameterSet.add("net_c");
-//		parameterSet.add("net_c_floatingIp");
-//		vnfDependency.setParameters(parameterSet);
-//		vnfDependencysSet.add(vnfDependency);
-//		vnfDependencysSet.add(vnfDependency);
-//
-//		// refresh the lokal NSD object
-//		nsd = getNetworkServiceDescriptor(nsd.getId());
-//		// Set the above parameters
-//		nsd.setVnf_dependency(vnfDependencysSet);
-//
-//		// VirtualLinkDescriptors for 5G-Core (more parameters)
-//		Set<VirtualLinkDescriptor> vldSet = new HashSet<VirtualLinkDescriptor>();
-//		VirtualLinkDescriptor vld = new VirtualLinkDescriptor();
-//		vld.setName("mgmt");
-//		vldSet.add(vld);
-//
-//		vld = new VirtualLinkDescriptor();
-//		vld.setName("net_a");
-//		vldSet.add(vld);
-//
-//		vld = new VirtualLinkDescriptor();
-//		vld.setName("net_c");
-//		vldSet.add(vld);
-//
-//		vld = new VirtualLinkDescriptor();
-//		vld.setName("net_d");
-//		vldSet.add(vld);
-//
-//		nsd.setVld(vldSet);
-//
-//		// Update the NetworkServiceDescriptor on the Server with new
-//		// Dependencys and VLDs
-//		NetworkServiceDescriptor updatedNSD = updateNetworkServiceDescriptor(nsd, nsd.getId());
-//
-//		// Updating the local NSD in the FiveGCore Object
-//		fiveG.setNsd(updatedNSD);
-//
-//	}
 
 }
