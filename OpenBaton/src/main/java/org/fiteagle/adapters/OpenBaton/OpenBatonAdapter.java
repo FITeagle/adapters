@@ -92,8 +92,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
     private String debugString;
     private VirtualNetworkFunctionDescriptor createdDebugMME;
 	private Resource debugTopologyResource;
-    private String debugProjectId = "d28a8a82-d503-42c5-80e5-899469e9255d";
-//    private String debugProjectId = null;
+//    private String debugProjectId = "d28a8a82-d503-42c5-80e5-899469e9255d";
+    private String debugProjectId = null;
 
 	private transient final HashMap<String, OpenBatonGeneric> instanceList = new HashMap<String, OpenBatonGeneric>();
 	private HashMap<String,OpenBatonClient> clientList = new HashMap<String,OpenBatonClient>();
