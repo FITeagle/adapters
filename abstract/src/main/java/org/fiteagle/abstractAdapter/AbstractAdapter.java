@@ -164,10 +164,15 @@ public abstract class AbstractAdapter {
 			throw new ProcessingException(Response.Status.CONFLICT.name());
 		}
 		if(getAdapterABox().hasProperty(RDF.type, OpenBaton.OpenBatonAdapter)){
-			Resource topologyResource = tmpResource.getProperty(Omn.isResourceOf).getObject().asResource();
-			String topologyUri = topologyResource.getURI().toString();			
+			try {
+				Resource topologyResource = tmpResource.getProperty(Omn.isResourceOf).getObject().asResource();
+				String topologyUri = topologyResource.getURI().toString();			
+				
+				startNSR(createdInstancesModel,topologyUri);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			
-			startNSR(createdInstancesModel,topologyUri);
 		}
 
 		return createdInstancesModel;
