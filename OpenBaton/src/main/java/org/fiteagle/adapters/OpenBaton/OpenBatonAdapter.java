@@ -675,7 +675,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    Iterator<String> ipIterator = ipMap.keySet().iterator();
 		                    for (Resource r : resIterator.toList()){
 
-		                    	if(!resource.hasProperty(RDF.type, Omn_resource.Link)){
+		                    	if(!r.hasProperty(RDF.type, Omn_resource.Link)){
 			                    	try{
 			                        	Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
 				                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
