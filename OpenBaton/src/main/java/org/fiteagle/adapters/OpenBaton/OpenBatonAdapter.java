@@ -670,6 +670,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    ResIterator resIterator = createdInstances.listResourcesWithProperty(Omn_lifecycle.hasState);
 		                    Model updatedInstances = ModelFactory.createDefaultModel();
 		                    HashMap<String,Ip> ipMap = getIpsFromNsr();
+		                    Iterator<String> ipIterator = ipMap.keySet().iterator();
 		                    for (Resource r : resIterator.toList()){
 
 		                    	if(!resource.hasProperty(RDF.type, Omn_resource.Link)){
@@ -681,9 +682,13 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	
 				                        String username = r.getProperty(Omn_service.username).getObject().asLiteral().getString();
 				                        loginService.addProperty((Property)Omn_service.username, username);
-				                        String ip = ipMap.keySet().iterator().next();
-				                        loginService.addProperty((Property)Omn_service.hostname, ipMap.get(ip).getIp());
-				                        ipMap.remove(ip);
+				                        
+				                        //Checking if there is another Floating IP in the Map
+				                        if(ipIterator.hasNext()){
+				                        	String ip = ipIterator.next();
+					                        loginService.addProperty((Property)Omn_service.hostname, ipMap.get(ip).getIp());
+				                        }
+				                        
 				                    	Statement stm2 = new StatementImpl(r, Omn.hasService, loginService);
 	
 					                    updatedInstances.add(stm2);
