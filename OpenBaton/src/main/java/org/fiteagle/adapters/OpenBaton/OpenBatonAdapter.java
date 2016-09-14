@@ -41,9 +41,11 @@ import org.fiteagle.api.core.OntologyModelUtil;
 import org.fiteagle.api.tripletStoreAccessor.TripletStoreAccessor;
 import org.openbaton.catalogue.mano.common.Ip;
 import org.openbaton.catalogue.mano.descriptor.NetworkServiceDescriptor;
+import org.openbaton.catalogue.mano.descriptor.VirtualDeploymentUnit;
 import org.openbaton.catalogue.mano.descriptor.VirtualLinkDescriptor;
 import org.openbaton.catalogue.mano.descriptor.VirtualNetworkFunctionDescriptor;
 import org.openbaton.catalogue.mano.record.NetworkServiceRecord;
+import org.openbaton.catalogue.mano.record.VNFCInstance;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.security.Project;
 
@@ -773,8 +775,19 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    public HashMap<String, Ip> getIpsFromNsr() {
 	    	HashMap<String, Ip> ipMap = new HashMap<>();
 	    	for(VirtualNetworkFunctionRecord v : fivegNSR.getVnfr()){
-	    	Ip ip = v.getVdu().iterator().next().getVnfc_instance().iterator().next().getFloatingIps().iterator().next();
-	    	ipMap.put(v.getName(), ip);
+//	    	Ip ip = v.getVdu().iterator().next().getVnfc_instance().iterator().next().getFloatingIps().iterator().next();
+	    	Iterator<VirtualDeploymentUnit> vduIterator = v.getVdu().iterator();
+	    	while(vduIterator.hasNext()){
+	    		VirtualDeploymentUnit vdu = vduIterator.next();	
+	    		Iterator<VNFCInstance> vnfcIterator = vdu.getVnfc_instance().iterator();
+	    		while(vnfcIterator.hasNext()){
+	    			VNFCInstance vnfcInstance = vnfcIterator.next();
+	    			for(Ip tmpIp : vnfcInstance.getFloatingIps()){
+	    		    	ipMap.put(v.getName(), tmpIp);
+
+	    			}
+	    		}
+	    	}
 	    	}
 	    	
 	    	return ipMap;
