@@ -576,11 +576,12 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	}
 	
 	@Override
-	public void startNSR(Model createdInstances){
+	public void startNSR(Model createdInstances,String topologyUri){
 		Property property = adapterABox.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
         property.addProperty(RDF.type, (RDFNode)OWL.FunctionalProperty);
         try {
-            CreateNSR createNsr = new CreateNSR(createdInstances, property, this.listener,findClient(adminProjectId));
+        	Topology topology = (Topology) this.getInstanceList().get(topologyUri);
+            CreateNSR createNsr = new CreateNSR(createdInstances, property, this.listener,topology.getProjectClient());
             ManagedThreadFactory threadFactory = (ManagedThreadFactory)new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
             Thread createVMThread = threadFactory.newThread((Runnable)createNsr);
             createVMThread.start();

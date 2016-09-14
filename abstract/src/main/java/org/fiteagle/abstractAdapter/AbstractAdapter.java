@@ -3,6 +3,7 @@ package org.fiteagle.abstractAdapter;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import info.openmultinet.ontology.vocabulary.Omn;
 import info.openmultinet.ontology.vocabulary.Omn_lifecycle;
 import info.openmultinet.ontology.vocabulary.OpenBaton;
 
@@ -140,7 +141,7 @@ public abstract class AbstractAdapter {
 	public Model createInstances(Model model) throws ProcessingException,
 			InvalidRequestException {
 		Model createdInstancesModel = ModelFactory.createDefaultModel();
-
+		Resource tmpResource = null;
 		if (getAdapterManagedResources().isEmpty())
 			LOGGER.log(Level.WARNING,
 					"To create an instance, I've to manage some :/");
@@ -149,7 +150,8 @@ public abstract class AbstractAdapter {
 			ResIterator resourceInstanceIterator = model
 					.listSubjectsWithProperty(RDF.type, resource);
 			while (resourceInstanceIterator.hasNext()) {
-				String instanceURI = resourceInstanceIterator.next().getURI();
+				tmpResource = resourceInstanceIterator.next();
+				String instanceURI = tmpResource.getURI();
 				LOGGER.log(Level.INFO, "Creating adapterABox: " + instanceURI);
 				Model createdInstance = createInstance(instanceURI, model);
 				createdInstancesModel.add(createdInstance);
@@ -162,7 +164,10 @@ public abstract class AbstractAdapter {
 			throw new ProcessingException(Response.Status.CONFLICT.name());
 		}
 		if(getAdapterABox().hasProperty(RDF.type, OpenBaton.OpenBatonAdapter)){
-			startNSR(createdInstancesModel);
+			Resource topologyResource = tmpResource.getProperty(Omn.isResourceOf).getObject().asResource();
+			String topologyUri = topologyResource.getURI().toString();			
+			
+			startNSR(createdInstancesModel,topologyUri);
 		}
 
 		return createdInstancesModel;
@@ -331,7 +336,7 @@ public abstract class AbstractAdapter {
 
 	public abstract Resource getAdapterABox();
 	
-	public void startNSR(Model createdInstancesModel){};
+	public void startNSR(Model createdInstancesModel,String topologyUri){};
 
 	public abstract Model getAdapterDescriptionModel();
 
