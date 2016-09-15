@@ -851,7 +851,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	
 	public class CheckForRessources	implements Runnable {
 		Resource threadAdapterABox;
-		Integer counter = 0;
+		Integer counter = 1;
 		
 		public CheckForRessources(Resource tmpAdapterABox) {
 			threadAdapterABox = tmpAdapterABox;
@@ -862,6 +862,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		public void run() {
 			
 			while(!Thread.currentThread().isInterrupted() && this.counter < 10){
+		        LOGGER.log(Level.INFO, "ResourceCheckerThread trying for "+counter + " time to run");
+
 				++counter;
 				adminClient = findClient(adminProjectId);
 				
@@ -892,8 +894,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 								threadAdapterABox.addProperty(Omn_lifecycle.canImplement, newResource);
 								threadAdapterABox.getModel().add(newResource.getModel());
 							}
-			                listener.publishModelUpdate(threadAdapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-					
+							//If everything was successful , update Model and terminate Thread
+							listener.publishModelUpdate(threadAdapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+					        LOGGER.log(Level.INFO, "ResourceCheckerThread was successfull and will be terminated now");
+							Thread.currentThread().interrupt();
 				}catch(Exception e){
 					e.printStackTrace();
 					try {
@@ -905,6 +909,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				}
 				
 			}
+	        LOGGER.log(Level.INFO, "ResourceCheckerThread either reached Limit of 10 failures or was successfull");
+
 
 
 		}
