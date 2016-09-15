@@ -15,6 +15,7 @@ import javax.ejb.PostActivate;
 import javax.enterprise.concurrent.ManagedThreadFactory;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.print.attribute.standard.NumberUpSupported;
 
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.OpenBaton.Model.BenchmarkingTool;
@@ -135,45 +136,60 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	}
 
-//	@PostConstruct
 	public void init() {
-//		openBatonClient.init();
-//		adminClient = new OpenBatonClient(this, adminProjectId);
-		adminClient = findClient(adminProjectId);
+		try {
+            CheckForRessources ressourceCheckerThread = new CheckForRessources(adapterABox);
+            ManagedThreadFactory threadFactory = (ManagedThreadFactory)new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
+            Thread createVMThread = threadFactory.newThread((Runnable)ressourceCheckerThread);
+            createVMThread.start();
+        }
+        catch (NamingException e) {
+            e.printStackTrace();
+        }
 		
-		// TODO CHANGE WHEN DEBUG IS OVER
-		OpenBatonClient initClient = adminClient;
 		
-		// Refresh the adapterABox Model with infos from Database
-		Model newImplementables = TripletStoreAccessor.getResource(adapterABox.getURI());
-		NodeIterator iterator = newImplementables.listObjectsOfProperty(Omn_lifecycle.canImplement);
 		
-		//If Adapter has no "canImplement" Resources check on OpenBaton-Server
-			while(iterator.hasNext()){
-				RDFNode statement = iterator.next();
-				Resource resource = statement.asResource();
-				this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
-				this.adapterABox.getModel().add(resource.getModel());
-			}	
-			
-			try{
-				List<VirtualLinkDescriptor> vnfdList = initClient.getAllVnfDescriptor();
-				for(VirtualLinkDescriptor v : vnfdList){
-					Resource newResource = this.adapterABox.getModel().createResource(Omn.NAMESPACE + v.getName());
-					newResource.addProperty(RDFS.label, v.getName());
-					newResource.addProperty(RDFS.subClassOf, Omn.Resource);
-					newResource.addProperty(Omn_lifecycle.hasID, v.getId());
-					
-					this.adapterABox.addProperty(Omn_lifecycle.canImplement, newResource);
-					this.adapterABox.getModel().add(newResource.getModel());
-				}
-                listener.publishModelUpdate(this.adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-
 		
+		
+		
+		
+		
+		
+//		adminClient = findClient(adminProjectId);
+//		
+//		// TODO CHANGE WHEN DEBUG IS OVER
+//		OpenBatonClient initClient = adminClient;
+//		
+//		// Refresh the adapterABox Model with infos from Database
+//		Model newImplementables = TripletStoreAccessor.getResource(adapterABox.getURI());
+//		NodeIterator iterator = newImplementables.listObjectsOfProperty(Omn_lifecycle.canImplement);
+//		
+//		//If Adapter has no "canImplement" Resources check on OpenBaton-Server
+//			while(iterator.hasNext()){
+//				RDFNode statement = iterator.next();
+//				Resource resource = statement.asResource();
+//				this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
+//				this.adapterABox.getModel().add(resource.getModel());
+//			}	
+//			
+//			try{
+//				List<VirtualLinkDescriptor> vnfdList = initClient.getAllVnfDescriptor();
+//				for(VirtualLinkDescriptor v : vnfdList){
+//					Resource newResource = this.adapterABox.getModel().createResource(Omn.NAMESPACE + v.getName());
+//					newResource.addProperty(RDFS.label, v.getName());
+//					newResource.addProperty(RDFS.subClassOf, Omn.Resource);
+//					newResource.addProperty(Omn_lifecycle.hasID, v.getId());
+//					
+//					this.adapterABox.addProperty(Omn_lifecycle.canImplement, newResource);
+//					this.adapterABox.getModel().add(newResource.getModel());
+//				}
+//                listener.publishModelUpdate(this.adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+//
+//			}catch(Exception e){
+//				e.printStackTrace();
+//			}
+//
+//		
 		
 
 	}
@@ -773,7 +789,9 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    }
 
 	    public HashMap<String, Ip> getIpsFromNsr() {
+	        fivegNSR = client.updateNetworkServiceRecord(fivegNSR);
 	    	HashMap<String, Ip> ipMap = new HashMap<>();
+	    	Integer numberOfVnfrs = fivegNSR.getVnfr().size();
 	    	for(VirtualNetworkFunctionRecord v : fivegNSR.getVnfr()){
 //	    	Ip ip = v.getVdu().iterator().next().getVnfc_instance().iterator().next().getFloatingIps().iterator().next();
 	    	Iterator<VirtualDeploymentUnit> vduIterator = v.getVdu().iterator();
@@ -789,7 +807,17 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    		}
 	    	}
 	    	}
-	    	
+	    	if(ipMap.size() < numberOfVnfrs){
+                LOGGER.log(Level.SEVERE, "Number of FloatingIps smaller than Nodes in the NetworkServiceRecord - Will try again");
+                try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                ipMap = getIpsFromNsr();
+	    	}
+
 	    	return ipMap;
 	    }
 
@@ -820,6 +848,69 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	        return false;
 	    }
 	}
+	
+	public class CheckForRessources	implements Runnable {
+		Resource threadAdapterABox;
+		Integer counter = 0;
+		
+		public CheckForRessources(Resource tmpAdapterABox) {
+			threadAdapterABox = tmpAdapterABox;
+			
+					}
+
+		@Override
+		public void run() {
+			
+			while(!Thread.currentThread().isInterrupted() && this.counter < 10){
+				++counter;
+				adminClient = findClient(adminProjectId);
+				
+				// TODO CHANGE WHEN DEBUG IS OVER
+				OpenBatonClient initClient = adminClient;
+				
+				try{
+					// Refresh the adapterABox Model with infos from Database
+					Model newImplementables = TripletStoreAccessor.getResource(threadAdapterABox.getURI());
+					NodeIterator iterator = newImplementables.listObjectsOfProperty(Omn_lifecycle.canImplement);
+					
+					//If Adapter has no "canImplement" Resources check on OpenBaton-Server
+						while(iterator.hasNext()){
+							RDFNode statement = iterator.next();
+							Resource resource = statement.asResource();
+							threadAdapterABox.addProperty(Omn_lifecycle.canImplement, resource);
+							threadAdapterABox.getModel().add(resource.getModel());
+						}	
+						
+						
+							List<VirtualLinkDescriptor> vnfdList = initClient.getAllVnfDescriptor();
+							for(VirtualLinkDescriptor v : vnfdList){
+								Resource newResource = threadAdapterABox.getModel().createResource(Omn.NAMESPACE + v.getName());
+								newResource.addProperty(RDFS.label, v.getName());
+								newResource.addProperty(RDFS.subClassOf, Omn.Resource);
+								newResource.addProperty(Omn_lifecycle.hasID, v.getId());
+								
+								threadAdapterABox.addProperty(Omn_lifecycle.canImplement, newResource);
+								threadAdapterABox.getModel().add(newResource.getModel());
+							}
+			                listener.publishModelUpdate(threadAdapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+					
+				}catch(Exception e){
+					e.printStackTrace();
+					try {
+						Thread.currentThread().sleep(5000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				
+			}
+
+
+		}
+	
+	}
+	
 	@Override
 	public void deleteInstance(String instanceURI)
 			throws InstanceNotFoundException, InvalidRequestException, ProcessingException {
