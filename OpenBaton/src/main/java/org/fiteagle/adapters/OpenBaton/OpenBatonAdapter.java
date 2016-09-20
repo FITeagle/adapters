@@ -362,6 +362,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 					client = findClient(projectId);
 					topology.setProjectId(projectId);
 					topology.setProjectClient(client);
+					topology.setExperimenterName(experimenterUsername);
 					nsd = client.createLocalNetworkServiceDescriptor();
 					
 					// Add the NSR-Name, Experimenter username und project ID to the related Topology
@@ -599,7 +600,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
         property.addProperty(RDF.type, (RDFNode)OWL.FunctionalProperty);
         try {
         	Topology topology = (Topology) this.getInstanceList().get(topologyUri);
-            CreateNSR createNsr = new CreateNSR(createdInstances, property, this.listener,topology.getProjectClient());
+            CreateNSR createNsr = new CreateNSR(createdInstances, property, this.listener,topology);
             ManagedThreadFactory threadFactory = (ManagedThreadFactory)new InitialContext().lookup("java:jboss/ee/concurrency/factory/default");
             Thread createVMThread = threadFactory.newThread((Runnable)createNsr);
             createVMThread.start();
@@ -620,6 +621,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    private String nsrID;
 	    private int counter;
 	    private OpenBatonAdapterMDBSender parent;
+	    private Topology topology;
 
 	    public CreateNSR(Resource resource, OpenBatonGeneric openBatonGeneric, Property property, OpenBatonAdapterMDBSender parent,OpenBatonClient client) {
 	        this.resource = resource;
@@ -631,13 +633,14 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	        LOGGER.log(Level.SEVERE, "Thread Created");
 	    }
 	    
-	    public CreateNSR(Model model, Property property, OpenBatonAdapterMDBSender parent,OpenBatonClient client) {
+	    public CreateNSR(Model model, Property property, OpenBatonAdapterMDBSender parent,Topology topology) {
 	        this.createdInstances = model;
 	        this.parent = parent;
 //	        this.fiveG = openBatonGeneric;
 	        this.property = property;
-	        this.client = client;
+	        this.client = topology.getProjectClient();
 	        this.counter = 0;
+	        this.topology = topology;
 	        LOGGER.log(Level.SEVERE, "Thread Created");
 	    }
 	    
@@ -698,7 +701,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
 				                        loginService.addProperty((Property)Omn_service.port, "22");
 	
-				                        String username = r.getProperty(Omn_service.username).getObject().asLiteral().getString();
+				                        String username = topology.getExperimenterName();
 				                        loginService.addProperty((Property)Omn_service.username, username);
 				                        
 				                        //Checking if there is another Floating IP in the Map
