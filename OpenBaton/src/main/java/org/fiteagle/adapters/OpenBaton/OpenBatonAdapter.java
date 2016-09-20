@@ -650,6 +650,11 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	        while (!Thread.currentThread().isInterrupted() && this.counter < 10) {
 	            LOGGER.log(Level.SEVERE, "Starting RUN Methode now");
 	            try {
+	            	try{
+	                    client.uploadSshKey(topology.getExperimenterName(), topology.getPublicKey());
+	            	}catch(Exception e){
+	                    LOGGER.log(Level.SEVERE, "Exception in adding Keys to server");
+	            	}
 	                try {
 	                    if (fivegNSR == null) {
 	                    	fivegNSR = client.createNetworkServiceRecord();
@@ -737,7 +742,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    
 		                    String publicKey = topology.getPublicKey();
 		                    String experimenterName = topology.getExperimenterName();
-		                    client.uploadSshKey(experimenterName, publicKey);
+//		                    client.uploadSshKey(experimenterName, publicKey);
 		                    LOGGER.log(Level.SEVERE, "Killing Thread now");
 		                    Thread.currentThread().interrupt();
 	                	}else{
@@ -924,15 +929,19 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	@Override
 	public void deleteInstance(String instanceURI)
 			throws InstanceNotFoundException, InvalidRequestException, ProcessingException {
-		try{
-			OpenBatonClient client = findClient(adminProjectId);
-			client.stopNetworkServiceRecord();
-			client.deleteNetworkServiceDescriptor();	
+		if(instanceList.containsKey(instanceURI)){
+			OpenBatonService generic = (OpenBatonService) instanceList.remove(instanceURI);
+			try{
+				if(generic.getServiceContainer().getTopology() != null){
+					OpenBatonClient client = generic.getServiceContainer().getTopology().getProjectClient();
+					client.stopNetworkServiceRecord();
+					client.deleteNetworkServiceDescriptor();
+				}	
+			}catch(Exception e){
+				
+			}
 			
-		}catch(Exception e){
-			e.printStackTrace();
 		}
-
 	}
 
 	@Override
