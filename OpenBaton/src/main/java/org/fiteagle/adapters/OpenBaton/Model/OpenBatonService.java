@@ -23,6 +23,7 @@ public class OpenBatonService extends OpenBatonGeneric{
 	private ServiceContainer serviceContainer;
 	private String name;
 	private List<String> requires;
+	private Topology topology;
 
 	// private String label;
 
@@ -208,6 +209,14 @@ public class OpenBatonService extends OpenBatonGeneric{
 
 	public List<String> getRequires() {
 		return this.requires;
+	}
+
+	public Topology getTopology() {
+		return topology;
+	}
+
+	public void setTopology(Topology topology) {
+		this.topology = topology;
 	}
 
 }

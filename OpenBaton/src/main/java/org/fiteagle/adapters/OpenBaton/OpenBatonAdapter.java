@@ -512,11 +512,12 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			return this.parseToModel(sc);
 		}
 		else if (resource.hasProperty(RDF.type) && !resource.hasProperty(RDF.type, Omn_resource.Link)) {
-			
+	
 			OpenBatonService fiveg = new OpenBatonService(this, instanceURI);
 			this.getInstanceList().put(instanceURI, fiveg);
 			this.updateInstance(instanceURI, newInstanceModel);
 			client.addVnfdToNsd(resource);
+			fiveg.setTopology(topology);
 			Model model = this.parseToModel(fiveg);
 			return model;
 		}
@@ -589,6 +590,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			OpenBatonGeneric fiveG =  fivegGeneric;
 			fiveG.parseToModel(resource);
 		}
+//		else if (fivegGeneric instanceof OpenBatonService) {
+//			OpenBatonService fiveG =  (OpenBatonService) fivegGeneric;
+//			fiveG.parseToModel(resource);
+//		}
 		if (LOGGER.isLoggable(Level.INFO)) {
 			LOGGER.log(Level.INFO, "CONTENT parse to model: " + resource.getModel().toString());
 		}
