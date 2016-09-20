@@ -3,6 +3,7 @@ package org.fiteagle.adapters.OpenBaton;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -71,6 +72,7 @@ public class OpenBatonClient {
 	private NetworkServiceRecord networkServiceRecord;
 	private HashMap<String,VirtualNetworkFunctionDescriptor> vnfdMap;
 	private List<VirtualNetworkFunctionDescriptor> vnfdList;
+	private HashMap<String,Key> keyMap = new HashMap<>();
 
 
 
@@ -175,13 +177,37 @@ public class OpenBatonClient {
 
 	public Key uploadSshKey(String experimenterName, String publicKey){
 		try {
-			Key key = keyAgent.importKey(experimenterName, publicKey);
-			return key;
+			if(!checkIfPubkeyAllreadyExists(experimenterName)){
+				Key key = keyAgent.importKey(experimenterName, publicKey);
+				keyMap.put(key.getName(), key);
+				return key;
+			}else{
+				return keyMap.get(experimenterName);
+			}
+			
 		} catch (SDKException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
+	}
+	public boolean checkIfPubkeyAllreadyExists(String experimenterName){
+		
+		 try {
+			List<Key> keyList = keyAgent.findAll();
+			for(Key k : keyList){
+				keyMap.put(k.getName(), k);
+			}
+			return keyMap.containsKey(experimenterName);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return false;
 	}
 
 	public NetworkServiceRecord createNsdAndNsr(){

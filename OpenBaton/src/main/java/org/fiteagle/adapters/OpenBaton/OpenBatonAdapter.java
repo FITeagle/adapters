@@ -660,6 +660,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	            	}catch(Exception e){
 	                    LOGGER.log(Level.SEVERE, "Exception in adding Keys to server");
 	            	}
+	            	
 	                try {
 	                    if (fivegNSR == null) {
 	                    	fivegNSR = client.createNsdAndNsr(topology.getExperimenterName());
@@ -676,28 +677,6 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	                	if(resource == null){
 	                		LOGGER.log(Level.SEVERE, "Adding LoginResource to Resource");
 		                    LOGGER.log(Level.SEVERE, "-------------------------------------------");
-//		                    Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
-//	                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-//	                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-//	                        loginService.addProperty((Property)Omn_service.port, "22");
-//
-//	                        String username = resource.getProperty(Omn_service.username).getObject().asLiteral().getString();
-//	                        loginService.addProperty((Property)Omn_service.username, username);
-
-		                    
-//		                    if (OpenBatonAdapter.this.vpnIP == null || OpenBatonAdapter.this.vpnIP.equals("") || OpenBatonAdapter.this.vpnPort == null || OpenBatonAdapter.this.vpnPort.equals("")) {
-//		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-//		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-//		                        loginService.addProperty((Property)Omn_service.username, "home");
-//		                        loginService.addProperty((Property)Omn_service.hostname, "127.0.0.1");
-//		                        loginService.addProperty((Property)Omn_service.port, "22");
-//		                    } else {
-//		                        loginService.addProperty(RDF.type, (RDFNode)Omn_service.LoginService);
-//		                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
-//		                        loginService.addProperty((Property)Omn_service.username, "home");
-//		                        loginService.addProperty((Property)Omn_service.hostname, OpenBatonAdapter.this.vpnIP);
-//		                        loginService.addProperty((Property)Omn_service.port, OpenBatonAdapter.this.vpnPort);
-//		                    }
 		                    
 		                    ResIterator resIterator = createdInstances.listResourcesWithProperty(Omn_lifecycle.hasState);
 		                    Model updatedInstances = ModelFactory.createDefaultModel();
