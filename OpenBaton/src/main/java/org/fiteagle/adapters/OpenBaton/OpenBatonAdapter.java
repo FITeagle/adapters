@@ -363,6 +363,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 					topology.setProjectId(projectId);
 					topology.setProjectClient(client);
 					topology.setExperimenterName(experimenterUsername);
+					topology.setPublicKey(resource.listProperties(Omn_service.publickey).next().getObject().asLiteral().getString());
 					nsd = client.createLocalNetworkServiceDescriptor();
 					
 					// Add the NSR-Name, Experimenter username und project ID to the related Topology
@@ -734,8 +735,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    }
 		                    parent.publishModelUpdate(updatedInstances, UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 		                    
-		                    String publicKey = updatedInstances.listResourcesWithProperty(Omn_service.publickey).next().getProperty(Omn_service.publickey).getObject().asLiteral().getString();
-		                    String experimenterName = updatedInstances.listResourcesWithProperty(Omn_service.username).next().getProperty(Omn_service.username).getObject().asLiteral().getString();
+		                    String publicKey = topology.getPublicKey();
+		                    String experimenterName = topology.getExperimenterName();
 		                    client.uploadSshKey(experimenterName, publicKey);
 		                    LOGGER.log(Level.SEVERE, "Killing Thread now");
 		                    Thread.currentThread().interrupt();

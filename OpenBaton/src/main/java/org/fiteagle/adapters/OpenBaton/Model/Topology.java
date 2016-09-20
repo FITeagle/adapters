@@ -28,6 +28,7 @@ public class Topology extends OpenBatonGeneric {
 	String projectId;
 	OpenBatonClient projectClient;
 	String experimenterName;
+	String publicKey;
 
 	private static final Logger LOGGER = Logger.getLogger(Topology.class
 			.toString());
@@ -212,5 +213,13 @@ public class Topology extends OpenBatonGeneric {
 
 	public void setExperimenterName(String experimenterName) {
 		this.experimenterName = experimenterName;
+	}
+
+	public String getPublicKey() {
+		return publicKey;
+	}
+
+	public void setPublicKey(String publicKey) {
+		this.publicKey = publicKey;
 	}
 }
