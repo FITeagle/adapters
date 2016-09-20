@@ -657,7 +657,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	            	}
 	                try {
 	                    if (fivegNSR == null) {
-	                    	fivegNSR = client.createNetworkServiceRecord();
+	                    	fivegNSR = client.createNsdAndNsr(topology.getExperimenterName());
 	                    }
 	                }
 	                catch (Exception e) {

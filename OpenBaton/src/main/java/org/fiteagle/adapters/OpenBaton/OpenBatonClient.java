@@ -184,7 +184,7 @@ public class OpenBatonClient {
 		return null;
 	}
 
-	public NetworkServiceRecord createNetworkServiceRecord(){
+	public NetworkServiceRecord createNsdAndNsr(){
 
 			createNetworkServiceDescriptor();
 			networkServiceRecord = createNetworkServiceRecord(networkServiceDescriptor.getId());
@@ -192,9 +192,32 @@ public class OpenBatonClient {
 			return networkServiceRecord;
 	}
 	
+	public NetworkServiceRecord createNsdAndNsr(String experimenterKeyName){
+
+		createNetworkServiceDescriptor();
+		networkServiceRecord = createNetworkServiceRecord(networkServiceDescriptor.getId(),experimenterKeyName);
+		
+		return networkServiceRecord;
+}
+	
 	public NetworkServiceRecord createNetworkServiceRecord(String nsdId) {
 		try {
-			networkServiceRecord = nsrAgent.create(nsdId, null, null, null);
+			ArrayList<String> keyArray = new ArrayList<>();
+//			keyArray.add(e)
+			networkServiceRecord = nsrAgent.create(nsdId, null, keyArray , null);
+			return networkServiceRecord;
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public NetworkServiceRecord createNetworkServiceRecord(String nsdId, String experimenterKeyName) {
+		try {
+			ArrayList<String> keyArray = new ArrayList<>();
+			keyArray.add(experimenterKeyName);
+			networkServiceRecord = nsrAgent.create(nsdId, null, keyArray , null);
 			return networkServiceRecord;
 		} catch (SDKException e) {
 			// TODO Auto-generated catch block
