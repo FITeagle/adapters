@@ -937,8 +937,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		if(instanceList.containsKey(instanceURI)){
 			OpenBatonService generic = (OpenBatonService) instanceList.remove(instanceURI);
 			try{
-				if(generic.getServiceContainer().getTopology() != null){
-					OpenBatonClient client = generic.getServiceContainer().getTopology().getProjectClient();
+				if(generic.getTopology() != null){
+					OpenBatonClient client = findClient(generic.getTopology().getProjectId());
 					client.stopNetworkServiceRecord();
 					client.deleteNetworkServiceDescriptor();
 				}	
