@@ -691,8 +691,8 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				                        loginService.addProperty((Property)Omn_service.authentication, "ssh-keys");
 				                        loginService.addProperty((Property)Omn_service.port, "22");
 	
-				                        String username = topology.getExperimenterName();
-				                        loginService.addProperty((Property)Omn_service.username, username);
+//				                        String username = topology.getExperimenterName();
+				                        loginService.addProperty((Property)Omn_service.username, "ubuntu");
 				                        
 				                        //Checking if there is another Floating IP in the Map
 				                        if(ipIterator.hasNext()){
@@ -719,14 +719,9 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			                    
 			                    LOGGER.log(Level.SEVERE, "Added LoginService to Resource");
 			                    
-//			                    updatedInstances.add(r.getModel());
-//			                    parent.publishModelUpdate(r.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 		                    }
 		                    parent.publishModelUpdate(updatedInstances, UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 		                    
-		                    String publicKey = topology.getPublicKey();
-		                    String experimenterName = topology.getExperimenterName();
-//		                    client.uploadSshKey(experimenterName, publicKey);
 		                    LOGGER.log(Level.SEVERE, "Killing Thread now");
 		                    Thread.currentThread().interrupt();
 	                	}else{
