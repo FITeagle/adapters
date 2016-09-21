@@ -631,6 +631,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    private OpenBatonAdapterMDBSender parent;
 	    private Topology topology;
 	    private Model topologyModel;
+	    private int ipCounter = 0;
 
 	    public CreateNSR(Resource resource, OpenBatonGeneric openBatonGeneric, Property property, OpenBatonAdapterMDBSender parent,OpenBatonClient client) {
 	        this.resource = resource;
@@ -811,8 +812,41 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    }
 
 	    public HashMap<String, Ip> getIpsFromNsr() {
-	        fivegNSR = client.updateNetworkServiceRecord(fivegNSR);
 	    	HashMap<String, Ip> ipMap = new HashMap<>();
+
+	    	if(ipCounter < 10){
+		    	++ipCounter;
+		        fivegNSR = client.updateNetworkServiceRecord(fivegNSR);
+		    	Integer numberOfVnfrs = fivegNSR.getVnfr().size();
+		    	for(VirtualNetworkFunctionRecord v : fivegNSR.getVnfr()){
+//		    	Ip ip = v.getVdu().iterator().next().getVnfc_instance().iterator().next().getFloatingIps().iterator().next();
+		    	Iterator<VirtualDeploymentUnit> vduIterator = v.getVdu().iterator();
+		    	while(vduIterator.hasNext()){
+		    		VirtualDeploymentUnit vdu = vduIterator.next();	
+		    		Iterator<VNFCInstance> vnfcIterator = vdu.getVnfc_instance().iterator();
+		    		while(vnfcIterator.hasNext()){
+		    			VNFCInstance vnfcInstance = vnfcIterator.next();
+		    			for(Ip tmpIp : vnfcInstance.getFloatingIps()){
+		    		    	ipMap.put(v.getName(), tmpIp);
+
+		    			}
+		    		}
+		    	}
+		    	}
+		    	if(ipMap.size() < numberOfVnfrs){
+	                LOGGER.log(Level.SEVERE, "Number of FloatingIps smaller than Nodes in the NetworkServiceRecord - Will try again");
+	                try {
+						Thread.sleep(3000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	                ipMap = getIpsFromNsr();
+		    	}
+
+		    	return ipMap;
+	    	}else{
+	    		fivegNSR = client.updateNetworkServiceRecord(fivegNSR);
 	    	Integer numberOfVnfrs = fivegNSR.getVnfr().size();
 	    	for(VirtualNetworkFunctionRecord v : fivegNSR.getVnfr()){
 //	    	Ip ip = v.getVdu().iterator().next().getVnfc_instance().iterator().next().getFloatingIps().iterator().next();
@@ -829,18 +863,9 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    		}
 	    	}
 	    	}
-	    	if(ipMap.size() < numberOfVnfrs){
-                LOGGER.log(Level.SEVERE, "Number of FloatingIps smaller than Nodes in the NetworkServiceRecord - Will try again");
-                try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-                ipMap = getIpsFromNsr();
 	    	}
-
 	    	return ipMap;
+
 	    }
 
 	    
