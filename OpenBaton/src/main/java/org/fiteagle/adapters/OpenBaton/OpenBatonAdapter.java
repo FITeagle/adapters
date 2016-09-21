@@ -50,6 +50,8 @@ import org.openbaton.catalogue.mano.record.VNFCInstance;
 import org.openbaton.catalogue.mano.record.VirtualNetworkFunctionRecord;
 import org.openbaton.catalogue.security.Project;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.hp.hpl.jena.ontology.Ontology;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -628,6 +630,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	    private int counter;
 	    private OpenBatonAdapterMDBSender parent;
 	    private Topology topology;
+	    private Model topologyModel;
 
 	    public CreateNSR(Resource resource, OpenBatonGeneric openBatonGeneric, Property property, OpenBatonAdapterMDBSender parent,OpenBatonClient client) {
 	        this.resource = resource;
@@ -656,10 +659,30 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	            LOGGER.log(Level.SEVERE, "Starting RUN Methode now");
 	            try {
 	            	try{
+//		            	BiMap<String,OpenBatonGeneric> s = HashBiMap.create(instanceList);
+		            	
+	            		for(String s : instanceList.keySet()){
+	            			OpenBatonGeneric o = instanceList.get(s);
+	            			if(o instanceof Topology){
+	            			if(o.equals(topology)){
+		            			topologyModel = TripletStoreAccessor.getResource(s);
+		            			break;	
+	            			}
+	            			}
+	            			
+	            		}
+		            	
+	            	}catch(Exception e){
+	                    LOGGER.log(Level.SEVERE, "Exception finding topology");
+	            	}
+	            	
+	            	
+	            	try{
 	                    client.uploadSshKey(topology.getExperimenterName(), topology.getPublicKey());
 	            	}catch(Exception e){
 	                    LOGGER.log(Level.SEVERE, "Exception in adding Keys to server");
 	            	}
+	            	
 	            	
 	                try {
 	                    if (fivegNSR == null) {
@@ -693,6 +716,17 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	
 //				                        String username = topology.getExperimenterName();
 				                        loginService.addProperty((Property)Omn_service.username, "ubuntu");
+				                        
+				                        
+				                        //==============================
+				                        /** 	topologyModel.getAllResources()
+				                        *		getOriginalOpenBatonIdOfResource
+				                        *		getvnfrVonOriginalerId
+				                        *		check if name of vnfr == ipMap(Keyset)
+				                        *		if true -> loginService(ip)
+				                        **/
+				                        //==============================
+				                        
 				                        
 				                        //Checking if there is another Floating IP in the Map
 				                        if(ipIterator.hasNext()){

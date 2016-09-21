@@ -346,34 +346,7 @@ public class OpenBatonClient {
 		}		
 	}
 
-	public NetworkServiceDescriptor createNetworkServiceDescriptor(OpenBatonService openBaton) {
-		checkRequestor();
-		NetworkServiceDescriptor networkDescriptor = new NetworkServiceDescriptor();
-		networkDescriptor.setEnabled(true);
-		networkDescriptor.setVendor("fokus");
-		if (openBaton != null) {
-			networkDescriptor.setVersion(openBaton.getServiceContainer().getVersion());
-			networkDescriptor.setName(openBaton.getServiceContainer().getContainerName());
-			networkDescriptor.setVnfd(null);
-		} else {
-			LOGGER.log(Level.WARNING, "Creating NetworkServiceDescriptor with null Object - Using default values");
-			networkDescriptor.setVersion("0.1");
-			networkDescriptor.setName("defaultName-" + new Random().nextInt());
-			networkDescriptor.setVnfd(null);
-		}
 
-		try {
-			NetworkServiceDescriptor createdNSD = nfvoRequestor.getNetworkServiceDescriptorAgent()
-					.create(networkDescriptor);
-			setNetworkServiceDescriptor(createdNSD);
-			return createdNSD;
-		} catch (SDKException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-
-	}
 	
 	public String createNewProjectOnServer(){
 		checkRequestor();
@@ -436,42 +409,7 @@ public class OpenBatonClient {
 		return null;
 	}
 
-	/**
-	 * 
-	 * @param openBaton
-	 * @param vnfSet
-	 * @return A created NSD with the created and linked Instances of the given
-	 *         vnfSet
-	 */
-	@Beta
-	public NetworkServiceDescriptor createNetworkServiceDescriptor(OpenBatonService openBaton,
-			Set<VirtualNetworkFunctionDescriptor> vnfSet) {
-		checkRequestor();
-		NetworkServiceDescriptor networkDescriptor = new NetworkServiceDescriptor();
-		networkDescriptor.setEnabled(true);
-		networkDescriptor.setVendor("fokus");
-		if (openBaton != null) {
-			networkDescriptor.setVersion(openBaton.getServiceContainer().getVersion());
-			networkDescriptor.setName(openBaton.getServiceContainer().getContainerName());
-			networkDescriptor.setVnfd(null);
-		} else {
-			LOGGER.log(Level.WARNING, "Creating NetworkServiceDescriptor with null Object - Using default values");
-			networkDescriptor.setVersion("0.1");
-			networkDescriptor.setName("defaultName-" + new Random().nextInt());
-			networkDescriptor.setVnfd(vnfSet);
-		}
-
-		try {
-			NetworkServiceDescriptor createdNSD = nfvoRequestor.getNetworkServiceDescriptorAgent()
-					.create(networkDescriptor);
-			return createdNSD;
-		} catch (SDKException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-
-	}
+	
 
 	public void stopNetworkServiceRecord(){
 		try {
@@ -1130,6 +1068,72 @@ public class OpenBatonClient {
 		tmpVnfd.setVirtual_link(mme.getVirtualLinkSet());
 
 		return tmpVnfd;
+	}
+	
+	public NetworkServiceDescriptor createNetworkServiceDescriptor(OpenBatonService openBaton) {
+		checkRequestor();
+		NetworkServiceDescriptor networkDescriptor = new NetworkServiceDescriptor();
+		networkDescriptor.setEnabled(true);
+		networkDescriptor.setVendor("fokus");
+		if (openBaton != null) {
+			networkDescriptor.setVersion(openBaton.getServiceContainer().getVersion());
+			networkDescriptor.setName(openBaton.getServiceContainer().getContainerName());
+			networkDescriptor.setVnfd(null);
+		} else {
+			LOGGER.log(Level.WARNING, "Creating NetworkServiceDescriptor with null Object - Using default values");
+			networkDescriptor.setVersion("0.1");
+			networkDescriptor.setName("defaultName-" + new Random().nextInt());
+			networkDescriptor.setVnfd(null);
+		}
+
+		try {
+			NetworkServiceDescriptor createdNSD = nfvoRequestor.getNetworkServiceDescriptorAgent()
+					.create(networkDescriptor);
+			setNetworkServiceDescriptor(createdNSD);
+			return createdNSD;
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+	
+	/**
+	 * 
+	 * @param openBaton
+	 * @param vnfSet
+	 * @return A created NSD with the created and linked Instances of the given
+	 *         vnfSet
+	 */
+	@Beta
+	public NetworkServiceDescriptor createNetworkServiceDescriptor(OpenBatonService openBaton,
+			Set<VirtualNetworkFunctionDescriptor> vnfSet) {
+		checkRequestor();
+		NetworkServiceDescriptor networkDescriptor = new NetworkServiceDescriptor();
+		networkDescriptor.setEnabled(true);
+		networkDescriptor.setVendor("fokus");
+		if (openBaton != null) {
+			networkDescriptor.setVersion(openBaton.getServiceContainer().getVersion());
+			networkDescriptor.setName(openBaton.getServiceContainer().getContainerName());
+			networkDescriptor.setVnfd(null);
+		} else {
+			LOGGER.log(Level.WARNING, "Creating NetworkServiceDescriptor with null Object - Using default values");
+			networkDescriptor.setVersion("0.1");
+			networkDescriptor.setName("defaultName-" + new Random().nextInt());
+			networkDescriptor.setVnfd(vnfSet);
+		}
+
+		try {
+			NetworkServiceDescriptor createdNSD = nfvoRequestor.getNetworkServiceDescriptorAgent()
+					.create(networkDescriptor);
+			return createdNSD;
+		} catch (SDKException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 	
 	
