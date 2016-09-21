@@ -721,14 +721,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				                        loginService.addProperty((Property)Omn_service.username, "ubuntu");
 				                        
 				                        
-				                        //==============================
-				                        /** 	topologyModel.getAllResources()
-				                        *		getOriginalOpenBatonIdOfResource
-				                        *		getvnfrVonOriginalerId
-				                        *		check if name of vnfr == ipMap(Keyset)
-				                        *		if true -> loginService(ip)
-				                        **/
-				                        //==============================
+				                        
 				                        String vnfdName = client.parseComponentIdToResourceURL(actualModel.getResource(r.getURI()));
 				                        VirtualNetworkFunctionDescriptor vnfd = client.getVnfdMap().get(vnfdName);
 				                        
