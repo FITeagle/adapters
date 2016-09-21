@@ -659,23 +659,25 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	        while (!Thread.currentThread().isInterrupted() && this.counter < 10) {
 	            LOGGER.log(Level.SEVERE, "Starting RUN Methode now");
 	            try {
-	            	try{
-//		            	BiMap<String,OpenBatonGeneric> s = HashBiMap.create(instanceList);
-		            	
-	            		for(String s : instanceList.keySet()){
-	            			OpenBatonGeneric o = instanceList.get(s);
-	            			if(o instanceof Topology){
-	            			if(o.equals(topology)){
-		            			topologyModel = TripletStoreAccessor.getResource(s);
-		            			break;	
-	            			}
-	            			}
-	            			
-	            		}
-		            	
-	            	}catch(Exception e){
-	                    LOGGER.log(Level.SEVERE, "Exception finding topology");
-	            	}
+	            	
+	            	// TO DELETE
+//	            	try{
+////		            	BiMap<String,OpenBatonGeneric> s = HashBiMap.create(instanceList);
+//		            	
+//	            		for(String s : instanceList.keySet()){
+//	            			OpenBatonGeneric o = instanceList.get(s);
+//	            			if(o instanceof Topology){
+//	            			if(o.equals(topology)){
+//		            			topologyModel = TripletStoreAccessor.getResource(s);
+//		            			break;	
+//	            			}
+//	            			}
+//	            			
+//	            		}
+//		            	
+//	            	}catch(Exception e){
+//	                    LOGGER.log(Level.SEVERE, "Exception finding topology");
+//	            	}
 	            	
 	            	
 	            	try{
@@ -707,7 +709,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		                    HashMap<String,Ip> ipMap = getIpsFromNsr();
 		                    Iterator<String> ipIterator = ipMap.keySet().iterator();
 		                    for (Resource r : resIterator.toList()){
-
+		                    	Model actualModel = TripletStoreAccessor.getResource(r.getURI());
 		                    	if(!r.hasProperty(RDF.type, Omn_resource.Link)){
 			                    	try{
 			                        	Resource loginService = createdInstances.createResource(OntologyModelUtil.getResourceNamespace() + "LoginService" + UUID.randomUUID().toString());
@@ -727,7 +729,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				                        *		if true -> loginService(ip)
 				                        **/
 				                        //==============================
-				                        String vnfdName = client.parseComponentIdToResourceURL(null);
+				                        String vnfdName = client.parseComponentIdToResourceURL(actualModel.getResource(r.getURI()));
 				                        VirtualNetworkFunctionDescriptor vnfd = client.getVnfdMap().get(vnfdName);
 				                        
 				                        if(vnfd.getName() != null){
