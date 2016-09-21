@@ -727,13 +727,24 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 				                        *		if true -> loginService(ip)
 				                        **/
 				                        //==============================
+				                        String vnfdName = client.parseComponentIdToResourceURL(null);
+				                        VirtualNetworkFunctionDescriptor vnfd = client.getVnfdMap().get(vnfdName);
+				                        
+				                        if(vnfd.getName() != null){
+					                        Ip nodeIp = ipMap.get(vnfd.getName());
+					                        if(nodeIp != null){
+						                        loginService.addProperty((Property)Omn_service.hostname, nodeIp.getIp());
+					                        }
+				                        }
+				                        
+				                        
 				                        
 				                        
 				                        //Checking if there is another Floating IP in the Map
-				                        if(ipIterator.hasNext()){
-				                        	String ip = ipIterator.next();
-					                        loginService.addProperty((Property)Omn_service.hostname, ipMap.get(ip).getIp());
-				                        }
+//				                        if(ipIterator.hasNext()){
+//				                        	String ip = ipIterator.next();
+//					                        loginService.addProperty((Property)Omn_service.hostname, ipMap.get(ip).getIp());
+//				                        }
 				                        
 				                    	Statement stm2 = new StatementImpl(r, Omn.hasService, loginService);
 	

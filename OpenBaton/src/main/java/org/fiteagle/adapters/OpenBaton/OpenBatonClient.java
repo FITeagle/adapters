@@ -652,6 +652,25 @@ public class OpenBatonClient {
 		}
 //		updateNetworkServiceDescriptor(networkServiceDescriptor, networkServiceDescriptor.getId());
 	}
+	
+	public String parseComponentIdToResourceURL(Resource resource){
+		String[] tmpArray; 
+		
+		Statement tmpStatement = resource.getProperty(Omn_lifecycle.hasComponentID);
+		String componentURI = null;
+		if(tmpStatement.getObject().isLiteral()) {componentURI = tmpStatement.getObject().asLiteral().getString();}
+		if(tmpStatement.getObject().isResource()) {componentURI = tmpStatement.getObject().asResource().getURI();}
+		
+		String componentName = null;
+		tmpArray = componentURI.split("\\+");
+		componentName = tmpArray[tmpArray.length-1];
+		
+//		Model vnfd = TripletStoreAccessor.getResource(Omn.NS + componentName);
+		String componentURL = Omn.NS + componentName;
+		return componentURL;
+	}
+	
+	
 	public VirtualNetworkFunctionDescriptor getVirtualNetworkFunctionDescriptor(String id){
 		try {
 			return vnfdAgent.findById(id);
@@ -1134,6 +1153,14 @@ public class OpenBatonClient {
 		}
 		return null;
 
+	}
+
+	public HashMap<String, VirtualNetworkFunctionDescriptor> getVnfdMap() {
+		return vnfdMap;
+	}
+
+	public void setVnfdMap(HashMap<String, VirtualNetworkFunctionDescriptor> vnfdMap) {
+		this.vnfdMap = vnfdMap;
 	}
 	
 	
