@@ -1140,6 +1140,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 //		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(adapterABox.getLocalName()+"/" +fileName);
 		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(Omn.NAMESPACE  +fileName);
 		resourceToCreate.addProperty(Omn_lifecycle.hasID,id);
+		resourceToCreate.addProperty(Omn_service.username,findClient(projectId).getUsername());
 		resourceToCreate.addProperty(RDFS.label,fileName);
 		resourceToCreate.addProperty(RDFS.subClassOf, Omn.Resource);
 		resourceToCreate.addProperty(Omn.isAttributeOf, projectId);

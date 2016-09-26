@@ -1162,6 +1162,10 @@ public class OpenBatonClient {
 	public void setVnfdMap(HashMap<String, VirtualNetworkFunctionDescriptor> vnfdMap) {
 		this.vnfdMap = vnfdMap;
 	}
+
+	public String getUsername() {
+		return username;
+	}
 	
 	
 
