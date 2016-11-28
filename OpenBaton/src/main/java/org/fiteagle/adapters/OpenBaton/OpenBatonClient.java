@@ -80,6 +80,7 @@ public class OpenBatonClient {
 	private VirtualNetworkFunctionDescriptorRestAgent vnfdAgent;
 	private NetworkServiceDescriptorRestAgent nsdAgent;
 	private NetworkServiceRecordRestAgent nsrAgent;
+
 	private KeyAgent keyAgent;
 
 	public OpenBatonClient(OpenBatonAdapter openBatonAdapter, String projectId) {
@@ -166,7 +167,8 @@ public class OpenBatonClient {
 			keyAgent = nfvoRequestor.getKeyAgent();
 			keyAgent.setProjectId(projectId);
 
-		}		
+		}
+
 	}
 	
 	private void checkRequestorWithoutId() {
@@ -521,6 +523,16 @@ public class OpenBatonClient {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public boolean deleteVNFPackage(String id) {
+		checkRequestor();
+		try {
+			vnfdAgent.delete(id);
+			return true;
+		} catch (SDKException e) {
+			return false;
+		}
 	}
 
 

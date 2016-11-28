@@ -17,6 +17,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.print.attribute.standard.NumberUpSupported;
 
+import info.openmultinet.ontology.exceptions.InvalidModelException;
 import org.fiteagle.abstractAdapter.AbstractAdapter;
 import org.fiteagle.adapters.OpenBaton.Model.BenchmarkingTool;
 import org.fiteagle.adapters.OpenBaton.Model.Control;
@@ -148,51 +149,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
         catch (NamingException e) {
             e.printStackTrace();
         }
-		
-		
-		
-		
-		
-		
-		
-		
-		
-//		adminClient = findClient(adminProjectId);
-//		
-//		// TODO CHANGE WHEN DEBUG IS OVER
-//		OpenBatonClient initClient = adminClient;
-//		
-//		// Refresh the adapterABox Model with infos from Database
-//		Model newImplementables = TripletStoreAccessor.getResource(adapterABox.getURI());
-//		NodeIterator iterator = newImplementables.listObjectsOfProperty(Omn_lifecycle.canImplement);
-//		
-//		//If Adapter has no "canImplement" Resources check on OpenBaton-Server
-//			while(iterator.hasNext()){
-//				RDFNode statement = iterator.next();
-//				Resource resource = statement.asResource();
-//				this.adapterABox.addProperty(Omn_lifecycle.canImplement, resource);
-//				this.adapterABox.getModel().add(resource.getModel());
-//			}	
-//			
-//			try{
-//				List<VirtualLinkDescriptor> vnfdList = initClient.getAllVnfDescriptor();
-//				for(VirtualLinkDescriptor v : vnfdList){
-//					Resource newResource = this.adapterABox.getModel().createResource(Omn.NAMESPACE + v.getName());
-//					newResource.addProperty(RDFS.label, v.getName());
-//					newResource.addProperty(RDFS.subClassOf, Omn.Resource);
-//					newResource.addProperty(Omn_lifecycle.hasID, v.getId());
-//					
-//					this.adapterABox.addProperty(Omn_lifecycle.canImplement, newResource);
-//					this.adapterABox.getModel().add(newResource.getModel());
-//				}
-//                listener.publishModelUpdate(this.adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-//
-//			}catch(Exception e){
-//				e.printStackTrace();
-//			}
-//
-//		
-		
+
 
 	}
 
@@ -249,14 +206,6 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 			topologyUri = object.asResource().getURI();
 		}
 
-		// Uncomment this method to make creation at OpenSDNCore automatically
-		// occur upon SFA provision call
-		// try {
-		// HelperMethods.createTopologyAtOpenSDNCore(this, "FiveGAdapter-1",
-		// topologyUri, 10);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
 
 		return createdInstancesModel;
 	}
@@ -602,7 +551,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		return resource.getModel();
 	}
 	
-	@Override
+	
 	public void startNSR(Model createdInstances,String topologyUri){
 		Property property = adapterABox.getModel().createProperty(Omn_lifecycle.hasState.getNameSpace(), Omn_lifecycle.hasState.getLocalName());
         property.addProperty(RDF.type, (RDFNode)OWL.FunctionalProperty);
@@ -616,6 +565,32 @@ public final class OpenBatonAdapter extends AbstractAdapter {
         catch (NamingException e) {
             e.printStackTrace();
         }
+	}
+
+	public boolean deleteVNFPackage(String id, String projectId) {
+		OpenBatonClient client = findClient(projectId);
+		boolean succ =  client.deleteVNFPackage(id);
+		if(succ){
+			succ = deleteVNFFromDatabase(id);
+
+		}
+		return succ;
+
+	}
+
+	private boolean deleteVNFFromDatabase(String id) {
+		Resource resourceToDelete = ModelFactory.createDefaultModel().createResource();
+		resourceToDelete.addProperty(Omn_lifecycle.hasID,id);
+		try {
+			TripletStoreAccessor.deleteVNF(resourceToDelete.getModel());
+			return true;
+		} catch (TripletStoreAccessor.ResourceRepositoryException e) {
+			e.printStackTrace();
+			return false;
+		} catch (InvalidModelException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 
@@ -660,25 +635,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	            LOGGER.log(Level.SEVERE, "Starting RUN Methode now");
 	            try {
 	            	
-	            	// TO DELETE
-//	            	try{
-////		            	BiMap<String,OpenBatonGeneric> s = HashBiMap.create(instanceList);
-//		            	
-//	            		for(String s : instanceList.keySet()){
-//	            			OpenBatonGeneric o = instanceList.get(s);
-//	            			if(o instanceof Topology){
-//	            			if(o.equals(topology)){
-//		            			topologyModel = TripletStoreAccessor.getResource(s);
-//		            			break;	
-//	            			}
-//	            			}
-//	            			
-//	            		}
-//		            	
-//	            	}catch(Exception e){
-//	                    LOGGER.log(Level.SEVERE, "Exception finding topology");
-//	            	}
-	            	
+
 	            	
 	            	try{
 	                    client.uploadSshKey(topology.getExperimenterName(), topology.getPublicKey());
@@ -1137,7 +1094,6 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 
 	public void addUploadedPackageToDatabase(String id, String fileName,String projectId) {
 		
-//		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(adapterABox.getLocalName()+"/" +fileName);
 		Resource resourceToCreate = ModelFactory.createDefaultModel().createResource(Omn.NAMESPACE  +fileName);
 		resourceToCreate.addProperty(Omn_lifecycle.hasID,id);
 		resourceToCreate.addProperty(Omn_service.username,findClient(projectId).getUsername());
@@ -1176,23 +1132,6 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	}
 	
 	
-//	public void createNewVnfPackage() {
-//  String mmeID;
-//  MME mme = new MME(this, "http://TEST.OPENBATON.MME");
-//  this.createdDebugMME = this.admin.createMME(mme);
-//  this.debugString = mmeID = this.createdDebugMME.getId();
-//  Model newmModel = ModelFactory.createDefaultModel();
-//  Resource newResource = newmModel.createResource("http://TEST.OPENBATON.RESOURCE");
-//  newResource.addProperty(RDF.type, OWL.Class);
-//  newResource.addProperty((Property)Omn_lifecycle.hasID, mmeID);
-//  newResource.addProperty(RDFS.subClassOf, Omn.Resource);
-//  this.adapterABox.addProperty((Property)Omn_lifecycle.canImplement, newResource);
-//  this.adapterABox.getModel().add(newResource.getModel());
-//  ResIterator propIterator = this.adapterTBox.listSubjectsWithProperty(RDFS.domain, newResource);
-//  while (propIterator.hasNext()) {
-//      Property property = this.adapterTBox.getProperty(((Resource)propIterator.next()).getURI());
-//  }
-//  this.listener.publishModelUpdate(this.adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-//}
+
 
 }
