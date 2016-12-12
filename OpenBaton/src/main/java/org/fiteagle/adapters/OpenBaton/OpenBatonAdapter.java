@@ -1100,9 +1100,10 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 		resourceToCreate.addProperty(RDFS.label,fileName);
 		resourceToCreate.addProperty(RDFS.subClassOf, Omn.Resource);
 		resourceToCreate.addProperty(Omn.isAttributeOf, projectId);
-		adapterABox.addProperty(Omn_lifecycle.canImplement, resourceToCreate);
+		resourceToCreate.getModel().add(adapterABox, Omn_lifecycle.canImplement, resourceToCreate);
+		//adapterABox.addProperty(Omn_lifecycle.canImplement, resourceToCreate);
         listener.publishModelUpdate(resourceToCreate.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
-        listener.publishModelUpdate(adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
+     //   listener.publishModelUpdate(adapterABox.getModel(), UUID.randomUUID().toString(), "INFORM", "TARGET_ORCHESTRATOR");
 
 	}
 
