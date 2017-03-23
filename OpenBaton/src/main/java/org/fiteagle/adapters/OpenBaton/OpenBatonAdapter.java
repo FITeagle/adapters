@@ -759,7 +759,7 @@ public final class OpenBatonAdapter extends AbstractAdapter {
 	            catch (Exception e) {
 	                ++this.counter;
 	                e.printStackTrace();
-	                if (this.counter >= 40) {
+	                if (this.counter >= 300) {
 	                    try {
 	                        Thread.currentThread();
 	                        Thread.sleep(30000);
